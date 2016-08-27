@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+group = 'org.ethereumclassic'
+version = '0.1-SNAPSHOT'
+
+targetCompatibility = '1.7'
+sourceCompatibility = '1.7'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+
+dependencies {
+
+    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
+    testCompile "org.objenesis:objenesis:2.2"
+    testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
+    testCompile "org.spockframework:spock-core:$spockVersion"
+
+}
