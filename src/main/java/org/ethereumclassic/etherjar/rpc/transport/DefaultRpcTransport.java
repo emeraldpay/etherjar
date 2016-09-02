@@ -1,16 +1,16 @@
 package org.ethereumclassic.etherjar.rpc.transport;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.ethereumclassic.etherjar.rpc.JacksonRpcConverter;
+import org.ethereumclassic.etherjar.rpc.RpcConverter;
+import org.ethereumclassic.etherjar.rpc.json.RequestJson;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -29,28 +29,23 @@ public class DefaultRpcTransport implements RpcTransport {
     private int callSequence = 1;
 
     private URI host;
-    private ObjectMapper objectMapper;
     private ExecutorService executorService;
+    private RpcConverter rpcConverter;
 
-    public DefaultRpcTransport(URI host, ObjectMapper objectMapper, ExecutorService executorService) {
+    public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService) {
         this.host = host;
-        this.objectMapper = objectMapper;
+        this.rpcConverter = rpcConverter;
         this.executorService = executorService;
     }
 
     public DefaultRpcTransport(URI host) {
         this.host = host;
-        this.objectMapper = createJsonMapper();
+        this.rpcConverter = createRpcConverter();
         this.executorService = createExecutor();
     }
 
-    public ObjectMapper createJsonMapper() {
-        SimpleModule module = new SimpleModule("EtherJar");
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(module);
-        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper;
+    private RpcConverter createRpcConverter() {
+        return new JacksonRpcConverter();
     }
 
     public ExecutorService createExecutor() {
@@ -69,7 +64,7 @@ public class DefaultRpcTransport implements RpcTransport {
 
     public <T> T executeSync(String method, List params, Class<T> resultType) throws IOException {
         HttpClient httpclient = HttpClients.createDefault();
-        String json = toJson(buildCall(method, params));
+        String json = rpcConverter.toJson(buildCall(method, params));
         RequestBuilder requestBuilder = RequestBuilder.create("POST")
             .setUri(host)
             .addHeader("Content-Type", "application/json")
@@ -78,8 +73,8 @@ public class DefaultRpcTransport implements RpcTransport {
         if (rcpResponse.getStatusLine().getStatusCode() != 200) {
             throw new IOException("Server returned error response: " + rcpResponse.getStatusLine().getStatusCode());
         }
-        ResponseJson responseJson = objectMapper.readValue(rcpResponse.getEntity().getContent(), ResponseJson.class);
-        return (T) responseJson.getResult();
+        InputStream content = rcpResponse.getEntity().getContent();
+        return rpcConverter.fromJson(content, resultType);
     }
 
     public RequestJson buildCall(String method, List<Object> params) {
@@ -89,66 +84,4 @@ public class DefaultRpcTransport implements RpcTransport {
         return new RequestJson(method, params, callSequence++);
     }
 
-    public String toJson(RequestJson request) throws JsonProcessingException {
-        return objectMapper.writer().writeValueAsString(request);
-    }
-
-    public static class RequestJson {
-        private String jsonrpc = "2.0";
-        private String method;
-        private List<Object> params;
-        private int id;
-
-        public RequestJson(String method, List<Object> params, int id) {
-            this.method = method;
-            this.params = params;
-            this.id = id;
-        }
-
-        public String getJsonrpc() {
-            return jsonrpc;
-        }
-
-        public String getMethod() {
-            return method;
-        }
-
-        public List<Object> getParams() {
-            return params;
-        }
-
-        public int getId() {
-            return id;
-        }
-    }
-
-    public static class ResponseJson<X> {
-        private String jsonrpc = "2.0";
-        private int id;
-        private X result;
-
-        public String getJsonrpc() {
-            return jsonrpc;
-        }
-
-        public void setJsonrpc(String jsonrpc) {
-            this.jsonrpc = jsonrpc;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public X getResult() {
-            return result;
-        }
-
-        public void setResult(X result) {
-            this.result = result;
-        }
-    }
 }

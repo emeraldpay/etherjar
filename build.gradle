@@ -18,6 +18,8 @@ dependencies {
 
     compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    compile "org.apache.httpcomponents:httpmime:$httpClientVersion"
+    compile "org.apache.httpcomponents:httpclient:$httpClientVersion"
 
     testCompile "org.objenesis:objenesis:2.2"
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"

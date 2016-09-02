@@ -20,6 +20,10 @@ public class HexValue {
         this.value = value;
     }
 
+    public static HexValue from(long value) {
+        return new HexValue(BigInteger.valueOf(value).toByteArray());
+    }
+
     /**
      * Parse ethereum hex representation for a number. Value should start with 0x
      *
@@ -50,7 +54,7 @@ public class HexValue {
         }
     }
 
-    public String toString() {
+    public String toHex() {
         final char[] hex = new char[value.length * 2 + 2];
         hex[0] = '0';
         hex[1] = 'x';
@@ -59,6 +63,10 @@ public class HexValue {
             hex[j++] = HEX_DIGITS[0x0F & value[i]];
         }
         return new String(hex);
+    }
+
+    public String toString() {
+        return toHex();
     }
 
     public byte[] getBytes() {
