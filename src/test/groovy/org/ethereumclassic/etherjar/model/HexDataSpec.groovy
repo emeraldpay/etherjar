@@ -7,12 +7,12 @@ import spock.lang.Specification
  * @since
  * @author Igor Artamonov
  */
-class HexValueSpec extends Specification {
+class HexDataSpec extends Specification {
 
     def "Parse hex"() {
         expect:
-        new HexValue(hex).bytes == bytes
-        new HexValue(hex).toString() == hex.toLowerCase()
+        new HexData(hex).bytes == bytes
+        new HexData(hex).toString() == hex.toLowerCase()
         where:
         hex         | bytes
         '0xff'      | [-1] as byte[]
@@ -29,22 +29,22 @@ class HexValueSpec extends Specification {
 
     def "Throw on invalid value"() {
         when:
-        new HexValue('')
+        new HexData('')
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new HexValue(null as byte[])
+        new HexData(null as byte[])
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new HexValue(null as String)
+        new HexData(null as String)
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new HexValue('0xfake')
+        new HexData('0xfake')
         then:
         thrown(IllegalArgumentException)
     }

@@ -5,7 +5,7 @@ package org.ethereumclassic.etherjar.model;
  *
  * @author Igor Artamonov
  */
-public class TransactionId extends HexValue {
+public class TransactionId extends HexData {
 
     public static final int SIZE_BYTES = 32;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;

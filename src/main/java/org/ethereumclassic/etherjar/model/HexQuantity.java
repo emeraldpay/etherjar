@@ -7,11 +7,11 @@ import java.math.BigInteger;
  *
  * @author Igor Artamonov
  */
-public class HexNumber {
+public class HexQuantity {
 
     private BigInteger value;
 
-    public HexNumber(BigInteger value) {
+    public HexQuantity(BigInteger value) {
         this.value = value;
     }
 
@@ -20,12 +20,12 @@ public class HexNumber {
      * @param value hex value with '0x' prefix
      * @return corresponding BigInteger
      */
-    public static HexNumber parse(String value) {
-        return new HexNumber(new BigInteger(value.substring(2), 16));
+    public static HexQuantity parse(String value) {
+        return new HexQuantity(new BigInteger(value.substring(2), 16));
     }
 
-    public static HexNumber valueOf(long value) {
-        return new HexNumber(BigInteger.valueOf(value));
+    public static HexQuantity valueOf(long value) {
+        return new HexQuantity(BigInteger.valueOf(value));
     }
 
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.ethereumclassic.etherjar.model.HexNumber;
+import org.ethereumclassic.etherjar.model.HexQuantity;
 
 import java.io.IOException;
 
@@ -22,13 +22,13 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
     public TransactionJson deserialize(JsonNode node) {
         TransactionJson tx = new TransactionJson();
         tx.setHash(getTxHash(node, "hash"));
-        tx.setNonce(getHexNumber(node, "nonce").getValue().longValue());
-        tx.setBlockHash(getHexValue(node, "blockHash"));
-        HexNumber blockNumber = getHexNumber(node, "blockNumber");
+        tx.setNonce(getQuantity(node, "nonce").getValue().longValue());
+        tx.setBlockHash(getData(node, "blockHash"));
+        HexQuantity blockNumber = getQuantity(node, "blockNumber");
         if (blockNumber != null)  {
             tx.setBlockNumber(blockNumber.getValue().intValue());
         }
-        HexNumber txIndex = getHexNumber(node, "transactionIndex");
+        HexQuantity txIndex = getQuantity(node, "transactionIndex");
         if (txIndex != null) {
             tx.setTransactionIndex(txIndex.getValue().intValue());
         }
@@ -36,8 +36,8 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
         tx.setTo(getAddress(node, "to"));
         tx.setValue(getWei(node, "value"));
         tx.setGasPrice(getWei(node, "gasPrice"));
-        tx.setGas(getHexNumber(node, "gas"));
-        tx.setInput(getHexValue(node, "input"));
+        tx.setGas(getQuantity(node, "gas"));
+        tx.setInput(getData(node, "input"));
 
         return tx;
     }

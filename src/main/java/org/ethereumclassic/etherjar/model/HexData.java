@@ -7,21 +7,21 @@ import java.math.BigInteger;
  *
  * @author Igor Artamonov
  */
-public class HexValue {
+public class HexData {
 
     private static final char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
     private final byte[] value;
 
-    public HexValue(byte[] value) {
+    public HexData(byte[] value) {
         if (value == null) {
             throw new IllegalArgumentException("Empty value");
         }
         this.value = value;
     }
 
-    public static HexValue from(long value) {
-        return new HexValue(BigInteger.valueOf(value).toByteArray());
+    public static HexData from(long value) {
+        return new HexData(BigInteger.valueOf(value).toByteArray());
     }
 
     /**
@@ -29,7 +29,7 @@ public class HexValue {
      *
      * @param value hex value
      */
-    public HexValue(String value) {
+    public HexData(String value) {
         if (value == null || value.length() == 0) {
             throw new IllegalArgumentException("Empty value");
         }

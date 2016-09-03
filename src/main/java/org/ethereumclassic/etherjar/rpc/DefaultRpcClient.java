@@ -1,7 +1,7 @@
 package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.Address;
-import org.ethereumclassic.etherjar.model.HexNumber;
+import org.ethereumclassic.etherjar.model.HexQuantity;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
@@ -61,14 +61,14 @@ public class DefaultRpcClient implements RpcClient {
         @Override
         public Future<Wei> getBalance(Address address, Integer block) throws IOException {
             Future<String> resp = transport.execute("eth_getBalance",
-                Arrays.asList(address.toHex(), HexNumber.valueOf(block)),
+                Arrays.asList(address.toHex(), HexQuantity.valueOf(block)),
                 String.class);
             return extractor.extractWei(resp);
         }
 
         public Future<BlockJson> getBlockByNumber(int blockNumber) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByNumber",
-                Collections.singletonList(HexNumber.valueOf(blockNumber).toHex()),
+                Collections.singletonList(HexQuantity.valueOf(blockNumber).toHex()),
                 BlockJson.class);
             return resp;
         }

@@ -3,11 +3,8 @@ package org.ethereumclassic.etherjar.rpc.json;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.ethereumclassic.etherjar.model.Address;
-import org.ethereumclassic.etherjar.model.HexNumber;
-import org.ethereumclassic.etherjar.model.HexValue;
+import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.TransactionId;
 
 import java.io.IOException;
@@ -27,9 +24,9 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         BlockJson blockJson = new BlockJson();
 
         JsonNode node = jp.readValueAsTree();
-        blockJson.setNumber(getHexNumber(node, "number").getValue().intValue());
-        blockJson.setHash(getHexValue(node, "hash"));
-        blockJson.setTimestamp(new Date(getHexNumber(node, "timestamp").getValue().longValue() * 1000L));
+        blockJson.setNumber(getQuantity(node, "number").getValue().intValue());
+        blockJson.setHash(getData(node, "hash"));
+        blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").getValue().longValue() * 1000L));
 
         List txes = new ArrayList();
         for (JsonNode tx: node.get("transactions")) {
@@ -41,19 +38,19 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         }
         blockJson.setTransactions(txes);
 
-        blockJson.setParentHash(getHexValue(node, "parentHash"));
-        blockJson.setSha3Uncles(getHexValue(node, "sha3Uncles"));
+        blockJson.setParentHash(getData(node, "parentHash"));
+        blockJson.setSha3Uncles(getData(node, "sha3Uncles"));
         blockJson.setMiner(getAddress(node, "miner"));
-        blockJson.setDifficulty(getHexNumber(node, "difficulty"));
-        blockJson.setTotalDifficulty(getHexNumber(node, "totalDifficulty"));
+        blockJson.setDifficulty(getQuantity(node, "difficulty"));
+        blockJson.setTotalDifficulty(getQuantity(node, "totalDifficulty"));
         blockJson.setSize(node.get("size").longValue());
-        blockJson.setGasLimit(getHexNumber(node, "gasLimit"));
-        blockJson.setGasUsed(getHexNumber(node, "gasUsed"));
-        blockJson.setExtraData(getHexValue(node, "extraData"));
+        blockJson.setGasLimit(getQuantity(node, "gasLimit"));
+        blockJson.setGasUsed(getQuantity(node, "gasUsed"));
+        blockJson.setExtraData(getData(node, "extraData"));
 
-        List<HexValue> uncles = new ArrayList<>();
+        List<HexData> uncles = new ArrayList<>();
         for (JsonNode tx: node.get("uncles")) {
-            uncles.add(new HexValue(tx.textValue()));
+            uncles.add(new HexData(tx.textValue()));
         }
         blockJson.setUncles(uncles);
 

@@ -5,7 +5,7 @@ package org.ethereumclassic.etherjar.model;
  *
  * @author Igor Artamonov
  */
-public class Address extends HexValue {
+public class Address extends HexData {
 
     public static final int SIZE_BYTES = 20;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;

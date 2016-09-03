@@ -21,7 +21,7 @@ public class Wei {
     }
 
     public Wei(String value) {
-        this.value = HexNumber.parse(value).getValue();
+        this.value = HexQuantity.parse(value).getValue();
     }
 
     /**

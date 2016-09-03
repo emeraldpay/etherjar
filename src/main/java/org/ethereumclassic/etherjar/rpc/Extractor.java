@@ -1,6 +1,6 @@
 package org.ethereumclassic.etherjar.rpc;
 
-import org.ethereumclassic.etherjar.model.HexNumber;
+import org.ethereumclassic.etherjar.model.HexQuantity;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.Function;
 import org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.FutureMap;
@@ -17,7 +17,7 @@ public class Extractor {
         return new FutureMap<>(result, new Function<String, BigInteger>() {
             @Override
             public BigInteger apply(String value) {
-                return HexNumber.parse(value).getValue();
+                return HexQuantity.parse(value).getValue();
             }
         });
     }
@@ -26,7 +26,7 @@ public class Extractor {
         return new FutureMap<>(result, new Function<String, Integer>() {
             @Override
             public Integer apply(String value) {
-                BigInteger parsed = HexNumber.parse(value).getValue();
+                BigInteger parsed = HexQuantity.parse(value).getValue();
                 return parsed != null ? parsed.intValue() : null;
             }
         });

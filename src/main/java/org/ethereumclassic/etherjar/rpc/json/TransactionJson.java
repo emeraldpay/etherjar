@@ -22,7 +22,7 @@ public class TransactionJson {
     /**
      * 32 Bytes - hash of the block where this transaction was in. null when its pending.
      */
-    private HexValue blockHash;
+    private HexData blockHash;
 
     /**
      * block number where this transaction was in. null when its pending.
@@ -57,12 +57,12 @@ public class TransactionJson {
     /**
      * gas provided by the sender.
      */
-    private HexNumber gas;
+    private HexQuantity gas;
 
     /**
      * the data send along with the transaction.
      */
-    private HexValue input;
+    private HexData input;
 
     public TransactionId getHash() {
         return hash;
@@ -80,11 +80,11 @@ public class TransactionJson {
         this.nonce = nonce;
     }
 
-    public HexValue getBlockHash() {
+    public HexData getBlockHash() {
         return blockHash;
     }
 
-    public void setBlockHash(HexValue blockHash) {
+    public void setBlockHash(HexData blockHash) {
         this.blockHash = blockHash;
     }
 
@@ -136,19 +136,19 @@ public class TransactionJson {
         this.gasPrice = gasPrice;
     }
 
-    public HexNumber getGas() {
+    public HexQuantity getGas() {
         return gas;
     }
 
-    public void setGas(HexNumber gas) {
+    public void setGas(HexQuantity gas) {
         this.gas = gas;
     }
 
-    public HexValue getInput() {
+    public HexData getInput() {
         return input;
     }
 
-    public void setInput(HexValue input) {
+    public void setInput(HexData input) {
         this.input = input;
     }
 }

@@ -1,6 +1,5 @@
 package org.ethereumclassic.etherjar.rpc
 
-import org.ethereumclassic.etherjar.model.HexValue
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson

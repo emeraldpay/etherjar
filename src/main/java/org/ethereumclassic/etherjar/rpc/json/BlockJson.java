@@ -2,8 +2,8 @@ package org.ethereumclassic.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.ethereumclassic.etherjar.model.Address;
-import org.ethereumclassic.etherjar.model.HexNumber;
-import org.ethereumclassic.etherjar.model.HexValue;
+import org.ethereumclassic.etherjar.model.HexData;
+import org.ethereumclassic.etherjar.model.HexQuantity;
 import org.ethereumclassic.etherjar.model.TransactionId;
 
 import java.util.Date;
@@ -25,22 +25,22 @@ public class BlockJson<T> {
     /**
      * 32 Bytes - hash of the block. null when its pending block.
      */
-    private HexValue hash;
+    private HexData hash;
 
     /**
      * 32 Bytes - hash of the parent block.
      */
-    private HexValue parentHash;
+    private HexData parentHash;
 
     /**
      * SHA3 of the uncles data in the block.
      */
-    private HexValue sha3Uncles;
+    private HexData sha3Uncles;
 
     /**
      * the bloom filter for the logs of the block. null when its pending block.
      */
-    private HexValue logsBloom;
+    private HexData logsBloom;
 
     /**
      * the root of the transaction trie of the block.
@@ -50,12 +50,12 @@ public class BlockJson<T> {
     /**
      * the root of the final state trie of the block.
      */
-    private HexValue stateRoot;
+    private HexData stateRoot;
 
     /**
      * the root of the receipts trie of the block.
      */
-    private HexValue receiptsRoot;
+    private HexData receiptsRoot;
 
     /**
      * the address of the beneficiary to whom the mining rewards were given.
@@ -65,17 +65,17 @@ public class BlockJson<T> {
     /**
      * the difficulty for this block.
      */
-    private HexNumber difficulty;
+    private HexQuantity difficulty;
 
     /**
      * total difficulty of the chain until this block.
      */
-    private HexNumber totalDifficulty;
+    private HexQuantity totalDifficulty;
 
     /**
      * the "extra data" field of this block.
      */
-    private HexValue extraData;
+    private HexData extraData;
 
     /**
      * the size of this block in bytes.
@@ -85,12 +85,12 @@ public class BlockJson<T> {
     /**
      * the maximum gas allowed in this block.
      */
-    private HexNumber gasLimit;
+    private HexQuantity gasLimit;
 
     /**
      * the total used gas by all transactions in this block.
      */
-    private HexNumber gasUsed;
+    private HexQuantity gasUsed;
 
     /**
      * when the block was collated
@@ -100,14 +100,14 @@ public class BlockJson<T> {
     /**
      * List of transaction objects, or 32 Bytes transaction hashes depending on the last given parameter.
      *
-     * HexValue or TransactionJson
+     * HexData or TransactionJson
      */
     private List<T> transactions;
 
     /**
      * list of uncle hashes.
      */
-    private List<HexValue> uncles;
+    private List<HexData> uncles;
 
     public Integer getNumber() {
         return number;
@@ -117,35 +117,35 @@ public class BlockJson<T> {
         this.number = number;
     }
 
-    public HexValue getHash() {
+    public HexData getHash() {
         return hash;
     }
 
-    public void setHash(HexValue hash) {
+    public void setHash(HexData hash) {
         this.hash = hash;
     }
 
-    public HexValue getParentHash() {
+    public HexData getParentHash() {
         return parentHash;
     }
 
-    public void setParentHash(HexValue parentHash) {
+    public void setParentHash(HexData parentHash) {
         this.parentHash = parentHash;
     }
 
-    public HexValue getSha3Uncles() {
+    public HexData getSha3Uncles() {
         return sha3Uncles;
     }
 
-    public void setSha3Uncles(HexValue sha3Uncles) {
+    public void setSha3Uncles(HexData sha3Uncles) {
         this.sha3Uncles = sha3Uncles;
     }
 
-    public HexValue getLogsBloom() {
+    public HexData getLogsBloom() {
         return logsBloom;
     }
 
-    public void setLogsBloom(HexValue logsBloom) {
+    public void setLogsBloom(HexData logsBloom) {
         this.logsBloom = logsBloom;
     }
 
@@ -157,19 +157,19 @@ public class BlockJson<T> {
         this.transactionsRoot = transactionsRoot;
     }
 
-    public HexValue getStateRoot() {
+    public HexData getStateRoot() {
         return stateRoot;
     }
 
-    public void setStateRoot(HexValue stateRoot) {
+    public void setStateRoot(HexData stateRoot) {
         this.stateRoot = stateRoot;
     }
 
-    public HexValue getReceiptsRoot() {
+    public HexData getReceiptsRoot() {
         return receiptsRoot;
     }
 
-    public void setReceiptsRoot(HexValue receiptsRoot) {
+    public void setReceiptsRoot(HexData receiptsRoot) {
         this.receiptsRoot = receiptsRoot;
     }
 
@@ -181,27 +181,27 @@ public class BlockJson<T> {
         this.miner = miner;
     }
 
-    public HexNumber getDifficulty() {
+    public HexQuantity getDifficulty() {
         return difficulty;
     }
 
-    public void setDifficulty(HexNumber difficulty) {
+    public void setDifficulty(HexQuantity difficulty) {
         this.difficulty = difficulty;
     }
 
-    public HexNumber getTotalDifficulty() {
+    public HexQuantity getTotalDifficulty() {
         return totalDifficulty;
     }
 
-    public void setTotalDifficulty(HexNumber totalDifficulty) {
+    public void setTotalDifficulty(HexQuantity totalDifficulty) {
         this.totalDifficulty = totalDifficulty;
     }
 
-    public HexValue getExtraData() {
+    public HexData getExtraData() {
         return extraData;
     }
 
-    public void setExtraData(HexValue extraData) {
+    public void setExtraData(HexData extraData) {
         this.extraData = extraData;
     }
 
@@ -213,19 +213,19 @@ public class BlockJson<T> {
         this.size = size;
     }
 
-    public HexNumber getGasLimit() {
+    public HexQuantity getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(HexNumber gasLimit) {
+    public void setGasLimit(HexQuantity gasLimit) {
         this.gasLimit = gasLimit;
     }
 
-    public HexNumber getGasUsed() {
+    public HexQuantity getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(HexNumber gasUsed) {
+    public void setGasUsed(HexQuantity gasUsed) {
         this.gasUsed = gasUsed;
     }
 
@@ -245,11 +245,11 @@ public class BlockJson<T> {
         this.transactions = transactions;
     }
 
-    public List<HexValue> getUncles() {
+    public List<HexData> getUncles() {
         return uncles;
     }
 
-    public void setUncles(List<HexValue> uncles) {
+    public void setUncles(List<HexData> uncles) {
         this.uncles = uncles;
     }
 }
