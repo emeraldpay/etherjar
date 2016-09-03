@@ -38,6 +38,9 @@ public class TransactionId extends HexValue {
      * @return TransactionId
      */
     public static TransactionId from(String value) {
+        if (value == null) {
+            return null;
+        }
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Tx length: " + value.length());
         }

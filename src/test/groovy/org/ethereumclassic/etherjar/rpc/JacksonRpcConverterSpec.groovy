@@ -1,7 +1,9 @@
 package org.ethereumclassic.etherjar.rpc
 
 import org.ethereumclassic.etherjar.model.HexValue
+import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
+import org.ethereumclassic.etherjar.rpc.json.TransactionJson
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
@@ -49,7 +51,7 @@ class JacksonRpcConverterSpec extends Specification {
         when:
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
         then:
-        act instanceof BlockJson<HexValue>
+        act instanceof BlockJson<TransactionId>
         act.number == 1920000
         act.hash.toHex() == '0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f'
         sdf.format(act.timestamp) == '2016-07-20 13:20:39 +0000'
@@ -67,6 +69,63 @@ class JacksonRpcConverterSpec extends Specification {
         act.gasLimit.value.longValue() == 4712384L
         act.gasUsed.value.longValue() == 84000L
         act.extraData.toHex() == '0xe4b883e5bda9e7a59ee4bb99e9b1bc'
+    }
+
+    def "Parse block 1920000 with transactions"() {
+        setup:
+        //http://gastracker.io/block/1920000
+        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920000-full.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, BlockJson)
+        then:
+        act instanceof BlockJson<TransactionJson>
+        act.number == 1920000
+        act.hash.toHex() == '0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f'
+
+        act.transactions.size() == 4
+        act.transactions*.blockHash*.toHex().unique() == ['0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f']
+        act.transactions*.blockNumber.unique() == [1920000]
+
+        act.transactions[0] instanceof TransactionJson
+        act.transactions[0].hash.toHex() == '0x6f75b64d9364b71b43cde81a889f95df72e6be004b28477f9083ed0ee471a7f9'
+        act.transactions[0].from.toHex() == '0x6ebeb2af2e734fbba2b58c5b922628af442527ce'
+        act.transactions[0].to.toHex() == '0x53d284357ec70ce289d6d64134dfac8e511c8a3d'
+        act.transactions[0].gas.value == 21000
+        act.transactions[0].gasPrice.value == new BigInteger('04a817c800', 16)
+        act.transactions[0].input == null
+        act.transactions[0].nonce == 1
+        act.transactions[0].transactionIndex == 0
+        act.transactions[0].value.value == new BigInteger('8b6cfa3afc058000', 16)
+
+        act.transactions[1].hash.toHex() == '0x50d8156ee48d01b56cb17b6cb2ac8f29e1bf565be0e604b2d8ffb2fb50a0f611'
+        act.transactions[1].from.toHex() == '0xee62a6740b3069781fc0ed138e94dcaa89f8eb05'
+        act.transactions[1].to.toHex() == '0x53d284357ec70ce289d6d64134dfac8e511c8a3d'
+        act.transactions[1].gas.value == 21000
+        act.transactions[1].gasPrice.value == new BigInteger('04a817c800', 16)
+        act.transactions[1].input == null
+        act.transactions[1].nonce == 1
+        act.transactions[1].transactionIndex == 1
+        act.transactions[1].value.value == new BigInteger('0116db7272d6d94000', 16)
+
+        act.transactions[2].hash.toHex() == '0x4677a93807b73a0875d3a292eacb450d0af0d6f0eec6f283f8ad927ec539a17b'
+        act.transactions[2].from.toHex() == '0x57ec8ef62a9af59b9fbbc6d7dba05516558f5018'
+        act.transactions[2].to.toHex() == '0x53d284357ec70ce289d6d64134dfac8e511c8a3d'
+        act.transactions[2].gas.value == 21000
+        act.transactions[2].gasPrice.value == new BigInteger('04a817c800', 16)
+        act.transactions[2].input == null
+        act.transactions[2].nonce == 1
+        act.transactions[2].transactionIndex == 2
+        act.transactions[2].value.value == new BigInteger('14da2c24e0d37014', 16)
+
+        act.transactions[3].hash.toHex() == '0x2a5177e6d6cea40594c7d4b0115dcd087443be3ec2fa81db3c21946a5e51cea9'
+        act.transactions[3].from.toHex() == '0x80a103beced8a6854a7a82ac2d48cdab0eb21cc0'
+        act.transactions[3].to.toHex() == '0x53d284357ec70ce289d6d64134dfac8e511c8a3d'
+        act.transactions[3].gas.value == 21000
+        act.transactions[3].gasPrice.value == new BigInteger('04a817c800', 16)
+        act.transactions[3].input == null
+        act.transactions[3].nonce == 1
+        act.transactions[3].transactionIndex == 3
+        act.transactions[3].value.value == new BigInteger('0e301365046d5000', 16)
     }
 
     def "Parse block 1920001"() {
