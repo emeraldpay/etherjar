@@ -177,4 +177,57 @@ class JacksonRpcConverterSpec extends Specification {
         act.extraData.toHex() == '0xd98301040a844765746887676f312e362e328777696e646f7773'
     }
 
+    def "Parse tx 0x1e694e"() {
+        setup:
+        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("tx/0x1e694e.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+        then:
+        act.hash.toHex() == '0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc'
+        act.blockNumber == 2007232
+        act.blockHash.toHex() == '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        act.from.toHex() == '0x72d61152f6c0c0e57c1fe2b0343a5eac055ff56e'
+        act.to == null
+        act.gas.value.longValue() == 3000000
+        act.gasPrice.value.longValue() == 20000000000
+        act.input.bytes.length == 7153
+        act.value.value == BigInteger.ZERO
+        act.nonce == 1
+    }
+
+    def "Parse tx 0x847149"() {
+        setup:
+        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("tx/0x847149.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+        then:
+        act.hash.toHex() == '0x8471497131d77305416c760ebfed2b6d653c2066c51dac58c6551dcc7dfb3350'
+        act.blockNumber == 1720231
+        act.blockHash.toHex() == '0x2c83b485b4e9211e2296b4cafd4f19f7dcb16c24430c187d37e6d93f8fd4a802'
+        act.from.toHex() == '0x969837498944ae1dc0dcac2d0c65634c88729b2d'
+        act.to.toHex() == '0xc0ee9db1a9e07ca63e4ff0d5fb6f86bf68d47b89'
+        act.gas.value.longValue() == 4712388
+        act.gasPrice.value.longValue() == 27000000000
+        act.input.bytes.length == 4
+        act.value.toString() == '102.5666 ether'
+        act.nonce == 259L
+    }
+
+    def "Parse tx 0x19442f"() {
+        setup:
+        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("tx/0x19442f.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+        then:
+        act.hash.toHex() == '0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31'
+        act.blockNumber == 1720231
+        act.blockHash.toHex() == '0x2c83b485b4e9211e2296b4cafd4f19f7dcb16c24430c187d37e6d93f8fd4a802'
+        act.from.toHex() == '0xed059bc543141c8c93031d545079b3da0233b27f'
+        act.to.toHex() == '0x8b3b3b624c3c0397d3da8fd861512393d51dcbac'
+        act.gas.value.longValue() == 250000
+        act.gasPrice.value.longValue() == 24085501424
+        act.input.bytes.length == 4
+        act.value.value.longValue() == 0
+        act.nonce == 15524L
+    }
 }
