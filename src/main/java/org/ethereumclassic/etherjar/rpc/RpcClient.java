@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.Address;
+import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
@@ -23,9 +24,8 @@ public interface RpcClient {
         public Future<Wei> getBalance(Address address, BlockTag block) throws IOException;
         public Future<Wei> getBalance(Address address, Integer block) throws IOException;
 
-        public Future<BlockJson> getBlockByNumber(int blockNumber) throws IOException;
-
-//    public void getBlockByHash();
+        public Future<BlockJson> getBlock(int blockNumber, boolean includeTransactions) throws IOException;
+        public Future<BlockJson> getBlock(HexData hash, boolean includeTransactions) throws IOException;
 //
 
 //    public void getTransactionCount();

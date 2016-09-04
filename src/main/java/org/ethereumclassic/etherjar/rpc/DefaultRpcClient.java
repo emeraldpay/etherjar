@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.Address;
+import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.HexQuantity;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
@@ -66,9 +67,15 @@ public class DefaultRpcClient implements RpcClient {
             return extractor.extractWei(resp);
         }
 
-        public Future<BlockJson> getBlockByNumber(int blockNumber) throws IOException {
+        public Future<BlockJson> getBlock(int blockNumber, boolean includeTransactions) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByNumber",
-                Collections.singletonList(HexQuantity.from(blockNumber).toHex()),
+                Arrays.asList(HexQuantity.from(blockNumber).toHex(), includeTransactions),
+                BlockJson.class);
+            return resp;
+        }
+        public Future<BlockJson> getBlock(HexData hash, boolean includeTransactions) throws IOException {
+            Future<BlockJson> resp = transport.execute("eth_getBlockByHash",
+                Arrays.asList(hash.toHex(), includeTransactions),
                 BlockJson.class);
             return resp;
         }
