@@ -20,6 +20,16 @@ public class HexData {
         this.value = value;
     }
 
+    public HexData(byte[] value, int size) {
+        if (value == null) {
+            throw new IllegalArgumentException("Empty value");
+        }
+        if (value.length != size) {
+            throw new IllegalArgumentException("Invalid data size: " + value.length);
+        }
+        this.value = value;
+    }
+
     public static HexData from(long value) {
         return new HexData(BigInteger.valueOf(value).toByteArray());
     }
@@ -29,7 +39,7 @@ public class HexData {
      *
      * @param value hex value
      */
-    public HexData(String value) {
+    public static HexData from(String value) {
         if (value == null || value.length() == 0) {
             throw new IllegalArgumentException("Empty value");
         }
@@ -42,15 +52,16 @@ public class HexData {
             int valueLength = value.length() / 2;
 
             if (bytes.length == valueLength) {
-                this.value = bytes;
+                return new HexData(bytes);
             } else {
-                this.value = new byte[valueLength];
+                byte[] buf = new byte[valueLength];
                 // for values like 0xffffff it produces extra 0 byte in the beginning, we need to skip it
-                int pos = bytes.length > this.value.length ? bytes.length - this.value.length : 0;
-                System.arraycopy(bytes, pos, this.value, this.value.length - bytes.length + pos, bytes.length - pos);
+                int pos = bytes.length > buf.length ? bytes.length - buf.length : 0;
+                System.arraycopy(bytes, pos, buf, buf.length - bytes.length + pos, bytes.length - pos);
+                return new HexData(buf);
             }
         } else {
-            this.value = new byte[0];
+            return new HexData(new byte[0]);
         }
     }
 

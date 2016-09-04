@@ -20,11 +20,11 @@ public class HexQuantity {
      * @param value hex value with '0x' prefix
      * @return corresponding BigInteger
      */
-    public static HexQuantity parse(String value) {
+    public static HexQuantity from(String value) {
         return new HexQuantity(new BigInteger(value.substring(2), 16));
     }
 
-    public static HexQuantity valueOf(long value) {
+    public static HexQuantity from(long value) {
         return new HexQuantity(BigInteger.valueOf(value));
     }
 

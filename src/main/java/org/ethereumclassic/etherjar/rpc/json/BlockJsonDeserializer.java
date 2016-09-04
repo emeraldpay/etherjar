@@ -50,7 +50,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
         List<HexData> uncles = new ArrayList<>();
         for (JsonNode tx: node.get("uncles")) {
-            uncles.add(new HexData(tx.textValue()));
+            uncles.add(HexData.from(tx.textValue()));
         }
         blockJson.setUncles(uncles);
 

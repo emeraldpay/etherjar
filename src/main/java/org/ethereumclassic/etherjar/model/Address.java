@@ -11,10 +11,7 @@ public class Address extends HexData {
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
     private Address(byte[] bytes) {
-        super(bytes);
-    }
-    private Address(String hex) {
-        super(hex);
+        super(bytes, SIZE_BYTES);
     }
 
     public static Address from(byte[] value) {
@@ -34,6 +31,6 @@ public class Address extends HexData {
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Address length: " + value.length());
         }
-        return new Address(value);
+        return new Address(HexData.from(value).getBytes());
     }
 }

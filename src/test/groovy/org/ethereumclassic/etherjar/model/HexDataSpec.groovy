@@ -11,8 +11,8 @@ class HexDataSpec extends Specification {
 
     def "Parse hex"() {
         expect:
-        new HexData(hex).bytes == bytes
-        new HexData(hex).toString() == hex.toLowerCase()
+        HexData.from(hex).bytes == bytes
+        HexData.from(hex).toString() == hex.toLowerCase()
         where:
         hex         | bytes
         '0xff'      | [-1] as byte[]
@@ -29,7 +29,7 @@ class HexDataSpec extends Specification {
 
     def "Throw on invalid value"() {
         when:
-        new HexData('')
+        HexData.from('')
         then:
         thrown(IllegalArgumentException)
 
@@ -39,12 +39,12 @@ class HexDataSpec extends Specification {
         thrown(IllegalArgumentException)
 
         when:
-        new HexData(null as String)
+        HexData.from(null as String)
         then:
         thrown(IllegalArgumentException)
 
         when:
-        new HexData('0xfake')
+        HexData.from('0xfake')
         then:
         thrown(IllegalArgumentException)
     }

@@ -11,11 +11,7 @@ public class TransactionId extends HexData {
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
     protected TransactionId(byte[] value) {
-        super(value);
-    }
-
-    protected TransactionId(String value) {
-        super(value);
+        super(value, SIZE_BYTES);
     }
 
     /**
@@ -44,6 +40,6 @@ public class TransactionId extends HexData {
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Tx length: " + value.length());
         }
-        return new TransactionId(value);
+        return new TransactionId(HexData.from(value).getBytes());
     }
 }

@@ -26,13 +26,13 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
     protected HexData getData(JsonNode node, String name) {
         String value = getHexString(node, name);
         if (value == null) return null;
-        return new HexData(value);
+        return HexData.from(value);
     }
 
     protected HexQuantity getQuantity(JsonNode node, String name) {
         String value = getHexString(node, name);
         if (value == null) return null;
-        return HexQuantity.parse(value);
+        return HexQuantity.from(value);
     }
 
     protected Address getAddress(JsonNode node, String name) {

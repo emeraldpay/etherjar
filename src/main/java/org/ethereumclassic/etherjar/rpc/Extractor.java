@@ -17,7 +17,7 @@ public class Extractor {
         return new FutureMap<>(result, new Function<String, BigInteger>() {
             @Override
             public BigInteger apply(String value) {
-                return HexQuantity.parse(value).getValue();
+                return HexQuantity.from(value).getValue();
             }
         });
     }
@@ -26,7 +26,7 @@ public class Extractor {
         return new FutureMap<>(result, new Function<String, Integer>() {
             @Override
             public Integer apply(String value) {
-                BigInteger parsed = HexQuantity.parse(value).getValue();
+                BigInteger parsed = HexQuantity.from(value).getValue();
                 return parsed != null ? parsed.intValue() : null;
             }
         });

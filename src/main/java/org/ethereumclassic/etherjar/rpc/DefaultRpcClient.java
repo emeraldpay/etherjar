@@ -61,14 +61,14 @@ public class DefaultRpcClient implements RpcClient {
         @Override
         public Future<Wei> getBalance(Address address, Integer block) throws IOException {
             Future<String> resp = transport.execute("eth_getBalance",
-                Arrays.asList(address.toHex(), HexQuantity.valueOf(block)),
+                Arrays.asList(address.toHex(), HexQuantity.from(block)),
                 String.class);
             return extractor.extractWei(resp);
         }
 
         public Future<BlockJson> getBlockByNumber(int blockNumber) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByNumber",
-                Collections.singletonList(HexQuantity.valueOf(blockNumber).toHex()),
+                Collections.singletonList(HexQuantity.from(blockNumber).toHex()),
                 BlockJson.class);
             return resp;
         }
