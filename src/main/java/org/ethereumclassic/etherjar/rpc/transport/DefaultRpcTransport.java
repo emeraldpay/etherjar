@@ -32,16 +32,27 @@ public class DefaultRpcTransport implements RpcTransport {
     private ExecutorService executorService;
     private RpcConverter rpcConverter;
 
+    private HttpClient httpclient;
+
+    public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService, HttpClient httpClient) {
+        this.host = host;
+        this.rpcConverter = rpcConverter;
+        this.executorService = executorService;
+        httpclient = httpClient;
+    }
+
     public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService) {
         this.host = host;
         this.rpcConverter = rpcConverter;
         this.executorService = executorService;
+        httpclient = HttpClients.createDefault();
     }
 
     public DefaultRpcTransport(URI host) {
         this.host = host;
         this.rpcConverter = createRpcConverter();
         this.executorService = createExecutor();
+        httpclient = HttpClients.createDefault();
     }
 
     private RpcConverter createRpcConverter() {
@@ -63,7 +74,6 @@ public class DefaultRpcTransport implements RpcTransport {
     }
 
     public <T> T executeSync(String method, List params, Class<T> resultType) throws IOException {
-        HttpClient httpclient = HttpClients.createDefault();
         String json = rpcConverter.toJson(buildCall(method, params));
         RequestBuilder requestBuilder = RequestBuilder.create("POST")
             .setUri(host)
