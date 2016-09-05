@@ -2,9 +2,11 @@ package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.Address;
 import org.ethereumclassic.etherjar.model.HexData;
+import org.ethereumclassic.etherjar.model.TransactionId;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
+import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -26,7 +28,11 @@ public interface RpcClient {
 
         public Future<BlockJson> getBlock(int blockNumber, boolean includeTransactions) throws IOException;
         public Future<BlockJson> getBlock(HexData hash, boolean includeTransactions) throws IOException;
-//
+
+        public Future<TransactionJson> getTransaction(TransactionId hash) throws IOException;
+        public Future<TransactionJson> getTransaction(HexData block, int index) throws IOException;;
+        public Future<TransactionJson> getTransaction(int block, int index) throws IOException;;
+
 
 //    public void getTransactionCount();
 //
@@ -39,12 +45,6 @@ public interface RpcClient {
 //    public void getUncleCountByBlockNumber();
 //
 //    public void getCode();
-//
-//    public void getTransactionByHash();
-//
-//    public void getTransactionByBlockHashAndIndex();
-//
-//    public void getTransactionByBlockNumberAndIndex();
 //
 //    public void getTransactionReceipt();
 //

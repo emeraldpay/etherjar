@@ -1,11 +1,9 @@
 package org.ethereumclassic.etherjar.rpc;
 
-import org.ethereumclassic.etherjar.model.Address;
-import org.ethereumclassic.etherjar.model.HexData;
-import org.ethereumclassic.etherjar.model.HexQuantity;
-import org.ethereumclassic.etherjar.model.Wei;
+import org.ethereumclassic.etherjar.model.*;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
+import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
@@ -67,16 +65,42 @@ public class DefaultRpcClient implements RpcClient {
             return extractor.extractWei(resp);
         }
 
+        @Override
         public Future<BlockJson> getBlock(int blockNumber, boolean includeTransactions) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByNumber",
                 Arrays.asList(HexQuantity.from(blockNumber).toHex(), includeTransactions),
                 BlockJson.class);
             return resp;
         }
+        @Override
         public Future<BlockJson> getBlock(HexData hash, boolean includeTransactions) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByHash",
                 Arrays.asList(hash.toHex(), includeTransactions),
                 BlockJson.class);
+            return resp;
+        }
+
+        @Override
+        public Future<TransactionJson> getTransaction(TransactionId hash) throws IOException {
+            Future<TransactionJson> resp = transport.execute("eth_getTransactionByHash",
+                Collections.singletonList(hash.toHex()),
+                TransactionJson.class);
+            return resp;
+        }
+
+        @Override
+        public Future<TransactionJson> getTransaction(HexData block, int index) throws IOException {
+            Future<TransactionJson> resp = transport.execute("eth_getTransactionByBlockHashAndIndex",
+                Arrays.asList(block.toHex(), HexQuantity.from(index).toHex()),
+                TransactionJson.class);
+            return resp;
+        }
+
+        @Override
+        public Future<TransactionJson> getTransaction(int block, int index) throws IOException {
+            Future<TransactionJson> resp = transport.execute("eth_getTransactionByBlockNumberAndIndex",
+                Arrays.asList(HexQuantity.from(block).toHex(), HexQuantity.from(index).toHex()),
+                TransactionJson.class);
             return resp;
         }
 
