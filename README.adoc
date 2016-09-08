@@ -5,7 +5,7 @@ Lightweight Java client to Ethereum blockchain
 
 http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master[Build Status]
 
-.Image caption
+.Image
 image::http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master/status.png[Build Status]
 
 
