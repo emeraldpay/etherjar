@@ -7,6 +7,7 @@ import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
+import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -33,6 +34,7 @@ public interface RpcClient {
         public Future<TransactionJson> getTransaction(HexData block, int index) throws IOException;;
         public Future<TransactionJson> getTransaction(int block, int index) throws IOException;;
 
+        public Future<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException;
 
 //    public void getTransactionCount();
 //
@@ -45,8 +47,6 @@ public interface RpcClient {
 //    public void getUncleCountByBlockNumber();
 //
 //    public void getCode();
-//
-//    public void getTransactionReceipt();
 //
 //    public void getUncleByBlockHashAndIndex();
 //

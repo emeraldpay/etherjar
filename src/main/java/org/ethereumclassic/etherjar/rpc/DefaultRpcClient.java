@@ -4,6 +4,7 @@ import org.ethereumclassic.etherjar.model.*;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
+import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
@@ -101,6 +102,14 @@ public class DefaultRpcClient implements RpcClient {
             Future<TransactionJson> resp = transport.execute("eth_getTransactionByBlockNumberAndIndex",
                 Arrays.asList(HexQuantity.from(block).toHex(), HexQuantity.from(index).toHex()),
                 TransactionJson.class);
+            return resp;
+        }
+
+        @Override
+        public Future<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException {
+            Future<TransactionReceiptJson> resp = transport.execute("eth_getTransactionReceipt",
+                Collections.singletonList(hash.toHex()),
+                TransactionReceiptJson.class);
             return resp;
         }
 

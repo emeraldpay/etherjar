@@ -6,6 +6,7 @@ import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson
+import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport
 import spock.lang.Specification
 
@@ -106,6 +107,18 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getTransactionByBlockNumberAndIndex",
                 ["0x1ea0c0", '0x0'], TransactionJson) >> new CompletedFuture<>(json)
+        act.get() == json
+    }
+
+    def "Get tx receipt"() {
+        setup:
+        def json = new TransactionReceiptJson()
+        json.transactionHash = TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc")
+        when:
+        def act = defaultRpcClient.network().getTransactionReceipt(TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"))
+        then:
+        1 * rpcTransport.execute("eth_getTransactionReceipt",
+                ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionReceiptJson) >> new CompletedFuture<>(json)
         act.get() == json
     }
 }
