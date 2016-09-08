@@ -1,13 +1,9 @@
 EtherJar
 ========
 
+image::http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master/status.png[Build Status, link=http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master]
+
 Lightweight Java client to Ethereum blockchain
-
-http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master[Build Status]
-
-.Image
-image::http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master/status.png[Build Status]
-
 
 ## Features
 
