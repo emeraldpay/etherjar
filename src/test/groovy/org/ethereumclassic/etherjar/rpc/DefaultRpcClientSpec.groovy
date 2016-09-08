@@ -121,4 +121,24 @@ class DefaultRpcClientSpec extends Specification {
                 ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionReceiptJson) >> new CompletedFuture<>(json)
         act.get() == json
     }
+
+    def "Get tx count"() {
+        when:
+        def act = defaultRpcClient.network().getTransactionCount(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST).get()
+        then:
+        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> new CompletedFuture<>("0x0234")
+        act == 564L
+
+        when:
+        act = defaultRpcClient.network().getTransactionCount(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST).get()
+        then:
+        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> new CompletedFuture<>("0x1")
+        act == 1L
+
+        when:
+        act = defaultRpcClient.network().getTransactionCount(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2050000).get()
+        then:
+        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> new CompletedFuture<>("0x9")
+        act == 9L
+    }
 }

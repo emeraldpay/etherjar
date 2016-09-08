@@ -36,7 +36,24 @@ public interface RpcClient {
 
         public Future<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException;
 
-//    public void getTransactionCount();
+        /**
+         * Returns the number of transactions sent from an address.
+         * @param address
+         * @param block
+         * @return
+         * @throws IOException
+         */
+        public Future<Long> getTransactionCount(Address address, BlockTag block) throws IOException;
+
+        /**
+         * Returns the number of transactions sent from an address.
+         * @param address
+         * @param block
+         * @return
+         * @throws IOException
+         */
+        public Future<Long> getTransactionCount(Address address, Long block) throws IOException;
+
 //
 //    public void getBlockTransactionCountByHash();
 //
