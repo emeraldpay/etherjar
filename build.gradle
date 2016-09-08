@@ -1,9 +1,15 @@
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 group = 'org.ethereumclassic'
 version = '0.1-SNAPSHOT'
+def description = 'Lightweight Java client to Ethereum blockchain'
 
 targetCompatibility = '1.7'
 sourceCompatibility = '1.7'
@@ -11,8 +17,8 @@ sourceCompatibility = '1.7'
 repositories {
     mavenLocal()
     mavenCentral()
+    jcenter()
 }
-
 
 dependencies {
 
@@ -26,3 +32,40 @@ dependencies {
     testCompile "org.spockframework:spock-core:$spockVersion"
 
 }
+
+publishing {
+    publications {
+        EtherJarPublication(MavenPublication) {
+            from components.java
+            artifact sourceJar
+            pom.withXml {
+                asNode().appendNode('description', description)
+            }
+        }
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['EtherJarPublication']
+    pkg {
+        repo = 'EtherJar'
+        name = 'etherjar'
+        userOrg = 'ethereumproject'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/ethereumproject/etherjar.git'
+        labels = ['etherjar', 'etc']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            description = project.description
+        }
+    }
+}
+
