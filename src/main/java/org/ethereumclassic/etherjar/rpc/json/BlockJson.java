@@ -17,7 +17,7 @@ public class BlockJson<T> {
     /**
      * the block number. null when its pending block.
      */
-    private Integer number;
+    private Long number;
 
     /**
      * hash of the block. null when its pending block.
@@ -106,11 +106,11 @@ public class BlockJson<T> {
      */
     private List<HexData> uncles;
 
-    public Integer getNumber() {
+    public Long getNumber() {
         return number;
     }
 
-    public void setNumber(Integer number) {
+    public void setNumber(Long number) {
         this.number = number;
     }
 

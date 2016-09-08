@@ -22,12 +22,12 @@ public class TransactionLogJson {
     /**
      * log index position in the block. null when its pending log.
      */
-    private Integer logIndex;
+    private Long logIndex;
 
     /**
      * transactions index position log was created from. null when its pending log.
      */
-    private Integer transactionIndex;
+    private Long transactionIndex;
 
     /**
      * hash of the transactions this log was created from. null when its pending log.
@@ -42,7 +42,7 @@ public class TransactionLogJson {
     /**
      * the block number where this log was in. null when its pending. null when its pending log.
      */
-    private Integer blockNumber;
+    private Long blockNumber;
 
     /**
      * address from which this log originated.
@@ -70,19 +70,19 @@ public class TransactionLogJson {
         this.removed = removed;
     }
 
-    public Integer getLogIndex() {
+    public Long getLogIndex() {
         return logIndex;
     }
 
-    public void setLogIndex(Integer logIndex) {
+    public void setLogIndex(Long logIndex) {
         this.logIndex = logIndex;
     }
 
-    public Integer getTransactionIndex() {
+    public Long getTransactionIndex() {
         return transactionIndex;
     }
 
-    public void setTransactionIndex(Integer transactionIndex) {
+    public void setTransactionIndex(Long transactionIndex) {
         this.transactionIndex = transactionIndex;
     }
 
@@ -102,11 +102,11 @@ public class TransactionLogJson {
         this.blockHash = blockHash;
     }
 
-    public Integer getBlockNumber() {
+    public Long getBlockNumber() {
         return blockNumber;
     }
 
-    public void setBlockNumber(Integer blockNumber) {
+    public void setBlockNumber(Long blockNumber) {
         this.blockNumber = blockNumber;
     }
 

@@ -22,17 +22,17 @@ public interface RpcClient {
 
     public interface NetworkDetails {
 
-        public Future<Integer> blockNumber() throws IOException;
+        public Future<Long> blockNumber() throws IOException;
 
         public Future<Wei> getBalance(Address address, BlockTag block) throws IOException;
-        public Future<Wei> getBalance(Address address, Integer block) throws IOException;
+        public Future<Wei> getBalance(Address address, Long block) throws IOException;
 
-        public Future<BlockJson> getBlock(int blockNumber, boolean includeTransactions) throws IOException;
+        public Future<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException;
         public Future<BlockJson> getBlock(HexData hash, boolean includeTransactions) throws IOException;
 
         public Future<TransactionJson> getTransaction(TransactionId hash) throws IOException;
-        public Future<TransactionJson> getTransaction(HexData block, int index) throws IOException;;
-        public Future<TransactionJson> getTransaction(int block, int index) throws IOException;;
+        public Future<TransactionJson> getTransaction(HexData block, long index) throws IOException;;
+        public Future<TransactionJson> getTransaction(long block, long index) throws IOException;;
 
         public Future<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException;
 

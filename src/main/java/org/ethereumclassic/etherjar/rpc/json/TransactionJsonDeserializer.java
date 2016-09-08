@@ -26,11 +26,11 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
         tx.setBlockHash(getBlockHash(node, "blockHash"));
         HexQuantity blockNumber = getQuantity(node, "blockNumber");
         if (blockNumber != null)  {
-            tx.setBlockNumber(blockNumber.getValue().intValue());
+            tx.setBlockNumber(blockNumber.getValue().longValue());
         }
         HexQuantity txIndex = getQuantity(node, "transactionIndex");
         if (txIndex != null) {
-            tx.setTransactionIndex(txIndex.getValue().intValue());
+            tx.setTransactionIndex(txIndex.getValue().longValue());
         }
         tx.setFrom(getAddress(node, "from"));
         tx.setTo(getAddress(node, "to"));

@@ -22,12 +22,12 @@ public class Extractor {
         });
     }
 
-    public Future<Integer> extractInteger(final Future<String> result) {
-        return new FutureMap<>(result, new Function<String, Integer>() {
+    public Future<Long> extractLong(final Future<String> result) {
+        return new FutureMap<>(result, new Function<String, Long>() {
             @Override
-            public Integer apply(String value) {
+            public Long apply(String value) {
                 BigInteger parsed = HexQuantity.from(value).getValue();
-                return parsed != null ? parsed.intValue() : null;
+                return parsed != null ? parsed.longValue() : null;
             }
         });
     }

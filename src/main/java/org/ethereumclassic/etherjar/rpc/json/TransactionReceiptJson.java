@@ -17,9 +17,9 @@ public class TransactionReceiptJson {
     private TransactionId transactionHash;
 
     /**
-     * integer of the transactions index position in the block.
+     * position in the block
      */
-    private Integer transactionIndex;
+    private Long transactionIndex;
 
     /**
      * hash of the block where this transaction was in.
@@ -27,9 +27,9 @@ public class TransactionReceiptJson {
     private BlockHash blockHash;
 
     /**
-     * block number where this transaction was in.
+     * block number where this transaction was in
      */
-    private Integer blockNumber;
+    private Long blockNumber;
 
     /**
      * total amount of gas used when this transaction was executed in the block.
@@ -59,11 +59,11 @@ public class TransactionReceiptJson {
         this.transactionHash = transactionHash;
     }
 
-    public Integer getTransactionIndex() {
+    public Long getTransactionIndex() {
         return transactionIndex;
     }
 
-    public void setTransactionIndex(Integer transactionIndex) {
+    public void setTransactionIndex(Long transactionIndex) {
         this.transactionIndex = transactionIndex;
     }
 
@@ -75,11 +75,11 @@ public class TransactionReceiptJson {
         this.blockHash = blockHash;
     }
 
-    public Integer getBlockNumber() {
+    public Long getBlockNumber() {
         return blockNumber;
     }
 
-    public void setBlockNumber(Integer blockNumber) {
+    public void setBlockNumber(Long blockNumber) {
         this.blockNumber = blockNumber;
     }
 

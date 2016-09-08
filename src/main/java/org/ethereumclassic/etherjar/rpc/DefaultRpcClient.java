@@ -45,9 +45,9 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Integer> blockNumber() throws IOException {
+        public Future<Long> blockNumber() throws IOException {
             Future<String> resp = transport.execute("eth_blockNumber", Collections.emptyList(), String.class);
-            return extractor.extractInteger(resp);
+            return extractor.extractLong(resp);
         }
 
         @Override
@@ -59,7 +59,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Wei> getBalance(Address address, Integer block) throws IOException {
+        public Future<Wei> getBalance(Address address, Long block) throws IOException {
             Future<String> resp = transport.execute("eth_getBalance",
                 Arrays.asList(address.toHex(), HexQuantity.from(block)),
                 String.class);
@@ -67,7 +67,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<BlockJson> getBlock(int blockNumber, boolean includeTransactions) throws IOException {
+        public Future<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByNumber",
                 Arrays.asList(HexQuantity.from(blockNumber).toHex(), includeTransactions),
                 BlockJson.class);
@@ -90,7 +90,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<TransactionJson> getTransaction(HexData block, int index) throws IOException {
+        public Future<TransactionJson> getTransaction(HexData block, long index) throws IOException {
             Future<TransactionJson> resp = transport.execute("eth_getTransactionByBlockHashAndIndex",
                 Arrays.asList(block.toHex(), HexQuantity.from(index).toHex()),
                 TransactionJson.class);
@@ -98,7 +98,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<TransactionJson> getTransaction(int block, int index) throws IOException {
+        public Future<TransactionJson> getTransaction(long block, long index) throws IOException {
             Future<TransactionJson> resp = transport.execute("eth_getTransactionByBlockNumberAndIndex",
                 Arrays.asList(HexQuantity.from(block).toHex(), HexQuantity.from(index).toHex()),
                 TransactionJson.class);

@@ -24,7 +24,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         BlockJson blockJson = new BlockJson();
 
         JsonNode node = jp.readValueAsTree();
-        blockJson.setNumber(getQuantity(node, "number").getValue().intValue());
+        blockJson.setNumber(getQuantity(node, "number").getValue().longValue());
         blockJson.setHash(getBlockHash(node, "hash"));
         blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").getValue().longValue() * 1000L));
 

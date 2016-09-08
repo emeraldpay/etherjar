@@ -27,12 +27,12 @@ public class TransactionJson {
     /**
      * block number where this transaction was in. null when its pending.
      */
-    private Integer blockNumber;
+    private Long blockNumber;
 
     /**
-     * integer of the transactions index position in the block. null when its pending.
+     * position in the block. null when its pending.
      */
-    private Integer transactionIndex;
+    private Long transactionIndex;
 
     /**
      * address of the sender.
@@ -88,19 +88,19 @@ public class TransactionJson {
         this.blockHash = blockHash;
     }
 
-    public Integer getBlockNumber() {
+    public Long getBlockNumber() {
         return blockNumber;
     }
 
-    public void setBlockNumber(Integer blockNumber) {
+    public void setBlockNumber(Long blockNumber) {
         this.blockNumber = blockNumber;
     }
 
-    public Integer getTransactionIndex() {
+    public Long getTransactionIndex() {
         return transactionIndex;
     }
 
-    public void setTransactionIndex(Integer transactionIndex) {
+    public void setTransactionIndex(Long transactionIndex) {
         this.transactionIndex = transactionIndex;
     }
 
