@@ -8,7 +8,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group = 'org.ethereumclassic'
-version = '0.1'
+version = '0.1-SNAPSHOT'
 def description = 'Lightweight Java client to Ethereum blockchain'
 
 targetCompatibility = '1.7'
