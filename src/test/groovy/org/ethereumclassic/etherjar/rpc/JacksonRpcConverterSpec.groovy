@@ -3,6 +3,7 @@ package org.ethereumclassic.etherjar.rpc
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson
+import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
@@ -229,5 +230,48 @@ class JacksonRpcConverterSpec extends Specification {
         act.input.bytes.length == 4
         act.value.value.longValue() == 0
         act.nonce == 15524L
+    }
+
+    def "Parse receipt 0x5929b3"() {
+        setup:
+        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x5929b3.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+        then:
+        act.blockHash.toHex() == "0x2c3cfd4c7f2b58859371f5795eaf8524caa6e63145ac7e9df23c8d63aab891ae"
+        act.blockNumber == 2177930
+        act.contractAddress == null
+        act.cumulativeGasUsed.value.longValue() == 21000
+        act.gasUsed.value.longValue() == 21000
+        act.transactionHash.toHex() == '0x5929b36be4586c57bd87dfb7ea6be3b985c1f527fa3d69d221604b424aeb4197'
+        act.transactionIndex == 0
+        act.logs.size() == 0
+    }
+
+    def "Parse receipt 0x8883dd"() {
+        setup:
+        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x8883dd.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+        then:
+        act.blockHash.toHex() == "0xb9789dbb3ed309ab88997cc5d3b0cf2c89e35ac41d16b0f11489678da6ad278d"
+        act.blockNumber == 1709877
+        act.contractAddress == null
+        act.cumulativeGasUsed.value == new BigInteger('045715', 16)
+        act.gasUsed.value == new BigInteger('01c6d5', 16)
+        act.transactionHash.toHex() == '0x8883dd2f424407e7ecfa1181496fcb5a17e2dc8cd38507582b6af239aa215f46'
+        act.transactionIndex == 8
+        act.logs.size() == 1
+        act.logs[0].address.toHex() == '0x4b8e1ad58657f8b4b036ad12afbcef54d24ac9ba'
+        act.logs[0].blockHash.toHex() == "0xb9789dbb3ed309ab88997cc5d3b0cf2c89e35ac41d16b0f11489678da6ad278d"
+        act.logs[0].blockNumber == 1709877
+        act.logs[0].data.toHex() == "0xbc2ddc901129318b063f3853f46f626f768f8cdaffeec4577eb7febe8e37f29000000000000000000000000000000000000000000000000000000000000000027368613235360000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000202fb928f34a04238701090b138c1d4652d6694a06f9aeea0706e6c474e801673a"
+        act.logs[0].logIndex == 0
+        act.logs[0].topics*.toHex() == [
+                "0x006409c471c01f75fa2c8509f25aae87aa4e1d13b3eda6dcf9cabd084c053265",
+                "0x000000000000000000000000e7827ba56a848dff35ccff016f6c0055603ec454"
+        ]
+        act.logs[0].transactionHash.toHex() == "0x8883dd2f424407e7ecfa1181496fcb5a17e2dc8cd38507582b6af239aa215f46"
+        act.logs[0].transactionIndex == 8
     }
 }
