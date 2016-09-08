@@ -25,7 +25,7 @@ public class TransactionLogJsonDeserializer extends EtherJsonDeserializer<Transa
         TransactionLogJson log = new TransactionLogJson();
 
         log.setAddress(getAddress(node, "address"));
-        log.setBlockHash(getData(node, "blockHash"));
+        log.setBlockHash(getBlockHash(node, "blockHash"));
         log.setBlockNumber(getQuantity(node, "blockNumber").getValue().intValue());
         log.setData(getData(node, "data"));
         log.setLogIndex(getQuantity(node, "logIndex").getValue().intValue());

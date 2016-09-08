@@ -1,10 +1,7 @@
 package org.ethereumclassic.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.ethereumclassic.etherjar.model.Address;
-import org.ethereumclassic.etherjar.model.HexData;
-import org.ethereumclassic.etherjar.model.HexQuantity;
-import org.ethereumclassic.etherjar.model.TransactionId;
+import org.ethereumclassic.etherjar.model.*;
 
 import java.util.Date;
 import java.util.List;
@@ -23,14 +20,14 @@ public class BlockJson<T> {
     private Integer number;
 
     /**
-     * 32 Bytes - hash of the block. null when its pending block.
+     * hash of the block. null when its pending block.
      */
-    private HexData hash;
+    private BlockHash hash;
 
     /**
-     * 32 Bytes - hash of the parent block.
+     * hash of the parent block.
      */
-    private HexData parentHash;
+    private BlockHash parentHash;
 
     /**
      * SHA3 of the uncles data in the block.
@@ -121,7 +118,7 @@ public class BlockJson<T> {
         return hash;
     }
 
-    public void setHash(HexData hash) {
+    public void setHash(BlockHash hash) {
         this.hash = hash;
     }
 
@@ -129,7 +126,7 @@ public class BlockJson<T> {
         return parentHash;
     }
 
-    public void setParentHash(HexData parentHash) {
+    public void setParentHash(BlockHash parentHash) {
         this.parentHash = parentHash;
     }
 

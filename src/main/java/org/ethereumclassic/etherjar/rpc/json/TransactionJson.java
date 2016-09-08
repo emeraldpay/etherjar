@@ -20,9 +20,9 @@ public class TransactionJson {
     private Long nonce;
 
     /**
-     * 32 Bytes - hash of the block where this transaction was in. null when its pending.
+     * hash of the block where this transaction was in. null when its pending.
      */
-    private HexData blockHash;
+    private BlockHash blockHash;
 
     /**
      * block number where this transaction was in. null when its pending.
@@ -84,7 +84,7 @@ public class TransactionJson {
         return blockHash;
     }
 
-    public void setBlockHash(HexData blockHash) {
+    public void setBlockHash(BlockHash blockHash) {
         this.blockHash = blockHash;
     }
 

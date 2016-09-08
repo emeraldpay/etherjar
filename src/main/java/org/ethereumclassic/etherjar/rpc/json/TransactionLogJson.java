@@ -2,6 +2,7 @@ package org.ethereumclassic.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.ethereumclassic.etherjar.model.Address;
+import org.ethereumclassic.etherjar.model.BlockHash;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.TransactionId;
 
@@ -36,7 +37,7 @@ public class TransactionLogJson {
     /**
      * hash of the block where this log was in. null when its pending. null when its pending log.
      */
-    private HexData blockHash;
+    private BlockHash blockHash;
 
     /**
      * the block number where this log was in. null when its pending. null when its pending log.
@@ -97,7 +98,7 @@ public class TransactionLogJson {
         return blockHash;
     }
 
-    public void setBlockHash(HexData blockHash) {
+    public void setBlockHash(BlockHash blockHash) {
         this.blockHash = blockHash;
     }
 

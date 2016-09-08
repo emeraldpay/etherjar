@@ -53,4 +53,9 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         return new Wei(value);
     }
 
+    protected BlockHash getBlockHash(JsonNode node, String name) {
+        String value = getHexString(node, name);
+        if (value == null) return null;
+        return BlockHash.from(value);
+    }
 }

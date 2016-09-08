@@ -25,7 +25,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
         JsonNode node = jp.readValueAsTree();
         blockJson.setNumber(getQuantity(node, "number").getValue().intValue());
-        blockJson.setHash(getData(node, "hash"));
+        blockJson.setHash(getBlockHash(node, "hash"));
         blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").getValue().longValue() * 1000L));
 
         List txes = new ArrayList();
@@ -38,7 +38,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         }
         blockJson.setTransactions(txes);
 
-        blockJson.setParentHash(getData(node, "parentHash"));
+        blockJson.setParentHash(getBlockHash(node, "parentHash"));
         blockJson.setSha3Uncles(getData(node, "sha3Uncles"));
         blockJson.setMiner(getAddress(node, "miner"));
         blockJson.setDifficulty(getQuantity(node, "difficulty"));
