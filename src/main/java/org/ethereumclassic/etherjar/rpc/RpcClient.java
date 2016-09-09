@@ -19,18 +19,77 @@ public interface RpcClient {
 
     public interface NetworkDetails {
 
+        /**
+         *
+         * @return number of most recent block.
+         * @throws IOException
+         */
         public Future<Long> getBlockNumber() throws IOException;
 
+        /**
+         *
+         * @param address address
+         * @param block block to check
+         * @return balance of the account of given address.
+         * @throws IOException
+         */
         public Future<Wei> getBalance(Address address, BlockTag block) throws IOException;
+        /**
+         *
+         * @param address address
+         * @param block block to check
+         * @return balance of the account of given address.
+         * @throws IOException
+         */
         public Future<Wei> getBalance(Address address, long block) throws IOException;
 
+        /**
+         *
+         * @param blockNumber block number
+         * @param includeTransactions includes TransactionJson if true, or hashes as HexData only
+         * @return information about a block
+         * @throws IOException
+         */
         public Future<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException;
+        /**
+         *
+         * @param hash block hash
+         * @param includeTransactions includes TransactionJson if true, or hashes as HexData only
+         * @return information about a block
+         * @throws IOException
+         */
         public Future<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) throws IOException;
 
+        /**
+         *
+         * @param hash tx hash
+         * @return information about a transaction
+         * @throws IOException
+         */
         public Future<TransactionJson> getTransaction(TransactionId hash) throws IOException;
+        /**
+         *
+         * @param block block hash
+         * @param index tx index in the block
+         * @return information about a transaction
+         * @throws IOException
+         */
         public Future<TransactionJson> getTransaction(BlockHash block, long index) throws IOException;;
+        /**
+         *
+         * @param block block number
+         * @param index tx index in the block
+         * @return information about a transaction
+         * @throws IOException
+         */
         public Future<TransactionJson> getTransaction(long block, long index) throws IOException;;
 
+        /**
+         *
+         * @param hash transaction hash
+         * @return receipt of a transaction
+         * @throws IOException
+         */
         public Future<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException;
 
         /**
