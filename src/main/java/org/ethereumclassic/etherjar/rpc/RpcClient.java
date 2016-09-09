@@ -67,10 +67,22 @@ public interface RpcClient {
          */
         public Future<Long> getBlockTransactionCount(Long block) throws IOException;
 
-//
-//    public void getUncleCountByBlockHash();
-//
-//    public void getUncleCountByBlockNumber();
+        /**
+         *
+         * @param block block hash
+         * @return number of uncles in a block from a block matching the given block hash.
+         * @throws IOException
+         */
+        public Future<Long> getUncleCount(BlockHash block) throws IOException;
+
+        /**
+         *
+         * @param block
+         * @return number of uncles in a block from a block matching the given block number.
+         * @throws IOException
+         */
+        public Future<Long> getUncleCount(Long block) throws IOException;
+
 //
 //    public void getCode();
 //

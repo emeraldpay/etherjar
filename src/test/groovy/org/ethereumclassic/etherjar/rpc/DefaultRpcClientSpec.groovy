@@ -160,4 +160,22 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_getBlockTransactionCountByNumber", ['0x1f47d0'], String) >> new CompletedFuture<>("0x1")
         act == 1L
     }
+
+    def "Get block uncles count"() {
+        when:
+        def act = defaultRpcClient.network().getUncleCount(
+                BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339')
+        ).get()
+        then:
+        1 * rpcTransport.execute("eth_getUncleCountByBlockHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'], String) >> new CompletedFuture<>("0x0a")
+        act == 10L
+
+        when:
+        act = defaultRpcClient.network().getUncleCount(
+                2050000
+        ).get()
+        then:
+        1 * rpcTransport.execute("eth_getUncleCountByBlockNumber", ['0x1f47d0'], String) >> new CompletedFuture<>("0x1")
+        act == 1L
+    }
 }
