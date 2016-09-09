@@ -2,7 +2,6 @@ package org.ethereumclassic.etherjar.rpc
 
 import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.BlockHash
-import org.ethereumclassic.etherjar.model.HexData
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
@@ -29,7 +28,7 @@ class DefaultRpcClientSpec extends Specification {
 
     def "Load current height"() {
         when:
-        def act = defaultRpcClient.network().blockNumber().get()
+        def act = defaultRpcClient.network().getBlockNumber().get()
         then:
         1 * rpcTransport.execute("eth_blockNumber", [], String) >> new CompletedFuture<>("0x1f47d0")
         act == 2050000

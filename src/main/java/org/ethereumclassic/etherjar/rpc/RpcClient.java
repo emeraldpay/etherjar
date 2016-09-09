@@ -19,7 +19,7 @@ public interface RpcClient {
 
     public interface NetworkDetails {
 
-        public Future<Long> blockNumber() throws IOException;
+        public Future<Long> getBlockNumber() throws IOException;
 
         public Future<Wei> getBalance(Address address, BlockTag block) throws IOException;
         public Future<Wei> getBalance(Address address, long block) throws IOException;

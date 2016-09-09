@@ -45,7 +45,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Long> blockNumber() throws IOException {
+        public Future<Long> getBlockNumber() throws IOException {
             Future<String> resp = transport.execute("eth_blockNumber", Collections.emptyList(), String.class);
             return extractor.extractLong(resp);
         }
