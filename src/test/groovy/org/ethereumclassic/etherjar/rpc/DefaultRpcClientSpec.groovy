@@ -40,6 +40,12 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> new CompletedFuture<>("0x0234c8a3397aab58")
         act.toString() == "0.1590 ether"
+
+        when:
+        act = defaultRpcClient.network().getBalance(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2050000).get()
+        then:
+        1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> new CompletedFuture<>("0x0234c8a3397aab58")
+        act.toString() == "0.1590 ether"
     }
 
     def "Get block by number"() {

@@ -61,7 +61,7 @@ public class DefaultRpcClient implements RpcClient {
         @Override
         public Future<Wei> getBalance(Address address, long block) throws IOException {
             Future<String> resp = transport.execute("eth_getBalance",
-                Arrays.asList(address.toHex(), HexQuantity.from(block)),
+                Arrays.asList(address.toHex(), HexQuantity.from(block).toHex()),
                 String.class);
             return extractor.extractWei(resp);
         }
