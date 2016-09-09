@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.rpc;
 
+import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.HexQuantity;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.Function;
@@ -41,5 +42,13 @@ public class Extractor {
         });
     }
 
+    public Future<HexData> extractData(final Future<String> result) {
+        return new FutureMap<>(result, new Function<String, HexData>() {
+            @Override
+            public HexData apply(String value) {
+                return HexData.from(value);
+            }
+        });
+    }
 
 }

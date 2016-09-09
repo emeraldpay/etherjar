@@ -83,8 +83,24 @@ public interface RpcClient {
          */
         public Future<Long> getUncleCount(Long block) throws IOException;
 
-//
-//    public void getCode();
+        /**
+         *
+         * @param address address
+         * @param block block number
+         * @return code at a given address
+         * @throws IOException
+         */
+        public Future<HexData> getCode(Address address, Long block) throws IOException;
+
+        /**
+         *
+         * @param address address
+         * @param block block tag
+         * @return code at a given address
+         * @throws IOException
+         */
+        public Future<HexData> getCode(Address address, BlockTag block) throws IOException;
+
 //
 //    public void getUncleByBlockHashAndIndex();
 //

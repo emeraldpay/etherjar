@@ -161,5 +161,21 @@ public class DefaultRpcClient implements RpcClient {
             return extractor.extractLong(resp);
         }
 
+        @Override
+        public Future<HexData> getCode(Address address, Long block) throws IOException {
+            Future<String> resp = transport.execute("eth_getCode",
+                Arrays.asList(address.toHex(), HexQuantity.from(block).toHex()),
+                String.class);
+            return extractor.extractData(resp);
+        }
+
+        @Override
+        public Future<HexData> getCode(Address address, BlockTag block) throws IOException {
+            Future<String> resp = transport.execute("eth_getCode",
+                Arrays.asList(address.toHex(), block.getCode()),
+                String.class);
+            return extractor.extractData(resp);
+        }
+
     }
 }

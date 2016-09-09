@@ -178,4 +178,26 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_getUncleCountByBlockNumber", ['0x1f47d0'], String) >> new CompletedFuture<>("0x1")
         act == 1L
     }
+
+    def "Get code"() {
+        when:
+        def act = defaultRpcClient.network().getCode(
+                Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST
+        ).get()
+        then:
+        1 * rpcTransport.execute("eth_getCode",
+                ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'],
+                String) >> new CompletedFuture<>("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
+        act.toHex() == "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
+
+        when:
+        act = defaultRpcClient.network().getCode(
+                Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2L
+        ).get()
+        then:
+        1 * rpcTransport.execute("eth_getCode",
+                ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x2'],
+                String) >> new CompletedFuture<>("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
+        act.toHex() == "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
+    }
 }
