@@ -74,7 +74,7 @@ public class DefaultRpcClient implements RpcClient {
             return resp;
         }
         @Override
-        public Future<BlockJson> getBlock(HexData hash, boolean includeTransactions) throws IOException {
+        public Future<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) throws IOException {
             Future<BlockJson> resp = transport.execute("eth_getBlockByHash",
                 Arrays.asList(hash.toHex(), includeTransactions),
                 BlockJson.class);
@@ -90,7 +90,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<TransactionJson> getTransaction(HexData block, long index) throws IOException {
+        public Future<TransactionJson> getTransaction(BlockHash block, long index) throws IOException {
             Future<TransactionJson> resp = transport.execute("eth_getTransactionByBlockHashAndIndex",
                 Arrays.asList(block.toHex(), HexQuantity.from(index).toHex()),
                 TransactionJson.class);

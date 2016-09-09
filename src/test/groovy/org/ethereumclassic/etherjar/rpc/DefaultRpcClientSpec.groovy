@@ -65,13 +65,13 @@ class DefaultRpcClientSpec extends Specification {
         def json = new BlockJson()
         json.number = 2050000
         when:
-        def act = defaultRpcClient.network().getBlock(HexData.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), false)
+        def act = defaultRpcClient.network().getBlock(BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), false)
         then:
         1 * rpcTransport.execute("eth_getBlockByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', false], BlockJson) >> new CompletedFuture<>(json)
         act.get() == json
 
         when:
-        act = defaultRpcClient.network().getBlock(HexData.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), true)
+        act = defaultRpcClient.network().getBlock(BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), true)
         then:
         1 * rpcTransport.execute("eth_getBlockByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', true], BlockJson) >> new CompletedFuture<>(json)
         act.get() == json
@@ -93,7 +93,7 @@ class DefaultRpcClientSpec extends Specification {
         def json = new TransactionJson()
         json.hash = TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc")
         when:
-        def act = defaultRpcClient.network().getTransaction(HexData.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'), 0)
+        def act = defaultRpcClient.network().getTransaction(BlockHash.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'), 0)
         then:
         1 * rpcTransport.execute("eth_getTransactionByBlockHashAndIndex",
                 ["0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946", '0x0'], TransactionJson) >> new CompletedFuture<>(json)
