@@ -22,7 +22,7 @@ public interface RpcClient {
         public Future<Long> blockNumber() throws IOException;
 
         public Future<Wei> getBalance(Address address, BlockTag block) throws IOException;
-        public Future<Wei> getBalance(Address address, Long block) throws IOException;
+        public Future<Wei> getBalance(Address address, long block) throws IOException;
 
         public Future<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException;
         public Future<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) throws IOException;
@@ -49,7 +49,7 @@ public interface RpcClient {
          * @return
          * @throws IOException
          */
-        public Future<Long> getTransactionCount(Address address, Long block) throws IOException;
+        public Future<Long> getTransactionCount(Address address, long block) throws IOException;
 
         /**
          *
@@ -65,7 +65,7 @@ public interface RpcClient {
          * @return number of transactions in a block from a block matching the given block
          * @throws IOException
          */
-        public Future<Long> getBlockTransactionCount(Long block) throws IOException;
+        public Future<Long> getBlockTransactionCount(long block) throws IOException;
 
         /**
          *
@@ -81,7 +81,7 @@ public interface RpcClient {
          * @return number of uncles in a block from a block matching the given block number.
          * @throws IOException
          */
-        public Future<Long> getUncleCount(Long block) throws IOException;
+        public Future<Long> getUncleCount(long block) throws IOException;
 
         /**
          *
@@ -108,7 +108,7 @@ public interface RpcClient {
          * @return code at a given address
          * @throws IOException
          */
-        public Future<HexData> getCode(Address address, Long block) throws IOException;
+        public Future<HexData> getCode(Address address, long block) throws IOException;
 
         /**
          *

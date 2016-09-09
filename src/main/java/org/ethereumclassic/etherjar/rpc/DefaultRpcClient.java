@@ -59,7 +59,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Wei> getBalance(Address address, Long block) throws IOException {
+        public Future<Wei> getBalance(Address address, long block) throws IOException {
             Future<String> resp = transport.execute("eth_getBalance",
                 Arrays.asList(address.toHex(), HexQuantity.from(block)),
                 String.class);
@@ -122,7 +122,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Long> getTransactionCount(Address address, Long block) throws IOException {
+        public Future<Long> getTransactionCount(Address address, long block) throws IOException {
             Future<String> resp = transport.execute("eth_getTransactionCount",
                 Arrays.asList(address.toHex(), HexQuantity.from(block).toHex()),
                 String.class);
@@ -138,7 +138,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Long> getBlockTransactionCount(Long block) throws IOException {
+        public Future<Long> getBlockTransactionCount(long block) throws IOException {
             Future<String> resp = transport.execute("eth_getBlockTransactionCountByNumber",
                 Collections.singletonList(HexQuantity.from(block).toHex()),
                 String.class);
@@ -154,7 +154,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Long> getUncleCount(Long block) throws IOException {
+        public Future<Long> getUncleCount(long block) throws IOException {
             Future<String> resp = transport.execute("eth_getUncleCountByBlockNumber",
                 Collections.singletonList(HexQuantity.from(block).toHex()),
                 String.class);
@@ -178,7 +178,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<HexData> getCode(Address address, Long block) throws IOException {
+        public Future<HexData> getCode(Address address, long block) throws IOException {
             Future<String> resp = transport.execute("eth_getCode",
                 Arrays.asList(address.toHex(), HexQuantity.from(block).toHex()),
                 String.class);
