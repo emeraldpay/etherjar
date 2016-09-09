@@ -85,6 +85,24 @@ public interface RpcClient {
 
         /**
          *
+         * @param block block hash
+         * @param index uncle index
+         * @return uncle block
+         * @throws IOException
+         */
+        public Future<BlockJson> getUncle(BlockHash block, long index) throws IOException;
+
+        /**
+         *
+         * @param block block number
+         * @param index uncle index
+         * @return uncle block
+         * @throws IOException
+         */
+        public Future<BlockJson> getUncle(long block, long index) throws IOException;
+
+        /**
+         *
          * @param address address
          * @param block block number
          * @return code at a given address
@@ -100,13 +118,6 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<HexData> getCode(Address address, BlockTag block) throws IOException;
-
-//
-//    public void getUncleByBlockHashAndIndex();
-//
-//    public void getUncleByBlockNumberAndIndex();
-
-
 
     }
 }

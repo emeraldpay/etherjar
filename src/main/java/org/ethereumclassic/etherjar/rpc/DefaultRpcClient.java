@@ -162,6 +162,22 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
+        public Future<BlockJson> getUncle(BlockHash block, long index) throws IOException {
+            Future<BlockJson> resp = transport.execute("eth_getUncleByBlockHashAndIndex",
+                Arrays.asList(block.toHex(), HexQuantity.from(index).toHex()),
+                BlockJson.class);
+            return resp;
+        }
+
+        @Override
+        public Future<BlockJson> getUncle(long block, long index) throws IOException {
+            Future<BlockJson> resp = transport.execute("eth_getUncleByBlockNumberAndIndex",
+                Arrays.asList(HexQuantity.from(block).toHex(), HexQuantity.from(index).toHex()),
+                BlockJson.class);
+            return resp;
+        }
+
+        @Override
         public Future<HexData> getCode(Address address, Long block) throws IOException {
             Future<String> resp = transport.execute("eth_getCode",
                 Arrays.asList(address.toHex(), HexQuantity.from(block).toHex()),

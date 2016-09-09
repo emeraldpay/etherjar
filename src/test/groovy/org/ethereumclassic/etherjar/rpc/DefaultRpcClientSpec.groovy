@@ -200,4 +200,25 @@ class DefaultRpcClientSpec extends Specification {
                 String) >> new CompletedFuture<>("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
         act.toHex() == "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
     }
+
+    def "Get uncle"() {
+        setup:
+        def json = new BlockJson()
+        json.number = 2050000
+        when:
+        def act = defaultRpcClient.network().getUncle(BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), 0L)
+        then:
+        1 * rpcTransport.execute("eth_getUncleByBlockHashAndIndex",
+                ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', '0x0'],
+                BlockJson) >> new CompletedFuture<>(json)
+        act.get() == json
+
+        when:
+        act = defaultRpcClient.network().getUncle(2050000, 0L)
+        then:
+        1 * rpcTransport.execute("eth_getUncleByBlockNumberAndIndex",
+                ['0x1f47d0', '0x0'],
+                BlockJson) >> new CompletedFuture<>(json)
+        act.get() == json
+    }
 }
