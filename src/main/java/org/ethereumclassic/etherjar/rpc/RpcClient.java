@@ -14,10 +14,10 @@ import java.util.concurrent.Future;
  */
 public interface RpcClient {
 
-    NetworkDetails network();
+    EthCommands eth();
 
 
-    public interface NetworkDetails {
+    public interface EthCommands {
 
         /**
          *

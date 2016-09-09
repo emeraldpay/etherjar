@@ -30,16 +30,16 @@ public class DefaultRpcClient implements RpcClient {
     }
 
     @Override
-    public NetworkDetails network() {
-        return new NetworkDetailsImpl(transport, extractor);
+    public EthCommands eth() {
+        return new EthCommandsImpl(transport, extractor);
     }
 
-    public static class NetworkDetailsImpl implements NetworkDetails {
+    public static class EthCommandsImpl implements EthCommands {
 
         private final RpcTransport transport;
         private Extractor extractor;
 
-        public NetworkDetailsImpl(RpcTransport transport, Extractor extractor) {
+        public EthCommandsImpl(RpcTransport transport, Extractor extractor) {
             this.transport = transport;
             this.extractor = extractor;
         }
