@@ -1,9 +1,6 @@
 package org.ethereumclassic.etherjar.rpc;
 
-import org.ethereumclassic.etherjar.model.Address;
-import org.ethereumclassic.etherjar.model.HexData;
-import org.ethereumclassic.etherjar.model.TransactionId;
-import org.ethereumclassic.etherjar.model.Wei;
+import org.ethereumclassic.etherjar.model.*;
 import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
@@ -54,10 +51,22 @@ public interface RpcClient {
          */
         public Future<Long> getTransactionCount(Address address, Long block) throws IOException;
 
-//
-//    public void getBlockTransactionCountByHash();
-//
-//    public void getBlockTransactionCountByNumber();
+        /**
+         *
+         * @param block block hash
+         * @return number of transactions in a block from a block matching the given block
+         * @throws IOException
+         */
+        public Future<Long> getBlockTransactionCount(BlockHash block) throws IOException;
+
+        /**
+         *
+         * @param block block height
+         * @return number of transactions in a block from a block matching the given block
+         * @throws IOException
+         */
+        public Future<Long> getBlockTransactionCount(Long block) throws IOException;
+
 //
 //    public void getUncleCountByBlockHash();
 //

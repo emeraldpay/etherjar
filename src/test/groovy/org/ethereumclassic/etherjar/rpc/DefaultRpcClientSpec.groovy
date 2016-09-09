@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.rpc
 
 import org.ethereumclassic.etherjar.model.Address
+import org.ethereumclassic.etherjar.model.BlockHash
 import org.ethereumclassic.etherjar.model.HexData
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
@@ -140,5 +141,23 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> new CompletedFuture<>("0x9")
         act == 9L
+    }
+
+    def "Get block tx count"() {
+        when:
+        def act = defaultRpcClient.network().getBlockTransactionCount(
+                BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339')
+        ).get()
+        then:
+        1 * rpcTransport.execute("eth_getBlockTransactionCountByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'], String) >> new CompletedFuture<>("0x0a")
+        act == 10L
+
+        when:
+        act = defaultRpcClient.network().getBlockTransactionCount(
+                2050000
+        ).get()
+        then:
+        1 * rpcTransport.execute("eth_getBlockTransactionCountByNumber", ['0x1f47d0'], String) >> new CompletedFuture<>("0x1")
+        act == 1L
     }
 }

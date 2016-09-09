@@ -129,5 +129,21 @@ public class DefaultRpcClient implements RpcClient {
             return extractor.extractLong(resp);
         }
 
+        @Override
+        public Future<Long> getBlockTransactionCount(BlockHash block) throws IOException {
+            Future<String> resp = transport.execute("eth_getBlockTransactionCountByHash",
+                Collections.singletonList(block.toHex()),
+                String.class);
+            return extractor.extractLong(resp);
+        }
+
+        @Override
+        public Future<Long> getBlockTransactionCount(Long block) throws IOException {
+            Future<String> resp = transport.execute("eth_getBlockTransactionCountByNumber",
+                Collections.singletonList(HexQuantity.from(block).toHex()),
+                String.class);
+            return extractor.extractLong(resp);
+        }
+
     }
 }
