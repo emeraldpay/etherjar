@@ -2,7 +2,7 @@ EtherJar
 ========
 
 image:http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master/status.png[Build Status, link=http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master]
-image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE.txt"]
+image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE"]
 
 Lightweight Java client to Ethereum blockchain
 
