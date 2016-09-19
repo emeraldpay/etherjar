@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
  * @since
  * @author Igor Artamonov
  */
-class JacksonRpcConverterSpec extends Specification {
+class JacksonEthRpcConverterSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z")
@@ -24,7 +24,7 @@ class JacksonRpcConverterSpec extends Specification {
 
     def "Parse block 1"() {
         setup:
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("block/block-1.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/block-1.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
         then:
@@ -47,7 +47,7 @@ class JacksonRpcConverterSpec extends Specification {
     def "Parse block 1920000"() {
         setup:
         //http://gastracker.io/block/1920000
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920000.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920000.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
         then:
@@ -74,7 +74,7 @@ class JacksonRpcConverterSpec extends Specification {
     def "Parse block 1920000 with transactions"() {
         setup:
         //http://gastracker.io/block/1920000
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920000-full.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920000-full.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
         then:
@@ -131,7 +131,7 @@ class JacksonRpcConverterSpec extends Specification {
     def "Parse block 1920001"() {
         setup:
         //http://gastracker.io/block/1920001
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920001.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/block-1920001.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
         then:
@@ -155,7 +155,7 @@ class JacksonRpcConverterSpec extends Specification {
     def "Parse block 2050000"() {
         setup:
         //http://gastracker.io/block/2050000
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("block/block-2050000.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/block-2050000.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
         then:
@@ -180,7 +180,7 @@ class JacksonRpcConverterSpec extends Specification {
 
     def "Parse tx 0x1e694e"() {
         setup:
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("tx/0x1e694e.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("tx/0x1e694e.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, TransactionJson)
         then:
@@ -198,7 +198,7 @@ class JacksonRpcConverterSpec extends Specification {
 
     def "Parse tx 0x847149"() {
         setup:
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("tx/0x847149.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("tx/0x847149.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, TransactionJson)
         then:
@@ -216,7 +216,7 @@ class JacksonRpcConverterSpec extends Specification {
 
     def "Parse tx 0x19442f"() {
         setup:
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("tx/0x19442f.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("tx/0x19442f.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, TransactionJson)
         then:
@@ -234,7 +234,7 @@ class JacksonRpcConverterSpec extends Specification {
 
     def "Parse receipt 0x5929b3"() {
         setup:
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x5929b3.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x5929b3.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
         then:
@@ -250,7 +250,7 @@ class JacksonRpcConverterSpec extends Specification {
 
     def "Parse receipt 0x8883dd"() {
         setup:
-        InputStream json = JacksonRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x8883dd.json")
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x8883dd.json")
         when:
         def act = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
         then:

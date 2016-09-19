@@ -10,6 +10,7 @@ import org.ethereumclassic.etherjar.rpc.json.ResponseJson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author Igor Artamonov
@@ -42,6 +43,13 @@ public class JacksonRpcConverter implements RpcConverter {
     public <T> T fromJson(InputStream content, Class<T> target) throws IOException {
         JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, target);
         ResponseJson<T> responseJson = objectMapper.readerFor(type1).readValue(content);
+        return responseJson.getResult();
+    }
+
+    public <T> List<T> fromJsonList(InputStream content, Class<T> target) throws IOException {
+        JavaType type1 = objectMapper.getTypeFactory().constructParametricType(List.class, target);
+        JavaType type2 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, type1);
+        ResponseJson<List<T>> responseJson = objectMapper.readerFor(type2).readValue(content);
         return responseJson.getResult();
     }
 

@@ -11,16 +11,18 @@ import org.ethereumclassic.etherjar.model.*;
  */
 public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
 
-    protected String getHexString(JsonNode node, String name) {
-        JsonNode subnode = node.get(name);
-        if (subnode == null) {
+    protected String getHexString(JsonNode node) {
+        if (node == null) {
             return null;
         }
-        String value = subnode.textValue();
+        String value = node.textValue();
         if (value == null || value.length() == 0 || value.equals("0x")) {
             return null;
         }
         return value;
+    }
+    protected String getHexString(JsonNode node, String name) {
+        return getHexString(node.get(name));
     }
 
     protected HexData getData(JsonNode node, String name) {
@@ -33,6 +35,22 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         String value = getHexString(node, name);
         if (value == null) return null;
         return HexQuantity.from(value);
+    }
+    protected HexQuantity getQuantity(JsonNode node) {
+        String value = getHexString(node);
+        if (value == null) return null;
+        return HexQuantity.from(value);
+    }
+
+    protected Long getLong(JsonNode node, String name) {
+        HexQuantity quantity = getQuantity(node, name);
+        if (quantity == null) return null;
+        return quantity.getValue().longValue();
+    }
+    protected Long getLong(JsonNode node) {
+        HexQuantity quantity = getQuantity(node);
+        if (quantity == null) return null;
+        return quantity.getValue().longValue();
     }
 
     protected Address getAddress(JsonNode node, String name) {
