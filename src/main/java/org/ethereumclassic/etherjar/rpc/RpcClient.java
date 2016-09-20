@@ -1,12 +1,10 @@
 package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.*;
-import org.ethereumclassic.etherjar.rpc.json.BlockJson;
-import org.ethereumclassic.etherjar.rpc.json.BlockTag;
-import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
-import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
+import org.ethereumclassic.etherjar.rpc.json.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -15,7 +13,7 @@ import java.util.concurrent.Future;
 public interface RpcClient {
 
     EthCommands eth();
-
+    TraceCommands trace();
 
     public interface EthCommands {
 
@@ -177,6 +175,12 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<HexData> getCode(Address address, BlockTag block) throws IOException;
+
+    }
+
+    interface TraceCommands {
+
+        Future<TraceList> getTransaction(TransactionId hash) throws IOException;
 
     }
 }

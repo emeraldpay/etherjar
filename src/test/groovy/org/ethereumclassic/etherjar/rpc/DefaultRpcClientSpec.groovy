@@ -5,6 +5,7 @@ import org.ethereumclassic.etherjar.model.BlockHash
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
+import org.ethereumclassic.etherjar.rpc.json.TraceItemJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport
@@ -224,6 +225,21 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_getUncleByBlockNumberAndIndex",
                 ['0x1f47d0', '0x0'],
                 BlockJson) >> new CompletedFuture<>(json)
+        act.get() == json
+    }
+
+    def "Get trace"() {
+        setup:
+        def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        def json = [
+                new TraceItemJson()
+        ]
+        when:
+        def act = defaultRpcClient.trace().getTransaction(txid)
+        then:
+        1 * rpcTransport.execute("trace_transaction",
+                ['0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc'],
+                TraceList) >> new CompletedFuture<>(json)
         act.get() == json
     }
 }

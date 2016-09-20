@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.ethereumclassic.etherjar.rpc.json.RequestJson;
 import org.ethereumclassic.etherjar.rpc.json.ResponseJson;
+import org.ethereumclassic.etherjar.rpc.json.TraceItemJson;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +42,9 @@ public class JacksonRpcConverter implements RpcConverter {
     }
 
     public <T> T fromJson(InputStream content, Class<T> target) throws IOException {
+        if (TraceList.class.isAssignableFrom(target)) {
+            return (T) fromJsonList(content, TraceItemJson.class);
+        }
         JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, target);
         ResponseJson<T> responseJson = objectMapper.readerFor(type1).readValue(content);
         return responseJson.getResult();

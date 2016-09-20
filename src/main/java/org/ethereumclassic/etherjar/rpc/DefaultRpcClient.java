@@ -1,15 +1,13 @@
 package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.*;
-import org.ethereumclassic.etherjar.rpc.json.BlockJson;
-import org.ethereumclassic.etherjar.rpc.json.BlockTag;
-import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
-import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
+import org.ethereumclassic.etherjar.rpc.json.*;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -32,6 +30,10 @@ public class DefaultRpcClient implements RpcClient {
     @Override
     public EthCommands eth() {
         return new EthCommandsImpl(transport, extractor);
+    }
+    @Override
+    public TraceCommands trace() {
+        return new TraceCommandsImpl(transport, extractor);
     }
 
     public static class EthCommandsImpl implements EthCommands {
@@ -193,5 +195,24 @@ public class DefaultRpcClient implements RpcClient {
             return extractor.extractData(resp);
         }
 
+    }
+
+    public static class TraceCommandsImpl implements TraceCommands {
+
+        private final RpcTransport transport;
+        private Extractor extractor;
+
+        public TraceCommandsImpl(RpcTransport transport, Extractor extractor) {
+            this.transport = transport;
+            this.extractor = extractor;
+        }
+
+        @Override
+        public Future<TraceList> getTransaction(TransactionId hash) throws IOException {
+            Future<TraceList> resp = transport.execute("trace_transaction",
+                Collections.singletonList(hash.toHex()),
+                TraceList.class);
+            return resp;
+        }
     }
 }
