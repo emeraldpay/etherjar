@@ -6,6 +6,7 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
 
 group = 'org.ethereumclassic'
 version = '0.2-SNAPSHOT'
@@ -66,6 +67,12 @@ bintray {
             name = project.version
             description = project.description
         }
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
     }
 }
 
