@@ -3,6 +3,7 @@ EtherJar
 
 image:http://build.ethereumclassic.org/app/rest/builds/buildType:(id:Etherjar_Master)/statusIcon[TC Build Status, link=http://build.ethereumclassic.org/viewType.html?buildTypeId=Etherjar_Master]
 image:https://travis-ci.org/ethereumproject/etherjar.png?branch=master[Travis CI Build Status, link=https://travis-ci.org/ethereumproject/etherjar]
+image:https://codecov.io/gh/ethereumproject/etherjar/branch/master/graph/badge.svg[Codecov, link=https://codecov.io/gh/ethereumproject/etherjar]
 image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE"]
 
 Lightweight Java client to Ethereum blockchain, supports both Ethereum Classic ETC and Ethereum ETH
