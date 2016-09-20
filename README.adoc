@@ -4,11 +4,22 @@ EtherJar
 image:http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master/status.png[Build Status, link=http://ec2-54-81-112-125.compute-1.amazonaws.com/Etherjar_Master]
 image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE"]
 
-Lightweight Java client to Ethereum blockchain
+Lightweight Java client to Ethereum blockchain, supports both Ethereum Classic ETC and Ethereum ETH
 
 ## Features
 
-TODO
+* native Java wrapper around Ethereum data structures and RPC calls
+* blockchain information through Ethereum RPC
+* (_in progress_) offline transaction signing
+* (_in progress_) ABI encoding/decoding
+* (_in progress_) Smart Contracts for Java
+* Parity RPC extensions support
+
+## Technology
+
+* Java 7 (for Android support)
+* Async first
+* HTTP Transport and JSON parser agnostic
 
 ## Installation
 
