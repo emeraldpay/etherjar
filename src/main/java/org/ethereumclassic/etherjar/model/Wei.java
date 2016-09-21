@@ -8,12 +8,10 @@ import java.math.BigInteger;
  *
  * @author Igor Artamonov
  */
-public class Wei {
-
-    private final BigInteger value;
+public class Wei extends HexQuantity {
 
     public Wei(BigInteger value) {
-        this.value = value;
+        super(value);
     }
 
     public Wei(byte[] value) {
@@ -21,7 +19,11 @@ public class Wei {
     }
 
     public Wei(String value) {
-        this.value = HexQuantity.from(value).getValue();
+        super(HexQuantity.from(value).getValue());
+    }
+
+    public static Wei from(String value) {
+        return new Wei(value);
     }
 
     /**
@@ -50,9 +52,9 @@ public class Wei {
      */
     public BigDecimal convertTo(EtherUnit etherUnit, int scale) {
         if (etherUnit == EtherUnit.WEI) {
-            return new BigDecimal(this.value);
+            return new BigDecimal(getValue());
         }
-        return new BigDecimal(this.value)
+        return new BigDecimal(getValue())
             .divide(etherUnit.getWeiDivider(), scale, BigDecimal.ROUND_HALF_DOWN);
     }
 
@@ -69,15 +71,7 @@ public class Wei {
      * @return bytes value
      */
     public byte[] getBytes() {
-        return value.toByteArray();
-    }
-
-    /**
-     *
-     * @return source value of wei
-     */
-    public BigInteger getValue() {
-        return value;
+        return getValue().toByteArray();
     }
 
     /**

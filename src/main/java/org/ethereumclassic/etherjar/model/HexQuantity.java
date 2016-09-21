@@ -40,4 +40,19 @@ public class HexQuantity {
     public String toString() {
         return toHex();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HexQuantity)) return false;
+
+        HexQuantity quantity = (HexQuantity) o;
+
+        return value != null ? value.equals(quantity.value) : quantity.value == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return value != null ? value.hashCode() : 0;
+    }
 }

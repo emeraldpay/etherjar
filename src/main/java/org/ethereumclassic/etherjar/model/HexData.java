@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.model;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * Fixed size value, such as Wallet Address, represented in Hex
@@ -83,4 +84,21 @@ public class HexData {
     public byte[] getBytes() {
         return value.clone();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (!(o instanceof HexData)) return false;
+
+        HexData hexData = (HexData) o;
+
+        return Arrays.equals(value, hexData.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(value);
+    }
+
 }
