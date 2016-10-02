@@ -67,7 +67,7 @@ public class TransactionReceiptJson {
         this.transactionIndex = transactionIndex;
     }
 
-    public HexData getBlockHash() {
+    public BlockHash getBlockHash() {
         return blockHash;
     }
 

@@ -114,7 +114,7 @@ public class BlockJson<T> {
         this.number = number;
     }
 
-    public HexData getHash() {
+    public BlockHash getHash() {
         return hash;
     }
 
@@ -122,7 +122,7 @@ public class BlockJson<T> {
         this.hash = hash;
     }
 
-    public HexData getParentHash() {
+    public BlockHash getParentHash() {
         return parentHash;
     }
 

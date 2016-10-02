@@ -94,7 +94,7 @@ public class TransactionLogJson {
         this.transactionHash = transactionHash;
     }
 
-    public HexData getBlockHash() {
+    public BlockHash getBlockHash() {
         return blockHash;
     }
 

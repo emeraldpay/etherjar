@@ -80,7 +80,7 @@ public class TransactionJson {
         this.nonce = nonce;
     }
 
-    public HexData getBlockHash() {
+    public BlockHash getBlockHash() {
         return blockHash;
     }
 
