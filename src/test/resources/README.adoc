@@ -15,3 +15,6 @@
 * 0x8471497131d77305416c760ebfed2b6d653c2066c51dac58c6551dcc7dfb3350 - DAO Hack
 * 0x5c19695f50a30abbadfeef201d695d9c95c254534019e2f6a7a590e9ef246e82 - Shanghai Go Home attack
 
+### Special
+* 0xb9c3215306c188ff07dc5fdb9816ccd9727c1f420acd0bebbff77851e32bb3f6 - Suicide
+

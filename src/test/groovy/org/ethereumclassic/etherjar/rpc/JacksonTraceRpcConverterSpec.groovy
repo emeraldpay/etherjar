@@ -39,6 +39,7 @@ class JacksonTraceRpcConverterSpec extends Specification {
         act[0].result.call.output == null
         act[0].result.create == null
         act[0].result.failedCall == null
+        act[0].result.none == null
         act[0].subtraces == 0L
         act[0].traceAddress == []
         act[0].transactionHash.toHex() == '0x16cb6998a1bf41e7cd64d9946f58e5a718bb1f79d7ffcf9902798ff8642d6593'
@@ -150,5 +151,20 @@ class JacksonTraceRpcConverterSpec extends Specification {
         act[51].traceAddress.size() == 20
         act[51].traceAddress == [2L, 4L, 1L, 2L, 4L, 1L, 2L, 4L, 1L, 2L, 4L, 1L, 2L, 4L, 1L, 2L, 4L, 1L, 1L, 0L]
         act[123].traceAddress.size() == 47
+    }
+
+    def "Contract suicide"() {
+        setup:
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("trace/0xb9c321.json")
+        when:
+        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        then:
+        act.size() == 2
+        act[0].action.call != null
+        act[1].action.suicide != null
+        act[1].action.suicide.address?.toHex() == '0x7d4c7c61f98d653d5b49b695a01839791e002393'
+        act[1].action.suicide.balance?.toHex() == '0x1aa9a6b21eb820000'
+        act[1].action.suicide.refundAddress?.toHex() == '0xd9446e2e0c9216a393df8e46c70ae8bbcce87e3c'
+        act[1].result.none != null
     }
 }

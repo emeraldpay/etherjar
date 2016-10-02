@@ -48,6 +48,14 @@ public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJs
                 create.setInit(getData(createNode, "init"));
                 create.setValue(getWei(createNode, "value"));
             }
+            JsonNode suicideNode = actionNode.get("suicide");
+            if (suicideNode != null && suicideNode.isObject()) {
+                TraceItemJson.ActionSuicide suicide = new TraceItemJson.ActionSuicide();
+                action.setSuicide(suicide);
+                suicide.setAddress(getAddress(suicideNode, "address"));
+                suicide.setBalance(getWei(suicideNode, "balance"));
+                suicide.setRefundAddress(getAddress(suicideNode, "refundAddress"));
+            }
         }
         trace.setBlockHash(getBlockHash(node, "blockHash"));
         trace.setBlockNumber(getLong(node, "blockNumber"));
@@ -74,6 +82,10 @@ public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJs
             JsonNode failedCallNode = resultNode.get("failedCall");
             if (failedCallNode != null) {
                 result.setFailedCall(Collections.emptyList());
+            }
+            JsonNode noneNode = resultNode.get("none");
+            if (noneNode != null) {
+                result.setNone(Collections.emptyList());
             }
         }
 

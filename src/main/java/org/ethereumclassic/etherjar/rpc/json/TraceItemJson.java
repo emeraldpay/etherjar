@@ -87,6 +87,7 @@ public class TraceItemJson {
     public static class Action {
         private ActionCall call;
         private ActionCreate create;
+        private ActionSuicide suicide;
 
         public ActionCall getCall() {
             return call;
@@ -102,6 +103,14 @@ public class TraceItemJson {
 
         public void setCreate(ActionCreate create) {
             this.create = create;
+        }
+
+        public ActionSuicide getSuicide() {
+            return suicide;
+        }
+
+        public void setSuicide(ActionSuicide suicide) {
+            this.suicide = suicide;
         }
     }
 
@@ -201,6 +210,36 @@ public class TraceItemJson {
         }
     }
 
+    public static class ActionSuicide {
+        private Address address;
+        private Wei balance;
+        private Address refundAddress;
+
+        public Address getAddress() {
+            return address;
+        }
+
+        public void setAddress(Address address) {
+            this.address = address;
+        }
+
+        public Wei getBalance() {
+            return balance;
+        }
+
+        public void setBalance(Wei balance) {
+            this.balance = balance;
+        }
+
+        public Address getRefundAddress() {
+            return refundAddress;
+        }
+
+        public void setRefundAddress(Address refundAddress) {
+            this.refundAddress = refundAddress;
+        }
+    }
+
     public static class CallType {
         private List call;
 
@@ -217,6 +256,7 @@ public class TraceItemJson {
         private ResultCall call;
         private ResultCreate create;
         private List failedCall;
+        private List none;
 
         public ResultCall getCall() {
             return call;
@@ -240,6 +280,14 @@ public class TraceItemJson {
 
         public void setFailedCall(List failedCall) {
             this.failedCall = failedCall;
+        }
+
+        public List getNone() {
+            return none;
+        }
+
+        public void setNone(List none) {
+            this.none = none;
         }
     }
 
