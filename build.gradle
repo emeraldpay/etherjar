@@ -9,7 +9,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 
 group = 'org.ethereumclassic'
-version = '0.2-SNAPSHOT'
+version = '0.3-SNAPSHOT'
 def description = 'Lightweight Java client to Ethereum blockchain'
 
 targetCompatibility = '1.7'
