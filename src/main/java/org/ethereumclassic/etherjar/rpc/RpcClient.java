@@ -176,6 +176,15 @@ public interface RpcClient {
          */
         public Future<HexData> getCode(Address address, BlockTag block) throws IOException;
 
+
+        /**
+         *
+         * @return the hash of the current block, the seedHash, and the boundary condition to be met ("target").
+         * @throws IOException
+         * @todo replace Hexdata in the return by an Array Object
+         */
+        public Future<String[]> getWork() throws IOException;
+
     }
 
     interface TraceCommands {

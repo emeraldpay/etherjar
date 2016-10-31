@@ -7,7 +7,6 @@ import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -193,6 +192,14 @@ public class DefaultRpcClient implements RpcClient {
                 Arrays.asList(address.toHex(), block.getCode()),
                 String.class);
             return extractor.extractData(resp);
+        }
+
+        @Override
+        public Future<String[]> getWork() throws IOException {
+            Future<String[]> resp = transport.execute("eth_getWork",
+                    Collections.emptyList(),
+                    String[].class);
+            return resp;
         }
 
     }

@@ -11,6 +11,8 @@ import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport
 import spock.lang.Specification
 
+import java.util.concurrent.CompletableFuture
+
 import static org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.*
 
 /**
@@ -241,5 +243,17 @@ class DefaultRpcClientSpec extends Specification {
                 ['0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc'],
                 TraceList) >> new CompletedFuture<>(json)
         act.get() == json
+    }
+
+    def "Get work"() {
+        setup:
+        def response = ['0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02',
+                        '0x002440e15267eebdf06fa7fe5aee5ccff445967925a90ecce6429aef7f8feb1f',
+                        '0x000000000029891796c0001e696bca79de31c4640e112f147dc80e77263ffa1a']
+        when:
+        def act = defaultRpcClient.eth().getWork()
+        then:
+        1 * rpcTransport.execute("eth_getWork", [], String[]) >> new CompletableFuture<>(response)
+        act.get() == response
     }
 }
