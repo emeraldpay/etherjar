@@ -1,16 +1,23 @@
 package org.ethereumclassic.etherjar.rpc;
 
-import org.apache.http.util.Asserts;
-import org.ethereumclassic.etherjar.model.*;
-import org.ethereumclassic.etherjar.rpc.json.*;
+import org.ethereumclassic.etherjar.model.Address;
+import org.ethereumclassic.etherjar.model.BlockHash;
+import org.ethereumclassic.etherjar.model.Hex32;
+import org.ethereumclassic.etherjar.model.HexData;
+import org.ethereumclassic.etherjar.model.HexQuantity;
+import org.ethereumclassic.etherjar.model.Nonce;
+import org.ethereumclassic.etherjar.model.TransactionId;
+import org.ethereumclassic.etherjar.model.Wei;
+import org.ethereumclassic.etherjar.rpc.json.BlockJson;
+import org.ethereumclassic.etherjar.rpc.json.BlockTag;
+import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
+import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Future;
-
-import static org.apache.http.util.Asserts.check;
 
 /**
  * @author Igor Artamonov
@@ -207,9 +214,6 @@ public class DefaultRpcClient implements RpcClient {
 
         @Override
         public Future<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException {
-            check(nonce.getBytes().length == 8, "Nonce should be 8 bytes long");
-            check(powHash.getBytes().length == 32, "PowHash should be 32 bytes long");
-            check(digest.getBytes().length == 32, "Digest should be 32 bytes long");
             Future<Boolean> resp = transport.execute("eth_submitWork",
                     Arrays.asList(nonce.toHex(), powHash.toHex(), digest.toHex()),
                     Boolean.class);
@@ -218,8 +222,6 @@ public class DefaultRpcClient implements RpcClient {
 
         @Override
         public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException {
-            check(hashrate.getBytes().length == 32, "Hashrate should be 32 bytes long");
-            check(id.getBytes().length == 32, "ID should be 32 bytes long");
             Future<Boolean> resp = transport.execute("eth_submitHashrate",
                     Arrays.asList(hashrate.toHex(), id.toHex()),
                     Boolean.class);
