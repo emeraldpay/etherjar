@@ -193,7 +193,7 @@ public interface RpcClient {
          * @throws IOException
          * @todo powHash and digest are the same than a BlockHash object - should we use a BlockHash?
          */
-        public Future<Boolean> submitWork(HexData nonce, HexData powHash, HexData digest) throws IOException;
+        public Future<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException;
 
         /**
          * Used for submitting mining hashrate.
@@ -202,7 +202,7 @@ public interface RpcClient {
          * @return true if submitting went through succesfully and false otherwise.
          * @throws IOException
          */
-        public Future<Boolean> submitHashrate(HexData hashrate, HexData id) throws IOException;
+        public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException;
 
     }
 

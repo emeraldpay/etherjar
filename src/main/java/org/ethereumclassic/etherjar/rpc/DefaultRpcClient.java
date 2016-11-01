@@ -206,7 +206,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Boolean> submitWork(HexData nonce, HexData powHash, HexData digest) throws IOException {
+        public Future<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException {
             check(nonce.getBytes().length == 8, "Nonce should be 8 bytes long");
             check(powHash.getBytes().length == 32, "PowHash should be 32 bytes long");
             check(digest.getBytes().length == 32, "Digest should be 32 bytes long");
@@ -217,7 +217,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Boolean> submitHashrate(HexData hashrate, HexData id) throws IOException {
+        public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException {
             check(hashrate.getBytes().length == 32, "Hashrate should be 32 bytes long");
             check(id.getBytes().length == 32, "ID should be 32 bytes long");
             Future<Boolean> resp = transport.execute("eth_submitHashrate",
