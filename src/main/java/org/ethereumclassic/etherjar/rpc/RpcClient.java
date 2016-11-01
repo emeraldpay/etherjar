@@ -181,9 +181,8 @@ public interface RpcClient {
          *
          * @return the hash of the current block, the seedHash, and the boundary condition to be met ("target").
          * @throws IOException
-         * @todo replace Hexdata in the return by an Array Object
          */
-        public Future<String[]> getWork() throws IOException;
+        public Future<HexData[]> getWork() throws IOException;
 
     }
 

@@ -31,6 +31,13 @@ public class HexData {
         this.value = value;
     }
 
+    public HexData(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Empty value");
+        }
+        this.value = value.getBytes();
+    }
+
     public static HexData from(long value) {
         return new HexData(BigInteger.valueOf(value).toByteArray());
     }

@@ -195,10 +195,10 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<String[]> getWork() throws IOException {
-            Future<String[]> resp = transport.execute("eth_getWork",
+        public Future<HexData[]> getWork() throws IOException {
+            Future<HexData[]> resp = transport.execute("eth_getWork",
                     Collections.emptyList(),
-                    String[].class);
+                    HexData[].class);
             return resp;
         }
 

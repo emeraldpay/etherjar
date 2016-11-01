@@ -2,6 +2,7 @@ package org.ethereumclassic.etherjar.rpc
 
 import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.BlockHash
+import org.ethereumclassic.etherjar.model.HexData
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
@@ -247,13 +248,13 @@ class DefaultRpcClientSpec extends Specification {
 
     def "Get work"() {
         setup:
-        def response = ['0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02',
+        def data = [    '0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02',
                         '0x002440e15267eebdf06fa7fe5aee5ccff445967925a90ecce6429aef7f8feb1f',
                         '0x000000000029891796c0001e696bca79de31c4640e112f147dc80e77263ffa1a']
         when:
         def act = defaultRpcClient.eth().getWork()
         then:
-        1 * rpcTransport.execute("eth_getWork", [], String[]) >> new CompletableFuture<>(response)
-        act.get() == response
+        1 * rpcTransport.execute("eth_getWork", [], HexData[]) >> new CompletableFuture<>(data)
+        act.get().size() == data.size() && act.get() as Set == data as Set
     }
 }
