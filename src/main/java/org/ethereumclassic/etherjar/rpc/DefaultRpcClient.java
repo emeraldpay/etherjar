@@ -228,6 +228,14 @@ public class DefaultRpcClient implements RpcClient {
             return resp;
         }
 
+        @Override
+        public Future<Address> coinbase() throws IOException {
+            Future<Address> resp = transport.execute("eth_coinbase",
+                    Collections.emptyList(),
+                    Address.class);
+            return resp;
+        }
+
     }
 
     public static class TraceCommandsImpl implements TraceCommands {

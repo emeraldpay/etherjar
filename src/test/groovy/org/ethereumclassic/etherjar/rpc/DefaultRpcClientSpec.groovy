@@ -281,4 +281,13 @@ class DefaultRpcClientSpec extends Specification {
         act.get() == true
     }
 
+    def "Coinbase"() {
+        setup:
+        def data = '0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02'
+        when:
+        def act = defaultRpcClient.eth().coinbase()
+        then:
+        1 * rpcTransport.execute("eth_coinbase", [], Address) >> new CompletedFuture<>(data)
+        act.get() == data
+    }
 }

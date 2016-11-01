@@ -204,6 +204,14 @@ public interface RpcClient {
          */
         public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException;
 
+
+        /**
+         * Returns the client coinbase address.
+         * @return coinbase address
+         * @throws IOException
+         */
+        public Future<Address> coinbase() throws IOException;
+
     }
 
     interface TraceCommands {
