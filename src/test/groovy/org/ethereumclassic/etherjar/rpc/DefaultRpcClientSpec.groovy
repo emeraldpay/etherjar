@@ -255,4 +255,28 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_getWork", [], HexData[]) >> new CompletedFuture<>(data)
         act.get().size() == data.size() && act.get() as Set == data as Set
     }
+
+    def "Submit Hashrate"() {
+        setup:
+        def hashRate = HexData.from("0x0000000000000000000000000000000000000000000000000000000000500000");
+        def id = HexData.from("0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c");
+        when:
+        def act = defaultRpcClient.eth().submitHashrate(hashRate, id);
+        then:
+        1 * rpcTransport.execute("eth_submitHashrate", [hashRate.toHex(), id.toHex()], Boolean) >> new CompletedFuture<>(true)
+        act.get() == true
+    }
+
+    def "Submit Work"() {
+        setup:
+        def nonce = HexData.from("0x0000000000000001");
+        def powHash = HexData.from("0x0234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+        def digest = HexData.from("0x01fe5700000000000000000000000000d1fe5700000000000000000000000000");
+        when:
+        def act = defaultRpcClient.eth().submitWork(nonce, powHash, digest);
+        then:
+        1 * rpcTransport.execute("eth_submitWork", [nonce.toHex(), powHash.toHex(), digest.toHex()], Boolean) >> new CompletedFuture<>(true)
+        act.get() == true
+    }
+
 }

@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.rpc;
 
+import org.apache.http.util.Asserts;
 import org.ethereumclassic.etherjar.model.*;
 import org.ethereumclassic.etherjar.rpc.json.*;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
@@ -8,6 +9,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.Future;
+
+import static org.apache.http.util.Asserts.check;
 
 /**
  * @author Igor Artamonov
@@ -199,6 +202,27 @@ public class DefaultRpcClient implements RpcClient {
             Future<HexData[]> resp = transport.execute("eth_getWork",
                     Collections.emptyList(),
                     HexData[].class);
+            return resp;
+        }
+
+        @Override
+        public Future<Boolean> submitWork(HexData nonce, HexData powHash, HexData digest) throws IOException {
+            check(nonce.getBytes().length == 8, "Nonce should be 8 bytes long");
+            check(powHash.getBytes().length == 32, "PowHash should be 32 bytes long");
+            check(digest.getBytes().length == 32, "Digest should be 32 bytes long");
+            Future<Boolean> resp = transport.execute("eth_submitWork",
+                    Arrays.asList(nonce.toHex(), powHash.toHex(), digest.toHex()),
+                    Boolean.class);
+            return resp;
+        }
+
+        @Override
+        public Future<Boolean> submitHashrate(HexData hashrate, HexData id) throws IOException {
+            check(hashrate.getBytes().length == 32, "Hashrate should be 32 bytes long");
+            check(id.getBytes().length == 32, "ID should be 32 bytes long");
+            Future<Boolean> resp = transport.execute("eth_submitHashrate",
+                    Arrays.asList(hashrate.toHex(), id.toHex()),
+                    Boolean.class);
             return resp;
         }
 
