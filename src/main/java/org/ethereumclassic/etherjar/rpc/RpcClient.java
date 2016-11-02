@@ -184,6 +184,34 @@ public interface RpcClient {
          */
         public Future<HexData[]> getWork() throws IOException;
 
+        /**
+         * Used for submitting a proof-of-work solution.
+         * @param nonce 8 Bytes - The nonce found (64 bits)
+         * @param powHash 32 Bytes - The header's pow-hash (256 bits)
+         * @param digest 32 Bytes - The mix digest (256 bits)
+         * @return true if the provided solution is valid, otherwise false.
+         * @throws IOException
+         * @todo powHash and digest are the same than a BlockHash object - should we use a BlockHash?
+         */
+        public Future<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException;
+
+        /**
+         * Used for submitting mining hashrate.
+         * @param hashrate a hexadecimal string representation (32 bytes) of the hash rate
+         * @param id  A random hexadecimal(32 bytes) ID identifying the client
+         * @return true if submitting went through succesfully and false otherwise.
+         * @throws IOException
+         */
+        public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException;
+
+
+        /**
+         * Returns the client coinbase address.
+         * @return coinbase address
+         * @throws IOException
+         */
+        public Future<Address> coinbase() throws IOException;
+
     }
 
     interface TraceCommands {

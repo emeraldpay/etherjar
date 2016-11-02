@@ -1,7 +1,17 @@
 package org.ethereumclassic.etherjar.rpc;
 
-import org.ethereumclassic.etherjar.model.*;
-import org.ethereumclassic.etherjar.rpc.json.*;
+import org.ethereumclassic.etherjar.model.Address;
+import org.ethereumclassic.etherjar.model.BlockHash;
+import org.ethereumclassic.etherjar.model.Hex32;
+import org.ethereumclassic.etherjar.model.HexData;
+import org.ethereumclassic.etherjar.model.HexQuantity;
+import org.ethereumclassic.etherjar.model.Nonce;
+import org.ethereumclassic.etherjar.model.TransactionId;
+import org.ethereumclassic.etherjar.model.Wei;
+import org.ethereumclassic.etherjar.rpc.json.BlockJson;
+import org.ethereumclassic.etherjar.rpc.json.BlockTag;
+import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
+import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
@@ -199,6 +209,30 @@ public class DefaultRpcClient implements RpcClient {
             Future<HexData[]> resp = transport.execute("eth_getWork",
                     Collections.emptyList(),
                     HexData[].class);
+            return resp;
+        }
+
+        @Override
+        public Future<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException {
+            Future<Boolean> resp = transport.execute("eth_submitWork",
+                    Arrays.asList(nonce.toHex(), powHash.toHex(), digest.toHex()),
+                    Boolean.class);
+            return resp;
+        }
+
+        @Override
+        public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException {
+            Future<Boolean> resp = transport.execute("eth_submitHashrate",
+                    Arrays.asList(hashrate.toHex(), id.toHex()),
+                    Boolean.class);
+            return resp;
+        }
+
+        @Override
+        public Future<Address> coinbase() throws IOException {
+            Future<Address> resp = transport.execute("eth_coinbase",
+                    Collections.emptyList(),
+                    Address.class);
             return resp;
         }
 

@@ -14,6 +14,10 @@ public class Address extends HexData {
         super(bytes, SIZE_BYTES);
     }
 
+    private Address(String value) {
+        super(HexData.from(value).getBytes(), SIZE_BYTES);
+    }
+
     public static Address from(byte[] value) {
         if (value == null) {
             throw new IllegalArgumentException("Null Address");

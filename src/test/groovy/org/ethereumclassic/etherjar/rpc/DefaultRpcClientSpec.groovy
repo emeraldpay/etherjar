@@ -2,7 +2,9 @@ package org.ethereumclassic.etherjar.rpc
 
 import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.BlockHash
+import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
+import org.ethereumclassic.etherjar.model.Nonce
 import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
@@ -254,5 +256,38 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getWork", [], HexData[]) >> new CompletedFuture<>(data)
         act.get().size() == data.size() && act.get() as Set == data as Set
+    }
+
+    def "Submit Hashrate"() {
+        setup:
+        def hashRate = Hex32.from("0x0000000000000000000000000000000000000000000000000000000000500000");
+        def id = Hex32.from("0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c");
+        when:
+        def act = defaultRpcClient.eth().submitHashrate(hashRate, id);
+        then:
+        1 * rpcTransport.execute("eth_submitHashrate", [hashRate.toHex(), id.toHex()], Boolean) >> new CompletedFuture<>(true)
+        act.get() == true
+    }
+
+    def "Submit Work"() {
+        setup:
+        def nonce = Nonce.from("0x0000000000000001");
+        def powHash = Hex32.from("0x0234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+        def digest = Hex32.from("0x01fe5700000000000000000000000000d1fe5700000000000000000000000000");
+        when:
+        def act = defaultRpcClient.eth().submitWork(nonce, powHash, digest);
+        then:
+        1 * rpcTransport.execute("eth_submitWork", [nonce.toHex(), powHash.toHex(), digest.toHex()], Boolean) >> new CompletedFuture<>(true)
+        act.get() == true
+    }
+
+    def "Coinbase"() {
+        setup:
+        def data = '0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02'
+        when:
+        def act = defaultRpcClient.eth().coinbase()
+        then:
+        1 * rpcTransport.execute("eth_coinbase", [], Address) >> new CompletedFuture<>(data)
+        act.get() == data
     }
 }
