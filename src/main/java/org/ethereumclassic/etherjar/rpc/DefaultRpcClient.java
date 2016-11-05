@@ -229,13 +229,44 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public Future<Address> coinbase() throws IOException {
+        public Future<Address> getCoinbase() throws IOException {
             Future<Address> resp = transport.execute("eth_coinbase",
                     Collections.emptyList(),
                     Address.class);
             return resp;
         }
 
+        @Override
+        public Future<Long> getHashrate() throws IOException {
+            Future<String> resp = transport.execute("eth_hashrate",
+                    Collections.emptyList(),
+                    String.class);
+            return extractor.extractLong(resp);
+        }
+
+        @Override
+        public Future<Boolean> isMining() throws IOException {
+            Future<Boolean> resp = transport.execute("eth_mining",
+                    Collections.emptyList(),
+                    Boolean.class);
+            return resp;
+        }
+
+        @Override
+        public Future<Long> getGasPrice() throws IOException {
+            Future<String> resp = transport.execute("eth_gasPrice",
+                    Collections.emptyList(),
+                    String.class);
+            return extractor.extractLong(resp);
+        }
+
+        @Override
+        public Future<Address[]> getAccounts() throws IOException {
+            Future<Address[]> resp = transport.execute("eth_accounts",
+                    Collections.emptyList(),
+                    Address[].class);
+            return resp;
+        }
     }
 
     public static class TraceCommandsImpl implements TraceCommands {

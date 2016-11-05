@@ -285,9 +285,50 @@ class DefaultRpcClientSpec extends Specification {
         setup:
         def data = '0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02'
         when:
-        def act = defaultRpcClient.eth().coinbase()
+        def act = defaultRpcClient.eth().getCoinbase()
         then:
         1 * rpcTransport.execute("eth_coinbase", [], Address) >> new CompletedFuture<>(data)
         act.get() == data
+    }
+
+    def "Get Hashrate"() {
+        setup:
+        def data = 947330l
+        when:
+        def act = defaultRpcClient.eth().getHashrate()
+        then:
+        1 * rpcTransport.execute("eth_hashrate", [], String) >> new CompletedFuture<>("0x1f47d0")
+        act.get() == 2050000
+    }
+
+    def "Is Mining"() {
+        when:
+        def act = defaultRpcClient.eth().isMining();
+        then:
+        1 * rpcTransport.execute("eth_mining", [], Boolean) >> new CompletedFuture<>(true)
+        act.get() == true
+    }
+
+    def "Gas price"() {
+        setup:
+        def data = 20000000000L
+        when:
+        def act = defaultRpcClient.eth().getGasPrice()
+        then:
+        1 * rpcTransport.execute("eth_gasPrice", [], String) >> new CompletedFuture<>("0x4A817C800")
+        act.get() == data
+    }
+
+    def "Accounts"() {
+        setup:
+        def data = [    Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
+                        Address.from('0x1e45c30168ba23a0dac51911079d0fcff1a9e4ad'),
+                        Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
+                        Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911')]
+        when:
+        def act = defaultRpcClient.eth().getAccounts()
+        then:
+        1 * rpcTransport.execute("eth_accounts", [], Address[]) >> new CompletedFuture<>(data)
+        act.get().size() == data.size() && act.get() as Set == data as Set
     }
 }
