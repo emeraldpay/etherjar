@@ -32,6 +32,7 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<Wei> getBalance(Address address, BlockTag block) throws IOException;
+
         /**
          *
          * @param address address
@@ -49,6 +50,7 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException;
+
         /**
          *
          * @param hash block hash
@@ -65,6 +67,7 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<TransactionJson> getTransaction(TransactionId hash) throws IOException;
+
         /**
          *
          * @param block block hash
@@ -73,6 +76,7 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<TransactionJson> getTransaction(BlockHash block, long index) throws IOException;;
+
         /**
          *
          * @param block block number
@@ -80,6 +84,7 @@ public interface RpcClient {
          * @return information about a transaction
          * @throws IOException
          */
+
         public Future<TransactionJson> getTransaction(long block, long index) throws IOException;;
 
         /**
@@ -176,7 +181,6 @@ public interface RpcClient {
          */
         public Future<HexData> getCode(Address address, BlockTag block) throws IOException;
 
-
         /**
          *
          * @return the hash of the current block, the seedHash, and the boundary condition to be met ("target").
@@ -191,7 +195,6 @@ public interface RpcClient {
          * @param digest 32 Bytes - The mix digest (256 bits)
          * @return true if the provided solution is valid, otherwise false.
          * @throws IOException
-         * @todo powHash and digest are the same than a BlockHash object - should we use a BlockHash?
          */
         public Future<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException;
 
@@ -204,14 +207,36 @@ public interface RpcClient {
          */
         public Future<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException;
 
-
         /**
-         * Returns the client coinbase address.
-         * @return coinbase address
+         * Returns the client getCoinbase address.
+         * @return getCoinbase address
          * @throws IOException
          */
-        public Future<Address> coinbase() throws IOException;
+        public Future<Address> getCoinbase() throws IOException;
 
+        /**
+         * @return the number of hashes per second that the node is mining with.
+         * @throws IOException
+         */
+        public Future<Long> getHashrate() throws IOException;
+
+        /**
+         * @return true if client is actively mining new blocks.
+         * @throws IOException
+         */
+        public Future<Boolean> isMining() throws IOException;
+
+        /**
+         * @return the current price per gas in wei.
+         * @throws IOException
+         */
+        public Future<Long> getGasPrice() throws IOException;
+
+        /**
+         * @return a list of addresses owned by client.
+         * @throws IOException
+         */
+        public Future<Address[]> getAccounts() throws IOException;
     }
 
     interface TraceCommands {
