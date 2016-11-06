@@ -237,6 +237,12 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<Address[]> getAccounts() throws IOException;
+
+        /**
+         * @return a list of available compilers in the client.
+         * @throws IOException
+         */
+        public Future<String[]> getCompilers() throws IOException;
     }
 
     interface TraceCommands {
