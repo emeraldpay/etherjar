@@ -255,7 +255,8 @@ class DefaultRpcClientSpec extends Specification {
         def act = defaultRpcClient.eth().getWork()
         then:
         1 * rpcTransport.execute("eth_getWork", [], HexData[]) >> new CompletedFuture<>(data)
-        act.get().size() == data.size() && act.get() as Set == data as Set
+        act.get().size() == data.size()
+        act.get() as Set == data as Set
     }
 
     def "Submit Hashrate"() {
@@ -329,6 +330,18 @@ class DefaultRpcClientSpec extends Specification {
         def act = defaultRpcClient.eth().getAccounts()
         then:
         1 * rpcTransport.execute("eth_accounts", [], Address[]) >> new CompletedFuture<>(data)
-        act.get().size() == data.size() && act.get() as Set == data as Set
+        act.get().size() == data.size()
+        act.get() as Set == data as Set
+    }
+
+    def "Get Compilers"() {
+        setup:
+        def data = ["solidity", "lll", "serpent"]
+        when:
+        def act = defaultRpcClient.eth().getCompilers()
+        then:
+        1 * rpcTransport.execute("eth_getCompilers", [], String[]) >> new CompletedFuture<>(data)
+        act.get().size() == data.size()
+        act.get() as Set == data as Set
     }
 }

@@ -267,6 +267,14 @@ public class DefaultRpcClient implements RpcClient {
                     Address[].class);
             return resp;
         }
+
+        @Override
+        public Future<String[]> getCompilers() throws IOException {
+            Future<String[]> resp = transport.execute("eth_getCompilers",
+                    Collections.emptyList(),
+                    String[].class);
+            return resp;
+        }
     }
 
     public static class TraceCommandsImpl implements TraceCommands {
