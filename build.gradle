@@ -27,6 +27,7 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "org.apache.httpcomponents:httpmime:$httpClientVersion"
     compile "org.apache.httpcomponents:httpclient:$httpClientVersion"
+    compile "org.bouncycastle:bcprov-jdk15on:1.55"
 
     testCompile "org.objenesis:objenesis:2.2"
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
