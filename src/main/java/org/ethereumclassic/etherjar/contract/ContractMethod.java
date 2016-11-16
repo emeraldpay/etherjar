@@ -7,6 +7,7 @@ import org.ethereumclassic.etherjar.model.MethodId;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -21,6 +22,7 @@ import java.io.IOException;
  * See https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
  *
  * @author Igor Artamonov
+ * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI">Ethereum Contract ABI</a>
  */
 public class ContractMethod {
 
@@ -58,6 +60,12 @@ public class ContractMethod {
 
     static class Builder {
 
+        final static Pattern SIGNATURE_PATTERN = Pattern.compile("\\p{Alpha}\\w*\\([\\w,x\\[\\]]+\\)");
+
+        static boolean isSignatureValid(String signature) {
+            return SIGNATURE_PATTERN.matcher(signature).matches();
+        }
+
         private MethodId id;
 
         public Builder() {
@@ -66,13 +74,16 @@ public class ContractMethod {
         /**
          * builds from full method signature like `name(datatype1,datatype2)`, or transfer(address,uint256)
          *
-         * Make sure you're using full name for the type, e.g uint256 instead of simple uint
+         * Make sure you're using canonical type of the name for the type, e.g uint256 instead of simple uint
          *
-         * @param signature full method signature
+         * @param signature full method signature ({@link #SIGNATURE_PATTERN})
          * @return builder
          */
         public Builder fromFullName(String signature) {
-            //TODO add regexp to validate signature format
+            if (signature == null)
+                throw new IllegalArgumentException("Null contract method signature");
+            if (!isSignatureValid(signature))
+                throw new IllegalArgumentException("Invalid contract method signature: " + signature);
             Keccak.Digest256 keccak = new Keccak.Digest256();
             keccak.update(signature.getBytes());
             byte[] hash = keccak.digest();
