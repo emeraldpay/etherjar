@@ -10,14 +10,13 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 /**
- *
- * baz(uint32,bool) with arguments (69, true) becomes:
- * 0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001
- *
  * The first four bytes of the call data for a function call specifies the function to be called. It is the
  * first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash of the signature of the function. The
  * signature is defined as the canonical expression of the basic prototype, i.e. the function name with the
  * parenthesised list of parameter types. Parameter types are split by a single comma - no spaces are used.
+ *
+ * <p><b>Example:</b> <code>baz(uint32,bool)</code> with arguments <tt>(69, true)</tt> becomes
+ * <tt>0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001</tt>
  *
  * @author Igor Artamonov
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI">Ethereum Contract ABI</a>
@@ -58,8 +57,15 @@ public class ContractMethod {
 
     static class Builder {
 
-        final static Pattern SIGNATURE_PATTERN = Pattern.compile("\\p{Alpha}+\\d*\\(((\\p{Alpha}*|\\d{1,3})|(\\[\\d*\\])|((?<!,),(?!\\))))*\\)");
+        final static Pattern SIGNATURE_PATTERN =
+                Pattern.compile("\\p{Alpha}+\\d*\\(((\\p{Alpha}*|\\d{1,3})|(\\[\\d*\\])|((?<!,),(?!\\))))*\\)");
 
+        /**
+         * Check contract method signature
+         *
+         * @param signature a method name
+         * @return boolean
+         */
         static boolean isSignatureValid(String signature) {
             return SIGNATURE_PATTERN.matcher(signature).matches();
         }
