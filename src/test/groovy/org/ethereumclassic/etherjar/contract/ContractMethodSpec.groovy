@@ -14,6 +14,8 @@ class ContractMethodSpec extends Specification {
         ContractMethod.Builder.isSignatureValid(valid_sign as String)
         where:
         _ | valid_sign
+        _ | 'baz()'
+        _ | 'baz(uint32)'
         _ | 'baz(uint32,bool)'
         _ | 'bar(fixed128x128[2])'
         _ | 'f123(uint256,uint32[],bytes10,bytes)'
@@ -24,8 +26,12 @@ class ContractMethodSpec extends Specification {
         !ContractMethod.Builder.isSignatureValid(invalid_sign as String)
         where:
         _ | invalid_sign
+        _ | 'baz(uint32,,bool)'
+        _ | 'baz(uint32,bool,)'
         _ | 'baz(uint32, bool)'
         _ | 'bar(fixed128x128[2]'
+        _ | 'f(uint256,uint32][,bytes10,bytes)'
+        _ | 'f(uint256,uint32[abc],bytes10,bytes)'
         _ | '1f(uint256,uint32[],bytes10,bytes)'
     }
 

@@ -19,8 +19,6 @@ import java.util.regex.Pattern;
  * signature is defined as the canonical expression of the basic prototype, i.e. the function name with the
  * parenthesised list of parameter types. Parameter types are split by a single comma - no spaces are used.
  *
- * See https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
- *
  * @author Igor Artamonov
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI">Ethereum Contract ABI</a>
  */
@@ -60,7 +58,7 @@ public class ContractMethod {
 
     static class Builder {
 
-        final static Pattern SIGNATURE_PATTERN = Pattern.compile("\\p{Alpha}\\w*\\([\\w,x\\[\\]]+\\)");
+        final static Pattern SIGNATURE_PATTERN = Pattern.compile("\\p{Alpha}+\\d*\\(((\\p{Alpha}*|\\d{1,3})|(\\[\\d*\\])|((?<!,),(?!\\))))*\\)");
 
         static boolean isSignatureValid(String signature) {
             return SIGNATURE_PATTERN.matcher(signature).matches();
@@ -74,7 +72,7 @@ public class ContractMethod {
         /**
          * builds from full method signature like `name(datatype1,datatype2)`, or transfer(address,uint256)
          *
-         * Make sure you're using canonical type of the name for the type, e.g uint256 instead of simple uint
+         * Make sure you're using canonical name type, e.g uint256 instead of simple uint
          *
          * @param signature full method signature ({@link #SIGNATURE_PATTERN})
          * @return builder
