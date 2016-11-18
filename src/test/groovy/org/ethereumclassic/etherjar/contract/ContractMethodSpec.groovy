@@ -30,8 +30,6 @@ class ContractMethodSpec extends Specification {
         _ | 'baz(uint32,bool,)'
         _ | 'baz(uint32, bool)'
         _ | 'bar(fixed128x128[2]'
-        _ | 'f(uint256,uint32][,bytes10,bytes)'
-        _ | 'f(uint256,uint32[abc],bytes10,bytes)'
         _ | '1f(uint256,uint32[],bytes10,bytes)'
     }
 
