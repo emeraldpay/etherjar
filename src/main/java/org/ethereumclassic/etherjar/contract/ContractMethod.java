@@ -58,7 +58,7 @@ public class ContractMethod {
     static class Builder {
 
         final static Pattern SIGNATURE_PATTERN =
-                Pattern.compile("\\p{Alpha}+\\d*\\(((\\p{Alnum}*)|([\\[\\]])|((?<!,),(?!\\))))*\\)");
+                Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|\\]|((?<!,),(?!\\))))*\\)");
 
         /**
          * Check contract method signature
