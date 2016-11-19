@@ -1,4 +1,4 @@
-package org.ethereumclassic.etherjar.contract;
+package org.ethereumclassic.etherjar.contract.type;
 
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.ethereumclassic.etherjar.model.Hex32;
@@ -7,6 +7,10 @@ import org.ethereumclassic.etherjar.model.MethodId;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -21,44 +25,15 @@ import java.util.regex.Pattern;
  * @author Igor Artamonov
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI">Ethereum Contract ABI</a>
  */
-public class ContractMethod {
-
-    private MethodId id;
-
-    private ContractMethod(MethodId id) {
-        this.id = id;
-    }
+public class MethodType implements Type<Object[]> {
 
     /**
-     * @return function id
+     * Single-threaded builder.
      */
-    public MethodId getId() {
-        return id;
-    }
-
-    /**
-     * Encodes call data to send through RPC
-     *
-     * @param params parameters of the call
-     * @return encoded call
-     */
-    public HexData encodeCall(Hex32... params) {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        try {
-            buf.write(id.getBytes());
-            for (Hex32 param: params) {
-                buf.write(param.getBytes());
-            }
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-        return new HexData(buf.toByteArray());
-    }
-
-    static class Builder {
+    public static class Builder {
 
         final static Pattern SIGNATURE_PATTERN =
-                Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|\\]|((?<!,),(?!\\))))*\\)");
+            Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|\\]|((?<!,),(?!\\))))*\\)");
 
         /**
          * Check contract method signature
@@ -72,13 +47,12 @@ public class ContractMethod {
 
         private MethodId id;
 
-        public Builder() {
-        }
+        private List<Type> types = new ArrayList<>();
 
         /**
-         * builds from full method signature like `name(datatype1,datatype2)`, or transfer(address,uint256)
+         * Start to build from full method signature like <tt>name(datatype1,datatype2)</tt>, or <tt>transfer(address,uint256)</tt>
          *
-         * Make sure you're using canonical name type, e.g uint256 instead of simple uint
+         * <p>Make sure you're using canonical name type, e.g <tt>uint256</tt> instead of simple <tt>uint</tt>
          *
          * @param signature full method signature ({@link #SIGNATURE_PATTERN})
          * @return builder
@@ -97,9 +71,69 @@ public class ContractMethod {
             return this;
         }
 
-        public ContractMethod build() {
-            return new ContractMethod(id);
+        public MethodType build() {
+            return new MethodType(id, types);
         }
     }
 
+    private final MethodId id;
+
+    private final List<Type> parameterTypes;
+
+    private MethodType(MethodId id, Type... parameterTypes) {
+        this(id, Arrays.asList(parameterTypes));
+    }
+
+    private MethodType(MethodId id, Collection<Type> parameterTypes) {
+        this.id = id;
+        this.parameterTypes = new ArrayList<>(parameterTypes);
+    }
+
+    /**
+     * @return function id
+     */
+    public MethodId getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return true;
+    }
+
+    @Override
+    public HexData encode(Object[] args) {
+        Hex32[] arr = null;
+
+        return encodeCall(arr);
+    }
+
+    @Override
+    public Object[] decode(HexData data) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <R> R visit(Visitor<R> visitor) {
+        return visitor.visit(this);
+    }
+
+    /**
+     * Encodes call data to send through RPC
+     *
+     * @param params encoded parameters of the call
+     * @return encoded call
+     */
+    HexData encodeCall(Hex32... params) {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        try {
+            buf.write(id.getBytes());
+            for (Hex32 param: params) {
+                buf.write(param.getBytes());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return new HexData(buf.toByteArray());
+    }
 }

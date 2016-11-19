@@ -1,7 +1,14 @@
 package org.ethereumclassic.etherjar.model;
 
+import org.ethereumclassic.etherjar.contract.type.MethodType;
+
 /**
+ * The first four bytes of the call data for a function call specifies the function to be called.
+ *
+ * <p>It is the first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash of the signature of the function.
+ *
  * @author Igor Artamonov
+ * @see MethodType
  */
 public class MethodId extends HexData {
 

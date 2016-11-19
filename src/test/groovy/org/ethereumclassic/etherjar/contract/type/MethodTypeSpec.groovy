@@ -1,4 +1,4 @@
-package org.ethereumclassic.etherjar.contract
+package org.ethereumclassic.etherjar.contract.type
 
 import org.ethereumclassic.etherjar.model.Hex32
 import spock.lang.Specification
@@ -7,11 +7,11 @@ import spock.lang.Specification
  *
  * @author Igor Artamonov
  */
-class ContractMethodSpec extends Specification {
+class MethodTypeSpec extends Specification {
 
     def "check method signature validity"() {
         expect:
-        ContractMethod.Builder.isSignatureValid(valid_sign as String)
+        MethodType.Builder.isSignatureValid(valid_sign as String)
         where:
         _ | valid_sign
         _ | 'baz()'
@@ -23,7 +23,7 @@ class ContractMethodSpec extends Specification {
 
     def "check method signature invalidity"() {
         expect:
-        !ContractMethod.Builder.isSignatureValid(invalid_sign as String)
+        !MethodType.Builder.isSignatureValid(invalid_sign as String)
         where:
         _ | invalid_sign
         _ | 'baz(uint32,,bool)'
@@ -35,7 +35,7 @@ class ContractMethodSpec extends Specification {
 
     def "prepare method id"() {
         expect:
-        def m = new ContractMethod.Builder().fromFullName(method).build()
+        def m = new MethodType.Builder().fromFullName(method).build()
         exp == m.id.toHex()
         where:
         exp             | method
@@ -46,7 +46,7 @@ class ContractMethodSpec extends Specification {
 
     def "encode call"() {
         setup:
-        def m = new ContractMethod.Builder().fromFullName('bar(fixed128x128[2])').build()
+        def m = new MethodType.Builder().fromFullName('bar(fixed128x128[2])').build()
         def params = [
                 Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
                 Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')
