@@ -3,8 +3,6 @@ package org.ethereumclassic.etherjar.model
 import spock.lang.Specification
 
 /**
- *
- * @since
  * @author Igor Artamonov
  */
 class HexDataSpec extends Specification {
@@ -47,6 +45,19 @@ class HexDataSpec extends Specification {
         HexData.from('0xfake')
         then:
         thrown(IllegalArgumentException)
+    }
+
+    def "combine hex data"() {
+        setup:
+        def params = [
+                MethodId.fromSignature('bar(fixed128x128[2])'),
+                Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
+                Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')
+        ] as HexData[]
+        when:
+        def data = HexData.from(params)
+        then:
+        data.toHex() == '0xab55044d00000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000880000000000000000000000000000000'
     }
 
     def "Equal"() {

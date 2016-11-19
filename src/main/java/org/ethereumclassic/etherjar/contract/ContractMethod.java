@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Contract method entity.
+ * A smart contract method.
  *
  * @author Igor Artamonov
  * @see Contract
@@ -41,7 +41,7 @@ public class ContractMethod {
 
     private final List<Type> parameterTypes;
 
-    private ContractMethod(MethodId id, Type... parameterTypes) {
+    public ContractMethod(MethodId id, Type... parameterTypes) {
         this.id = id;
         this.parameterTypes = Collections.unmodifiableList(Arrays.asList(parameterTypes));
     }
@@ -75,7 +75,7 @@ public class ContractMethod {
         if (parameterTypes.size() != params.length)
             throw new IllegalArgumentException("Wrong number of input parameters: " + params.length);
 
-        int headBytesSize = MethodId.SIZE_BYTES;
+        int headBytesSize = 0;
         int tailBytesSize = 0;
 
         for (Type type : parameterTypes) {
@@ -89,26 +89,26 @@ public class ContractMethod {
         for (int i = 0; i < parameterTypes.size(); i++) {
             Type type = parameterTypes.get(i);
 
+            //noinspection unchecked
+            Hex32[] data = type.encode(params[i]);
+
             if (!type.isDynamic()) {
-                //noinspection unchecked
-                Collections.addAll(head, type.encode(params[i]));
+                Collections.addAll(head, data);
             } else {
-                //noinspection unchecked
-                Hex32[] data = type.encode(params[i]);
-
-                head.add(Hex32.from(headBytesSize + tailBytesSize));
-
                 Collections.addAll(tail, data);
+
+                head.add(Hex32.from(MethodId.SIZE_BYTES + headBytesSize + tailBytesSize));
                 tailBytesSize += data.length * Hex32.SIZE_BYTES;
             }
         }
 
-        Hex32[] arr = new Hex32[head.size() + tail.size()];
+        HexData[] data = new HexData[head.size() + tail.size() + 1];
 
-        System.arraycopy(head.toArray(new Hex32[head.size()]), 0, arr, 0, head.size());
-        System.arraycopy(tail.toArray(new Hex32[tail.size()]), 0, arr, head.size(), head.size());
+        data[0] = id;
+        System.arraycopy(head.toArray(new Hex32[head.size()]), 0, data, 1, head.size());
+        System.arraycopy(tail.toArray(new Hex32[tail.size()]), 0, data, head.size() + 1, tail.size());
 
-        return encodeCall(arr);
+        return HexData.from(data);
     }
 
     /**

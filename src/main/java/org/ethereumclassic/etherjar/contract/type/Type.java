@@ -11,6 +11,13 @@ import org.ethereumclassic.etherjar.model.Hex32;
 public interface Type<T> {
 
     /**
+     * Number of bytes to store fixed-size offset of the beginning of dynamic tail part.
+     *
+     * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#formal-specification-of-the-encoding">Formal Specification of the Encoding</a>
+     */
+    int DYNAMIC_OFFSET_FIXED_SIZE_BYTES = Hex32.SIZE_BYTES;
+
+    /**
      * @param <V> the type of result object
      * @see <a href="https://en.wikipedia.org/wiki/Visitor_pattern">Visitor pattern (Wikipedia)</a>
      */
@@ -18,6 +25,8 @@ public interface Type<T> {
 
         V visit(UInt uInt);
     }
+
+    <V> V visit(Visitor<V> visitor);
 
     /**
      * Returns {@code true} if, and only if, current type is dynamic (non-fixed-size type).
@@ -29,7 +38,7 @@ public interface Type<T> {
     boolean isDynamic();
 
     /**
-     * @return number of bytes, only for static (not dynamic, fixed-size) types.
+     * @return number of fixed-size bytes, for dynamic types it must be offset with {@link #DYNAMIC_OFFSET_FIXED_SIZE_BYTES}.
      * @see #isDynamic()
      */
     int getBytesFixedSize();
@@ -49,6 +58,4 @@ public interface Type<T> {
      * @return encoded call
      */
     T decode(Hex32[] data);
-
-    <V> V visit(Visitor<V> visitor);
 }

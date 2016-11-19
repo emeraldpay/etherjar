@@ -1,5 +1,7 @@
 package org.ethereumclassic.etherjar.model;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -71,6 +73,26 @@ public class HexData {
         } else {
             return new HexData(new byte[0]);
         }
+    }
+
+    /**
+     * Combine several {@link HexData} together.
+     *
+     * @param data data for combining
+     * @return hex value
+     */
+    public static HexData from(HexData... data) {
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+
+        try {
+            for (HexData param: data) {
+                buf.write(param.getBytes());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new HexData(buf.toByteArray());
     }
 
     public String toHex() {
