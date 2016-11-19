@@ -27,4 +27,14 @@ class MethodIdSpec extends Specification {
         _ | 'bar(fixed128x128[2]'
         _ | '1f(uint256,uint32[],bytes10,bytes)'
     }
+
+    def "prepare method id"() {
+        expect:
+        id == MethodId.fromSignature(method).toHex()
+        where:
+        id           | method
+        '0xcdcd77c0' | 'baz(uint32,bool)'
+        '0xab55044d' | 'bar(fixed128x128[2])'
+        '0x8be65246' | 'f(uint256,uint32[],bytes10,bytes)'
+    }
 }
