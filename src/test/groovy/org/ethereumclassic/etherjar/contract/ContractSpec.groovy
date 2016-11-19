@@ -12,10 +12,10 @@ class ContractSpec extends Specification {
             contract.getMethod(method.getId()) == method
         where:
         _ | valid_methods
+        _ | []
         _ | [new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
              new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])),
              new ContractMethod(new MethodId([0xff, 0xAA, 0x2B, 0x3C] as byte[]))]
-        _ | []
     }
 
     def "check invalid method search"() {
@@ -34,10 +34,12 @@ class ContractSpec extends Specification {
         when:
         Contract contract = new Contract([new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
                                           new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[]))])
-        contract.getMethod(null)
+        contract.getMethod(id)
         then:
         thrown(IllegalArgumentException)
-
+        where:
+        _ | id
+        _ | null
     }
 
     def "check get methods"() {
@@ -48,9 +50,9 @@ class ContractSpec extends Specification {
         true
         where:
         _ | valid_methods
+        _ | []
         _ | [new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
              new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])),
              new ContractMethod(new MethodId([0xff, 0xAA, 0x2B, 0x3C] as byte[]))]
-        _ | []
     }
 }
