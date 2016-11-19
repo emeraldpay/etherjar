@@ -17,10 +17,6 @@ class ContractSpec extends Specification {
              new MethodType(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])),
              new MethodType(new MethodId([0xff, 0xAA, 0x2B, 0x3C] as byte[]))]
         _ | []
-        _ | new ArrayList<MethodType>()
-        _ | new ArrayList<MethodType>() {{new MethodType(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[]));
-                                            new MethodType(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[]));
-                                            new MethodType(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[]))}}
     }
 
     def "check invalid method search"() {
