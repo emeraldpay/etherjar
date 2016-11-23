@@ -20,10 +20,6 @@ class IntSpec extends Specification {
 
     }
 
-    def "Encode1"() {
-
-    }
-
     def "Decode"() {
 
     }
