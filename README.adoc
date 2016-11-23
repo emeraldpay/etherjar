@@ -6,20 +6,20 @@ image:https://travis-ci.org/ethereumproject/etherjar.png?branch=master[Travis CI
 image:https://codecov.io/gh/ethereumproject/etherjar/branch/master/graph/badge.svg[Codecov, link=https://codecov.io/gh/ethereumproject/etherjar]
 image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE"]
 
-Lightweight Java client to Ethereum blockchain, supports both Ethereum Classic ETC and Ethereum ETH
+Lightweight Java client to Ethereum blockchain, supports both Ethereum Classic (ETC) and Ethereum (ETH).
 
 ## Features
 
-* native Java wrapper around Ethereum data structures and RPC calls
-* blockchain information through Ethereum RPC
-* (_in progress_) offline transaction signing
-* (_in progress_) ABI encoding/decoding
+* Native Java wrapper around Ethereum data structures and RPC calls
+* Blockchain information through Ethereum RPC
+* (_in progress_) Offline transaction signing
 * (_in progress_) Smart Contracts for Java
+* (_in progress_) JSON ABI encoding/decoding
 * Parity RPC extensions support
 
 ## Technology
 
-* Java 7 (for Android support)
+* Java 8
 * Async first
 * HTTP Transport and JSON parser agnostic
 

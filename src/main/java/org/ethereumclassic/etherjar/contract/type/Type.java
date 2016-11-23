@@ -29,6 +29,13 @@ public interface Type<T> {
     <V> V visit(Visitor<V> visitor);
 
     /**
+     * Get type's canonical string representation
+     *
+     * @return a string
+     */
+    String getName();
+
+    /**
      * Returns {@code true} if, and only if, current type is dynamic (non-fixed-size type).
      *
      * <p>Dynamic type has additionally a length as the first {@link Hex32} element.
