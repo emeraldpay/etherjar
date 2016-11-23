@@ -9,6 +9,11 @@ public class UInt implements Type<BigInteger> {
     public static final int SIZE_BYTES = 32;
 
     @Override
+    public String getName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -20,12 +25,12 @@ public class UInt implements Type<BigInteger> {
 
     @Override
     public Hex32[] encode(BigInteger obj) {
-        return new Hex32[0];
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public BigInteger decode(Hex32[] data) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

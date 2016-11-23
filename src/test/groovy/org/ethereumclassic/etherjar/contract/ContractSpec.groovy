@@ -1,17 +1,21 @@
 package org.ethereumclassic.etherjar.contract
 
+import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.MethodId
 import spock.lang.Specification
 
 class ContractSpec extends Specification {
+
     def "check valid method search"() {
         when:
-        Contract contract = new Contract(valid_methods as Collection<ContractMethod>)
+        Contract contract = new Contract(Address.EMPTY, methods)
+
         then:
-        for (ContractMethod method: valid_methods)
+        for (ContractMethod method: methods)
             contract.getMethod(method.getId()) == method
+
         where:
-        _ | valid_methods
+        _ | methods
         _ | []
         _ | [new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
              new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])),
@@ -20,23 +24,29 @@ class ContractSpec extends Specification {
 
     def "check invalid method search"() {
         when:
-        Contract contract = new Contract([new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
-                                          new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[]))])
+        Contract contract = new Contract(Address.EMPTY,
+                new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
+                new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])))
+
         then:
-            contract.getMethod(invalid_methodId as MethodId) == null
+            contract.getMethod(id) == null
+
         where:
-        _ | invalid_methodId
+        _ | id
         _ | new MethodId([0xff, 0xff, 0xff, 0xff] as byte[])
         _ | new MethodId([0x11, 0x11, 0x11, 0x11] as byte[])
     }
 
     def "check null method id"() {
         when:
-        Contract contract = new Contract([new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
-                                          new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[]))])
+        Contract contract = new Contract(Address.EMPTY,
+                new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
+                new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])))
         contract.getMethod(id)
+
         then:
         thrown(IllegalArgumentException)
+
         where:
         _ | id
         _ | null
@@ -44,12 +54,14 @@ class ContractSpec extends Specification {
 
     def "check get methods"() {
         when:
-        Contract contract = new Contract(valid_methods as Collection<ContractMethod>)
+        Contract contract = new Contract(Address.EMPTY, methods)
+
         then:
-        contract.getMethods().containsAll(valid_methods)
+        contract.getMethods().containsAll(methods)
         true
+
         where:
-        _ | valid_methods
+        _ | methods
         _ | []
         _ | [new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
              new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])),
