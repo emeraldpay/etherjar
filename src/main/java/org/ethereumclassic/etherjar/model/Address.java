@@ -10,6 +10,8 @@ public class Address extends HexData {
     public static final int SIZE_BYTES = 20;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
+    public static final Address EMPTY = Address.from("0x0000000000000000000000000000000000000000");
+
     private Address(byte[] bytes) {
         super(bytes, SIZE_BYTES);
     }

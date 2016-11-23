@@ -12,8 +12,8 @@ group = 'org.ethereumclassic'
 version = '0.3-SNAPSHOT'
 def description = 'Lightweight Java client to Ethereum blockchain'
 
-targetCompatibility = '1.7'
-sourceCompatibility = '1.7'
+targetCompatibility = '1.8'
+sourceCompatibility = '1.8'
 
 repositories {
     mavenLocal()
