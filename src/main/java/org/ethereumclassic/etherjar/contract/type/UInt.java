@@ -6,45 +6,25 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-public class UInt implements Type<BigInteger> {
-    public static final int SIZE_BYTES = 32;
-    private int bytes;
-
+public class UInt extends Numeric{
     public UInt(int bits) {
-        if (bits > 256 && bits % 8 != 0)
-            throw new IllegalArgumentException("Invalid uint bits count.");
-
-        this.bytes = bits / 8;
+        super(bits, false);
     }
 
     @Override
-    public boolean isDynamic() {
-        return false;
-    }
-
-    @Override
-    public int getBytesFixedSize() {
-        return this.bytes;
-    }
+    public String getName() { return String.format("uint%d", this.bytes*8); }
 
     @Override
     public Hex32[] encode(BigInteger obj) {
         if (obj.signum() < 0 && obj.toByteArray().length > this.bytes)
             throw new IllegalArgumentException("Invalid uint value.");
 
-        ByteBuffer alignedBuf = ByteBuffer.allocate(Hex32.SIZE_BYTES);
-        alignedBuf.put(new byte[Hex32.SIZE_BYTES - obj.toByteArray().length]);
-        alignedBuf.put(obj.toByteArray());
-
-        return new Hex32[] {new Hex32(alignedBuf.array())};
+        return super.encode(obj);
     }
 
     @Override
     public BigInteger decode(Hex32[] data) {
-        if (data.length > 1)
-            throw new IllegalArgumentException("Invalid input for decoding.");
-
-        return new BigInteger(data[0].toString().replaceFirst("0x", "+"), 16);
+        return super.decode(data);
     }
 
     @Override

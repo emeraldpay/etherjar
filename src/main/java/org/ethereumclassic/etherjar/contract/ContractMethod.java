@@ -5,45 +5,171 @@ import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.MethodId;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * A smart contract method.
+ * A smart contract method (a constructor or a function).
  *
  * @author Igor Artamonov
  * @see Contract
  */
 public class ContractMethod {
 
-    /**
-     * Build from canonical method signature like <tt>name(datatype1,datatype2)</tt>, or <tt>transfer(address,uint256)</tt>.
-     *
-     * <p>Make sure you're using canonical name type, e.g <tt>uint256</tt> instead of simple <tt>uint</tt>
-     *
-     * <p>The signature is defined as the canonical expression of the basic prototype,
-     * i.e. the function name with the parenthesised list of parameter types.
-     * Parameter types are split by a single comma - no spaces are used.
-     *
-     * @param signature canonical signature
-     * @return contract method instance
-     * @see MethodId#fromSignature(String)
-     */
-    public static ContractMethod fromSignature(String signature) {
-        if (signature == null)
-            throw new IllegalArgumentException("Null contract method signature");
+    public static class Builder {
 
-        return new ContractMethod(MethodId.fromSignature(signature));
+        private MethodId id;
+
+        private String name;
+
+        private boolean isConstant;
+
+        private Collection<? extends Type> inputTypes;
+
+        private Collection<? extends Type> outputTypes;
+
+        /**
+         * Build from canonical method signature like <tt>name(datatype1,datatype2)</tt>,
+         * or <tt>transfer(address,uint256)</tt>.
+         *
+         * <p>Make sure you're using canonical name type, e.g <tt>uint256</tt>
+         * instead of simple <tt>uint</tt>
+         *
+         * <p>The signature is defined as the canonical expression of the basic prototype,
+         * i.e. the function name with the parenthesised list of parameter types.
+         * Parameter types are split by a single comma - no spaces are used.
+         *
+         * @param signature canonical signature
+         * @return contract method instance
+         * @see MethodId#fromSignature(String)
+         */
+        public Builder withSignature(String signature) {
+            id = MethodId.fromSignature(signature);
+
+            return this;
+        }
+
+        /**
+         * @param name a contract method name
+         * @return the current builder object
+         */
+        public Builder withName(String name) {
+            this.name = Objects.requireNonNull(name);
+
+            return this;
+        }
+
+        /**
+         * Mark a contract method as a constant method.
+         *
+         * @return the current builder object
+         */
+        public Builder asConstant() {
+            isConstant = true;
+
+            return this;
+        }
+
+        /**
+         * @param types a contract method input types
+         * @return the current builder object
+         */
+        public Builder accepts(Type... types) {
+            return accepts(Arrays.asList(types));
+        }
+
+        /**
+         * @param types a contract method input types
+         * @return the current builder object
+         */
+        public Builder accepts(Collection<? extends Type> types) {
+            inputTypes = Objects.requireNonNull(types);
+
+            return this;
+        }
+
+        /**
+         * @param types a contract method output types
+         * @return the current builder object
+         */
+        public Builder returns(Type... types) {
+            return returns(Arrays.asList(types));
+        }
+
+        /**
+         * @param types a contract method output types
+         * @return the current builder object
+         */
+        public Builder returns(Collection<? extends Type> types) {
+            outputTypes = Objects.requireNonNull(types);
+
+            return this;
+        }
+
+        /**
+         * Build a {@link ContractMethod} object with predefined by builder conditions.
+         *
+         * @return a {@link ContractMethod} object
+         */
+        public ContractMethod build() {
+            if (Objects.isNull(id) && Objects.isNull(name))
+                throw new IllegalStateException("Contract method id is absent");
+
+            if (Objects.isNull(id)) {
+                id = MethodId.fromSignature(toSignature(name, inputTypes));
+            }
+
+            return new ContractMethod(id, isConstant, inputTypes, outputTypes);
+        }
+    }
+
+    public static String toSignature(String name, Type... inputTypes) {
+        return toSignature(name, Arrays.asList(inputTypes));
+    }
+
+    public static String toSignature(String name, Collection<? extends Type> inputTypes) {
+        Objects.requireNonNull(name);
+
+        String args = inputTypes.stream()
+                .map(Type::getName).collect(Collectors.joining(","));
+
+        return name + '(' + args + ')';
     }
 
     private final MethodId id;
 
-    private final List<Type> parameterTypes;
+    private final boolean isConstant;
 
-    public ContractMethod(MethodId id, Type... parameterTypes) {
+    private final List<Type> inputTypes;
+
+    private final List<Type> outputTypes;
+
+    public ContractMethod(MethodId id, Type... inputTypes) {
+        this(id, false, Arrays.asList(inputTypes), Collections.emptyList());
+    }
+
+    public ContractMethod(MethodId id, Collection<? extends Type> inputTypes) {
+        this(id, false, inputTypes, Collections.emptyList());
+    }
+
+    public ContractMethod(MethodId id, boolean isConstant, Type... inputTypes) {
+        this(id, isConstant, Arrays.asList(inputTypes), Collections.emptyList());
+    }
+
+    public ContractMethod(MethodId id, boolean isConstant, Collection<? extends Type> inputTypes) {
+        this(id, isConstant, inputTypes, Collections.emptyList());
+    }
+
+    public ContractMethod(MethodId id, boolean isConstant,
+                          Collection<? extends Type> inputTypes,
+                          Collection<? extends Type> outputTypes) {
+        if (id == null)
+            throw new IllegalArgumentException("Null contract method id");
+
         this.id = id;
-        this.parameterTypes = Collections.unmodifiableList(Arrays.asList(parameterTypes));
+        this.isConstant = isConstant;
+        this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
+        this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
     }
 
     /**
@@ -54,14 +180,28 @@ public class ContractMethod {
     }
 
     /**
-     * @return the method parameter types
+     * @return is the method doesn't change contract's state
      */
-    public List<Type> getParameterTypes() {
-        return parameterTypes;
+    public boolean isConstant() {
+        return isConstant;
     }
 
     /**
-     * Encodes call data to send through RPC.
+     * @return the method parameter types
+     */
+    public List<Type> getInputTypes() {
+        return inputTypes;
+    }
+
+    /**
+     * @return the method return types
+     */
+    public List<Type> getOutputTypes() {
+        return outputTypes;
+    }
+
+    /**
+     * Encodes call data, so you can call the contract through some other means (for example, through RPC).
      *
      * <p><b>Example:</b> <code>baz(uint32,bool)</code> with arguments <tt>(69, true)</tt> becomes
      * <tt>0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001</tt>
@@ -72,13 +212,13 @@ public class ContractMethod {
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
     public HexData encodeCall(Object... params) {
-        if (parameterTypes.size() != params.length)
+        if (inputTypes.size() != params.length)
             throw new IllegalArgumentException("Wrong number of input parameters: " + params.length);
 
         int headBytesSize = 0;
         int tailBytesSize = 0;
 
-        for (Type type : parameterTypes) {
+        for (Type type : inputTypes) {
             headBytesSize += type.isDynamic() ?
                 Hex32.SIZE_BYTES : type.getBytesFixedSize();
         }
@@ -86,8 +226,8 @@ public class ContractMethod {
         List<Hex32> head = new ArrayList<>(headBytesSize / Hex32.SIZE_BYTES);
         List<Hex32> tail = new ArrayList<>();
 
-        for (int i = 0; i < parameterTypes.size(); i++) {
-            Type type = parameterTypes.get(i);
+        for (int i = 0; i < inputTypes.size(); i++) {
+            Type type = inputTypes.get(i);
 
             //noinspection unchecked
             Hex32[] data = type.encode(params[i]);
@@ -111,29 +251,6 @@ public class ContractMethod {
         return HexData.from(data);
     }
 
-    /**
-     * Encodes call data to send through RPC.
-     *
-     * @param params encoded parameters of the call
-     * @return encoded call
-     * @see #encodeCall(Object...)
-     */
-    HexData encodeCall(Hex32... params) {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-
-        try {
-            buf.write(id.getBytes());
-
-            for (Hex32 param: params) {
-                buf.write(param.getBytes());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new HexData(buf.toByteArray());
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(getClass(), id);
@@ -142,7 +259,8 @@ public class ContractMethod {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
+
+        if (Objects.isNull(obj)) return false;
 
         if (!Objects.equals(getClass(), obj.getClass()))
             return false;
@@ -154,7 +272,8 @@ public class ContractMethod {
 
     @Override
     public String toString() {
-        return String.format("%s!%h@%h{id=%s,params=%s}",
-            getClass().getSimpleName(), System.identityHashCode(this), hashCode(), id, parameterTypes);
+        return String.format("%s!%h@%h{id=%s,constant=%b,accepts=%s,returns=%s}",
+                getClass().getSimpleName(), System.identityHashCode(this), hashCode(),
+                id, isConstant, inputTypes, outputTypes);
     }
 }

@@ -3,12 +3,14 @@ package org.ethereumclassic.etherjar.model;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.ethereumclassic.etherjar.contract.ContractMethod;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
  * The first four bytes of the call data for a function call specifies the function to be called.
  *
- * <p>It is the first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash of the signature of the function.
+ * <p>It is the first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash
+ * of the signature of the function.
  *
  * @author Igor Artamonov
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector">Function Selector</a>
@@ -20,7 +22,7 @@ public class MethodId extends HexData {
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
     public final static Pattern SIGNATURE_PATTERN =
-        Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|\\]|((?<!,),(?!\\))))*\\)");
+        Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|]|((?<!,),(?!\\))))*\\)");
 
     /**
      * Check method canonical signature.
@@ -38,8 +40,7 @@ public class MethodId extends HexData {
      * @return method id
      */
     public static MethodId fromSignature(String signature) {
-        if (signature == null)
-            throw new IllegalArgumentException("Null method signature");
+        Objects.requireNonNull(signature);
 
         if (!isSignatureValid(signature))
             throw new IllegalArgumentException("Invalid method signature: " + signature);
