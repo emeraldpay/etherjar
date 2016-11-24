@@ -123,7 +123,7 @@ class BytesTypeSpec extends Specification {
         first           | second
         DEFAULT_TYPE    | null
         DEFAULT_TYPE    | 'ABC'
-        DEFAULT_TYPE    | new UIntType()
+        DEFAULT_TYPE    | UIntType.DEFAULT_TYPE
     }
 
     def "should be converted to a string representation"() {

@@ -1,11 +1,8 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
 import spock.lang.Specification
 
 class UIntTypeSpec extends Specification {
-
-    final static DEFAULT_TYPE = [] as UIntType
 
     def "should parse string representation"() {
         when:
@@ -79,15 +76,15 @@ class UIntTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
-        !DEFAULT_TYPE.signed
+        UIntType.DEFAULT_TYPE.bits == 256
+        !UIntType.DEFAULT_TYPE.signed
     }
 
     def "should create an instance with specified number of bits"() {
         def type = [40] as UIntType
 
         expect:
-        type.bytes == 5
+        type.bits == 40
         !type.signed
     }
 
@@ -95,7 +92,7 @@ class UIntTypeSpec extends Specification {
         def type = [bits] as UIntType
 
         expect:
-        type.minValue == BigInteger.ZERO
+        type.minValue == 0G
 
         where:
         bits << [8, 40, 64, 128, 256]
@@ -105,15 +102,15 @@ class UIntTypeSpec extends Specification {
         def type = [bits] as UIntType
 
         expect:
-        type.maxValue == new BigInteger(str, 16)
+        type.maxValue == val
 
         where:
-        bits    | str
-        8       | '+100'
-        40      | '+10000000000'
-        64      | '+10000000000000000'
-        128     | '+100000000000000000000000000000000'
-        256     | '+10000000000000000000000000000000000000000000000000000000000000000'
+        bits    | val
+        8       | 0x100G
+        40      | 0x10000000000G
+        64      | 0x10000000000000000G
+        128     | 0x100000000000000000000000000000000G
+        256     | 0x10000000000000000000000000000000000000000000000000000000000000000G
     }
 
     def "should return a canonical string representation" () {

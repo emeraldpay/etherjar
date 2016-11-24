@@ -8,11 +8,11 @@ class NumericTypeSpec extends Specification {
     static class NumericTypeImpl extends NumericType {
 
         protected NumericTypeImpl() {
-            super()
+            super(256, false)
         }
 
         protected NumericTypeImpl(int bits) {
-            super(bits)
+            super(bits, false)
         }
 
         protected NumericTypeImpl(int bits, boolean signed) {
@@ -31,7 +31,7 @@ class NumericTypeSpec extends Specification {
 
         @Override
         String getCanonicalName() {
-            'impl'
+            throw new UnsupportedOperationException()
         }
     }
 
@@ -39,27 +39,43 @@ class NumericTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
-        DEFAULT_TYPE.bits == Hex32.SIZE_BYTES << 3
+        DEFAULT_TYPE.bits == 256
         !DEFAULT_TYPE.signed
         DEFAULT_TYPE.static
         DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
     }
 
-    def "should create an instance with specified number of bits"() {
-        def obj = [16] as NumericTypeImpl
+    def "should return a power of two"() {
+        def res = NumericType.powerOfTwo bits
 
         expect:
-        obj.bytes == 2
+        res == pow
+
+        where:
+        bits    | pow
+        0       | 1G
+        1       | 2G
+        2       | 4G
+        3       | 8G
+        8       | 256G
+        21      | 2097152G
+        128     | 340282366920938463463374607431768211456G
+        253     | 14474011154664524427946373126085988481658748083205070504932198000989141204992G
+        256     | 115792089237316195423570985008687907853269984665640564039457584007913129639936G
+    }
+
+    def "should create an unsigned instance with specified number of bits"() {
+        def obj = [16, false] as NumericTypeImpl
+
+        expect:
         obj.bits == 16
         !obj.signed
     }
 
-    def "should create an unsigned instance with specified number of bits"() {
+    def "should create a signed instance with specified number of bits"() {
         def obj = [24, true] as NumericTypeImpl
 
         expect:
-        obj.bytes == 3
         obj.bits == 24
         obj.signed
     }
@@ -86,8 +102,8 @@ class NumericTypeSpec extends Specification {
 
     def "should check value validity"() {
         def obj = [
-                getMinValue: BigInteger.ZERO,
-                getMaxValue: BigInteger.TEN,
+                getMinValue: 0G,
+                getMaxValue: 10G,
         ] as NumericTypeImpl
 
         expect:
@@ -95,15 +111,15 @@ class NumericTypeSpec extends Specification {
 
         where:
         _ | value
-        _ | BigInteger.ZERO
-        _ | BigInteger.ONE
-        _ | BigInteger.TEN.subtract(BigInteger.ONE)
+        _ | 0G
+        _ | 1G
+        _ | 9G
     }
 
     def "should check value invalidity"() {
         def obj = [
-                getMinValue: BigInteger.ZERO,
-                getMaxValue: BigInteger.ONE,
+                getMinValue: 0G,
+                getMaxValue: 1G,
         ] as NumericTypeImpl
 
         expect:
@@ -111,9 +127,9 @@ class NumericTypeSpec extends Specification {
 
         where:
         _ | value
-        _ | BigInteger.ONE
-        _ | BigInteger.ONE.add(BigInteger.TEN)
-        _ | BigInteger.ZERO.subtract(BigInteger.ONE)
+        _ | -1G
+        _ | 1G
+        _ | 11G
     }
 
     def "should encode long values"() {
@@ -121,12 +137,12 @@ class NumericTypeSpec extends Specification {
 
             @Override
             BigInteger getMinValue() {
-                return new BigInteger('-8' + '0' * 63, 16)
+                -0x8000000000000000000000000000000000000000000000000000000000000000
             }
 
             @Override
             BigInteger getMaxValue() {
-                return new BigInteger('+8' + '0' * 63, 16)
+                0x8000000000000000000000000000000000000000000000000000000000000000
             }
         }
 
@@ -140,7 +156,7 @@ class NumericTypeSpec extends Specification {
         val                 | hex
         0                   | '0x0000000000000000000000000000000000000000000000000000000000000000'
         -64                 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc0'
-        +64                 | '0x0000000000000000000000000000000000000000000000000000000000000040'
+        64                  | '0x0000000000000000000000000000000000000000000000000000000000000040'
         Integer.MIN_VALUE   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000'
         Integer.MAX_VALUE   | '0x000000000000000000000000000000000000000000000000000000007fffffff'
         Long.MIN_VALUE      | '0xffffffffffffffffffffffffffffffffffffffffffffffff8000000000000000'
@@ -152,145 +168,145 @@ class NumericTypeSpec extends Specification {
 
             @Override
             BigInteger getMinValue() {
-                return isSigned() ?
-                        new BigInteger('-8' + '0' * 63, 16) : BigInteger.ZERO
+                isSigned() ?
+                        -0x8000000000000000000000000000000000000000000000000000000000000000 :
+                        0G
             }
 
             @Override
             BigInteger getMaxValue() {
-                return isSigned() ?
-                        new BigInteger('+8' + '0' * 63, 16) : new BigInteger('+1' + '0' * 64, 16)
+                isSigned() ?
+                        0x8000000000000000000000000000000000000000000000000000000000000000 :
+                        0x10000000000000000000000000000000000000000000000000000000000000000
             }
         }
 
-        def val = new BigInteger(str, 16)
-
         when:
-        def data = obj.encodeStatic val
+        def data = obj.encodeStatic(val as BigInteger)
         def res = obj.decodeStatic data
 
         then:
         data.toHex() == hex
-        res == val
+        res == val as BigInteger
 
         where:
-        bits    | sign  | str       | hex
-        8       | false | '+0'      | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        8       | false | '+1'      | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        8       | false | '+10'     | '0x0000000000000000000000000000000000000000000000000000000000000010'
-        8       | false | '+64'     | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        8       | false | '+ff'     | '0x00000000000000000000000000000000000000000000000000000000000000ff'
-        8       | true  | '-0'      | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        8       | true  | '+0'      | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        8       | true  | '-1'      | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        8       | true  | '+1'      | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        8       | true  | '-11'     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffef'
-        8       | true  | '+12'     | '0x0000000000000000000000000000000000000000000000000000000000000012'
-        8       | true  | '-64'     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
-        8       | true  | '+64'     | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        8       | true  | '-80'     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80'
-        8       | true  | '+7f'     | '0x000000000000000000000000000000000000000000000000000000000000007f'
+        bits    | sign  | val       | hex
+        8       | false | 0x00      | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        8       | false | 0x01      | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        8       | false | 0x10      | '0x0000000000000000000000000000000000000000000000000000000000000010'
+        8       | false | 0x64      | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        8       | false | 0xff      | '0x00000000000000000000000000000000000000000000000000000000000000ff'
+        8       | true  | -0x00     | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        8       | true  | 0x00      | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        8       | true  | -0x01     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        8       | true  | +0x01     | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        8       | true  | -0x11     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffef'
+        8       | true  | 0x12      | '0x0000000000000000000000000000000000000000000000000000000000000012'
+        8       | true  | -0x64     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
+        8       | true  | 0x64      | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        8       | true  | -0x80     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80'
+        8       | true  | 0x7f      | '0x000000000000000000000000000000000000000000000000000000000000007f'
 
-        16      | false | '+0'      | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        16      | false | '+1'      | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        16      | false | '+64'     | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        16      | true  | '-0'      | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        16      | true  | '+0'      | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        16      | true  | '-1'      | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        16      | true  | '+1'      | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        16      | true  | '-64'     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
-        16      | true  | '+64'     | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        16      | false | '+647'    | '0x0000000000000000000000000000000000000000000000000000000000000647'
-        16      | false | '+1234'   | '0x0000000000000000000000000000000000000000000000000000000000001234'
-        16      | false | '+ffff'   | '0x000000000000000000000000000000000000000000000000000000000000ffff'
-        16      | true  | '-647'    | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9b9'
-        16      | true  | '+647'    | '0x0000000000000000000000000000000000000000000000000000000000000647'
-        16      | true  | '-1234'   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffedcc'
-        16      | true  | '+4321'   | '0x0000000000000000000000000000000000000000000000000000000000004321'
-        16      | true  | '-8000'   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000'
-        16      | true  | '+7fff'   | '0x0000000000000000000000000000000000000000000000000000000000007fff'
+        16      | false | 0x0000    | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        16      | false | 0x0001    | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        16      | false | 0x0064    | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        16      | true  | -0x0000   | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        16      | true  | 0x0000    | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        16      | true  | -0x0001   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        16      | true  | 0x0001    | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        16      | true  | -0x0064   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
+        16      | true  | 0x0064    | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        16      | false | 0x0647    | '0x0000000000000000000000000000000000000000000000000000000000000647'
+        16      | false | 0x1234    | '0x0000000000000000000000000000000000000000000000000000000000001234'
+        16      | false | 0xffff    | '0x000000000000000000000000000000000000000000000000000000000000ffff'
+        16      | true  | -0x0647   | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9b9'
+        16      | true  | 0x0647    | '0x0000000000000000000000000000000000000000000000000000000000000647'
+        16      | true  | -0x1234   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffedcc'
+        16      | true  | 0x4321    | '0x0000000000000000000000000000000000000000000000000000000000004321'
+        16      | true  | -0x8000   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8000'
+        16      | true  | 0x7fff    | '0x0000000000000000000000000000000000000000000000000000000000007fff'
 
-        40      | false | '+0'          | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        40      | false | '+1'          | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        40      | false | '+64'         | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        40      | true  | '-0'          | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        40      | true  | '+0'          | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        40      | true  | '-1'          | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        40      | true  | '+1'          | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        40      | true  | '-64'         | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
-        40      | true  | '+64'         | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        40      | false | '+64123'      | '0x0000000000000000000000000000000000000000000000000000000000064123'
-        40      | false | '+1122334455' | '0x0000000000000000000000000000000000000000000000000000001122334455'
-        40      | false | '+ffffffffff' | '0x000000000000000000000000000000000000000000000000000000ffffffffff'
-        40      | true  | '-64123'      | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9bedd'
-        40      | true  | '+64123'      | '0x0000000000000000000000000000000000000000000000000000000000064123'
-        40      | true  | '-1122334455' | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffeeddccbbab'
-        40      | true  | '+5544332211' | '0x0000000000000000000000000000000000000000000000000000005544332211'
-        40      | true  | '-8000000000' | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000000'
-        40      | true  | '+7fffffffff' | '0x0000000000000000000000000000000000000000000000000000007fffffffff'
+        40      | false | 0x0000000000  | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        40      | false | 0x0000000001  | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        40      | false | 0x0000000064  | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        40      | true  | -0x0000000000 | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        40      | true  | 0x0000000000  | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        40      | true  | -0x0000000001 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        40      | true  | 0x0000000001  | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        40      | true  | -0x0000000064 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
+        40      | true  | 0x0000000064  | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        40      | false | 0x0000064123  | '0x0000000000000000000000000000000000000000000000000000000000064123'
+        40      | false | 0x1122334455  | '0x0000000000000000000000000000000000000000000000000000001122334455'
+        40      | false | 0xffffffffff  | '0x000000000000000000000000000000000000000000000000000000ffffffffff'
+        40      | true  | -0x0000064123 | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9bedd'
+        40      | true  | 0x0000064123  | '0x0000000000000000000000000000000000000000000000000000000000064123'
+        40      | true  | -0x1122334455 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffeeddccbbab'
+        40      | true  | 0x5544332211  | '0x0000000000000000000000000000000000000000000000000000005544332211'
+        40      | true  | -0x8000000000 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffff8000000000'
+        40      | true  | 0x7fffffffff  | '0x0000000000000000000000000000000000000000000000000000007fffffffff'
 
-        64      | false | '+0'                  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        64      | false | '+1'                  | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        64      | false | '+64'                 | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        64      | true  | '-0'                  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        64      | true  | '+0'                  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        64      | true  | '-1'                  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        64      | true  | '+1'                  | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        64      | true  | '-64'                 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
-        64      | true  | '+64'                 | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        64      | false | '+641234567'          | '0x0000000000000000000000000000000000000000000000000000000641234567'
-        64      | false | '+1122334455667788'   | '0x0000000000000000000000000000000000000000000000001122334455667788'
-        64      | false | '+ffffffffffffffff'   | '0x000000000000000000000000000000000000000000000000ffffffffffffffff'
-        64      | true  | '-641234567'          | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffff9bedcba99'
-        64      | true  | '+641234567'          | '0x0000000000000000000000000000000000000000000000000000000641234567'
-        64      | true  | '-1122334455667788'   | '0xffffffffffffffffffffffffffffffffffffffffffffffffeeddccbbaa998878'
-        64      | true  | '+1122334455667788'   | '0x0000000000000000000000000000000000000000000000001122334455667788'
-        64      | true  | '-8000000000000000'   | '0xffffffffffffffffffffffffffffffffffffffffffffffff8000000000000000'
-        64      | true  | '+7fffffffffffffff'   | '0x0000000000000000000000000000000000000000000000007fffffffffffffff'
+        64      | false | 0x0000000000000000    | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        64      | false | 0x0000000000000001    | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        64      | false | 0x0000000000000064    | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        64      | true  | -0x0000000000000000   | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        64      | true  | 0x0000000000000000    | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        64      | true  | -0x0000000000000001   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        64      | true  | 0x0000000000000001    | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        64      | true  | -0x0000000000000064   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
+        64      | true  | 0x0000000000000064    | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        64      | false | 0x0000000641234567    | '0x0000000000000000000000000000000000000000000000000000000641234567'
+        64      | false | 0x1122334455667788    | '0x0000000000000000000000000000000000000000000000001122334455667788'
+        64      | false | 0xffffffffffffffff    | '0x000000000000000000000000000000000000000000000000ffffffffffffffff'
+        64      | true  | -0x0000000641234567   | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffff9bedcba99'
+        64      | true  | 0x0000000641234567    | '0x0000000000000000000000000000000000000000000000000000000641234567'
+        64      | true  | -0x1122334455667788   | '0xffffffffffffffffffffffffffffffffffffffffffffffffeeddccbbaa998878'
+        64      | true  | 0x1122334455667788    | '0x0000000000000000000000000000000000000000000000001122334455667788'
+        64      | true  | -0x8000000000000000   | '0xffffffffffffffffffffffffffffffffffffffffffffffff8000000000000000'
+        64      | true  | 0x7fffffffffffffff    | '0x0000000000000000000000000000000000000000000000007fffffffffffffff'
 
-        120     | false | '+0'                              | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        120     | false | '+1'                              | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        120     | false | '+64'                             | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        120     | true  | '-0'                              | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        120     | true  | '+0'                              | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        120     | true  | '-1'                              | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        120     | true  | '+1'                              | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        120     | true  | '-64'                             | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
-        120     | true  | '+64'                             | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        120     | false | '+1280000000'                     | '0x0000000000000000000000000000000000000000000000000000001280000000'
-        120     | false | '+112233445566778899aabbccddeeff' | '0x0000000000000000000000000000000000112233445566778899aabbccddeeff'
-        120     | false | '+ffffffffffffffffffffffffffffff' | '0x0000000000000000000000000000000000ffffffffffffffffffffffffffffff'
-        120     | true  | '-1280000000'                     | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffed80000000'
-        120     | true  | '+1280000000'                     | '0x0000000000000000000000000000000000000000000000000000001280000000'
-        120     | true  | '-112233445566778899aabbccddeeff' | '0xffffffffffffffffffffffffffffffffffeeddccbbaa99887766554433221101'
-        120     | true  | '+112233445566778899aabbccddeeff' | '0x0000000000000000000000000000000000112233445566778899aabbccddeeff'
-        120     | true  | '-800000000000000000000000000000' | '0xffffffffffffffffffffffffffffffffff800000000000000000000000000000'
-        120     | true  | '+7fffffffffffffffffffffffffffff' | '0x00000000000000000000000000000000007fffffffffffffffffffffffffffff'
+        120     | false | 0x000000000000000000000000000000  | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        120     | false | 0x000000000000000000000000000001  | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        120     | false | 0x000000000000000000000000000064  | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        120     | true  | -0x000000000000000000000000000000 | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        120     | true  | 0x000000000000000000000000000000  | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        120     | true  | -0x000000000000000000000000000001 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        120     | true  | 0x000000000000000000000000000001  | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        120     | true  | -0x000000000000000000000000000064 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
+        120     | true  | 0x000000000000000000000000000064  | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        120     | false | 0x000000000000000000001280000000  | '0x0000000000000000000000000000000000000000000000000000001280000000'
+        120     | false | 0x112233445566778899aabbccddeeff  | '0x0000000000000000000000000000000000112233445566778899aabbccddeeff'
+        120     | false | 0xffffffffffffffffffffffffffffff  | '0x0000000000000000000000000000000000ffffffffffffffffffffffffffffff'
+        120     | true  | -0x000000000000000000001280000000 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffed80000000'
+        120     | true  | 0x000000000000000000001280000000  | '0x0000000000000000000000000000000000000000000000000000001280000000'
+        120     | true  | -0x112233445566778899aabbccddeeff | '0xffffffffffffffffffffffffffffffffffeeddccbbaa99887766554433221101'
+        120     | true  | 0x112233445566778899aabbccddeeff  | '0x0000000000000000000000000000000000112233445566778899aabbccddeeff'
+        120     | true  | -0x800000000000000000000000000000 | '0xffffffffffffffffffffffffffffffffff800000000000000000000000000000'
+        120     | true  | 0x7fffffffffffffffffffffffffffff  | '0x00000000000000000000000000000000007fffffffffffffffffffffffffffff'
 
-        256     | false | '+0'                                                                  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        256     | false | '+1'                                                                  | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        256     | false | '+64'                                                                 | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        256     | true  | '-0'                                                                  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        256     | true  | '+0'                                                                  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        256     | true  | '-1'                                                                  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        256     | true  | '+1'                                                                  | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        256     | true  | '-64'                                                                 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
-        256     | true  | '+64'                                                                 | '0x0000000000000000000000000000000000000000000000000000000000000064'
-        256     | false | '+6400000'                                                            | '0x0000000000000000000000000000000000000000000000000000000006400000'
-        256     | false | '+112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'   | '0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'
-        256     | false | '+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        256     | true  | '-6400000'                                                            | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c00000'
-        256     | true  | '+6400000'                                                            | '0x0000000000000000000000000000000000000000000000000000000006400000'
-        256     | true  | '-112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'   | '0xeeddccbbaa99887766554433221100eeddccbbaa99887766554433221100eede'
-        256     | true  | '+112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'   | '0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'
-        256     | true  | '-8000000000000000000000000000000000000000000000000000000000000000'   | '0x8000000000000000000000000000000000000000000000000000000000000000'
-        256     | true  | '+7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'   | '0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        256     | false | 0x000000000000000000000000000000000000000000000000000000000000000     | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        256     | false | 0x000000000000000000000000000000000000000000000000000000000000001     | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        256     | false | 0x000000000000000000000000000000000000000000000000000000000000064     | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        256     | true  | -0x000000000000000000000000000000000000000000000000000000000000000    | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        256     | true  | 0x000000000000000000000000000000000000000000000000000000000000000     | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        256     | true  | -0x000000000000000000000000000000000000000000000000000000000000001    | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        256     | true  | 0x000000000000000000000000000000000000000000000000000000000000001     | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        256     | true  | -0x000000000000000000000000000000000000000000000000000000000000064    | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c'
+        256     | true  | 0x0000000000000000000000000000000000000000000000000000000000000064    | '0x0000000000000000000000000000000000000000000000000000000000000064'
+        256     | false | 0x0000000000000000000000000000000000000000000000000000000006400000    | '0x0000000000000000000000000000000000000000000000000000000006400000'
+        256     | false | 0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122    | '0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'
+        256     | false | 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff    | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        256     | true  | -0x0000000000000000000000000000000000000000000000000000000006400000   | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c00000'
+        256     | true  | 0x0000000000000000000000000000000000000000000000000000000006400000    | '0x0000000000000000000000000000000000000000000000000000000006400000'
+        256     | true  | -0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122   | '0xeeddccbbaa99887766554433221100eeddccbbaa99887766554433221100eede'
+        256     | true  | 0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122    | '0x112233445566778899aabbccddeeff112233445566778899aabbccddeeff1122'
+        256     | true  | -0x8000000000000000000000000000000000000000000000000000000000000000   | '0x8000000000000000000000000000000000000000000000000000000000000000'
+        256     | true  | 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff    | '0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
     }
 
     def "should catch out of range before encoding"() {
         def obj = [
-                getMinValue: BigInteger.ZERO,
-                getMaxValue: BigInteger.TEN
+                getMinValue: 0G,
+                getMaxValue: 10G,
         ] as NumericTypeImpl
 
         when:
@@ -301,8 +317,8 @@ class NumericTypeSpec extends Specification {
 
         where:
         _ | value
-        _ | BigInteger.TEN
-        _ | BigInteger.ZERO.subtract(BigInteger.ONE)
+        _ | -1G
+        _ | 10G
     }
 
     def "should catch out of range after decoding"() {
@@ -310,12 +326,12 @@ class NumericTypeSpec extends Specification {
 
             @Override
             BigInteger getMinValue() {
-                return BigInteger.ZERO
+                1
             }
 
             @Override
             BigInteger getMaxValue() {
-                return BigInteger.valueOf(256)
+                256
             }
         }
 
@@ -361,12 +377,16 @@ class NumericTypeSpec extends Specification {
         where:
         first           | second
         DEFAULT_TYPE    | null
-        DEFAULT_TYPE    | [64, true] as NumericTypeImpl
-        DEFAULT_TYPE    | new UIntType()
+        DEFAULT_TYPE    | [64] as NumericTypeImpl
+        DEFAULT_TYPE    | UIntType.DEFAULT_TYPE
     }
 
     def "should be converted to a string representation"() {
+        def obj = [
+                getCanonicalName: 'impl'
+        ] as NumericTypeImpl
+
         expect:
-        DEFAULT_TYPE as String == 'impl'
+        obj as String == 'impl'
     }
 }
