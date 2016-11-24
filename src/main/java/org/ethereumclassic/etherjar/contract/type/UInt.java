@@ -3,34 +3,28 @@ package org.ethereumclassic.etherjar.contract.type;
 import org.ethereumclassic.etherjar.model.Hex32;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.*;
 
-public class UInt implements Type<BigInteger> {
-
-    public static final int SIZE_BYTES = 32;
-
-    @Override
-    public String getName() {
-        throw new UnsupportedOperationException();
+public class UInt extends Numeric{
+    public UInt(int bits) {
+        super(bits, false);
     }
 
     @Override
-    public boolean isDynamic() {
-        return false;
-    }
-
-    @Override
-    public int getBytesFixedSize() {
-        return SIZE_BYTES;
-    }
+    public String getName() { return String.format("uint%d", this.bytes*8); }
 
     @Override
     public Hex32[] encode(BigInteger obj) {
-        throw new UnsupportedOperationException();
+        if (obj.signum() < 0 && obj.toByteArray().length > this.bytes)
+            throw new IllegalArgumentException("Invalid uint value.");
+
+        return super.encode(obj);
     }
 
     @Override
     public BigInteger decode(Hex32[] data) {
-        throw new UnsupportedOperationException();
+        return super.decode(data);
     }
 
     @Override
