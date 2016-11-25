@@ -116,6 +116,7 @@ class ContractSpec extends Specification {
 
         where:
         first    | second
+        contract | contract
         contract | new Contract(contract.address)
         contract | new Contract(contract.address, contract.methods)
     }
@@ -126,6 +127,7 @@ class ContractSpec extends Specification {
 
         where:
         first    | second
+        contract | null
         contract | new ContractMethod(MethodId.fromSignature('bar(fixed128x128[2])'))
         contract | new Contract(Address.from("0x0000000000015b23c7e20b0ea5ebd84c39dcbe60"))
     }
