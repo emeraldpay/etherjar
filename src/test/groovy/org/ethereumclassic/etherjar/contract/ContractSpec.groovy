@@ -19,7 +19,7 @@ class ContractSpec extends Specification {
     def "should be created using builder"() {
         setup:
         def other = new Contract.Builder()
-                .at(contract.address).withMethods(contract.methods).build()
+                .at(contract.address).withMethods(contract.methods as ContractMethod[]).build()
 
         expect:
         contract == other
@@ -102,20 +102,32 @@ class ContractSpec extends Specification {
 
     def "should calculate consistent hashcode"() {
         expect:
-        fisrt.hashCode() == second.hashCode()
+        first.hashCode() == second.hashCode()
 
         where:
-        fisrt    | second
-        contract | new Contract(contract.address, contract.methods)
+        first                         | second
+        contract                      | new Contract(contract.address, contract.methods)
+        new Contract(contract.address) | new Contract(contract.address)
     }
 
     def "should be equal"() {
         expect:
-        fisrt == second
+        first == second
 
         where:
-        fisrt    | second
+        first    | second
+        contract | new Contract(contract.address)
         contract | new Contract(contract.address, contract.methods)
+    }
+
+    def "should not be equal"() {
+        expect:
+        first != second
+
+        where:
+        first    | second
+        contract | new ContractMethod(MethodId.fromSignature('bar(fixed128x128[2])'))
+        contract | new Contract(Address.from("0x0000000000015b23c7e20b0ea5ebd84c39dcbe60"))
     }
 
     def "should be converted to a string representation"() {
