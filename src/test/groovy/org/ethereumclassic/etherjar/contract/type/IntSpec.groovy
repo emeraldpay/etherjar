@@ -6,31 +6,85 @@ import spock.lang.Specification
 
 class IntSpec extends Specification {
     def "check is dynamic"() {
-        when:
-        UInt uintType = new UInt(8)
-        then:
-        uintType.isDynamic() == false
+        setup:
+        Int intType = new Int(8)
+
+        expect:
+        intType.isDynamic() == false
     }
 
-    def "check get fixed size"() {
+    def "check invalid bits size" () {
         when:
-        UInt uintType = new UInt(size as int)
+        Int intType = new Int(size as int)
+
         then:
-        uintType.getBytesFixedSize() == (size / 8)
+        thrown IllegalArgumentException
+
         where:
         _ | size
         _ | 0
+        _ | -1
+        _ | 7
+        _ | 257
+    }
+
+    def "check get fixed size"() {
+        setup:
+        Int intType = new Int(size as int)
+
+        expect:
+        intType.getBytesFixedSize() == (size / 8)
+
+        where:
+        _ | size
+        _ | 8
         _ | 40
         _ | 128
         _ | 256
+    }
+
+    def "check name" () {
+        setup:
+        Int intType = new Int(size as int)
+
+        expect:
+        intType.getName() == String.format("int%d", size)
+
+        where:
+        _ | size
+        _ | 8
+        _ | 40
+        _ | 128
+        _ | 256
+    }
+
+    def "check invalid bytes encode"() {
+        setup:
+        Int intType = new Int(bits)
+        BigInteger par = new BigInteger(str, 16)
+
+        when:
+        intType.encode(par)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        bits | str
+        8   | "ffffff"
+        16  | "ffeeddcc"
+        120 | "112233445566778899aabbccddeeff112233"
+        256 | "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     }
 
     def "check encode"() {
         when:
         Int intType = new Int(bits)
         BigInteger par = new BigInteger(str, 16);
+
         then:
         intType.encode(par)[0].toString() == encoded
+
         where:
         bits | str                 | encoded
         8   | "1"                  | "0x0000000000000000000000000000000000000000000000000000000000000001"
@@ -60,26 +114,28 @@ class IntSpec extends Specification {
     }
 
     def "check decode"() {
-        when:
-        UInt uintType = new UInt(bits)
+        setup:
+        Int intType = new Int(bits)
         Hex32[] par = [new Hex32(array as byte[])]
-        BigInteger decoded = new BigInteger(str, 16)
-        then:
-        uintType.decode(par) == decoded
+        BigInteger decoded = new BigInteger(array as byte[])
+
+        expect:
+        intType.decode(par) == decoded
+
         where:
         bits | array                                                         | str
-        8   | [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        8   | [0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]              | "+1"
-        16   | [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]              | "+1"
+        16   | [0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]               | "+1"
-        16   | [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]               | "+1"
+        16   | [0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte)0xff, (byte)0xff]   | "+ffff"
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]   | "-8000"
 //        40   | [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 //               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 //               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

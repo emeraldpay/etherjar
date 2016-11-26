@@ -6,15 +6,19 @@ import org.ethereumclassic.etherjar.model.Hex32;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
+//TODO: refactor Numeric to Mixin.
 public class Numeric implements Type<BigInteger>{
     protected int bytes;
+    private boolean signed;
 
-    public Numeric(int bits, boolean signed) {
-        if (bits > 256 || bits % 8 != 0)
+    protected Numeric(int bits, boolean signed) {
+        if (bits > 256 || bits <= 0 || bits % 8 != 0)
             throw new IllegalArgumentException("Invalid bits count.");
 
         this.bytes = bits / 8;
+        this.signed = signed;
     }
 
     @Override
@@ -34,6 +38,9 @@ public class Numeric implements Type<BigInteger>{
 
     @Override
     public Hex32[] encode(BigInteger obj) {
+        if (Objects.isNull(obj))
+            throw new IllegalArgumentException("Invalid input.");
+
         ByteBuffer alignedBuf = ByteBuffer.allocate(Hex32.SIZE_BYTES);
 
         if (obj.compareTo(BigInteger.valueOf(-1)) == 0) {
@@ -51,10 +58,10 @@ public class Numeric implements Type<BigInteger>{
 
     @Override
     public BigInteger decode(Hex32[] data) {
-        if (data.length > 1)
+        if (data.length > 1 || Objects.isNull(data))
             throw new IllegalArgumentException("Invalid input for decoding.");
 
-        return new BigInteger(data[0].toString().replaceFirst("0x", "+"), 16);
+        return new BigInteger(data[0].getBytes());
     }
 
     @Override

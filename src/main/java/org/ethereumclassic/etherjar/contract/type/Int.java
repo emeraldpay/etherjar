@@ -17,11 +17,7 @@ public class Int extends Numeric {
     public Hex32[] encode(BigInteger obj) {
         if (obj.toByteArray().length > this.bytes)
             throw new IllegalArgumentException("Invalid int value.");
-        try {
-            return super.encode(obj);
-        } catch(Exception ex) {
-            return null;
-        }
+        return super.encode(obj);
     }
 
     @Override

@@ -3,11 +3,9 @@ package org.ethereumclassic.etherjar.contract.type;
 import org.ethereumclassic.etherjar.model.Hex32;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.*;
 
 public class UInt extends Numeric{
-    public UInt(int bits) {
+     public UInt(int bits) {
         super(bits, false);
     }
 
@@ -17,7 +15,7 @@ public class UInt extends Numeric{
     @Override
     public Hex32[] encode(BigInteger obj) {
         if (obj.signum() < 0 && obj.toByteArray().length > this.bytes)
-            throw new IllegalArgumentException("Invalid uint value.");
+            throw new IllegalArgumentException("Invalid input size.");
 
         return super.encode(obj);
     }
