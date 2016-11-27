@@ -14,9 +14,9 @@ public class Contract {
 
     public static class Builder {
 
-        private Address address;
+        private Address address = Address.EMPTY;
 
-        private Collection<ContractMethod> methods;
+        private Collection<ContractMethod> methods = Collections.emptyList();
 
         /**
          * @param address a contract address
@@ -32,15 +32,15 @@ public class Contract {
          * @param methods a contract methods
          * @return the current builder object
          */
-        public Builder withMethods(ContractMethod... methods) {
-            return withMethods(Arrays.asList(methods));
+        public Builder methods(ContractMethod... methods) {
+            return methods(Arrays.asList(methods));
         }
 
         /**
          * @param methods a contract methods
          * @return the current builder object
          */
-        public Builder withMethods(Collection<ContractMethod> methods) {
+        public Builder methods(Collection<ContractMethod> methods) {
             this.methods = Objects.requireNonNull(methods);
 
             return this;
@@ -88,16 +88,17 @@ public class Contract {
     }
 
     /**
-     * Find a method type by a method signature id.
+     * Find a methods type by a methods signature id.
      *
-     * @param id a method signature id
-     * @return an {@code Optional} containing required method, or an empty
-     * {@code Optional} if method with the given {@code id} doesn't exist
+     * @param id a methods signature id
+     * @return an {@code Optional} containing required methods, or an empty
+     * {@code Optional} if methods with the given {@code id} doesn't exist
      */
     public Optional<ContractMethod> findMethod(MethodId id) {
         Objects.requireNonNull(id);
 
-        return methods.stream().filter(it -> it.getId().equals(id)).findFirst();
+        return methods.stream()
+                .filter(it -> it.getId().equals(id)).findFirst();
     }
 
     @Override
@@ -121,8 +122,7 @@ public class Contract {
 
     @Override
     public String toString() {
-        return String.format("%s!%h@%h{address=%s,methods=%s}",
-                getClass().getSimpleName(), System.identityHashCode(this), hashCode(),
-                address, methods);
+        return String.format("%s{address=%s,methods=%s}",
+                getClass().getSimpleName(), address, methods);
     }
 }
