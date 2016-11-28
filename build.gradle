@@ -36,6 +36,11 @@ dependencies {
 
 }
 
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+compileJava.options.compilerArgs \
+        << "-Xlint:unchecked" << "-Xlint:deprecation"
+
 publishing {
     publications {
         EtherJarPublication(MavenPublication) {

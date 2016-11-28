@@ -1,9 +1,8 @@
 package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A general type is used to convert java object to and from {@link Hex32} array.
@@ -17,12 +16,11 @@ public interface Type<T> {
      * Find appropriate {@link Type} instance for a given {@link String}.
      *
      * @param str a {@link Type} string representation (either canonical or not)
-     * @return a {@link Type} instance
+     * @return a {@link Type} instance is packed as {@link Optional} value,
+     * or {@link Optional#empty()} instead
      */
-    static Type<?> from(String str) {
-        Objects.requireNonNull(str);
-
-        throw new NotImplementedException();
+    static Optional<Type> from(String str) {
+        throw new UnsupportedOperationException();
     }
 
     /**

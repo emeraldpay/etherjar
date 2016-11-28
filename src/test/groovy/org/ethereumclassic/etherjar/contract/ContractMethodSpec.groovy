@@ -1,8 +1,10 @@
 package org.ethereumclassic.etherjar.contract
 
 import org.ethereumclassic.etherjar.contract.type.Type
+import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.MethodId
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -30,12 +32,12 @@ class ContractMethodSpec extends Specification {
                     [ Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000') ] as Hex32[] }
         ] as Type
 
-        method = new ContractMethod(MethodId.fromAbi('bar', 'fixed128x128', 'fixed128x128'), t1 ,t2)
+        method = new ContractMethod('bar', t1 ,t2)
     }
 
     def "should check method signature validity"() {
         expect:
-        ContractMethod.Builder.isSignatureValid valid_sign
+        ContractMethod.Builder.isAbiValid valid_sign
 
         where:
         _ | valid_sign
@@ -48,23 +50,70 @@ class ContractMethodSpec extends Specification {
 
     def "should check method signature invalidity"() {
         expect:
-        !ContractMethod.Builder.isSignatureValid(invalid_sign)
+        !ContractMethod.Builder.isAbiValid(invalid_sign)
 
         where:
         _ | invalid_sign
-        _ | 'baz(uint32,,bool)'
-        _ | 'baz(uint32,bool,)'
         _ | 'baz(uint32, bool)'
         _ | 'bar(fixed128x128[2]'
         _ | '1f(uint256,uint32[],bytes10,bytes)'
     }
 
-    def "should rebuild similar contract method"() {
-        def obj = new ContractMethod.Builder()
-                .withName('bar').expects(method.getInputTypes()).build()
+    @Ignore
+    def "should copy contract method"() {
+        def obj = ContractMethod.Builder.fromAbi(method.toAbi()).build()
 
         expect:
         obj == method
+    }
+
+    def "should catch null ABIs"() {
+        when:
+        ContractMethod.Builder.fromAbi abi
+
+        then:
+        thrown NullPointerException
+
+        where:
+        _ | abi
+        _ | null
+    }
+
+    def "should catch invalid ABIs"() {
+        when:
+        ContractMethod.Builder.fromAbi abi
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | abi
+        _ | ''
+        _ | 'bar'
+    }
+
+    def "should rebuild similar contract method"() {
+        def obj = new ContractMethod.Builder().withName('bar')
+                .expects(method.getInputTypes() as Type[])
+                .returns(method.outputTypes as Type[])
+                .build()
+
+        expect:
+        obj == method
+    }
+
+    def "should build constant contract method"() {
+        def obj = new ContractMethod.Builder()
+                .withName('bar').asConstant()
+                .expects(method.getInputTypes() as Type[])
+                .returns(method.outputTypes as Type[])
+                .build()
+
+        expect:
+        obj.id == method.id
+        obj.constant
+        obj.outputTypes == method.outputTypes
+        obj.inputTypes == method.inputTypes
     }
 
     def "should throw illegal state exception for empty builder"() {
@@ -77,7 +126,7 @@ class ContractMethodSpec extends Specification {
 
     def "should be steady for external modifications"() {
         def coll = new ArrayList(method.inputTypes)
-        def obj = new ContractMethod(MethodId.fromAbi('bar', 'fixed128x128[2]'), coll)
+        def obj = new ContractMethod('bar', coll)
 
         when:
         coll.clear()
@@ -88,10 +137,28 @@ class ContractMethodSpec extends Specification {
 
     def "should be created correctly"() {
         expect:
-        method.id == MethodId.fromAbi('bar', 'fixed128x128', 'fixed128x128')
+        method.id == MethodId.fromSignature('bar', 'fixed128x128', 'fixed128x128')
         !method.constant
         method.inputTypes.size() == 2
         method.outputTypes.isEmpty()
+    }
+
+    def "should create correctly without constant flag"() {
+        when:
+        def obj = new ContractMethod(method.name)
+
+        then:
+        !obj.constant
+    }
+
+    def "should create correctly without input and output types"() {
+        when:
+        def obj = new ContractMethod(method.name, method.constant)
+
+        then:
+        !obj.constant
+        obj.inputTypes.isEmpty()
+        obj.outputTypes.isEmpty()
     }
 
     def "should check the returned input types collection for immutability"() {
@@ -123,7 +190,7 @@ class ContractMethodSpec extends Specification {
         hex.contains '00000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000880000000000000000000000000000000'
     }
 
-    def "should encode call with wrong parameters number"() {
+    def "should throw exception for encode call with wrong parameters number"() {
         when:
         method.encodeCall params
 
@@ -137,14 +204,20 @@ class ContractMethodSpec extends Specification {
         _ | [1, 2, 3] as Object[]
     }
 
+    def "should be converted to ABI string representation"() {
+        def str = method.toAbi()
+
+        expect:
+        str == 'bar(fixed128x128,fixed128x128)'
+    }
+
     def "should calculate consistent hashcode"() {
         expect:
         first.hashCode() == second.hashCode()
 
         where:
-        first                           | second
-        new ContractMethod(method.id)   | new ContractMethod(method.id)
-        method                          | new ContractMethod.Builder().withName('bar').expects(method.getInputTypes()).build()
+        first   | second
+        method  | new ContractMethod.Builder().withName('bar').expects(method.inputTypes).build()
     }
 
     def "should be equal"() {
@@ -152,10 +225,9 @@ class ContractMethodSpec extends Specification {
         first == second
 
         where:
-        first                           | second
-        method                          | method
-        new ContractMethod(method.id)   | new ContractMethod(method.id)
-        method                          | new ContractMethod.Builder().withName('bar').expects(method.getInputTypes()).build()
+        first   | second
+        method  | method
+        method  | new ContractMethod.Builder().withName('bar').expects(method.inputTypes).build()
     }
 
     def "should not be equal"() {
@@ -163,9 +235,10 @@ class ContractMethodSpec extends Specification {
         first != second
 
         where:
-        first       | second
-        method      | null
-        method      | new ContractMethod(MethodId.fromAbi('bar', 'fixed128x128[2]'))
+        first   | second
+        method  | null
+        method  | new ContractMethod('baz', method.inputTypes)
+        method  | new Contract(Address.EMPTY)
     }
 
     def "should be converted to a string representation"() {
@@ -174,6 +247,7 @@ class ContractMethodSpec extends Specification {
         expect:
         str ==~ /ContractMethod\{.+}/
         str.contains "id=${method.id}"
+        str.contains "name=${method.name}"
         str.contains "isConstant=${method.constant}"
         str.contains "expects=${method.inputTypes}"
         str.contains "returns=${method.outputTypes}"

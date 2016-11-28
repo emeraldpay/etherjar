@@ -4,9 +4,9 @@ import org.ethereumclassic.etherjar.contract.type.Type;
 import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.MethodId;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -20,19 +20,18 @@ public class ContractMethod {
 
     public static class Builder {
 
-        final static Pattern SIGNATURE_PATTERN =
-                Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|]|((?<!,),(?!\\))))*\\)");
+        final static Pattern ABI_PATTERN = Pattern.compile("(\\p{Alpha}\\p{Alnum}*)\\((\\S*)\\)");
 
         /**
-         * Check contract method signature.
+         * Check contract method ABI signature.
          *
          * @param signature a contract method signature string representation
          * @return {@code true} if <code>signature</code> is valid, otherwise
          * {@code false}
-         * @see #SIGNATURE_PATTERN
+         * @see #ABI_PATTERN
          */
-        static boolean isSignatureValid(String signature) {
-            return SIGNATURE_PATTERN.matcher(signature).matches();
+        static boolean isAbiValid(String signature) {
+            return ABI_PATTERN.matcher(signature).matches();
         }
 
         /**
@@ -47,7 +46,17 @@ public class ContractMethod {
          * @return builder instance
          */
         public static Builder fromAbi(String signature) {
-            throw new NotImplementedException();
+            Matcher m = ABI_PATTERN.matcher(signature);
+
+            if (!m.find())
+                throw new IllegalArgumentException("Wrong ABI method signature: " + signature);
+
+            String name = m.group(1);
+
+            List<Type> types = Arrays.stream(m.group(1).split(",")).map(Type::from)
+                    .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
+            return new Builder().withName(name).expects(types);
         }
 
         private String name = null;
@@ -124,14 +133,13 @@ public class ContractMethod {
             if (Objects.isNull(name))
                 throw new IllegalStateException("Undefined contract method name");
 
-            MethodId id = MethodId.fromAbi(name,
-                    inputTypes.stream().map(Type::getName).collect(Collectors.toList()));
-
-            return new ContractMethod(id, isConstant, inputTypes, outputTypes);
+            return new ContractMethod(name, isConstant, inputTypes, outputTypes);
         }
     }
 
     private final MethodId id;
+
+    private final String name;
 
     private final boolean isConstant;
 
@@ -139,26 +147,28 @@ public class ContractMethod {
 
     private final List<Type> outputTypes;
 
-    public ContractMethod(MethodId id, Type... inputTypes) {
-        this(id, false, Arrays.asList(inputTypes), Collections.emptyList());
+    public ContractMethod(String name, Type... inputTypes) {
+        this(name, false, Arrays.asList(inputTypes), Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, Collection<? extends Type> inputTypes) {
-        this(id, false, inputTypes, Collections.emptyList());
+    public ContractMethod(String name, Collection<? extends Type> inputTypes) {
+        this(name, false, inputTypes, Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, boolean isConstant, Type... inputTypes) {
-        this(id, isConstant, Arrays.asList(inputTypes), Collections.emptyList());
+    public ContractMethod(String name, boolean isConstant, Type... inputTypes) {
+        this(name, isConstant, Arrays.asList(inputTypes), Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, boolean isConstant, Collection<? extends Type> inputTypes) {
-        this(id, isConstant, inputTypes, Collections.emptyList());
+    public ContractMethod(String name, boolean isConstant, Collection<? extends Type> inputTypes) {
+        this(name, isConstant, inputTypes, Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, boolean isConstant,
+    public ContractMethod(String name, boolean isConstant,
                           Collection<? extends Type> inputTypes,
                           Collection<? extends Type> outputTypes) {
-        this.id = Objects.requireNonNull(id);
+        this.id = MethodId.fromSignature(Objects.requireNonNull(name),
+                inputTypes.stream().map(Type::getName).collect(Collectors.toList()));
+        this.name = name;
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
         this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
@@ -172,7 +182,16 @@ public class ContractMethod {
     }
 
     /**
-     * @return is the methods doesn't change contract's state
+     * @return the method name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return {@code true} if this method change contract's state,
+     * otherwise {@code false}
+     * @see Contract
      */
     public boolean isConstant() {
         return isConstant;
@@ -203,6 +222,7 @@ public class ContractMethod {
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector-and-argument-encoding">Function Selector and Argument Encoding</a>
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
+    @SuppressWarnings("unchecked")
     public HexData encodeCall(Object... params) {
         if (inputTypes.size() != params.length)
             throw new IllegalArgumentException("Wrong number of input parameters: " + params.length);
@@ -221,7 +241,6 @@ public class ContractMethod {
         for (int i = 0; i < inputTypes.size(); i++) {
             Type type = inputTypes.get(i);
 
-            //noinspection unchecked
             Hex32[] data = type.encode(params[i]);
 
             if (!type.isDynamic()) {
@@ -241,6 +260,18 @@ public class ContractMethod {
         System.arraycopy(tail.toArray(new Hex32[tail.size()]), 0, data, head.size() + 1, tail.size());
 
         return HexData.from(data);
+    }
+
+    /**
+     * ABI encoded contract method signature.
+     *
+     * @return a string
+     */
+    public String toAbi() {
+        String args = inputTypes.stream()
+                .map(Type::getName).collect(Collectors.joining(","));
+
+        return name + '(' + args + ')';
     }
 
     @Override
@@ -264,7 +295,7 @@ public class ContractMethod {
 
     @Override
     public String toString() {
-        return String.format("%s{id=%s,isConstant=%b,expects=%s,returns=%s}",
-                getClass().getSimpleName(), id, isConstant, inputTypes, outputTypes);
+        return String.format("%s{id=%s,name=%s,isConstant=%b,expects=%s,returns=%s}",
+                getClass().getSimpleName(), id, name, isConstant, inputTypes, outputTypes);
     }
 }

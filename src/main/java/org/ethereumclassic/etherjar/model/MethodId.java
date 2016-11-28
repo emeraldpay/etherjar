@@ -22,11 +22,11 @@ public class MethodId extends HexData {
     public static final int SIZE_BYTES = 4;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
-    public static MethodId fromAbi(String name, String... types) {
-        return fromAbi(name, Arrays.asList(types));
+    public static MethodId fromSignature(String name, String... types) {
+        return fromSignature(name, Arrays.asList(types));
     }
 
-    public static MethodId fromAbi(String name, Collection<String> types) {
+    public static MethodId fromSignature(String name, Collection<String> types) {
         String sign = Objects.requireNonNull(name) +
                 '(' + String.join(",", Objects.requireNonNull(types)) + ')';
 

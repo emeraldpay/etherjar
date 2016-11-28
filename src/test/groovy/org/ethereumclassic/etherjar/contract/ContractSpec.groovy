@@ -10,10 +10,13 @@ class ContractSpec extends Specification {
     @Shared Contract contract
 
     def setup() {
-        contract = new Contract(Address.EMPTY,
-                new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])),
-                new ContractMethod(new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])),
-                new ContractMethod(new MethodId([0xff, 0xAA, 0x2B, 0x3C] as byte[])))
+        def methods = []
+
+        methods << new ContractMethod('bar')
+        methods << new ContractMethod('baz')
+        methods << new ContractMethod('baz')
+
+        contract = new Contract(Address.EMPTY, methods as ContractMethod[])
     }
 
     def "should build an empty contract by default"() {
@@ -38,29 +41,26 @@ class ContractSpec extends Specification {
     }
 
     def "should be steady for external modifications"() {
-        def coll = [] << new ContractMethod(new MethodId([0xff, 0x11, 0x22, 0x33] as byte[]))
+        def coll = [] + contract.methods
         def obj = new Contract(contract.address, coll)
 
         when:
         coll.clear()
 
         then:
-        obj.methods.size() == 1
+        obj.methods.size() == 3
     }
 
     def "should find a contract method by a signature id"() {
         when:
-        def opt = contract.findMethod id
+        def opt = contract.findMethod(id)
 
         then:
         opt.present
         opt.get().id == id
 
         where:
-        _ | id
-        _ | new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])
-        _ | new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])
-        _ | new MethodId([0xff, 0xAA, 0x2B, 0x3C] as byte[])
+        id << contract.methods*.id
     }
 
     def "should catch a non-existent contract method signatures id"() {
@@ -90,10 +90,7 @@ class ContractSpec extends Specification {
         coll.stream().anyMatch { it.id == id }
 
         where:
-        _ | id
-        _ | new MethodId([0xff, 0x11, 0x22, 0x33] as byte[])
-        _ | new MethodId([0xff, 0x00, 0xCC, 0x44] as byte[])
-        _ | new MethodId([0xff, 0xAA, 0x2B, 0x3C] as byte[])
+        id << contract.methods*.id
     }
 
     def "should check the returned methods collection for immutability"() {
@@ -134,7 +131,7 @@ class ContractSpec extends Specification {
         where:
         first       | second
         contract    | null
-        contract    | new ContractMethod(MethodId.fromAbi('bar', 'fixed128x128[2])'))
+        contract    | new ContractMethod('bar')
         contract    | new Contract(Address.from("0x0000000000015b23c7e20b0ea5ebd84c39dcbe60"))
     }
 

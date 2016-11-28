@@ -6,7 +6,7 @@ class MethodIdSpec extends Specification {
 
     def "should be created from ABI"() {
         expect:
-        id == MethodId.fromAbi(name, types as String[]).toHex()
+        id == MethodId.fromSignature(name, types as String[]).toHex()
 
         where:
         id           | name     | types
@@ -17,7 +17,7 @@ class MethodIdSpec extends Specification {
 
     def "should catch null contract method name"() {
         when:
-        MethodId.fromAbi null
+        MethodId.fromSignature null
 
         then:
         thrown NullPointerException
@@ -25,7 +25,7 @@ class MethodIdSpec extends Specification {
 
     def "should catch null contract method types"() {
         when:
-        MethodId.fromAbi(null, null as Collection<String>)
+        MethodId.fromSignature(null, null as Collection<String>)
 
         then:
         thrown NullPointerException
