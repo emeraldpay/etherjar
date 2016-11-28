@@ -2,6 +2,8 @@ package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
 
+import java.util.Optional;
+
 /**
  * A general type is used to convert java object to and from {@link Hex32} array.
  *
@@ -11,11 +13,15 @@ import org.ethereumclassic.etherjar.model.Hex32;
 public interface Type<T> {
 
     /**
-     * Number of bytes to store fixed-size offset of the beginning of dynamic tail part.
+     * Find appropriate {@link Type} instance for a given {@link String}.
      *
-     * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#formal-specification-of-the-encoding">Formal Specification of the Encoding</a>
+     * @param str a {@link Type} string representation (either canonical or not)
+     * @return a {@link Type} instance is packed as {@link Optional} value,
+     * or {@link Optional#empty()} instead
      */
-    int DYNAMIC_OFFSET_FIXED_SIZE_BYTES = Hex32.SIZE_BYTES;
+    static Optional<Type> from(String str) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * @param <V> the type of result object

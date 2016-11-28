@@ -1,5 +1,5 @@
 plugins {
-    id "com.jfrog.bintray" version "1.7"
+    id "com.jfrog.bintray" version "1.7.3"
 }
 
 apply plugin: 'java'
@@ -7,6 +7,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
+apply plugin: 'idea'
 
 group = 'org.ethereumclassic'
 version = '0.3-SNAPSHOT'
@@ -27,13 +28,18 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "org.apache.httpcomponents:httpmime:$httpClientVersion"
     compile "org.apache.httpcomponents:httpclient:$httpClientVersion"
-    compile "org.bouncycastle:bcprov-jdk15on:1.55"
+    compile "org.bouncycastle:bcprov-jdk15on:$bcprovVersion"
 
-    testCompile "org.objenesis:objenesis:2.2"
+    testCompile "org.objenesis:objenesis:$objenesisVersion"
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
     testCompile "org.spockframework:spock-core:$spockVersion"
 
 }
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+compileJava.options.compilerArgs \
+        << "-Xlint:unchecked" << "-Xlint:deprecation"
 
 publishing {
     publications {
