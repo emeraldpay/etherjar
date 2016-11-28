@@ -14,7 +14,7 @@ class ContractSpec extends Specification {
 
         methods << new ContractMethod('bar')
         methods << new ContractMethod('baz')
-        methods << new ContractMethod('baz')
+        methods << new ContractMethod('sam')
 
         contract = new Contract(Address.EMPTY, methods as ContractMethod[])
     }
