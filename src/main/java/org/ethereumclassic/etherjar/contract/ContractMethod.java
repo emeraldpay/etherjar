@@ -6,10 +6,12 @@ import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.MethodId;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * A smart contract method (a constructor or a function).
+ * A smart contract methods (either a constructor or a function).
  *
  * @author Igor Artamonov
  * @see Contract
@@ -18,40 +20,56 @@ public class ContractMethod {
 
     public static class Builder {
 
-        private MethodId id;
-
-        private String name;
-
-        private boolean isConstant;
-
-        private Collection<? extends Type> inputTypes;
-
-        private Collection<? extends Type> outputTypes;
+        final static Pattern ABI_PATTERN = Pattern.compile("(\\p{Alpha}\\p{Alnum}*)\\((\\S*)\\)");
 
         /**
-         * Build from canonical method signature like <tt>name(datatype1,datatype2)</tt>,
-         * or <tt>transfer(address,uint256)</tt>.
+         * Check contract method ABI signature.
          *
-         * <p>Make sure you're using canonical name type, e.g <tt>uint256</tt>
-         * instead of simple <tt>uint</tt>
+         * @param signature a contract method signature string representation
+         * @return {@code true} if <code>signature</code> is valid, otherwise
+         * {@code false}
+         * @see #ABI_PATTERN
+         */
+        static boolean isAbiValid(String signature) {
+            return ABI_PATTERN.matcher(signature).matches();
+        }
+
+        /**
+         * Create a {@link Builder} instance from methods signature like
+         * <tt>name(datatype1,datatype2)</tt>, or <tt>transfer(address,uint256)</tt>.
          *
          * <p>The signature is defined as the canonical expression of the basic prototype,
          * i.e. the function name with the parenthesised list of parameter types.
          * Parameter types are split by a single comma - no spaces are used.
          *
-         * @param signature canonical signature
-         * @return contract method instance
-         * @see MethodId#fromSignature(String)
+         * @param signature a contract method signature string representation
+         * @return builder instance
          */
-        public Builder withSignature(String signature) {
-            id = MethodId.fromSignature(signature);
+        public static Builder fromAbi(String signature) {
+            Matcher m = ABI_PATTERN.matcher(signature);
 
-            return this;
+            if (!m.find())
+                throw new IllegalArgumentException("Wrong ABI method signature: " + signature);
+
+            String name = m.group(1);
+
+            List<Type> types = Arrays.stream(m.group(1).split(",")).map(Type::from)
+                    .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+
+            return new Builder().withName(name).expects(types);
         }
 
+        private String name = null;
+
+        private boolean isConstant = false;
+
+        private Collection<? extends Type> inputTypes = Collections.emptyList();
+
+        private Collection<? extends Type> outputTypes = Collections.emptyList();
+
         /**
-         * @param name a contract method name
-         * @return the current builder object
+         * @param name a contract methods name
+         * @return builder instance
          */
         public Builder withName(String name) {
             this.name = Objects.requireNonNull(name);
@@ -60,9 +78,9 @@ public class ContractMethod {
         }
 
         /**
-         * Mark a contract method as a constant method.
+         * Mark a contract methods as a constant methods.
          *
-         * @return the current builder object
+         * @return builder instance
          */
         public Builder asConstant() {
             isConstant = true;
@@ -71,34 +89,34 @@ public class ContractMethod {
         }
 
         /**
-         * @param types a contract method input types
-         * @return the current builder object
+         * @param types a contract methods input types
+         * @return builder instance
          */
-        public Builder accepts(Type... types) {
-            return accepts(Arrays.asList(types));
+        public Builder expects(Type... types) {
+            return expects(Arrays.asList(types));
         }
 
         /**
-         * @param types a contract method input types
-         * @return the current builder object
+         * @param types a contract methods input types
+         * @return builder instance
          */
-        public Builder accepts(Collection<? extends Type> types) {
+        public Builder expects(Collection<? extends Type> types) {
             inputTypes = Objects.requireNonNull(types);
 
             return this;
         }
 
         /**
-         * @param types a contract method output types
-         * @return the current builder object
+         * @param types a contract methods output types
+         * @return builder instance
          */
         public Builder returns(Type... types) {
             return returns(Arrays.asList(types));
         }
 
         /**
-         * @param types a contract method output types
-         * @return the current builder object
+         * @param types a contract methods output types
+         * @return builder instance
          */
         public Builder returns(Collection<? extends Type> types) {
             outputTypes = Objects.requireNonNull(types);
@@ -107,36 +125,21 @@ public class ContractMethod {
         }
 
         /**
-         * Build a {@link ContractMethod} object with predefined by builder conditions.
+         * Build a {@link ContractMethod} instance with predefined conditions.
          *
-         * @return a {@link ContractMethod} object
+         * @return a {@link ContractMethod} instance
          */
         public ContractMethod build() {
-            if (Objects.isNull(id) && Objects.isNull(name))
-                throw new IllegalStateException("Contract method id is absent");
+            if (Objects.isNull(name))
+                throw new IllegalStateException("Undefined contract method name");
 
-            if (Objects.isNull(id)) {
-                id = MethodId.fromSignature(toSignature(name, inputTypes));
-            }
-
-            return new ContractMethod(id, isConstant, inputTypes, outputTypes);
+            return new ContractMethod(name, isConstant, inputTypes, outputTypes);
         }
     }
 
-    public static String toSignature(String name, Type... inputTypes) {
-        return toSignature(name, Arrays.asList(inputTypes));
-    }
-
-    public static String toSignature(String name, Collection<? extends Type> inputTypes) {
-        Objects.requireNonNull(name);
-
-        String args = inputTypes.stream()
-                .map(Type::getName).collect(Collectors.joining(","));
-
-        return name + '(' + args + ')';
-    }
-
     private final MethodId id;
+
+    private final String name;
 
     private final boolean isConstant;
 
@@ -144,57 +147,65 @@ public class ContractMethod {
 
     private final List<Type> outputTypes;
 
-    public ContractMethod(MethodId id, Type... inputTypes) {
-        this(id, false, Arrays.asList(inputTypes), Collections.emptyList());
+    public ContractMethod(String name, Type... inputTypes) {
+        this(name, false, Arrays.asList(inputTypes), Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, Collection<? extends Type> inputTypes) {
-        this(id, false, inputTypes, Collections.emptyList());
+    public ContractMethod(String name, Collection<? extends Type> inputTypes) {
+        this(name, false, inputTypes, Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, boolean isConstant, Type... inputTypes) {
-        this(id, isConstant, Arrays.asList(inputTypes), Collections.emptyList());
+    public ContractMethod(String name, boolean isConstant, Type... inputTypes) {
+        this(name, isConstant, Arrays.asList(inputTypes), Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, boolean isConstant, Collection<? extends Type> inputTypes) {
-        this(id, isConstant, inputTypes, Collections.emptyList());
+    public ContractMethod(String name, boolean isConstant, Collection<? extends Type> inputTypes) {
+        this(name, isConstant, inputTypes, Collections.emptyList());
     }
 
-    public ContractMethod(MethodId id, boolean isConstant,
+    public ContractMethod(String name, boolean isConstant,
                           Collection<? extends Type> inputTypes,
                           Collection<? extends Type> outputTypes) {
-        if (id == null)
-            throw new IllegalArgumentException("Null contract method id");
-
-        this.id = id;
+        this.id = MethodId.fromSignature(Objects.requireNonNull(name),
+                inputTypes.stream().map(Type::getName).collect(Collectors.toList()));
+        this.name = name;
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
         this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
     }
 
     /**
-     * @return the method id
+     * @return the methods id
      */
     public MethodId getId() {
         return id;
     }
 
     /**
-     * @return is the method doesn't change contract's state
+     * @return the method name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return {@code true} if this method change contract's state,
+     * otherwise {@code false}
+     * @see Contract
      */
     public boolean isConstant() {
         return isConstant;
     }
 
     /**
-     * @return the method parameter types
+     * @return the methods parameter types
      */
     public List<Type> getInputTypes() {
         return inputTypes;
     }
 
     /**
-     * @return the method return types
+     * @return the methods return types
      */
     public List<Type> getOutputTypes() {
         return outputTypes;
@@ -211,6 +222,7 @@ public class ContractMethod {
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector-and-argument-encoding">Function Selector and Argument Encoding</a>
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
+    @SuppressWarnings("unchecked")
     public HexData encodeCall(Object... params) {
         if (inputTypes.size() != params.length)
             throw new IllegalArgumentException("Wrong number of input parameters: " + params.length);
@@ -229,7 +241,6 @@ public class ContractMethod {
         for (int i = 0; i < inputTypes.size(); i++) {
             Type type = inputTypes.get(i);
 
-            //noinspection unchecked
             Hex32[] data = type.encode(params[i]);
 
             if (!type.isDynamic()) {
@@ -249,6 +260,18 @@ public class ContractMethod {
         System.arraycopy(tail.toArray(new Hex32[tail.size()]), 0, data, head.size() + 1, tail.size());
 
         return HexData.from(data);
+    }
+
+    /**
+     * ABI encoded contract method signature.
+     *
+     * @return a string
+     */
+    public String toAbi() {
+        String args = inputTypes.stream()
+                .map(Type::getName).collect(Collectors.joining(","));
+
+        return name + '(' + args + ')';
     }
 
     @Override
@@ -272,8 +295,7 @@ public class ContractMethod {
 
     @Override
     public String toString() {
-        return String.format("%s!%h@%h{id=%s,constant=%b,accepts=%s,returns=%s}",
-                getClass().getSimpleName(), System.identityHashCode(this), hashCode(),
-                id, isConstant, inputTypes, outputTypes);
+        return String.format("%s{id=%s,name=%s,isConstant=%b,expects=%s,returns=%s}",
+                getClass().getSimpleName(), id, name, isConstant, inputTypes, outputTypes);
     }
 }

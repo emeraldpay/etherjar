@@ -3,8 +3,9 @@ package org.ethereumclassic.etherjar.model;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.ethereumclassic.etherjar.contract.ContractMethod;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * The first four bytes of the call data for a function call specifies the function to be called.
@@ -21,34 +22,18 @@ public class MethodId extends HexData {
     public static final int SIZE_BYTES = 4;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
-    public final static Pattern SIGNATURE_PATTERN =
-        Pattern.compile("\\p{Alpha}+\\d*\\((\\w*|\\[|]|((?<!,),(?!\\))))*\\)");
-
-    /**
-     * Check method canonical signature.
-     *
-     * @param signature a method name
-     * @return boolean
-     * @see #SIGNATURE_PATTERN
-     */
-    static boolean isSignatureValid(String signature) {
-        return SIGNATURE_PATTERN.matcher(signature).matches();
+    public static MethodId fromSignature(String name, String... types) {
+        return fromSignature(name, Arrays.asList(types));
     }
 
-    /**
-     * @param signature canonical signature ({@link #SIGNATURE_PATTERN})
-     * @return method id
-     */
-    public static MethodId fromSignature(String signature) {
-        Objects.requireNonNull(signature);
-
-        if (!isSignatureValid(signature))
-            throw new IllegalArgumentException("Invalid method signature: " + signature);
+    public static MethodId fromSignature(String name, Collection<String> types) {
+        String sign = Objects.requireNonNull(name) +
+                '(' + String.join(",", Objects.requireNonNull(types)) + ')';
 
         byte[] head = new byte[4];
         Keccak.Digest256 digest256 = new Keccak.Digest256();
 
-        digest256.update(signature.getBytes());
+        digest256.update(sign.getBytes());
         System.arraycopy(digest256.digest(), 0, head, 0, 4);
 
         return from(head);

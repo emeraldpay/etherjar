@@ -6,7 +6,7 @@ import org.ethereumclassic.etherjar.model.MethodId;
 import java.util.*;
 
 /**
- * A smart contract.
+ * A smart contract (ABI).
  *
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI">Ethereum Contract ABI</a>
  */
@@ -14,45 +14,33 @@ public class Contract {
 
     public static class Builder {
 
-        private Address address;
+        private Address address = Address.EMPTY;
 
-        private ContractMethod constructor;
-
-        private Collection<ContractMethod> methods;
+        private Collection<ContractMethod> methods = Collections.emptyList();
 
         /**
          * @param address a contract address
          * @return the current builder object
          */
-        public Builder withAdress(Address address) {
+        public Builder at(Address address) {
             this.address = Objects.requireNonNull(address);
 
             return this;
         }
 
         /**
-         * @param constructor a contract constructor
+         * @param methods a contract methods
          * @return the current builder object
          */
-        public Builder withConstructor(ContractMethod constructor) {
-            this.constructor = Objects.requireNonNull(constructor);
-
-            return this;
+        public Builder methods(ContractMethod... methods) {
+            return methods(Arrays.asList(methods));
         }
 
         /**
          * @param methods a contract methods
          * @return the current builder object
          */
-        public Builder withMethods(ContractMethod... methods) {
-            return withMethods(Arrays.asList(methods));
-        }
-
-        /**
-         * @param methods a contract methods
-         * @return the current builder object
-         */
-        public Builder withMethods(Collection<ContractMethod> methods) {
+        public Builder methods(Collection<ContractMethod> methods) {
             this.methods = Objects.requireNonNull(methods);
 
             return this;
@@ -64,66 +52,53 @@ public class Contract {
          * @return a {@link Contract} object
          */
         public Contract build() {
-            if (Objects.isNull(address) || Objects.isNull(methods) || methods.size() == 0)
-                throw new IllegalStateException(
-                        "Wrong contract builder state (null address, ot empty method list)");
-
-            return Objects.isNull(constructor) ?
-                    new Contract(address, methods) :
-                    new Contract(address, constructor, methods);
+            return new Contract(address, methods);
         }
     }
 
     private final Address address;
 
-    private final Optional<ContractMethod> constructor;
-
     private final Collection<ContractMethod> methods;
 
     public Contract(Address address, ContractMethod... methods) {
-        this(address, null, methods);
+        this(address, Arrays.asList(methods));
     }
 
     public Contract(Address address, Collection<ContractMethod> methods) {
-        this(address, null, methods);
-    }
-
-    public Contract(Address address, ContractMethod constructor, ContractMethod... methods) {
-        this(address, constructor, Arrays.asList(methods));
-    }
-
-    public Contract(
-            Address address, ContractMethod constructor, Collection<ContractMethod> methods) {
         this.address = Objects.requireNonNull(address);
-        this.constructor = Optional.ofNullable(constructor);
         this.methods = Collections.unmodifiableCollection(new ArrayList<>(methods));
     }
 
     /**
-     * Find a method type by a method signature.
+     * Get contract's address.
      *
-     * @param id a method signature id
-     * @return a required method type or <tt>null</tt>
+     * @return an address
      */
-    public ContractMethod getMethod(MethodId id) {
-        if (id == null)
-            throw new IllegalArgumentException("Null method signature id");
-
-        for (ContractMethod method : methods) {
-            if (method.getId().equals(id))
-                return method;
-        }
-
-        return null;
+    public Address getAddress() {
+        return address;
     }
 
     /**
-     * Get all method types.
+     * Get all contract's methods.
      *
-     * @return a method types collection
+     * @return a methods collection
      */
     public Collection<ContractMethod> getMethods() {
         return methods;
+    }
+
+    /**
+     * Find a methods type by a methods signature id.
+     *
+     * @param id a methods signature id
+     * @return an {@code Optional} containing required methods, or an empty
+     * {@code Optional} if methods with the given {@code id} doesn't exist
+     */
+    public Optional<ContractMethod> findMethod(MethodId id) {
+        Objects.requireNonNull(id);
+
+        return methods.stream()
+                .filter(it -> it.getId().equals(id)).findFirst();
     }
 
     @Override
@@ -147,8 +122,7 @@ public class Contract {
 
     @Override
     public String toString() {
-        return String.format("%s!%h@%h{address=%s,constructor=%b,methods=%s}",
-                getClass().getSimpleName(), System.identityHashCode(this), hashCode(),
-                address, constructor, methods);
+        return String.format("%s{address=%s,methods=%s}",
+                getClass().getSimpleName(), address, methods);
     }
 }

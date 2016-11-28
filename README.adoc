@@ -14,7 +14,7 @@ Lightweight Java client to Ethereum blockchain, supports both Ethereum Classic (
 * Blockchain information through Ethereum RPC
 * (_in progress_) Offline transaction signing
 * (_in progress_) Smart Contracts for Java
-* (_in progress_) JSON ABI encoding/decoding
+* (_in progress_) ABI encoding/decoding
 * Parity RPC extensions support
 
 ## Technology
