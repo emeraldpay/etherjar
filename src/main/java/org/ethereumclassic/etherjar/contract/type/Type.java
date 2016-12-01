@@ -2,10 +2,6 @@ package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 /**
  * A general type is used to convert java object to and from {@link Hex32} array.
  *
@@ -16,45 +12,12 @@ import java.util.Optional;
  */
 public interface Type<T> {
 
-    @FunctionalInterface
-    interface Repository {
-
-        /**
-         * Search appropriate {@link Type} instance for a given {@link String}.
-         *
-         * @param str a {@link Type} string representation (either canonical or not)
-         * @return a {@link Type} instance is packed as {@link Optional} value,
-         * or {@link Optional#empty()} instead
-         */
-        @SuppressWarnings("unchecked")
-        default Optional<Type> search(String str) {
-            return getAllTypes().stream().map(t -> (Optional<Type>) t.parse(str))
-                    .filter(Optional::isPresent).map(Optional::get).findFirst();
-        }
-
-        /**
-         * Get all existing {@link Type}.
-         *
-         * @return a list of all existing {@link Type}
-         */
-        List<Type> getAllTypes();
-    }
-
-    Type[] ALL_TYPES = new Type[] { new UIntType(), new IntType(), new BoolType() };
-
-    Repository REPOSITORY = () -> Arrays.asList(ALL_TYPES);
-
     /**
-     * Find appropriate {@link Type} instance for a given {@link String}.
+     * Number of bytes to store fixed-size offset of the beginning of dynamic tail part.
      *
-     * @param str a {@link Type} string representation (either canonical or not)
-     * @return a {@link Type} instance is packed as {@link Optional} value,
-     * or {@link Optional#empty()} instead
-     * @see Repository#search(String)
+     * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#formal-specification-of-the-encoding">Formal Specification of the Encoding</a>
      */
-    static Optional<Type> from(String str) {
-        return REPOSITORY.search(str);
-    }
+    int DYNAMIC_OFFSET_FIXED_SIZE_BYTES = Hex32.SIZE_BYTES;
 
     /**
      * @param <V> the type of result object
