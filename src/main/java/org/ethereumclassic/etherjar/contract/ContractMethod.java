@@ -232,7 +232,7 @@ public class ContractMethod {
 
         for (Type type : inputTypes) {
             headBytesSize += type.isDynamic() ?
-                Hex32.SIZE_BYTES : type.getBytesFixedSize();
+                Hex32.SIZE_BYTES : type.getEncodedSize();
         }
 
         List<Hex32> head = new ArrayList<>(headBytesSize / Hex32.SIZE_BYTES);

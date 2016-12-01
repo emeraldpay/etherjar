@@ -17,4 +17,3 @@
 
 ### Special
 * 0xb9c3215306c188ff07dc5fdb9816ccd9727c1f420acd0bebbff77851e32bb3f6 - Suicide
-
