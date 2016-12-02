@@ -181,6 +181,7 @@ class ContractMethodSpec extends Specification {
         thrown UnsupportedOperationException
     }
 
+    @Ignore
     def "should encode call"() {
         when:
         def hex = method.encodeCall([1, 2] as Object[]).toHex()
