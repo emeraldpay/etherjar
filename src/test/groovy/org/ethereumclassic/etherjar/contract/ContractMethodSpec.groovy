@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.contract
 
+import org.ethereumclassic.etherjar.contract.type.BoolType
 import org.ethereumclassic.etherjar.contract.type.Type
 import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.Hex32
@@ -199,13 +200,121 @@ class ContractMethodSpec extends Specification {
         thrown UnsupportedOperationException
     }
 
-    def "should encode call"() {
+    def "should encode call 'bar(fixed[2])' with the with the argument [2.125, 8.5]"() {
+        def type = [
+                getCanonicalName: { 'fixed128x128[2]' },
+                isDynamic: { false },
+                getEncodedSize: { Hex32.SIZE_BYTES * 2 },
+                encode: { Object obj -> [
+                        Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
+                        Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')
+                ] as Hex32[] }
+        ] as Type
+
+        def obj = new ContractMethod('bar', type)
+
+        def args = [[BigDecimal.valueOf(2.125), BigDecimal.valueOf(8.5)]]
+
         when:
-        def hex = method.encodeCall([1, 2] as Object[]).toHex()
+        def hex = obj.encodeCall(args as Object[]).toHex()
+        def arr = hex.substring(MethodId.SIZE_HEX).split "(?<=\\G.{${Hex32.SIZE_BYTES << 1}})"
 
         then:
-        hex.startsWith(method.getId().toHex())
-        hex.contains '00000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000880000000000000000000000000000000'
+        obj.toAbi() == 'bar(fixed128x128[2])'
+        hex.startsWith '0xab55044d'
+
+        arr.length == 2
+        arr[0] == '0000000000000000000000000000000220000000000000000000000000000000'
+        arr[1] == '0000000000000000000000000000000880000000000000000000000000000000'
+    }
+
+    def "should encode call 'baz(uint32,bool)' with the parameters 69 and true"() {
+        def type1 = [
+                getCanonicalName: { 'uint32' },
+                isDynamic: { false },
+                getEncodedSize: { Hex32.SIZE_BYTES },
+                encode: { Object obj ->
+                    [ Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000045') ] as Hex32[] }
+        ] as Type
+
+        def type2 = [
+                getCanonicalName: { 'bool' },
+                isDynamic: { false },
+                getEncodedSize: { Hex32.SIZE_BYTES },
+                encode: { Object obj ->
+                    [ Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001') ] as Hex32[] }
+        ] as Type
+
+        def obj = new ContractMethod('baz', type1, type2)
+
+        def args = [BigInteger.valueOf(69), BoolType.TRUE]
+
+        when:
+        def hex = obj.encodeCall(args as Object[]).toHex()
+        def arr = hex.substring(MethodId.SIZE_HEX).split "(?<=\\G.{${Hex32.SIZE_BYTES << 1}})"
+
+        then:
+        obj.toAbi() == 'baz(uint32,bool)'
+        hex.startsWith '0xcdcd77c0'
+
+        arr.length == 2
+        arr[0] == '0000000000000000000000000000000000000000000000000000000000000045'
+        arr[1] == '0000000000000000000000000000000000000000000000000000000000000001'
+    }
+
+    def "should encode call 'sam(bytes,bool,uint[])' with the arguments 'dave', true and [1,2,3]"() {
+        def type1 = [
+                getCanonicalName: { 'bytes' },
+                isDynamic: { true },
+                getEncodedSize: { Hex32.SIZE_BYTES },
+                encode: { Object obj -> [
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000004'),
+                        Hex32.from('0x6461766500000000000000000000000000000000000000000000000000000000')
+                ] as Hex32[] }
+        ] as Type
+
+        def type2 = [
+                getCanonicalName: { 'bool' },
+                isDynamic: { false },
+                getEncodedSize: { Hex32.SIZE_BYTES },
+                encode: { Object obj ->
+                    [ Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001') ] as Hex32[] }
+        ] as Type
+
+        def type3 = [
+                getCanonicalName: { 'uint256[]' },
+                isDynamic: { true },
+                getEncodedSize: { Hex32.SIZE_BYTES },
+                encode: { Object obj -> [
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000003'),
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001'),
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000002'),
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000003')
+                ] as Hex32[] }
+        ] as Type
+
+        def obj = new ContractMethod('sam', type1, type2, type3)
+
+        def args = ['dave', BoolType.TRUE, [BigInteger.ONE, BigInteger.valueOf(2), BigInteger.valueOf(3)]]
+
+        when:
+        def hex = obj.encodeCall(args as Object[]).toHex()
+        def arr = hex.substring(MethodId.SIZE_HEX).split "(?<=\\G.{${Hex32.SIZE_BYTES << 1}})"
+
+        then:
+        obj.toAbi() == 'sam(bytes,bool,uint256[])'
+        hex.startsWith '0xa5643bf2'
+
+        arr.length == 9
+        arr[0] == '0000000000000000000000000000000000000000000000000000000000000060'
+        arr[1] == '0000000000000000000000000000000000000000000000000000000000000001'
+        arr[2] == '00000000000000000000000000000000000000000000000000000000000000a0'
+        arr[3] == '0000000000000000000000000000000000000000000000000000000000000004'
+        arr[4] == '6461766500000000000000000000000000000000000000000000000000000000'
+        arr[5] == '0000000000000000000000000000000000000000000000000000000000000003'
+        arr[6] == '0000000000000000000000000000000000000000000000000000000000000001'
+        arr[7] == '0000000000000000000000000000000000000000000000000000000000000002'
+        arr[8] == '0000000000000000000000000000000000000000000000000000000000000003'
     }
 
     def "should throw exception for encode call with wrong parameters number"() {

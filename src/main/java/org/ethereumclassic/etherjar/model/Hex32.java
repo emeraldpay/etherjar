@@ -1,8 +1,5 @@
 package org.ethereumclassic.etherjar.model;
 
-
-import java.math.BigInteger;
-
 public class Hex32 extends HexData {
 
     public static final int SIZE_BYTES = 32;
@@ -10,10 +7,6 @@ public class Hex32 extends HexData {
 
     public Hex32(byte[] value) {
         super(value, SIZE_BYTES);
-    }
-
-    public static Hex32 from(long value) {
-        return new Hex32(BigInteger.valueOf(value).toByteArray());
     }
 
     public static Hex32 from(byte[] value) {

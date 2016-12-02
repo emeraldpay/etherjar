@@ -6,6 +6,10 @@ import java.util.Optional;
 
 public class BoolType extends NumericType {
 
+    public final static BigInteger FALSE = BigInteger.ZERO;
+
+    public final static BigInteger TRUE = BigInteger.ONE;
+
     /**
      * Try to parse a {@link BoolType} string representation (either canonical form or not).
      *

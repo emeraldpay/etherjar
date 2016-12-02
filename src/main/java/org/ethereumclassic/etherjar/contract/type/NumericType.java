@@ -90,6 +90,10 @@ public abstract class NumericType implements Type<BigInteger> {
         return Hex32.SIZE_BYTES;
     }
 
+    public Hex32[] encode(long value) {
+        return encode(BigInteger.valueOf(value));
+    }
+
     @Override
     public Hex32[] encode(BigInteger value) {
         if (!isValueValid(value))
@@ -100,10 +104,14 @@ public abstract class NumericType implements Type<BigInteger> {
         byte[] arr = new byte[Hex32.SIZE_BYTES];
 
         if (value.signum() == -1) {
-            System.arraycopy(NEGATIVE_ARRAY_FOR_PADDING, 0, arr, 0, Hex32.SIZE_BYTES - bytes);
+            System.arraycopy(NEGATIVE_ARRAY_FOR_PADDING, 0, arr, 0, Hex32.SIZE_BYTES);
         }
 
-        System.arraycopy(data, data.length - bytes, arr, Hex32.SIZE_BYTES - bytes, bytes);
+        if (data.length > bytes) {
+            System.arraycopy(data, data.length - bytes, arr, Hex32.SIZE_BYTES - bytes, bytes);
+        } else {
+            System.arraycopy(data, 0, arr, Hex32.SIZE_BYTES - data.length, data.length);
+        }
 
         return new Hex32[] { new Hex32(arr) };
     }
