@@ -12,12 +12,39 @@ import java.util.stream.Stream;
 
 public class UIntType extends NumericType {
 
-    final static Map<Integer, BigInteger> POPULAR_MAX_VALUES =
+    final static Map<Integer, BigInteger> MOST_POPULAR_MAX_VALUES =
             Collections.unmodifiableMap(
                     Stream.of(8, 16, 32, 64, 128, 256).collect(
                             Collectors.toMap(Function.identity(), UIntType::maxValue)));
 
+    final static String NAME_PREFIX = "uint";
+
     final static Pattern NAME_PATTERN = Pattern.compile("^uint(\\d*)$");
+
+    /**
+     * Try to parse a {@link UIntType} string representation (ether canonical form or not).
+     *
+     * @param str a string
+     * @return a {@link UIntType} instance is packed as {@link Optional} value,
+     * or {@link Optional#empty()} instead
+     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws IllegalArgumentException if a {@link UIntType} has invalid input
+     * @see #getCanonicalName()
+     */
+    public static Optional<UIntType> from(String str) {
+        if (!str.startsWith(NAME_PREFIX))
+            return Optional.empty();
+
+        Matcher matcher = NAME_PATTERN.matcher(str);
+
+        if (!matcher.find())
+            throw new IllegalArgumentException("Wrong 'uint' type format: " + str);
+
+        String digits = matcher.group(1);
+
+        return Optional.of(
+                digits.isEmpty() ? new UIntType() : new UIntType(Integer.parseInt(digits)));
+    }
 
     static BigInteger maxValue(int bits) {
         if (bits < 0)
@@ -35,8 +62,8 @@ public class UIntType extends NumericType {
     public UIntType(int bits) {
         super(bits, false);
 
-        maxValue = POPULAR_MAX_VALUES.containsKey(bits) ?
-                POPULAR_MAX_VALUES.get(bits) : maxValue(bits);
+        maxValue = MOST_POPULAR_MAX_VALUES.containsKey(bits) ?
+                MOST_POPULAR_MAX_VALUES.get(bits) : maxValue(bits);
     }
 
     @Override
@@ -55,20 +82,7 @@ public class UIntType extends NumericType {
     }
 
     @Override
-    public Optional<UIntType> parse(String str) {
-        Matcher matcher = NAME_PATTERN.matcher(str);
-
-        if (!matcher.find())
-            return Optional.empty();
-
-        String digits = matcher.group(1);
-
-        return Optional.of(
-                digits.isEmpty() ? new UIntType() : new UIntType(Integer.parseInt(digits)));
-    }
-
-    @Override
-    public String getName() { return "uint" + getBits(); }
+    public String getCanonicalName() { return "uint" + getBits(); }
 
     @Override
     public String toString() {

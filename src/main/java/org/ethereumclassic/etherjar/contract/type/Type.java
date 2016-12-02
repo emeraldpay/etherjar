@@ -2,9 +2,9 @@ package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * A general type is used to convert java object to and from {@link Hex32} array.
@@ -16,6 +16,15 @@ import java.util.Optional;
  */
 public interface Type<T> {
 
+    /**
+     * A {@link Type} instances repository.
+     *
+     * <p>Here are some examples of how repositories can be created:
+     * <blockquote><pre>
+     * Type.Repository repo = () ->
+     *      Arrays.asList(UIntType::from, IntType::from, ...)
+     * </pre></blockquote>
+     */
     @FunctionalInterface
     interface Repository {
 
@@ -28,32 +37,33 @@ public interface Type<T> {
          */
         @SuppressWarnings("unchecked")
         default Optional<Type> search(String str) {
-            return getAllTypes().stream().map(t -> (Optional<Type>) t.parse(str))
+            return getTypeParsers().stream().map(t -> (Optional<Type>) t.apply(str))
                     .filter(Optional::isPresent).map(Optional::get).findFirst();
         }
 
         /**
-         * Get all existing {@link Type}.
+         * Get {@link Type} string parsers in order to build an appropriate {@link Type} instances.
          *
-         * @return a list of all existing {@link Type}
+         * <p>Parser can throw {@link NullPointerException} if a {@code str} is <code>null</code>.
+         *
+         * <p>Parser can throw {@link IllegalArgumentException} if a {@link Type} has invalid input.
+         *
+         * @return a list of {@link Type} parsers
          */
-        List<Type> getAllTypes();
+        List<Function<String, Optional<? extends Type>>> getTypeParsers();
     }
-
-    Type[] ALL_TYPES = new Type[] { new UIntType(), new IntType(), new BoolType() };
-
-    Repository REPOSITORY = () -> Arrays.asList(ALL_TYPES);
 
     /**
      * Find appropriate {@link Type} instance for a given {@link String}.
      *
+     * @param repo a {@link Repository} a repository of {@link Type} parsers
      * @param str a {@link Type} string representation (either canonical or not)
      * @return a {@link Type} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @see Repository#search(String)
      */
-    static Optional<Type> from(String str) {
-        return REPOSITORY.search(str);
+    static Optional<Type> search(Repository repo, String str) {
+        return repo.search(str);
     }
 
     /**
@@ -103,21 +113,11 @@ public interface Type<T> {
     <V> V visit(Visitor<V> visitor);
 
     /**
-     * Try to parse a {@link Type} string representation to an {@link Type} instance.
-     *
-     * @return a {@link Type} instance is packed as {@link Optional} value,
-     * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
-     * @throws IllegalArgumentException if a detected {@link Type} has invalid input
-     */
-    Optional<? extends Type<T>> parse(String str);
-
-    /**
      * Get type's canonical string representation
      *
      * @return a string
      */
-    String getName();
+    String getCanonicalName();
 
     /**
      * Returns {@code true} if, and only if, current type is dynamic (non-fixed-size type).

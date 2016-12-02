@@ -7,6 +7,68 @@ class IntTypeSpec extends Specification {
 
     final static DEFAULT_TYPE = [] as IntType
 
+    def "should parse string representation"() {
+        when:
+        def opt = IntType.from input
+
+        then:
+        opt.present
+        opt.get().canonicalName == output
+
+        where:
+        input       | output
+        'int'       | 'int256'
+        'int8'      | 'int8'
+        'int40'     | 'int40'
+        'int64'     | 'int64'
+        'int128'    | 'int128'
+        'int256'    | 'int256'
+    }
+
+    def "should detect null string representation"() {
+        when:
+        IntType.from null
+
+        then:
+        thrown NullPointerException
+    }
+
+    def "should ignore empty string representation"() {
+        when:
+        def opt = IntType.from ''
+
+        then:
+        !opt.present
+    }
+
+    def "should ignore wrong string representation"() {
+        when:
+        def opt = IntType.from input
+
+        then:
+        !opt.present
+
+        where:
+        _ | input
+        _ | 'uint40'
+        _ | 'xint140'
+        _ | 'bool'
+    }
+
+    def "should detect wrong inputs in string representation"() {
+        when:
+        IntType.from input
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | input
+        _ | 'int257'
+        _ | 'int1024'
+        _ | 'int140x'
+    }
+
     def "should detect negative bits before min value calculation"() {
         when:
         IntType.minValue(-1)
@@ -78,71 +140,11 @@ class IntTypeSpec extends Specification {
         0 * _
     }
 
-    def "should parse string representation"() {
-        when:
-        def opt = DEFAULT_TYPE.parse input
-
-        then:
-        opt.present
-        opt.get().name == output
-
-        where:
-        input       | output
-        'int'       | 'int256'
-        'int8'      | 'int8'
-        'int40'     | 'int40'
-        'int64'     | 'int64'
-        'int128'    | 'int128'
-        'int256'    | 'int256'
-    }
-
-    def "should detect null string representation"() {
-        when:
-        DEFAULT_TYPE.parse null
-
-        then:
-        thrown NullPointerException
-    }
-
-    def "should ignore empty string representation"() {
-        when:
-        def opt = DEFAULT_TYPE.parse ''
-
-        then:
-        !opt.present
-    }
-
-    def "should ignore wrong string representation"() {
-        when:
-        def opt = DEFAULT_TYPE.parse input
-
-        then:
-        !opt.present
-
-        where:
-        _ | input
-        _ | 'uint40'
-        _ | 'bool'
-    }
-
-    def "should detect wrong inputs in string representation"() {
-        when:
-        DEFAULT_TYPE.parse input
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | input
-        _ | 'int257'
-        _ | 'int1024'
-    }
-
     def "should return a canonical string representation" () {
         def type  = [size] as IntType
 
         expect:
-        type.name == str
+        type.canonicalName == str
 
         where:
         size    | str

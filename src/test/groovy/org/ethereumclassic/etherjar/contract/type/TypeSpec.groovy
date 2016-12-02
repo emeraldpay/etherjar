@@ -2,35 +2,29 @@ package org.ethereumclassic.etherjar.contract.type
 
 import spock.lang.Specification
 
+import java.util.function.Function
+
 class TypeSpec extends Specification {
 
     def "should find an appropriate type"() {
-        def res = Stub(Type)
+        def type = Stub(Type)
 
-        def type1 = Stub(Type) {
-            parse("abc123") >> Optional.of(res)
+        def mock = Mock(Function) {
+            0 * apply(_ as String)
         }
 
-        def type2 = Mock(Type) {
-            0 * parse(_ as String)
-        }
-
-        Type.Repository repo = { -> [type1, type2] }
+        Type.Repository repo = { -> [{ Optional.of type } as Function, mock] }
 
         when:
         def opt = repo.search "abc123"
 
         then:
         opt.present
-        opt.get() == res
+        opt.get() == type
     }
 
     def "should not find a type"() {
-        def type = Stub(Type) {
-            parse(_ as String) >> Optional.empty()
-        }
-
-        Type.Repository repo = { -> [type] }
+        Type.Repository repo = { -> [{ Optional.empty() } as Function] }
 
         when:
         def opt = repo.search "abc321"

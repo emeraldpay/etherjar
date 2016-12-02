@@ -30,12 +30,7 @@ class NumericTypeSpec extends Specification {
         }
 
         @Override
-        Optional<? extends Type<BigInteger>> parse(String str) {
-            throw new UnsupportedOperationException()
-        }
-
-        @Override
-        String getName() {
+        String getCanonicalName() {
             throw new UnsupportedOperationException()
         }
     }

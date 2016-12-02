@@ -4,9 +4,10 @@ import org.ethereumclassic.etherjar.contract.type.Type
 import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.MethodId
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
+
+import java.util.function.Function
 
 /**
  * @author Igor Artamonov
@@ -17,17 +18,17 @@ class ContractMethodSpec extends Specification {
 
     def setup() {
         def t1 = [
-                getName: { 'fixed128x128' },
+                getCanonicalName: { 'fixed128x128' },
                 isDynamic: { false },
-                getBytesFixedSize: { Hex32.SIZE_BYTES },
+                getEncodedSize: { Hex32.SIZE_BYTES },
                 encode: { Object obj ->
                     [ Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000') ] as Hex32[] }
         ] as Type
 
         def t2 = [
-                getName: { 'fixed128x128' },
+                getCanonicalName: { 'fixed128x128' },
                 isDynamic: { false },
-                getBytesFixedSize: { Hex32.SIZE_BYTES },
+                getEncodedSize: { Hex32.SIZE_BYTES },
                 encode: { Object obj ->
                     [ Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000') ] as Hex32[] }
         ] as Type
@@ -59,17 +60,24 @@ class ContractMethodSpec extends Specification {
         _ | '1f(uint256,uint32[],bytes10,bytes)'
     }
 
-    @Ignore
     def "should copy contract method"() {
-        def obj = ContractMethod.Builder.fromAbi(method.toAbi()).build()
+        def parser = Stub(Function) {
+            apply('fixed128x128') >> Optional.of(method.inputTypes[0])
+        }
+
+        Type.Repository repo = { -> [parser] }
+
+        def obj = ContractMethod.Builder.fromAbi(repo, method.toAbi()).build()
 
         expect:
         obj == method
     }
 
     def "should catch null ABIs"() {
+        def repo = Stub(Type.Repository)
+
         when:
-        ContractMethod.Builder.fromAbi abi
+        ContractMethod.Builder.fromAbi(repo, abi)
 
         then:
         thrown NullPointerException
@@ -80,8 +88,15 @@ class ContractMethodSpec extends Specification {
     }
 
     def "should catch invalid ABIs"() {
+        def parser = Stub(Function) {
+            apply('int32') >> Optional.of('')
+            apply(_ as String) >> Optional.empty()
+        }
+
+        Type.Repository repo = { -> [parser] }
+
         when:
-        ContractMethod.Builder.fromAbi abi
+        ContractMethod.Builder.fromAbi(repo, abi)
 
         then:
         thrown IllegalArgumentException
@@ -90,6 +105,8 @@ class ContractMethodSpec extends Specification {
         _ | abi
         _ | ''
         _ | 'bar'
+        _ | 'bar(uint32)'
+        _ | 'bar(int32,uint32)'
     }
 
     def "should rebuild similar contract method"() {
@@ -181,7 +198,6 @@ class ContractMethodSpec extends Specification {
         thrown UnsupportedOperationException
     }
 
-    @Ignore
     def "should encode call"() {
         when:
         def hex = method.encodeCall([1, 2] as Object[]).toHex()

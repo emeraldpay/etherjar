@@ -42,10 +42,11 @@ public class ContractMethod {
          * i.e. the function name with the parenthesised list of parameter types.
          * Parameter types are split by a single comma - no spaces are used.
          *
+         * @param repo a {@link Type} parsers repository
          * @param signature a contract method signature string representation
          * @return builder instance
          */
-        public static Builder fromAbi(String signature) {
+        public static Builder fromAbi(Type.Repository repo, String signature) {
             Matcher m = ABI_PATTERN.matcher(signature);
 
             if (!m.find())
@@ -53,8 +54,16 @@ public class ContractMethod {
 
             String name = m.group(1);
 
-            List<Type> types = Arrays.stream(m.group(1).split(",")).map(Type::from)
-                    .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+            List<Type> types = new ArrayList<>();
+
+            for (String str : m.group(2).split(",")) {
+                Optional<Type> type = repo.search(str);
+
+                if (!type.isPresent())
+                    throw new IllegalArgumentException("Unknown input parameter type format: " + str);
+
+                types.add(type.get());
+            }
 
             return new Builder().withName(name).expects(types);
         }
@@ -167,7 +176,7 @@ public class ContractMethod {
                           Collection<? extends Type> inputTypes,
                           Collection<? extends Type> outputTypes) {
         this.id = MethodId.fromSignature(Objects.requireNonNull(name),
-                inputTypes.stream().map(Type::getName).collect(Collectors.toList()));
+                inputTypes.stream().map(Type::getCanonicalName).collect(Collectors.toList()));
         this.name = name;
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
@@ -269,7 +278,7 @@ public class ContractMethod {
      */
     public String toAbi() {
         String args = inputTypes.stream()
-                .map(Type::getName).collect(Collectors.joining(","));
+                .map(Type::getCanonicalName).collect(Collectors.joining(","));
 
         return name + '(' + args + ')';
     }
