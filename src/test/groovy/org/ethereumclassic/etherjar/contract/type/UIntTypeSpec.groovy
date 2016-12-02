@@ -7,6 +7,14 @@ class UIntTypeSpec extends Specification {
 
     final static DEFAULT_TYPE = [] as UIntType
 
+    def "should detect negative bits before max value calculation"() {
+        when:
+        UIntType.maxValue(-1)
+
+        then:
+        thrown IllegalArgumentException
+    }
+
     def "should create a default instance"() {
         expect:
         DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES

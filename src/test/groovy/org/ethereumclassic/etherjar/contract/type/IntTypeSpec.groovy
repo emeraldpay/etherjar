@@ -7,6 +7,22 @@ class IntTypeSpec extends Specification {
 
     final static DEFAULT_TYPE = [] as IntType
 
+    def "should detect negative bits before min value calculation"() {
+        when:
+        IntType.minValue(-1)
+
+        then:
+        thrown IllegalArgumentException
+    }
+
+    def "should detect negative bits before max value calculation"() {
+        when:
+        IntType.maxValue(-2)
+
+        then:
+        thrown IllegalArgumentException
+    }
+
     def "should create a default instance"() {
         expect:
         DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
