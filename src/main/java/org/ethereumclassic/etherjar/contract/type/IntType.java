@@ -24,10 +24,10 @@ public class IntType extends NumericType {
 
     final static String NAME_PREFIX = "int";
 
-    final static Pattern NAME_PATTERN = Pattern.compile("^int(\\d*)$");
+    final static Pattern NAME_PATTERN = Pattern.compile("int(\\d*)");
 
     /**
-     * Try to parse a {@link IntType} string representation (ether canonical form or not).
+     * Try to parse a {@link IntType} string representation (either canonical form or not).
      *
      * @param str a string
      * @return a {@link IntType} instance is packed as {@link Optional} value,
@@ -42,7 +42,7 @@ public class IntType extends NumericType {
 
         Matcher matcher = NAME_PATTERN.matcher(str);
 
-        if (!matcher.find())
+        if (!matcher.matches())
             throw new IllegalArgumentException("Wrong 'int' type format: " + str);
 
         String digits = matcher.group(1);

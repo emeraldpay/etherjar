@@ -107,6 +107,7 @@ class ContractMethodSpec extends Specification {
         _ | 'bar'
         _ | 'bar(uint32)'
         _ | 'bar(int32,uint32)'
+        _ | '1bar(int32,int32)'
     }
 
     def "should rebuild similar contract method"() {

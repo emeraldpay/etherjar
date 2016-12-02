@@ -7,7 +7,7 @@ import java.util.Optional;
 public class BoolType extends NumericType {
 
     /**
-     * Try to parse a {@link BoolType} string representation (ether canonical form or not).
+     * Try to parse a {@link BoolType} string representation (either canonical form or not).
      *
      * @param str a string
      * @return a {@link BoolType} instance is packed as {@link Optional} value,

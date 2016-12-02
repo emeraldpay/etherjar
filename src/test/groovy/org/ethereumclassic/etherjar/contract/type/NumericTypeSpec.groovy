@@ -42,6 +42,8 @@ class NumericTypeSpec extends Specification {
         DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
         DEFAULT_TYPE.bits == Hex32.SIZE_BYTES << 3
         !DEFAULT_TYPE.signed
+        !DEFAULT_TYPE.dynamic
+        DEFAULT_TYPE.encodedSize == Hex32.SIZE_BYTES
     }
 
     def "should create an instance with specified number of bits"() {

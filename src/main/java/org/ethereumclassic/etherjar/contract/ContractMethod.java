@@ -49,7 +49,7 @@ public class ContractMethod {
         public static Builder fromAbi(Type.Repository repo, String signature) {
             Matcher m = ABI_PATTERN.matcher(signature);
 
-            if (!m.find())
+            if (!m.matches())
                 throw new IllegalArgumentException("Wrong ABI method signature: " + signature);
 
             String name = m.group(1);
