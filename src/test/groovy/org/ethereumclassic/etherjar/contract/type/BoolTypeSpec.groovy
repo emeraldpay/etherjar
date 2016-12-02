@@ -6,6 +6,43 @@ class BoolTypeSpec extends Specification {
 
     final static DEFAULT_TYPE = [] as BoolType
 
+    def "should parse string representation"() {
+        when:
+        def opt = BoolType.from 'bool'
+
+        then:
+        opt.present
+    }
+
+    def "should detect null string representation"() {
+        when:
+        BoolType.from null
+
+        then:
+        thrown NullPointerException
+    }
+
+    def "should ignore empty string representation"() {
+        when:
+        def opt = BoolType.from ''
+
+        then:
+        !opt.present
+    }
+
+    def "should ignore wrong string representation"() {
+        when:
+        def opt = BoolType.from input
+
+        then:
+        !opt.present
+
+        where:
+        _ | input
+        _ | 'uint40'
+        _ | 'int256'
+    }
+
     def "should create a default instance"() {
         expect:
         DEFAULT_TYPE.bytes == 1
@@ -33,46 +70,9 @@ class BoolTypeSpec extends Specification {
         0 * _
     }
 
-    def "should parse string representation"() {
-        when:
-        def opt = DEFAULT_TYPE.parse 'bool'
-
-        then:
-        opt.present
-    }
-
-    def "should detect null string representation"() {
-        when:
-        DEFAULT_TYPE.parse null
-
-        then:
-        thrown NullPointerException
-    }
-
-    def "should ignore empty string representation"() {
-        when:
-        def opt = DEFAULT_TYPE.parse ''
-
-        then:
-        !opt.present
-    }
-
-    def "should ignore wrong string representation"() {
-        when:
-        def opt = DEFAULT_TYPE.parse input
-
-        then:
-        !opt.present
-
-        where:
-        _ | input
-        _ | 'uint40'
-        _ | 'int256'
-    }
-
     def "should return a canonical string representation" () {
         expect:
-        DEFAULT_TYPE.name == 'bool'
+        DEFAULT_TYPE.canonicalName == 'bool'
     }
 
     def "should be converted to a string representation"() {

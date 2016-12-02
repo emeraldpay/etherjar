@@ -6,6 +6,26 @@ import java.util.Optional;
 
 public class BoolType extends NumericType {
 
+    public final static BigInteger FALSE = BigInteger.ZERO;
+
+    public final static BigInteger TRUE = BigInteger.ONE;
+
+    /**
+     * Try to parse a {@link BoolType} string representation (either canonical form or not).
+     *
+     * @param str a string
+     * @return a {@link BoolType} instance is packed as {@link Optional} value,
+     * or {@link Optional#empty()} instead
+     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @see #getCanonicalName()
+     */
+    public static Optional<BoolType> from(String str) {
+        Objects.requireNonNull(str);
+
+        return Objects.equals(str, "bool") ?
+                Optional.of(new BoolType()) : Optional.empty();
+    }
+
     public BoolType() {
         super(8, false);
     }
@@ -21,15 +41,7 @@ public class BoolType extends NumericType {
     }
 
     @Override
-    public Optional<BoolType> parse(String str) {
-        Objects.requireNonNull(str);
-
-        return Objects.equals(str, "bool") ?
-                Optional.of(new BoolType()) : Optional.empty();
-    }
-
-    @Override
-    public String getName() {
+    public String getCanonicalName() {
         return "bool";
     }
 

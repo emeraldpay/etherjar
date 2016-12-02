@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.contract;
 
 import org.ethereumclassic.etherjar.contract.type.Type;
+import org.ethereumclassic.etherjar.contract.type.UIntType;
 import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.MethodId;
@@ -42,19 +43,28 @@ public class ContractMethod {
          * i.e. the function name with the parenthesised list of parameter types.
          * Parameter types are split by a single comma - no spaces are used.
          *
+         * @param repo a {@link Type} parsers repository
          * @param signature a contract method signature string representation
          * @return builder instance
          */
-        public static Builder fromAbi(String signature) {
+        public static Builder fromAbi(Type.Repository repo, String signature) {
             Matcher m = ABI_PATTERN.matcher(signature);
 
-            if (!m.find())
+            if (!m.matches())
                 throw new IllegalArgumentException("Wrong ABI method signature: " + signature);
 
             String name = m.group(1);
 
-            List<Type> types = Arrays.stream(m.group(1).split(",")).map(Type::from)
-                    .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+            List<Type> types = new ArrayList<>();
+
+            for (String str : m.group(2).split(",")) {
+                Optional<Type> type = repo.search(str);
+
+                if (!type.isPresent())
+                    throw new IllegalArgumentException("Unknown input parameter type format: " + str);
+
+                types.add(type.get());
+            }
 
             return new Builder().withName(name).expects(types);
         }
@@ -166,9 +176,9 @@ public class ContractMethod {
     public ContractMethod(String name, boolean isConstant,
                           Collection<? extends Type> inputTypes,
                           Collection<? extends Type> outputTypes) {
-        this.id = MethodId.fromSignature(Objects.requireNonNull(name),
-                inputTypes.stream().map(Type::getName).collect(Collectors.toList()));
-        this.name = name;
+        this.id = MethodId.fromSignature(name,
+                inputTypes.stream().map(Type::getCanonicalName).collect(Collectors.toList()));
+        this.name = Objects.requireNonNull(name);
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
         this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
@@ -214,41 +224,55 @@ public class ContractMethod {
     /**
      * Encodes call data, so you can call the contract through some other means (for example, through RPC).
      *
+     * @param params parameters of the call
+     * @return {@link HexData} encoded call
+     * @see #encodeCall(Collection)
+     */
+    public HexData encodeCall(Object... params) {
+        return encodeCall(Arrays.asList(params));
+    }
+
+    /**
+     * Encodes call data, so you can call the contract through some other means (for example, through RPC).
+     *
      * <p><b>Example:</b> <code>baz(uint32,bool)</code> with arguments <tt>(69, true)</tt> becomes
      * <tt>0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001</tt>
      *
      * @param params parameters of the call
-     * @return encoded call
+     * @return {@link HexData} encoded call
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector-and-argument-encoding">Function Selector and Argument Encoding</a>
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
     @SuppressWarnings("unchecked")
-    public HexData encodeCall(Object... params) {
-        if (inputTypes.size() != params.length)
-            throw new IllegalArgumentException("Wrong number of input parameters: " + params.length);
+    public HexData encodeCall(Collection<?> params) {
+        if (inputTypes.size() != params.size())
+            throw new IllegalArgumentException("Wrong number of input parameters: " + params.size());
 
         int headBytesSize = 0;
         int tailBytesSize = 0;
 
         for (Type type : inputTypes) {
-            headBytesSize += type.isDynamic() ?
-                Hex32.SIZE_BYTES : type.getEncodedSize();
+            headBytesSize += type.getEncodedSize();
         }
 
         List<Hex32> head = new ArrayList<>(headBytesSize / Hex32.SIZE_BYTES);
         List<Hex32> tail = new ArrayList<>();
 
-        for (int i = 0; i < inputTypes.size(); i++) {
-            Type type = inputTypes.get(i);
+        int i = 0;
 
-            Hex32[] data = type.encode(params[i]);
+        UIntType uIntType = new UIntType();
+
+        for (Object obj : params) {
+            Type type = inputTypes.get(i++);
+
+            Hex32[] data = type.encode(obj);
 
             if (!type.isDynamic()) {
                 Collections.addAll(head, data);
             } else {
                 Collections.addAll(tail, data);
 
-                head.add(Hex32.from(MethodId.SIZE_BYTES + headBytesSize + tailBytesSize));
+                head.add(uIntType.encode(headBytesSize + tailBytesSize)[0]);
                 tailBytesSize += data.length * Hex32.SIZE_BYTES;
             }
         }
@@ -269,7 +293,7 @@ public class ContractMethod {
      */
     public String toAbi() {
         String args = inputTypes.stream()
-                .map(Type::getName).collect(Collectors.joining(","));
+                .map(Type::getCanonicalName).collect(Collectors.joining(","));
 
         return name + '(' + args + ')';
     }
