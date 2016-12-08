@@ -91,11 +91,6 @@ public class IntType extends NumericType {
     }
 
     @Override
-    public <R> R visit(Visitor<R> visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
     public String getCanonicalName() { return "int" + getBits(); }
 
     @Override

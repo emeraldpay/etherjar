@@ -116,17 +116,6 @@ class NumericTypeSpec extends Specification {
         _ | BigInteger.ZERO.subtract(BigInteger.ONE)
     }
 
-    def "should accept visitor"() {
-        def visitor = Mock(Type.Visitor)
-
-        when:
-        DEFAULT_TYPE.visit visitor
-
-        then:
-        1 * visitor.visit(DEFAULT_TYPE as NumericType)
-        0 * _
-    }
-
     def "should calculate consistent hashcode"() {
         expect:
         first.hashCode() == second.hashCode()
@@ -180,12 +169,11 @@ class NumericTypeSpec extends Specification {
         def val = new BigInteger(str, 16)
 
         when:
-        def data = obj.encode val
-        def res = obj.decode data
+        def data = obj.singleEncode val
+        def res = obj.singleDecode data
 
         then:
-        data.length == 1
-        data[0].toHex() == hex
+        data.toHex() == hex
         res == val
 
         where:
@@ -309,7 +297,7 @@ class NumericTypeSpec extends Specification {
         ] as NumericTypeImpl
 
         when:
-        obj.encode value
+        obj.singleEncode value
 
         then:
         thrown IllegalArgumentException
@@ -335,7 +323,7 @@ class NumericTypeSpec extends Specification {
         }
 
         when:
-        obj.decode([Hex32.from(hex)] as Hex32[])
+        obj.singleDecode(Hex32.from(hex))
 
         then:
         thrown IllegalArgumentException
@@ -344,18 +332,5 @@ class NumericTypeSpec extends Specification {
         bits    |sign   | hex
         8       | true  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         16      | false | '0x000000000000000000000000000000000000000000000000000000000000ffff'
-    }
-
-    def "should catch not single data"() {
-        when:
-        DEFAULT_TYPE.decode data
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | data
-        _ | new Hex32[0]
-        _ | new Hex32[2]
     }
 }

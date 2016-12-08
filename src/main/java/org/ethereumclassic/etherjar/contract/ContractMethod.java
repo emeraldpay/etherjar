@@ -147,6 +147,27 @@ public class ContractMethod {
         }
     }
 
+    /**
+     * Convert a type collection to a collection of canonical names.
+     *
+     * @param types a {@link Collection} of {@link Type}
+     * @return a {@link Collection} of {@link String}
+     */
+    static Collection<String> convert(Collection<? extends Type> types) {
+        return types.stream().map(Type::getCanonicalName).collect(Collectors.toList());
+    }
+
+    /**
+     * Join a type collection to a string with the help of {@code delimiter}.
+     *
+     * @param types a {@link Collection} of {@link Type}
+     * @param delimiter the delimiter to be used between each names
+     * @return a joined by {@code delimiter} string
+     */
+    static String join(Collection<? extends Type> types, CharSequence delimiter) {
+        return types.stream().map(Type::getCanonicalName).collect(Collectors.joining(delimiter));
+    }
+
     private final MethodId id;
 
     private final String name;
@@ -176,8 +197,7 @@ public class ContractMethod {
     public ContractMethod(String name, boolean isConstant,
                           Collection<? extends Type> inputTypes,
                           Collection<? extends Type> outputTypes) {
-        this.id = MethodId.fromSignature(name,
-                inputTypes.stream().map(Type::getCanonicalName).collect(Collectors.toList()));
+        this.id = MethodId.fromSignature(name, convert(inputTypes));
         this.name = Objects.requireNonNull(name);
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
@@ -260,8 +280,6 @@ public class ContractMethod {
 
         int i = 0;
 
-        UIntType uIntType = new UIntType();
-
         for (Object obj : params) {
             Type type = inputTypes.get(i++);
 
@@ -272,7 +290,7 @@ public class ContractMethod {
             } else {
                 Collections.addAll(tail, data);
 
-                head.add(uIntType.encode(headBytesSize + tailBytesSize)[0]);
+                head.add(new UIntType().encode(headBytesSize + tailBytesSize));
                 tailBytesSize += data.length * Hex32.SIZE_BYTES;
             }
         }
@@ -292,10 +310,7 @@ public class ContractMethod {
      * @return a string
      */
     public String toAbi() {
-        String args = inputTypes.stream()
-                .map(Type::getCanonicalName).collect(Collectors.joining(","));
-
-        return name + '(' + args + ')';
+        return name + '(' + join(inputTypes, ",") + ')';
     }
 
     @Override

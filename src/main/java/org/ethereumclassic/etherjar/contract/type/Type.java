@@ -72,13 +72,7 @@ public interface Type<T> {
      */
     interface Visitor<V> {
 
-        V visit(NumericType type);
-
-        V visit(UIntType type);
-
-        V visit(IntType type);
-
-        V visit(BoolType type);
+        V visit(ElementaryType<?> type);
     }
 
     /**
@@ -90,22 +84,7 @@ public interface Type<T> {
     class VisitorImpl<V> implements Type.Visitor<V> {
 
         @Override
-        public V visit(NumericType type) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public V visit(UIntType type) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public V visit(IntType type) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public V visit(BoolType type) {
+        public V visit(ElementaryType<?> type) {
             throw new UnsupportedOperationException();
         }
     }
@@ -138,7 +117,7 @@ public interface Type<T> {
      * Encode an object to {@link Hex32} array.
      *
      * @param obj an object
-     * @return encoded call
+     * @return encoded array
      */
     Hex32[] encode(T obj);
 
@@ -146,7 +125,7 @@ public interface Type<T> {
      * Decode {@link Hex32} to an object.
      *
      * @param data a hex data
-     * @return encoded call
+     * @return decoded object
      */
     T decode(Hex32[] data);
 }
