@@ -2,7 +2,7 @@ package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
 
-interface ElementaryType<T> extends Type<T> {
+public interface ElementaryType<T> extends Type<T> {
 
     @Override
     default <V> V visit(Visitor<V> visitor) {
@@ -33,7 +33,7 @@ interface ElementaryType<T> extends Type<T> {
     }
 
     /**
-     * Encode an elementary object to a single {@link Hex32}.
+     * Encode an object to a single {@link Hex32}.
      *
      * @param obj an object
      * @return encoded hex
@@ -42,9 +42,9 @@ interface ElementaryType<T> extends Type<T> {
     Hex32 singleEncode(T obj);
 
     /**
-     * Decode a single {@link Hex32} to an elementary object.
+     * Decode a single {@link Hex32} to an object.
      *
-     * @param data a hex data
+     * @param hex32 a hex data
      * @return decoded object
      * @see #decode(Hex32[])
      */
