@@ -77,11 +77,6 @@ public class UIntType extends NumericType {
     }
 
     @Override
-    public <R> R visit(Visitor<R> visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
     public String getCanonicalName() { return "uint" + getBits(); }
 
     @Override

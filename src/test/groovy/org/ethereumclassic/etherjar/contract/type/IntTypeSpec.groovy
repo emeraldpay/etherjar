@@ -129,17 +129,6 @@ class IntTypeSpec extends Specification {
         256     | '+8000000000000000000000000000000000000000000000000000000000000000'
     }
 
-    def "should accept visitor"() {
-        def visitor = Mock(Type.Visitor)
-
-        when:
-        DEFAULT_TYPE.visit visitor
-
-        then:
-        1 * visitor.visit(DEFAULT_TYPE as IntType)
-        0 * _
-    }
-
     def "should return a canonical string representation" () {
         def type  = [size] as IntType
 

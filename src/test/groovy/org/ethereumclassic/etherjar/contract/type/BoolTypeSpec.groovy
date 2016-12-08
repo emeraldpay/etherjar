@@ -59,17 +59,6 @@ class BoolTypeSpec extends Specification {
         DEFAULT_TYPE.maxValue == BigInteger.valueOf(2)
     }
 
-    def "should accept visitor"() {
-        def visitor = Mock(Type.Visitor)
-
-        when:
-        DEFAULT_TYPE.visit visitor
-
-        then:
-        1 * visitor.visit(DEFAULT_TYPE as BoolType)
-        0 * _
-    }
-
     def "should return a canonical string representation" () {
         expect:
         DEFAULT_TYPE.canonicalName == 'bool'

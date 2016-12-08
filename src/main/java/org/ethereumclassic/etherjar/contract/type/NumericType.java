@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
-public abstract class NumericType implements Type<BigInteger> {
+public abstract class NumericType implements ElementaryType<BigInteger> {
 
     private final static byte[] NEGATIVE_ARRAY_FOR_PADDING = new byte[32];
 
@@ -75,27 +75,12 @@ public abstract class NumericType implements Type<BigInteger> {
      */
     public abstract BigInteger getMaxValue();
 
-    @Override
-    public <V> V visit(Visitor<V> visitor) {
-        return visitor.visit(this);
+    public Hex32 encode(long value) {
+        return singleEncode(BigInteger.valueOf(value));
     }
 
     @Override
-    public boolean isDynamic() {
-        return false;
-    }
-
-    @Override
-    public int getEncodedSize() {
-        return Hex32.SIZE_BYTES;
-    }
-
-    public Hex32[] encode(long value) {
-        return encode(BigInteger.valueOf(value));
-    }
-
-    @Override
-    public Hex32[] encode(BigInteger value) {
+    public Hex32 singleEncode(BigInteger value) {
         if (!isValueValid(value))
             throw new IllegalArgumentException("Out of range: " + value);
 
@@ -113,15 +98,12 @@ public abstract class NumericType implements Type<BigInteger> {
             System.arraycopy(data, 0, arr, Hex32.SIZE_BYTES - data.length, data.length);
         }
 
-        return new Hex32[] { new Hex32(arr) };
+        return new Hex32(arr);
     }
 
     @Override
-    public BigInteger decode(Hex32[] data) {
-        if (data.length == 0 || data.length > 1)
-            throw new IllegalArgumentException("Not single input data length: " + data.length);
-
-        BigInteger value = new BigInteger(data[0].getBytes());
+    public BigInteger singleDecode(Hex32 hex32) {
+        BigInteger value = new BigInteger(hex32.getBytes());
 
         if (!isSigned && value.signum() < 0) {
             value = getMaxValue().add(value);

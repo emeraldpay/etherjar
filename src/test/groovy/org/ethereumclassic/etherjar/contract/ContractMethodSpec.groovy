@@ -17,6 +17,8 @@ class ContractMethodSpec extends Specification {
 
     @Shared ContractMethod method
 
+    @Shared def t = { [getCanonicalName: { -> it }] as Type }
+
     def setup() {
         def t1 = [
                 getCanonicalName: { 'fixed128x128' },
@@ -62,11 +64,9 @@ class ContractMethodSpec extends Specification {
     }
 
     def "should copy contract method"() {
-        def parser = Stub(Function) {
-            apply('fixed128x128') >> Optional.of(method.inputTypes[0])
-        }
+        def parser = { Optional.of(method.inputTypes[0]) }
 
-        Type.Repository repo = { -> [parser] }
+        Type.Repository repo = { -> [parser as Function] }
 
         def obj = ContractMethod.Builder.fromAbi(repo, method.toAbi()).build()
 
@@ -141,6 +141,28 @@ class ContractMethodSpec extends Specification {
 
         then:
         thrown IllegalStateException
+    }
+
+    def "should convert a collection of input types"() {
+        expect:
+        ContractMethod.convert(types) == names
+
+        where:
+        types                           | names
+        []                              | []
+        [t('t1'), t('t12'), t('t123')]  | ['t1', 't12', 't123']
+    }
+
+    def "should join a collection of input types"() {
+        expect:
+        ContractMethod.join(types, delimiter) == str
+
+        where:
+        types                           | delimiter | str
+        []                              | ''        | ''
+        []                              | 'x'       | ''
+        [t('t1'), t('t12')]             | ''        | 't1t12'
+        [t('t1'), t('t12'), t('t123')]  | 'xxx'     | 't1xxxt12xxxt123'
     }
 
     def "should be steady for external modifications"() {
