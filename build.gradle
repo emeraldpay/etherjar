@@ -23,7 +23,6 @@ repositories {
 }
 
 dependencies {
-
     compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "org.apache.httpcomponents:httpmime:$httpClientVersion"
@@ -33,7 +32,10 @@ dependencies {
     testCompile "org.objenesis:objenesis:$objenesisVersion"
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
     testCompile "org.spockframework:spock-core:$spockVersion"
+}
 
+test {
+    jvmArgs '-ea'
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -59,8 +61,10 @@ task sourceJar(type: Jar) {
 }
 
 bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    user = project.hasProperty('bintrayUser') ?
+            project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ?
+            project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     publications = ['EtherJarPublication']
     pkg {
         repo = 'EtherJar'

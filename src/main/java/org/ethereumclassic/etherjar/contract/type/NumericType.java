@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
-public abstract class NumericType implements ElementaryType<BigInteger> {
+public abstract class NumericType implements StaticType<BigInteger> {
 
     private final static byte[] NEGATIVE_ARRAY_FOR_PADDING = new byte[32];
 
@@ -76,11 +76,11 @@ public abstract class NumericType implements ElementaryType<BigInteger> {
     public abstract BigInteger getMaxValue();
 
     public Hex32 encode(long value) {
-        return singleEncode(BigInteger.valueOf(value));
+        return encodeSingle(BigInteger.valueOf(value));
     }
 
     @Override
-    public Hex32 singleEncode(BigInteger value) {
+    public Hex32 encodeSingle(BigInteger value) {
         if (!isValueValid(value))
             throw new IllegalArgumentException("Out of range: " + value);
 
@@ -102,7 +102,7 @@ public abstract class NumericType implements ElementaryType<BigInteger> {
     }
 
     @Override
-    public BigInteger singleDecode(Hex32 hex32) {
+    public BigInteger decodeSingle(Hex32 hex32) {
         BigInteger value = new BigInteger(hex32.getBytes());
 
         if (!isSigned && value.signum() < 0) {
