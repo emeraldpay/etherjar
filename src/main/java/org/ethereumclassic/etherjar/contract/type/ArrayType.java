@@ -179,13 +179,13 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
             toBytesOffset = i == len - 1 ?
                     endBytesOffset : Type.decodeLength(iter.next()).intValueExact();
 
+            if (list.size() < (headBytesOffset + toBytesOffset) / Hex32.SIZE_BYTES)
+                throw new IllegalArgumentException("Insufficient data length to decode: " + list.size());
+
             if (fromBytesOffset >= toBytesOffset)
                 throw new IllegalArgumentException(
                         String.format("Illegal dynamic bytes offsets: from %d, to %d",
                                 fromBytesOffset, toBytesOffset));
-
-            if (list.size() < (headBytesOffset + toBytesOffset) / Hex32.SIZE_BYTES)
-                throw new IllegalArgumentException("Insufficient data length to decode: " + list.size());
 
             buf[i] = getWrappedType().decode(
                     list.subList((headBytesOffset + fromBytesOffset) / Hex32.SIZE_BYTES,
