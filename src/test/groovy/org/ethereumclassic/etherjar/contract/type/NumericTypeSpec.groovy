@@ -116,6 +116,37 @@ class NumericTypeSpec extends Specification {
         _ | BigInteger.ZERO.subtract(BigInteger.ONE)
     }
 
+    def "should encode long values"() {
+        def obj = new NumericTypeImpl(128, true) {
+
+            @Override
+            BigInteger getMinValue() {
+                return new BigInteger('-8' + '0' * 63, 16)
+            }
+
+            @Override
+            BigInteger getMaxValue() {
+                return new BigInteger('+8' + '0' * 63, 16)
+            }
+        }
+
+        when:
+        def data = obj.encode val
+
+        then:
+        data.toHex() == hex
+
+        where:
+        val                 | hex
+        0                   | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        -64                 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc0'
+        +64                 | '0x0000000000000000000000000000000000000000000000000000000000000040'
+        Integer.MIN_VALUE   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000'
+        Integer.MAX_VALUE   | '0x000000000000000000000000000000000000000000000000000000007fffffff'
+        Long.MIN_VALUE      | '0xffffffffffffffffffffffffffffffffffffffffffffffff8000000000000000'
+        Long.MAX_VALUE      | '0x0000000000000000000000000000000000000000000000007fffffffffffffff'
+    }
+
     def "should encode & decode numeric values"() {
         def obj = new NumericTypeImpl(bits, sign) {
 

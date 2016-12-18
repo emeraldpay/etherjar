@@ -107,6 +107,19 @@ class ArrayTypeSpec extends Specification {
         _ | 'int16[][-3]'
     }
 
+    def "should detect unknown array wrapped type"() {
+        when:
+        ArrayType.from({ -> [{ Optional.empty() } as Function] }, input)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | input
+        _ | 'int16[]'
+        _ | 'uint16[3]'
+    }
+
     def "should create a fixed-size instance with fixed length"() {
         expect:
         arrayType1.wrappedType == wrappedType1
@@ -238,6 +251,8 @@ class ArrayTypeSpec extends Specification {
         'type2[2]'  | [Type.encodeLength(Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('A') + wrappedType2.encode('B')
         'type2[]'   | [Type.encodeLength(1)] + [Type.encodeLength(Hex32.SIZE_BYTES)]
         'type2[]'   | [Type.encodeLength(1)] + [Type.encodeLength(Hex32.SIZE_BYTES)] + wrappedType2.encode('1') + wrappedType2.encode('2')
+        'type2[]'   | [Type.encodeLength(2)] + [Type.encodeLength(2 * Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('1')
+        'type2[]'   | [Type.encodeLength(2)] + [Type.encodeLength(2 * Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('1') + wrappedType2.encode('2') + wrappedType2.encode('3')
     }
 
     def "should calculate consistent hashcode"() {
