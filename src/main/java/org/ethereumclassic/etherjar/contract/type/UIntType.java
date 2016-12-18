@@ -29,6 +29,7 @@ public class UIntType extends NumericType {
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
      * @throws IllegalArgumentException if a {@link UIntType} has invalid input
+     *
      * @see #getCanonicalName()
      */
     public static Optional<UIntType> from(String str) {

@@ -17,26 +17,26 @@ class ContractMethodSpec extends Specification {
 
     @Shared ContractMethod method
 
-    @Shared def t = { [getCanonicalName: { -> it }] as Type }
+    def t(String name) {
+        [getCanonicalName: { -> name }] as Type
+    }
 
     def setup() {
         def t1 = [
                 getCanonicalName: { 'fixed128x128' },
                 isDynamic: { false },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj ->
-                    [ Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000') ] as Hex32[] }
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { [Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000')] },
         ] as Type
 
         def t2 = [
                 getCanonicalName: { 'fixed128x128' },
                 isDynamic: { false },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj ->
-                    [ Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000') ] as Hex32[] }
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { [Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')] },
         ] as Type
 
-        method = new ContractMethod('bar', t1 ,t2)
+        method = ['bar', t1 ,t2] as ContractMethod
     }
 
     def "should check method signature validity"() {
@@ -48,7 +48,7 @@ class ContractMethodSpec extends Specification {
         _ | 'baz()'
         _ | 'baz(uint32)'
         _ | 'baz(uint32,bool)'
-        _ | 'bar(fixed128x128[2])'
+        _ | '_bar(fixed128x128[2])'
         _ | 'f123(uint256,uint32[],bytes10,bytes)'
     }
 
@@ -226,11 +226,11 @@ class ContractMethodSpec extends Specification {
         def type = [
                 getCanonicalName: { 'fixed128x128[2]' },
                 isDynamic: { false },
-                getEncodedSize: { Hex32.SIZE_BYTES * 2 },
-                encode: { Object obj -> [
+                getFixedSize: { (Hex32.SIZE_BYTES * 2) as long },
+                encode: { [
                         Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
-                        Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')
-                ] as Hex32[] }
+                        Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000'),
+                ] },
         ] as Type
 
         def obj = new ContractMethod('bar', type)
@@ -254,17 +254,15 @@ class ContractMethodSpec extends Specification {
         def type1 = [
                 getCanonicalName: { 'uint32' },
                 isDynamic: { false },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj ->
-                    [ Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000045') ] as Hex32[] }
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { [Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000045')] },
         ] as Type
 
         def type2 = [
                 getCanonicalName: { 'bool' },
                 isDynamic: { false },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj ->
-                    [ Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001') ] as Hex32[] }
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { [Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001')] },
         ] as Type
 
         def obj = new ContractMethod('baz', type1, type2)
@@ -288,31 +286,32 @@ class ContractMethodSpec extends Specification {
         def type1 = [
                 getCanonicalName: { 'bytes' },
                 isDynamic: { true },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj -> [
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { [
                         Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000004'),
-                        Hex32.from('0x6461766500000000000000000000000000000000000000000000000000000000')
-                ] as Hex32[] }
+                        Hex32.from('0x6461766500000000000000000000000000000000000000000000000000000000'),
+                ] },
         ] as Type
 
         def type2 = [
                 getCanonicalName: { 'bool' },
                 isDynamic: { false },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj ->
-                    [ Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001') ] as Hex32[] }
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { Object obj -> [
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001'),
+                ] },
         ] as Type
 
         def type3 = [
                 getCanonicalName: { 'uint256[]' },
                 isDynamic: { true },
-                getEncodedSize: { Hex32.SIZE_BYTES },
-                encode: { Object obj -> [
+                getFixedSize: { Hex32.SIZE_BYTES as long },
+                encode: { [
                         Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000003'),
                         Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001'),
                         Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000002'),
-                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000003')
-                ] as Hex32[] }
+                        Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000003'),
+                ] },
         ] as Type
 
         def obj = new ContractMethod('sam', type1, type2, type3)

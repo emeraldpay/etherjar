@@ -140,7 +140,7 @@ class ContractSpec extends Specification {
 
         expect:
         str ==~ /Contract\{.+}/
-        str.contains "address=0x0000000000000000000000000000000000000000"
+        str.contains 'address=0x0000000000000000000000000000000000000000'
         str.contains "methods=${contract.methods}"
     }
 }

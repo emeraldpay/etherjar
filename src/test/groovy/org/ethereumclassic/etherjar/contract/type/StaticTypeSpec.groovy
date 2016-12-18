@@ -5,46 +5,46 @@ import spock.lang.Specification
 
 import java.util.function.Function
 
-class ElementaryTypeSpec extends Specification {
+class StaticTypeSpec extends Specification {
 
-    static class ElementaryTypeImpl<T> implements ElementaryType<T> {
-
-        @Override
-        Hex32 singleEncode(T obj) {
-            throw new UnsupportedOperationException()
-        }
-
-        @Override
-        T singleDecode(Hex32 hex32) {
-            throw new UnsupportedOperationException()
-        }
+    static class StaticTypeImpl<T> implements StaticType<T> {
 
         @Override
         String getCanonicalName() {
             throw new UnsupportedOperationException()
         }
+
+        @Override
+        Hex32 encodeSingle(T obj) {
+            throw new UnsupportedOperationException()
+        }
+
+        @Override
+        T decodeSingle(Hex32 hex32) {
+            throw new UnsupportedOperationException()
+        }
     }
 
-    final static ElementaryType<?> DEFAULT_TYPE = [] as ElementaryTypeImpl
+    final static DEFAULT_TYPE = [] as StaticTypeImpl
 
-    def "should create a default instance"() {
+    def "should create a correct default instance"() {
         expect:
-        !DEFAULT_TYPE.dynamic
-        DEFAULT_TYPE.encodedSize == Hex32.SIZE_BYTES
+        DEFAULT_TYPE.static
+        DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should accept visitor"() {
         def visitor = new Type.VisitorImpl<Boolean>() {
 
             @Override
-            Boolean visit(ElementaryType type) { true }
+            <T> Boolean visit(StaticType<T> type) { true }
         }
 
         expect:
         DEFAULT_TYPE.visit visitor
     }
 
-    def "should encode an object into a single array"() {
+    def "should encode an object into a singleton list"() {
         def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
 
         def m = Mock(Function) {
@@ -52,17 +52,17 @@ class ElementaryTypeSpec extends Specification {
             0 * _
         }
 
-        def t = [ singleEncode: { m.apply it } ] as ElementaryType
+        def t = [encodeSingle: { m.apply it }] as StaticType
 
         when:
         def arr = t.encode 123
 
         then:
-        arr.length == 1
+        arr.size() == 1
         arr[0] == hex
     }
 
-    def "should decode a single array into an object"() {
+    def "should decode a singleton collection into an object"() {
         def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
 
         def m = Mock(Function) {
@@ -70,16 +70,16 @@ class ElementaryTypeSpec extends Specification {
             0 * _
         }
 
-        def t = [ singleDecode: { m.apply it } ] as ElementaryType
+        def t = [decodeSingle: { m.apply it }] as StaticType
 
         when:
-        def obj = t.decode([hex] as Hex32[])
+        def obj = t.decode hex
 
         then:
         obj == 123
     }
 
-    def "should catch not single data to decode"() {
+    def "should catch empty or not single data to decode"() {
         when:
         DEFAULT_TYPE.decode data
 
@@ -88,7 +88,7 @@ class ElementaryTypeSpec extends Specification {
 
         where:
         _ | data
-        _ | new Hex32[0]
-        _ | new Hex32[2]
+        _ | []
+        _ | [Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000000')] * 2
     }
 }

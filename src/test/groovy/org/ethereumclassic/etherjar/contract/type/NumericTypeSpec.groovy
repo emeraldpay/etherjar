@@ -35,15 +35,15 @@ class NumericTypeSpec extends Specification {
         }
     }
 
-    final static NumericType DEFAULT_TYPE = [] as NumericTypeImpl
+    final static DEFAULT_TYPE = [] as NumericTypeImpl
 
-    def "should create a default instance"() {
+    def "should create a correct default instance"() {
         expect:
         DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
         DEFAULT_TYPE.bits == Hex32.SIZE_BYTES << 3
         !DEFAULT_TYPE.signed
-        !DEFAULT_TYPE.dynamic
-        DEFAULT_TYPE.encodedSize == Hex32.SIZE_BYTES
+        DEFAULT_TYPE.static
+        DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should create an instance with specified number of bits"() {
@@ -116,38 +116,35 @@ class NumericTypeSpec extends Specification {
         _ | BigInteger.ZERO.subtract(BigInteger.ONE)
     }
 
-    def "should calculate consistent hashcode"() {
-        expect:
-        first.hashCode() == second.hashCode()
+    def "should encode long values"() {
+        def obj = new NumericTypeImpl(128, true) {
+
+            @Override
+            BigInteger getMinValue() {
+                return new BigInteger('-8' + '0' * 63, 16)
+            }
+
+            @Override
+            BigInteger getMaxValue() {
+                return new BigInteger('+8' + '0' * 63, 16)
+            }
+        }
+
+        when:
+        def data = obj.encode val
+
+        then:
+        data.toHex() == hex
 
         where:
-        first                           | second
-        DEFAULT_TYPE                    | [] as NumericTypeImpl
-        DEFAULT_TYPE                    | [256] as NumericTypeImpl
-        [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
-    }
-
-    def "should be equal"() {
-        expect:
-        first == second
-
-        where:
-        first                           | second
-        DEFAULT_TYPE                    | DEFAULT_TYPE
-        DEFAULT_TYPE                    | [] as NumericTypeImpl
-        DEFAULT_TYPE                    | [256] as NumericTypeImpl
-        [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
-    }
-
-    def "should not be equal"() {
-        expect:
-        first != second
-
-        where:
-        first           | second
-        DEFAULT_TYPE    | null
-        DEFAULT_TYPE    | [64, true] as NumericTypeImpl
-        DEFAULT_TYPE    | new UIntType()
+        val                 | hex
+        0                   | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        -64                 | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc0'
+        +64                 | '0x0000000000000000000000000000000000000000000000000000000000000040'
+        Integer.MIN_VALUE   | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000'
+        Integer.MAX_VALUE   | '0x000000000000000000000000000000000000000000000000000000007fffffff'
+        Long.MIN_VALUE      | '0xffffffffffffffffffffffffffffffffffffffffffffffff8000000000000000'
+        Long.MAX_VALUE      | '0x0000000000000000000000000000000000000000000000007fffffffffffffff'
     }
 
     def "should encode & decode numeric values"() {
@@ -169,8 +166,8 @@ class NumericTypeSpec extends Specification {
         def val = new BigInteger(str, 16)
 
         when:
-        def data = obj.singleEncode val
-        def res = obj.singleDecode data
+        def data = obj.encodeSingle val
+        def res = obj.decodeSingle data
 
         then:
         data.toHex() == hex
@@ -297,7 +294,7 @@ class NumericTypeSpec extends Specification {
         ] as NumericTypeImpl
 
         when:
-        obj.singleEncode value
+        obj.encodeSingle value
 
         then:
         thrown IllegalArgumentException
@@ -323,7 +320,7 @@ class NumericTypeSpec extends Specification {
         }
 
         when:
-        obj.singleDecode(Hex32.from(hex))
+        obj.decodeSingle(Hex32.from(hex))
 
         then:
         thrown IllegalArgumentException
@@ -332,5 +329,39 @@ class NumericTypeSpec extends Specification {
         bits    |sign   | hex
         8       | true  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         16      | false | '0x000000000000000000000000000000000000000000000000000000000000ffff'
+    }
+
+    def "should calculate consistent hashcode"() {
+        expect:
+        first.hashCode() == second.hashCode()
+
+        where:
+        first                           | second
+        DEFAULT_TYPE                    | [] as NumericTypeImpl
+        DEFAULT_TYPE                    | [256] as NumericTypeImpl
+        [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
+    }
+
+    def "should be equal"() {
+        expect:
+        first == second
+
+        where:
+        first                           | second
+        DEFAULT_TYPE                    | DEFAULT_TYPE
+        DEFAULT_TYPE                    | [] as NumericTypeImpl
+        DEFAULT_TYPE                    | [256] as NumericTypeImpl
+        [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
+    }
+
+    def "should not be equal"() {
+        expect:
+        first != second
+
+        where:
+        first           | second
+        DEFAULT_TYPE    | null
+        DEFAULT_TYPE    | [64, true] as NumericTypeImpl
+        DEFAULT_TYPE    | new UIntType()
     }
 }

@@ -47,14 +47,16 @@ class HexDataSpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    def "combine hex data"() {
+    def "combine hex data together"() {
         setup:
         def params = [
                 Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
                 Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')
         ] as HexData[]
+
         when:
         def data = HexData.from(params)
+
         then:
         data.toHex() == '0x00000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000880000000000000000000000000000000'
     }

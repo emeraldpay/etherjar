@@ -1,7 +1,6 @@
 package org.ethereumclassic.etherjar.contract;
 
 import org.ethereumclassic.etherjar.contract.type.Type;
-import org.ethereumclassic.etherjar.contract.type.UIntType;
 import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.MethodId;
@@ -21,7 +20,7 @@ public class ContractMethod {
 
     public static class Builder {
 
-        final static Pattern ABI_PATTERN = Pattern.compile("(\\p{Alpha}\\p{Alnum}*)\\((\\S*)\\)");
+        final static Pattern ABI_PATTERN = Pattern.compile("([_a-zA-Z][_a-zA-Z0-9]*)\\((\\S*)\\)");
 
         /**
          * Check contract method ABI signature.
@@ -29,6 +28,7 @@ public class ContractMethod {
          * @param signature a contract method signature string representation
          * @return {@code true} if <code>signature</code> is valid, otherwise
          * {@code false}
+         *
          * @see #ABI_PATTERN
          */
         static boolean isAbiValid(String signature) {
@@ -178,6 +178,8 @@ public class ContractMethod {
 
     private final List<Type> outputTypes;
 
+    private final transient long headFixedSize;
+
     public ContractMethod(String name, Type... inputTypes) {
         this(name, false, Arrays.asList(inputTypes), Collections.emptyList());
     }
@@ -202,6 +204,8 @@ public class ContractMethod {
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
         this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
+        /* FIXME: extract this logic into separate array related type class */
+        this.headFixedSize = inputTypes.stream().mapToLong(Type::getFixedSize).sum();
     }
 
     /**
@@ -221,6 +225,7 @@ public class ContractMethod {
     /**
      * @return {@code true} if this method change contract's state,
      * otherwise {@code false}
+     *
      * @see Contract
      */
     public boolean isConstant() {
@@ -246,6 +251,7 @@ public class ContractMethod {
      *
      * @param params parameters of the call
      * @return {@link HexData} encoded call
+     *
      * @see #encodeCall(Collection)
      */
     public HexData encodeCall(Object... params) {
@@ -260,6 +266,7 @@ public class ContractMethod {
      *
      * @param params parameters of the call
      * @return {@link HexData} encoded call
+     *
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector-and-argument-encoding">Function Selector and Argument Encoding</a>
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
@@ -268,40 +275,35 @@ public class ContractMethod {
         if (inputTypes.size() != params.size())
             throw new IllegalArgumentException("Wrong number of input parameters: " + params.size());
 
-        int headBytesSize = 0;
-        int tailBytesSize = 0;
+        List<HexData> buf =
+                new ArrayList<>((int) (headFixedSize / Hex32.SIZE_BYTES) + 1);
 
-        for (Type type : inputTypes) {
-            headBytesSize += type.getEncodedSize();
-        }
-
-        List<Hex32> head = new ArrayList<>(headBytesSize / Hex32.SIZE_BYTES);
-        List<Hex32> tail = new ArrayList<>();
+        buf.add(id);
 
         int i = 0;
+
+        long tailBytesSize = 0;
+
+        List<Hex32> tail = new ArrayList<>();
 
         for (Object obj : params) {
             Type type = inputTypes.get(i++);
 
-            Hex32[] data = type.encode(obj);
+            List<Hex32> data = type.encode(obj);
 
-            if (!type.isDynamic()) {
-                Collections.addAll(head, data);
+            if (type.isStatic()) {
+                buf.addAll(data);
             } else {
-                Collections.addAll(tail, data);
+                buf.add(Type.encodeLength(headFixedSize + tailBytesSize));
 
-                head.add(new UIntType().encode(headBytesSize + tailBytesSize));
-                tailBytesSize += data.length * Hex32.SIZE_BYTES;
+                tailBytesSize += data.size() * Hex32.SIZE_BYTES;
+                tail.addAll(data);
             }
         }
 
-        HexData[] data = new HexData[head.size() + tail.size() + 1];
+        buf.addAll(tail);
 
-        data[0] = id;
-        System.arraycopy(head.toArray(new Hex32[head.size()]), 0, data, 1, head.size());
-        System.arraycopy(tail.toArray(new Hex32[tail.size()]), 0, data, head.size() + 1, tail.size());
-
-        return HexData.from(data);
+        return HexData.from(buf);
     }
 
     /**

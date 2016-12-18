@@ -43,7 +43,7 @@ class BoolTypeSpec extends Specification {
         _ | 'int256'
     }
 
-    def "should create a default instance"() {
+    def "should create a correct default instance"() {
         expect:
         DEFAULT_TYPE.bytes == 1
         !DEFAULT_TYPE.signed

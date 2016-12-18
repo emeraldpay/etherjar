@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Fixed size value, such as Wallet Address, represented in Hex
@@ -76,12 +77,22 @@ public class HexData {
     }
 
     /**
-     * Combine several {@link HexData} together.
+     * Combine an array of {@link HexData} together.
      *
-     * @param data data for combining
+     * @param data an array of {@link HexData}
      * @return hex value
      */
     public static HexData from(HexData... data) {
+        return from(Arrays.asList(data));
+    }
+
+    /**
+     * Combine a collection of {@link HexData} together.
+     *
+     * @param data a collection of {@link HexData}
+     * @return hex value
+     */
+    public static HexData from(Collection<? extends HexData> data) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
         try {

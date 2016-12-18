@@ -85,7 +85,7 @@ class IntTypeSpec extends Specification {
         thrown IllegalArgumentException
     }
 
-    def "should create a default instance"() {
+    def "should create a correct default instance"() {
         expect:
         DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
         !DEFAULT_TYPE.signed
@@ -152,6 +152,6 @@ class IntTypeSpec extends Specification {
 
         then:
         str ==~ /IntType\{.+}/
-        str.contains "bytes=8"
+        str.contains 'bytes=8'
     }
 }
