@@ -58,21 +58,17 @@ class ArrayTypeSpec extends Specification {
         0 * parser.apply(_)
 
         where:
-        input           | inter     | output
-        '_[]'           | '_'       | 'ABC[]'
-        'abc[123]'      | 'abc'     | 'ABC[123]'
-        '_[][123]'      | '_[]'     | 'ABC[123]'
-        '_[123][]'      | '_[123]'  | 'ABC[]'
-        '_[1][2][3]'    | '_[1][2]' | 'ABC[3]'
+        input           | inter
+        '_[]'           | '_'
+        'abc[123]'      | 'abc'
+        '_[][123]'      | '_[]'
+        '_[123][]'      | '_[123]'
+        '_[1][2][3]'    | '_[1][2]'
     }
 
     def "should detect null string representation"() {
-        def parser = Mock(Function) {
-            0 * apply(_)
-        }
-
         when:
-        ArrayType.from({ -> [parser] }, null)
+        ArrayType.from({ -> [] }, null)
 
         then:
         thrown NullPointerException

@@ -11,11 +11,7 @@ class TypeSpec extends Specification {
     def "should find an appropriate type"() {
         def type = Stub(Type)
 
-        def mock = Mock(Function) {
-            0 * apply(_)
-        }
-
-        Type.Repository repo = { -> [{ Optional.of type } as Function, mock] }
+        Type.Repository repo = { -> [{ Optional.of type } as Function] }
 
         when:
         def opt = repo.search '_'

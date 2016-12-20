@@ -47,10 +47,7 @@ class StaticTypeSpec extends Specification {
     def "should encode an object into a singleton list"() {
         def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
 
-        def m = Mock(Function) {
-            1 * apply(123) >> hex
-            0 * _
-        }
+        def m = Stub(Function) { apply(123) >> hex }
 
         def t = [encodeSingle: { m.apply it }] as StaticType
 
@@ -65,10 +62,7 @@ class StaticTypeSpec extends Specification {
     def "should decode a singleton collection into an object"() {
         def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
 
-        def m = Mock(Function) {
-            1 * apply(hex) >> 123
-            0 * _
-        }
+        def m = Stub(Function) { apply(hex) >> 123 }
 
         def t = [decodeSingle: { m.apply it }] as StaticType
 
