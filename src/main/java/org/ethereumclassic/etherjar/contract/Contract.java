@@ -22,14 +22,14 @@ public class Contract {
          * @param address a contract address
          * @return the current builder object
          */
-        public Builder at(Address address) {
+        public Builder address(Address address) {
             this.address = Objects.requireNonNull(address);
 
             return this;
         }
 
         /**
-         * @param methods a contract methods
+         * @param methods contract methods
          * @return the current builder object
          */
         public Builder methods(ContractMethod... methods) {
@@ -37,7 +37,7 @@ public class Contract {
         }
 
         /**
-         * @param methods a contract methods
+         * @param methods a contract methods collection
          * @return the current builder object
          */
         public Builder methods(Collection<ContractMethod> methods) {

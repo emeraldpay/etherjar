@@ -18,56 +18,56 @@ import java.util.stream.Collectors;
  */
 public class ContractMethod {
 
+    final static Pattern ABI_PATTERN = Pattern.compile("([_a-zA-Z][_a-zA-Z0-9]*)\\((\\S*)\\)");
+
+    /**
+     * Check contract method ABI signature.
+     *
+     * @param signature a contract method signature string representation
+     * @return {@code true} if <code>signature</code> is valid, otherwise
+     * {@code false}
+     *
+     * @see #ABI_PATTERN
+     */
+    static boolean isAbiValid(String signature) {
+        return ABI_PATTERN.matcher(signature).matches();
+    }
+
+    /**
+     * Create a {@link Builder} instance from methods signature like
+     * <tt>name(datatype1,datatype2)</tt>, or <tt>transfer(address,uint256)</tt>.
+     *
+     * <p>The signature is defined as the canonical expression of the basic prototype,
+     * i.e. the function name with the parenthesised list of parameter types.
+     * Parameter types are split by a single comma - no spaces are used.
+     *
+     * @param repo a {@link Type} parsers repository
+     * @param signature a contract method signature string representation
+     * @return a {@link ContractMethod} instance
+     */
+    public static ContractMethod fromAbi(Type.Repository repo, String signature) {
+        Matcher m = ABI_PATTERN.matcher(signature);
+
+        if (!m.matches())
+            throw new IllegalArgumentException("Wrong ABI method signature: " + signature);
+
+        String name = m.group(1);
+
+        List<Type> types = new ArrayList<>();
+
+        for (String str : m.group(2).split(",")) {
+            Optional<Type> type = repo.search(str);
+
+            if (!type.isPresent())
+                throw new IllegalArgumentException("Unknown input parameter type format: " + str);
+
+            types.add(type.get());
+        }
+
+        return new Builder().name(name).inputTypes(types).build();
+    }
+
     public static class Builder {
-
-        final static Pattern ABI_PATTERN = Pattern.compile("([_a-zA-Z][_a-zA-Z0-9]*)\\((\\S*)\\)");
-
-        /**
-         * Check contract method ABI signature.
-         *
-         * @param signature a contract method signature string representation
-         * @return {@code true} if <code>signature</code> is valid, otherwise
-         * {@code false}
-         *
-         * @see #ABI_PATTERN
-         */
-        static boolean isAbiValid(String signature) {
-            return ABI_PATTERN.matcher(signature).matches();
-        }
-
-        /**
-         * Create a {@link Builder} instance from methods signature like
-         * <tt>name(datatype1,datatype2)</tt>, or <tt>transfer(address,uint256)</tt>.
-         *
-         * <p>The signature is defined as the canonical expression of the basic prototype,
-         * i.e. the function name with the parenthesised list of parameter types.
-         * Parameter types are split by a single comma - no spaces are used.
-         *
-         * @param repo a {@link Type} parsers repository
-         * @param signature a contract method signature string representation
-         * @return builder instance
-         */
-        public static Builder fromAbi(Type.Repository repo, String signature) {
-            Matcher m = ABI_PATTERN.matcher(signature);
-
-            if (!m.matches())
-                throw new IllegalArgumentException("Wrong ABI method signature: " + signature);
-
-            String name = m.group(1);
-
-            List<Type> types = new ArrayList<>();
-
-            for (String str : m.group(2).split(",")) {
-                Optional<Type> type = repo.search(str);
-
-                if (!type.isPresent())
-                    throw new IllegalArgumentException("Unknown input parameter type format: " + str);
-
-                types.add(type.get());
-            }
-
-            return new Builder().withName(name).expects(types);
-        }
 
         private String name = null;
 
@@ -81,7 +81,7 @@ public class ContractMethod {
          * @param name a contract methods name
          * @return builder instance
          */
-        public Builder withName(String name) {
+        public Builder name(String name) {
             this.name = Objects.requireNonNull(name);
 
             return this;
@@ -99,36 +99,36 @@ public class ContractMethod {
         }
 
         /**
-         * @param types a contract methods input types
+         * @param types contract methods input types
          * @return builder instance
          */
-        public Builder expects(Type... types) {
-            return expects(Arrays.asList(types));
+        public Builder inputTypes(Type... types) {
+            return inputTypes(Arrays.asList(types));
         }
 
         /**
-         * @param types a contract methods input types
+         * @param types a contract methods input types collection
          * @return builder instance
          */
-        public Builder expects(Collection<? extends Type> types) {
+        public Builder inputTypes(Collection<? extends Type> types) {
             inputTypes = Objects.requireNonNull(types);
 
             return this;
         }
 
         /**
-         * @param types a contract methods output types
+         * @param types contract methods output types
          * @return builder instance
          */
-        public Builder returns(Type... types) {
-            return returns(Arrays.asList(types));
+        public Builder outputTypes(Type... types) {
+            return outputTypes(Arrays.asList(types));
         }
 
         /**
-         * @param types a contract methods output types
+         * @param types a contract methods output types collection
          * @return builder instance
          */
-        public Builder returns(Collection<? extends Type> types) {
+        public Builder outputTypes(Collection<? extends Type> types) {
             outputTypes = Objects.requireNonNull(types);
 
             return this;

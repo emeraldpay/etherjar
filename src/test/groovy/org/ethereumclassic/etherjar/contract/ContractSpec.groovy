@@ -27,7 +27,7 @@ class ContractSpec extends Specification {
     }
 
     def "should rebuild similar contract"() {
-        def obj = new Contract.Builder().at(contract.address)
+        def obj = new Contract.Builder().address(contract.address)
                 .methods(contract.methods as ContractMethod[]).build()
 
         expect:

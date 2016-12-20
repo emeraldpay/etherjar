@@ -284,6 +284,7 @@ class ArrayTypeSpec extends Specification {
 
         where:
         first                                       | second
+        arrayType1                                  | null
         arrayType1                                  | arrayType2
         arrayType2                                  | arrayType1
         arrayType1                                  | [wrappedType1, 8] as ArrayType

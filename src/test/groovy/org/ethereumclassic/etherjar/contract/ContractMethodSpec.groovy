@@ -41,7 +41,7 @@ class ContractMethodSpec extends Specification {
 
     def "should check method signature validity"() {
         expect:
-        ContractMethod.Builder.isAbiValid valid_sign
+        ContractMethod.isAbiValid valid_sign
 
         where:
         _ | valid_sign
@@ -54,7 +54,7 @@ class ContractMethodSpec extends Specification {
 
     def "should check method signature invalidity"() {
         expect:
-        !ContractMethod.Builder.isAbiValid(invalid_sign)
+        !ContractMethod.isAbiValid(invalid_sign)
 
         where:
         _ | invalid_sign
@@ -68,7 +68,7 @@ class ContractMethodSpec extends Specification {
 
         Type.Repository repo = { -> [parser as Function] }
 
-        def obj = ContractMethod.Builder.fromAbi(repo, method.toAbi()).build()
+        def obj = ContractMethod.fromAbi(repo, method.toAbi())
 
         expect:
         obj == method
@@ -78,7 +78,7 @@ class ContractMethodSpec extends Specification {
         def repo = Stub(Type.Repository)
 
         when:
-        ContractMethod.Builder.fromAbi(repo, abi)
+        ContractMethod.fromAbi(repo, abi)
 
         then:
         thrown NullPointerException
@@ -97,7 +97,7 @@ class ContractMethodSpec extends Specification {
         Type.Repository repo = { -> [parser] }
 
         when:
-        ContractMethod.Builder.fromAbi(repo, abi)
+        ContractMethod.fromAbi(repo, abi)
 
         then:
         thrown IllegalArgumentException
@@ -112,9 +112,9 @@ class ContractMethodSpec extends Specification {
     }
 
     def "should rebuild similar contract method"() {
-        def obj = new ContractMethod.Builder().withName('bar')
-                .expects(method.getInputTypes() as Type[])
-                .returns(method.outputTypes as Type[])
+        def obj = new ContractMethod.Builder().name('bar')
+                .inputTypes(method.getInputTypes() as Type[])
+                .outputTypes(method.outputTypes as Type[])
                 .build()
 
         expect:
@@ -123,9 +123,9 @@ class ContractMethodSpec extends Specification {
 
     def "should build constant contract method"() {
         def obj = new ContractMethod.Builder()
-                .withName('bar').asConstant()
-                .expects(method.getInputTypes() as Type[])
-                .returns(method.outputTypes as Type[])
+                .name('bar').asConstant()
+                .inputTypes(method.getInputTypes() as Type[])
+                .outputTypes(method.outputTypes as Type[])
                 .build()
 
         expect:
@@ -365,7 +365,7 @@ class ContractMethodSpec extends Specification {
 
         where:
         first   | second
-        method  | new ContractMethod.Builder().withName('bar').expects(method.inputTypes).build()
+        method  | new ContractMethod.Builder().name('bar').inputTypes(method.inputTypes).build()
     }
 
     def "should be equal"() {
@@ -375,7 +375,7 @@ class ContractMethodSpec extends Specification {
         where:
         first   | second
         method  | method
-        method  | new ContractMethod.Builder().withName('bar').expects(method.inputTypes).build()
+        method  | new ContractMethod.Builder().name('bar').inputTypes(method.inputTypes).build()
     }
 
     def "should not be equal"() {
