@@ -57,6 +57,8 @@ public interface Type<T> {
         /**
          * Append current repository with a complex type parser.
          *
+         * <p>A repository as a first function parameter will be fixed to the current call state.
+         *
          * @param parser a {@link BiFunction} complex parser
          * @return an extended type repository
          *

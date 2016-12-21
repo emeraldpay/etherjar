@@ -148,6 +148,16 @@ public class ContractMethod {
     }
 
     /**
+     * Calculate a summary number of encoded fixed-size bytes for given types.
+     *
+     * @param types a {@link Collection} of {@link Type}
+     * @return a number of encoded fixed-size bytes
+     */
+    static long sumFixedSize(Collection<? extends Type> types) {
+        return types.stream().mapToLong(Type::getFixedSize).sum();
+    }
+
+    /**
      * Convert a type collection to a collection of canonical names.
      *
      * @param types a {@link Collection} of {@link Type}
@@ -178,7 +188,7 @@ public class ContractMethod {
 
     private final List<Type> outputTypes;
 
-    private final transient long headFixedSize;
+    private final transient long encodedFixedSize;
 
     public ContractMethod(String name, Type... inputTypes) {
         this(name, false, Arrays.asList(inputTypes), Collections.emptyList());
@@ -204,8 +214,7 @@ public class ContractMethod {
         this.isConstant = isConstant;
         this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
         this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
-        /* FIXME: extract this logic into separate array related type class */
-        this.headFixedSize = inputTypes.stream().mapToLong(Type::getFixedSize).sum();
+        this.encodedFixedSize = sumFixedSize(inputTypes);
     }
 
     /**
@@ -247,6 +256,15 @@ public class ContractMethod {
     }
 
     /**
+     * Get a head fixed-size bytes required for encoding.
+     *
+     * @return a number of head fixed-size bytes
+     */
+    public long getEncodedFixedSize() {
+        return encodedFixedSize;
+    }
+
+    /**
      * Encodes call data, so you can call the contract through some other means (for example, through RPC).
      *
      * @param params parameters of the call
@@ -276,7 +294,7 @@ public class ContractMethod {
             throw new IllegalArgumentException("Wrong number of input parameters: " + params.size());
 
         List<HexData> buf =
-                new ArrayList<>((int) (headFixedSize / Hex32.SIZE_BYTES) + 1);
+                new ArrayList<>((int) (encodedFixedSize / Hex32.SIZE_BYTES) + 1);
 
         buf.add(id);
 
@@ -294,7 +312,7 @@ public class ContractMethod {
             if (type.isStatic()) {
                 buf.addAll(data);
             } else {
-                buf.add(Type.encodeLength(headFixedSize + tailBytesSize));
+                buf.add(Type.encodeLength(encodedFixedSize + tailBytesSize));
 
                 tailBytesSize += data.size() * Hex32.SIZE_BYTES;
                 tail.addAll(data);

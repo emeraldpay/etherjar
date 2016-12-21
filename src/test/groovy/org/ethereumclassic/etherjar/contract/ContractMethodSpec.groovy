@@ -21,6 +21,14 @@ class ContractMethodSpec extends Specification {
         [getCanonicalName: { -> name }] as Type
     }
 
+    def t(boolean isDynamic) {
+        [isDynamic: { -> isDynamic }] as Type
+    }
+
+    def t(long size) {
+        [getFixedSize: { -> size }] as Type
+    }
+
     def setup() {
         def t1 = [
                 getCanonicalName: { 'fixed128x128' },
@@ -143,6 +151,17 @@ class ContractMethodSpec extends Specification {
         thrown IllegalStateException
     }
 
+    def "should calculate a number of encoded fixed-size bytes"() {
+        expect:
+        ContractMethod.sumFixedSize(types) == sum
+
+        where:
+        types                           | sum
+        []                              | 0
+        [t(64)]                         | 64
+        [t(8), t(16), t(32)]            | 56
+    }
+
     def "should convert a collection of input types"() {
         expect:
         ContractMethod.convert(types) == names
@@ -182,6 +201,7 @@ class ContractMethodSpec extends Specification {
         !method.constant
         method.inputTypes.size() == 2
         method.outputTypes.isEmpty()
+        method.encodedFixedSize == 2 * Hex32.SIZE_BYTES
     }
 
     def "should create correctly without constant flag"() {
