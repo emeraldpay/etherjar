@@ -77,25 +77,27 @@ public class HexData {
     }
 
     /**
-     * Combine an array of {@link HexData} together.
+     * Concat with an array of {@link HexData}.
      *
      * @param data an array of {@link HexData}
      * @return hex value
      */
-    public static HexData from(HexData... data) {
-        return from(Arrays.asList(data));
+    public HexData concat(HexData... data) {
+        return concat(Arrays.asList(data));
     }
 
     /**
-     * Combine a collection of {@link HexData} together.
+     * Concat with a collection of {@link HexData}.
      *
      * @param data a collection of {@link HexData}
      * @return hex value
      */
-    public static HexData from(Collection<? extends HexData> data) {
+    public HexData concat(Collection<? extends HexData> data) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
         try {
+            buf.write(getBytes());
+
             for (HexData param: data) {
                 buf.write(param.getBytes());
             }
@@ -140,5 +142,4 @@ public class HexData {
     public int hashCode() {
         return Arrays.hashCode(value);
     }
-
 }

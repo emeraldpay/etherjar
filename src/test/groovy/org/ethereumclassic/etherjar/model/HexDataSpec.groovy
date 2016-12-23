@@ -47,18 +47,27 @@ class HexDataSpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    def "combine hex data together"() {
+    def "should concat with another hex data"() {
         setup:
-        def params = [
-                Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
-                Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000')
-        ] as HexData[]
+        def x = HexData.from('0x0123456789abcdef')
+        def c = [HexData.from('0x0123'), HexData.from('0x456789ab'), HexData.from('0xcdef')]
 
         when:
-        def data = HexData.from(params)
+        def y = x.concat(c as HexData[])
 
         then:
-        data.toHex() == '0x00000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000880000000000000000000000000000000'
+        y == HexData.from('0x0123456789abcdef0123456789abcdef')
+    }
+
+    def "should detect a case with null concat"() {
+        setup:
+        def x = HexData.from('0x0123456789abcdef')
+
+        when:
+        x.concat null
+
+        then:
+        thrown NullPointerException
     }
 
     def "Equal"() {
