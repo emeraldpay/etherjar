@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.util;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -18,8 +19,11 @@ public interface Lazy {
      * @param supplier a value supplier
      * @param <T> a java object type is needed to store
      * @return a lazy cached supplier value
+     * @throws NullPointerException if a supplier value is {@code null}
      */
     static <T> Supplier<T> wrap(Supplier<? extends T> supplier) {
+        Objects.requireNonNull(supplier);
+
         return new Supplier<T>() {
 
             private volatile T cached;
@@ -29,7 +33,7 @@ public interface Lazy {
                 if (cached == null) {
                     synchronized (this) {
                         if (cached == null) {
-                            cached = supplier.get();
+                            cached = Objects.requireNonNull(supplier.get());
                         }
                     }
                 }
