@@ -7,11 +7,15 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * A general type is used to convert java object to and from {@link Hex32} array.
  *
- * <p>Immutable arbitrary-precision types, with provided thread safety guarantees.
+ * <p>Immutable arbitrary-precision types, with provided thread safety guarantees.git
  *
  * @param <T> a java object type is needed to convert
  *
@@ -24,14 +28,14 @@ public interface Type<T> {
      *
      * <p>Here are some examples of how type repositories can be created:
      *
-     * <blockquote><pre>
+     * <pre>{@code
      * Type.Repository repo1 = () ->
      *          Arrays.asList(UIntType::from, IntType::from, ...)
      *
      * Type.Repository repo2 = ((Repository) () ->
      *          Arrays.asList(UIntType::from, IntType::from, ...))
      *                  .append(ArrayType::from);
-     * </pre></blockquote>
+     * }</pre>
      */
     @FunctionalInterface
     interface Repository {
@@ -50,16 +54,27 @@ public interface Type<T> {
             if (str.isEmpty())
                 throw new IllegalArgumentException("Empty type string representation.");
 
-            return getTypeParsers().stream().map(t -> (Optional<Type>) t.apply(str))
+            return getTypeParsers().stream()
+                    .map(t -> (Optional<Type>) t.apply(str))
                     .filter(Optional::isPresent).map(Optional::get).findFirst();
         }
 
         /**
-         * Append current repository with a complex type parser.
+         * Append a complex type parser to current repository.
          *
          * <p>A repository as a first function parameter will be fixed to the current call state.
+         * Subsequent parsers will not be included and therefore used by this complex type parser.
          *
-         * @param parser a {@link BiFunction} complex parser
+         * <pre>{@code
+         * Type.Repository repo = ((Repository) () ->
+         *          Arrays.asList(parser1, parser2, parser3))
+         *                  .append(complexParser1).append(complexParser2);
+         * }</pre>
+         *
+         * <p>In this example <code>complexParser1</code> don't know anything about
+         * <code>complexParse2</code>, but it's not right visa versa.
+         *
+         * @param parser a {@link BiFunction} complex type parser
          * @return an extended type repository
          *
          * @see #append(Function)
@@ -72,9 +87,9 @@ public interface Type<T> {
         }
 
         /**
-         * Append current repository with a simple parser.
+         * Append a simple type parser to current repository.
          *
-         * @param parser a {@link BiFunction} simple parser
+         * @param parser a {@link BiFunction} simple type parser
          * @return an extended type repository
          *
          * @see #append(BiFunction)
@@ -84,10 +99,8 @@ public interface Type<T> {
             Objects.requireNonNull(parser);
 
             List<Function<String, Optional<? extends Type>>> list =
-                    Collections.unmodifiableList(
-                            new ArrayList<Function<String, Optional<? extends Type>>>(getTypeParsers()) {{
-                                add(parser);
-                            }});
+                    Stream.concat(getTypeParsers().stream(), Stream.of(parser))
+                            .collect(Collectors.collectingAndThen(toList(), Collections::unmodifiableList));
 
             return () -> list;
         }
