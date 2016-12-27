@@ -2,55 +2,100 @@ package org.ethereumclassic.etherjar.model
 
 import spock.lang.Specification
 
+import java.util.function.Function
+
 /**
  * @author Igor Artamonov
  */
 class HexDataSpec extends Specification {
 
-    def "Parse hex"() {
+    def "should combine hex data"() {
+        def x = [
+                HexData.from('0x0123'),
+                HexData.from('0x456789ab'),
+                HexData.from('0xcdef')
+        ]
+
+        when:
+        def y = HexData.combine(x as HexData[])
+
+        then:
+        y == HexData.from('0x0123456789abcdef')
+    }
+
+    def "should throw on combine null value"() {
+        when:
+        HexData.combine(null as HexData[])
+
+        then:
+        thrown NullPointerException
+
+        when:
+        HexData.combine(null as List<HexData>)
+
+        then:
+        thrown NullPointerException
+    }
+
+    def "should parse hex"() {
+        def x = HexData.from hex
+
         expect:
-        HexData.from(hex).bytes == bytes
-        HexData.from(hex).toString() == hex.toLowerCase()
+        x.bytes == bytes
+
         where:
         hex         | bytes
-        '0xff'      | [-1] as byte[]
+        '0x0'       | [0] as byte[]
+        '0x1'       | [1] as byte[]
         '0x00'      | [0] as byte[]
         '0x01'      | [1] as byte[]
         '0x0f'      | [15] as byte[]
+        '0x23'      | [35] as byte[]
+        '0xff'      | [-1] as byte[]
+        '0x123'     | [1, 35] as byte[]
         '0x0001'    | [0, 1] as byte[]
-        '0xff01'    | [-1, 1] as byte[]
-        '0x000001'  | [0, 0, 1] as byte[]
-        '0x000000'  | [0, 0, 0] as byte[]
-        '0xffffff'  | [-1, -1, -1] as byte[]
         '0xABcD'    | [-85, -51] as byte[]
+        '0xff01'    | [-1, 1] as byte[]
+        '0x000000'  | [0, 0, 0] as byte[]
+        '0x000001'  | [0, 0, 1] as byte[]
+        '0xffffff'  | [-1, -1, -1] as byte[]
     }
 
-    def "Throw on invalid value"() {
-        when:
-        HexData.from('')
-        then:
-        thrown(IllegalArgumentException)
-
+    def "should throw on null value"() {
         when:
         new HexData(null as byte[])
+
         then:
-        thrown(IllegalArgumentException)
+        thrown NullPointerException
 
         when:
         HexData.from(null as String)
-        then:
-        thrown(IllegalArgumentException)
 
-        when:
-        HexData.from('0xfake')
         then:
-        thrown(IllegalArgumentException)
+        thrown NullPointerException
+    }
+
+    def "should throw on invalid value"() {
+        when:
+        HexData.from str
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | str
+        _ | ''
+        _ | '0xfake'
     }
 
     def "should concat with another hex data"() {
-        setup:
-        def x = HexData.from('0x0123456789abcdef')
-        def c = [HexData.from('0x0123'), HexData.from('0x456789ab'), HexData.from('0xcdef')]
+        def x = HexData.from '0x0123456789abcdef'
+
+        def c = [
+                HexData.from('0x0123'),
+                HexData.from('0x456789ab'),
+                HexData.from('0xcdef')
+        ]
 
         when:
         def y = x.concat(c as HexData[])
@@ -60,69 +105,211 @@ class HexDataSpec extends Specification {
     }
 
     def "should detect a case with null concat"() {
-        setup:
-        def x = HexData.from('0x0123456789abcdef')
-
         when:
-        x.concat null
+        HexData.EMPTY.concat(null as HexData[])
 
         then:
         thrown NullPointerException
     }
 
+    def "should extract empty data"() {
+        expect:
+        HexData.EMPTY.extract(0).is(HexData.EMPTY)
+    }
+
+    def "should extract hex data"() {
+        when:
+        def x = hex.extract(size, offset)
+
+        then:
+        x == res
+
+        where:
+        hex                                 | size  | offset    | res
+        HexData.from('0x1234')              | 1     | 0         | HexData.from('0x12')
+        HexData.from('0x1234')              | 1     | 1         | HexData.from('0x34')
+        HexData.from('0x1234')              | 2     | 0         | HexData.from('0x1234')
+        HexData.from('0x0123456789abcdef')  | 8     | 0         | HexData.from('0x0123456789abcdef')
+        HexData.from('0x0123456789abcdef')  | 4     | 4         | HexData.from('0x89abcdef')
+        HexData.from('0x0123456789abcdef')  | 2     | 3         | HexData.from('0x6789')
+        HexData.from('0x0123456789abcdef')  | 1     | 2         | HexData.from('0x45')
+    }
+
+    def "should extract custom instances"() {
+        def x = HexData.from '0x0123456789abcdef'
+
+        when:
+        def y = x.extract(size, offset, conv as Function)
+
+        then:
+        y == res
+
+        where:
+        size    | offset    | conv              | res
+        1       | 0         | { it.toHex() }    | '0x01'
+        2       | 3         | { it.getSize() }  | 2
+        4       | 2         | { it.bytes }      | [0x45, 0x67, 0x89, 0xab] as byte[]
+    }
+
+    def "should catch wrong extracted arguments"() {
+        when:
+        offset == 0 && hex.extract(size)
+        offset != 0 && hex.extract(size, offset)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        hex                     | size    | offset
+        HexData.EMPTY           | -1      | 0
+        HexData.EMPTY           | 0       | -1
+        HexData.from('0x1234')  | 3       | 0
+        HexData.from('0x1234')  | 1       | 2
+    }
+
+    def "should catch null extracted converter"() {
+        when:
+        HexData.from(1).extract(1, null)
+
+        then:
+        thrown NullPointerException
+    }
+
+    def "should split empty data"() {
+        expect:
+        HexData.EMPTY.split(0).size() == 0
+    }
+
+    def "should split hex data"() {
+        when:
+        def x = hex.split(size, offset)
+
+        then:
+        x == res
+
+        where:
+        hex                                 | size  | offset    | res
+        HexData.from('0x1234')              | 1     | 0         | [HexData.from('0x12'), HexData.from('0x34')]
+        HexData.from('0x1234')              | 1     | 1         | [HexData.from('0x34')]
+        HexData.from('0x1234')              | 2     | 0         | [HexData.from('0x1234')]
+        HexData.from('0x0123456789abcdef')  | 1     | 4         | [HexData.from('0x89'), HexData.from('0xab'), HexData.from('0xcd'), HexData.from('0xef')]
+        HexData.from('0x0123456789abcdef')  | 2     | 4         | [HexData.from('0x89ab'), HexData.from('0xcdef')]
+        HexData.from('0x0123456789abcdef')  | 3     | 2         | [HexData.from('0x456789'), HexData.from('0xabcdef')]
+        HexData.from('0x0123456789abcdef')  | 8     | 0         | [HexData.from('0x0123456789abcdef')]
+    }
+
+    def "should split custom instances"() {
+        def x = HexData.from '0x0123456789abcdef'
+
+        when:
+        def y = x.split(size, offset, conv as Function)
+
+        then:
+        y == res
+
+        where:
+        size    | offset    | conv              | res
+        1       | 4         | { it.toHex() }    | ['0x89', '0xab', '0xcd', '0xef']
+        2       | 2         | { it.getSize() }  | [2, 2, 2]
+        4       | 4         | { it.bytes }      | [[0x89, 0xab, 0xcd, 0xef]] as byte[][]
+    }
+
+    def "should catch wrong split arguments"() {
+        when:
+        offset == 0 && hex.split(size)
+        offset != 0 && hex.split(size, offset)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        hex                                 | size  | offset
+        HexData.EMPTY                       | -1    | 0
+        HexData.EMPTY                       | 0     | -1
+        HexData.from('0x1234')              | 2     | 1
+        HexData.from('0x1234')              | 1     | 2
+        HexData.from('0x0123456789abcdef')  | 3     | 0
+        HexData.from('0x0123456789abcdef')  | 4     | 2
+        HexData.from('0x0123456789abcdef')  | 2     | 3
+    }
+
+    def "should split to unmodified list"() {
+        def x = HexData.from('0x0123456789abcdef').split(8)
+
+        when:
+        x.clear()
+
+        then:
+        thrown UnsupportedOperationException
+    }
+
+    def "should catch null split converter"() {
+        when:
+        HexData.from(1).split(1, null)
+
+        then:
+        thrown NullPointerException
+    }
+
+    def "should format to hex"() {
+        def x = new HexData(bytes)
+
+        expect:
+        x.toHex() == str
+
+        where:
+        bytes                   | str
+        [0] as byte[]           | '0x00'
+        [1] as byte[]           | '0x01'
+        [15] as byte[]          | '0x0f'
+        [35] as byte[]          | '0x23'
+        [-1] as byte[]          | '0xff'
+        [1, 35] as byte[]       | '0x0123'
+        [0, 1] as byte[]        | '0x0001'
+        [-85, -51] as byte[]    | '0xabcd'
+        [-1, 1] as byte[]       | '0xff01'
+        [0, 0, 0] as byte[]     | '0x000000'
+        [0, 0, 1] as byte[]     | '0x000001'
+        [-1, -1, -1] as byte[]  | '0xffffff'
+    }
+
     def "Equal"() {
-        setup:
-        def x = HexData.from('0x0123456789abcdef')
-        when:
-        def act = x.equals(HexData.from('0x0123456789abcdef'))
-        then:
-        act == true
+        def x = HexData.from '0x0123456789abcdef'
+        def y = HexData.from '0x00'
 
-        when:
-        act = x.equals(HexData.from('0x0123456789abcdee'))
-        then:
-        act == false
+        expect:
+        x == HexData.from('0x0123456789abcdef')
+        x != HexData.from('0x0123456789abcdee')
 
-        when:
-        x = HexData.from('0x0')
-        act = x.equals(HexData.from('0x0'))
-        then:
-        act == true
+        and:
+        y == HexData.from('0x00')
+        y != HexData.from('0x01')
     }
 
     def "Equal is reflexive"() {
-        setup:
-        def x = HexData.from('0x0123456789abcdef')
-        when:
-        def act = x.equals(x)
-        then:
-        act == true
+        def x = HexData.from '0x0123456789abcdef'
+
+        expect:
+        x == x
     }
 
     def "Equal is symmetric"() {
-        setup:
-        def x = HexData.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946')
-        def y = BlockHash.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946')
-        when:
-        def act1 = x.equals(y)
-        def act2 = y.equals(x)
-        then:
-        act1 == true
-        act2 == true
+        def x = HexData.from'0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def y = BlockHash.from'0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+
+        expect:
+        x == y
+        y == x
     }
 
     def "Equal is transitive"() {
-        setup:
-        def x = HexData.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946')
-        def y = TransactionId.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946')
-        def z = BlockHash.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946')
-        when:
-        def act1 = x.equals(y)
-        def act2 = y.equals(x)
-        def act3 = x.equals(z)
-        then:
-        act1 == true
-        act2 == true
-        act3 == true
+        def x = HexData.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def y = TransactionId.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def z = BlockHash.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+
+        expect:
+        x == y
+        y == x
+        x == z
     }
 }

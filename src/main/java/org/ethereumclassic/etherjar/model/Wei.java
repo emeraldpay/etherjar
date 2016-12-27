@@ -18,12 +18,8 @@ public class Wei extends HexQuantity {
         this(new BigInteger(value));
     }
 
-    public Wei(String value) {
-        super(HexQuantity.from(value).getValue());
-    }
-
     public static Wei from(String value) {
-        return new Wei(value);
+        return new Wei(HexQuantity.from(value).getValue());
     }
 
     /**

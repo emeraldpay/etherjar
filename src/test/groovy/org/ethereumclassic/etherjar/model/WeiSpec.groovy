@@ -11,7 +11,7 @@ class WeiSpec extends Specification {
 
     def "Convert wei to Ether"() {
         expect:
-        new Wei(hex).toEther() == ether
+        Wei.from(hex).toEther() == ether
         where:
         hex                     | ether
         '0x0'                   |  0.0
@@ -28,7 +28,7 @@ class WeiSpec extends Specification {
         setup:
         String hex = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
         when:
-        def wei = new Wei(hex)
+        def wei = Wei.from(hex)
         then:
         wei.value.toString() == '115792089237316195423570985008687907853269984665640564039457584007913129639935'
         wei.value.toString(16) == 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
@@ -40,7 +40,7 @@ class WeiSpec extends Specification {
 
     def "Process small number of wei"() {
         when:
-        def wei = new Wei('0x0b3266')
+        def wei = Wei.from('0x0b3266')
         then:
         wei.getValue().toLong() == 733798L
         wei.toEther() == 0.0
