@@ -1,9 +1,13 @@
 package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
+import org.ethereumclassic.etherjar.model.HexData;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -15,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * A general type is used to convert java object to and from {@link Hex32} array.
  *
- * <p>Immutable arbitrary-precision types, with provided thread safety guarantees.git
+ * <p>Immutable arbitrary-precision types, with provided thread safety guarantees
  *
  * @param <T> a java object type is needed to convert
  *
@@ -157,7 +161,7 @@ public interface Type<T> {
         if (val.compareTo(BigInteger.ZERO) == 0)
             throw new IllegalArgumentException("Zero dynamic type length to encode");
 
-        return new UIntType().encodeSingle(val);
+        return new UIntType().encodeStatic(val);
     }
 
     /**
@@ -170,7 +174,7 @@ public interface Type<T> {
      * @see #encodeLength(BigInteger)
      */
     static BigInteger decodeLength(Hex32 hex32) {
-        BigInteger val = new UIntType().decodeSingle(hex32);
+        BigInteger val = new UIntType().decodeStatic(hex32);
 
         if (val.compareTo(BigInteger.ZERO) == 0)
             throw new IllegalArgumentException("Zero decoded dynamic type length");
@@ -187,18 +191,6 @@ public interface Type<T> {
      */
     default boolean isStatic() {
         return !isDynamic();
-    }
-
-    /**
-     * Decode a {@link Hex32} collection to an object.
-     *
-     * @param data an encoded hex data
-     * @return a decoded object
-     *
-     * @see #decode(Collection)
-     */
-    default T decode(Hex32... data) {
-        return decode(Arrays.asList(data));
     }
 
     /**
@@ -255,6 +247,8 @@ public interface Type<T> {
      * <p>Dynamic type has additionally a length as the first {@link Hex32} element.
      *
      * @return {@code true} if current type is dynamic, otherwise {@code false}
+     *
+     * @see #isStatic()
      */
     boolean isDynamic();
 
@@ -267,21 +261,21 @@ public interface Type<T> {
      * @see #isDynamic()
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#formal-specification-of-the-encoding">Formal Specification of the Encoding</a>
      */
-    long getFixedSize();
+    int getFixedSize();
 
     /**
-     * Encode an object to a {@link Hex32} list.
+     * Encode an object to a hex data.
      *
      * @param obj an object
      * @return an encoded hex data
      */
-    List<? extends Hex32> encode(T obj);
+    HexData encode(T obj);
 
     /**
-     * Decode a {@link Hex32} collection to an object.
+     * Decode a hex data to an object.
      *
      * @param data an encoded hex data
      * @return a decoded object
      */
-    T decode(Collection<? extends Hex32> data);
+    T decode(HexData data);
 }

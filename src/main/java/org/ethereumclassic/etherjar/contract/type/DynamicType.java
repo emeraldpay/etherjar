@@ -3,7 +3,7 @@ package org.ethereumclassic.etherjar.contract.type;
 import org.ethereumclassic.etherjar.model.Hex32;
 
 /**
- * Non-fixed-size advanced types.
+ * Non-fixed-size dynamic advanced types.
  *
  * @see StaticType
  * @see ReferenceType
@@ -21,7 +21,7 @@ public interface DynamicType<T> extends Type<T> {
     }
 
     @Override
-    default long getFixedSize() {
+    default int getFixedSize() {
         return Hex32.SIZE_BYTES;
     }
 }

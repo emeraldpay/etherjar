@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.contract.type
 
 import org.ethereumclassic.etherjar.model.Hex32
+import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -8,42 +9,18 @@ import java.util.function.Function
 
 class ArrayTypeSpec extends Specification {
 
-    @Shared Type<Boolean> wrappedType1
-
-    @Shared Type<String> wrappedType2
-
-    @Shared ArrayType<Boolean> arrayType1
-
-    @Shared ArrayType<String> arrayType2
+    @Shared Type<Boolean> wrappedType
 
     def setup() {
-        def list1 = [
-                Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000001'),
-        ]
-
-        def list2 = [
-                Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000003'),
-                Hex32.from('0x7878780000000000000000000000000000000000000000000000000000000001'),
-        ]
-
-        wrappedType1 = [
+        wrappedType = [
                 getCanonicalName: { 'ABC' },
                 isDynamic: { false },
-                getFixedSize: { Hex32.SIZE_BYTES as long },
-                encode: { Boolean bool -> list1 },
-                decode: { if (it != list1) { throw new IllegalArgumentException() }; true },
+                getFixedSize: { Hex32.SIZE_BYTES },
+                encode: { Boolean bool ->
+                    HexData.from('0x0000000000000000000000000000000000000000000000000000000000000001')
+                },
+                decode: { true },
         ] as Type
-
-        wrappedType2 = [
-                getCanonicalName: { 'CBA' },
-                isDynamic: { true },
-                getFixedSize: { Hex32.SIZE_BYTES as long },
-                encode: { String str -> list2 },
-                decode: { if (it != list2) { throw new IllegalArgumentException() }; 'xxx' },
-        ] as Type
-
-        arrayType1 = [wrappedType1, 12] as ArrayType
-        arrayType2 = [wrappedType2, 21] as ArrayType
     }
 
     def "should parse string representation"() {
@@ -116,29 +93,31 @@ class ArrayTypeSpec extends Specification {
         _ | 'uint16[3]'
     }
 
-    def "should create a fixed-size instance with fixed length"() {
+    def "should create a fixed-size static instance"() {
+        def obj = [wrappedType, 12] as ArrayType
+
         expect:
-        arrayType1.wrappedType == wrappedType1
-        arrayType1.fixedLength.present
-        arrayType1.fixedLength.asLong == 12
-        arrayType1.static
+        obj.wrappedType == wrappedType
+        obj.length.present
+        obj.length.asInt == 12
+        obj.static
     }
 
-    def "should create a non-fixed-size instance without fixed length"() {
-        def obj = [wrappedType1] as ArrayType
+    def "should create a non-fixed-size dynamic instance"() {
+        def obj = [wrappedType] as ArrayType
 
         expect:
-        obj.wrappedType == wrappedType1
-        !obj.fixedLength.present
+        obj.wrappedType == wrappedType
+        !obj.length.present
         obj.dynamic
     }
 
-    def "should create a non-fixed-size instance with fixed length"() {
-        expect:
-        arrayType2.wrappedType == wrappedType2
-        arrayType2.fixedLength.present
-        arrayType2.fixedLength.asLong == 21
-        arrayType2.dynamic
+    def "should detect dynamic wrapped types"() {
+        when:
+        new ArrayType([isDynamic: { true }] as Type)
+
+        then:
+        thrown IllegalArgumentException
     }
 
     def "should return a canonical string representation" () {
@@ -146,26 +125,17 @@ class ArrayTypeSpec extends Specification {
         type.canonicalName == str
 
         where:
-        type                                            | str
-        arrayType1                                      | 'ABC[12]'
-        arrayType2                                      | 'CBA[21]'
-        [wrappedType1] as ArrayType                     | 'ABC[]'
-        [wrappedType2] as ArrayType                     | 'CBA[]'
-        [arrayType1] as ArrayType                       | 'ABC[12][]'
-        [arrayType2, 123] as ArrayType                  | 'CBA[21][123]'
-        [[arrayType2, 123] as ArrayType] as ArrayType   | 'CBA[21][123][]'
+        type                                                                | str
+        [wrappedType] as ArrayType                                          | 'ABC[]'
+        [wrappedType, 12] as ArrayType                                      | 'ABC[12]'
+        [[wrappedType, 21] as ArrayType] as ArrayType                       | 'ABC[21][]'
+        [[[wrappedType, 12] as ArrayType, 123] as ArrayType] as ArrayType   | 'ABC[12][123][]'
     }
 
     def "should encode & decode array values"() {
-        def parser1 = {
-            it == 'type1' ? Optional.of(wrappedType1) : Optional.empty()
-        } as Function
+        def parser = { Optional.of(wrappedType) } as Function
 
-        def parser2 = {
-            it == 'type2' ? Optional.of(wrappedType2) : Optional.empty()
-        } as Function
-
-        def obj = ArrayType.from({ -> [parser1, parser2] }, str).get()
+        def obj = ArrayType.from({ -> [parser] }, str).get()
 
         when:
         def data = obj.encode(arr as Object[])
@@ -176,26 +146,17 @@ class ArrayTypeSpec extends Specification {
         Arrays.equals(res, arr as Object[])
 
         where:
-        str         | arr                   | hex
-        'type1[1]'  | [true]                | wrappedType1.encode(true)
-        'type1[3]'  | [true, true, true]    | wrappedType1.encode(true) + wrappedType1.encode(true) + wrappedType1.encode(true)
-        'type1[]'   | [true, true]          | [Type.encodeLength(2)] + wrappedType1.encode(true) + wrappedType1.encode(true)
-        'type2[1]'  | ['xxx']               | [Type.encodeLength(Hex32.SIZE_BYTES)] + wrappedType2.encode('xxx')
-        'type2[2]'  | ['xxx', 'xxx']        | [Type.encodeLength(2 * Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('A') + wrappedType2.encode('B')
-        'type2[]'   | ['xxx']               | [Type.encodeLength(1)] + [Type.encodeLength(Hex32.SIZE_BYTES)] + wrappedType2.encode('1')
-    }
-
-    def "should catch empty array to encode"() {
-        when:
-        arrayType1.encode([] as Boolean[])
-
-        then:
-        thrown IllegalArgumentException
+        str     | arr                   | hex
+        '_[1]'  | [true]                | wrappedType.encode(true)
+        '_[3]'  | [true, true, true]    | HexData.combine([wrappedType.encode(true)] * 3)
+        '_[]'   | [true, true]          | Type.encodeLength(2).concat([wrappedType.encode(true)] * 2)
     }
 
     def "should catch wrong array length to encode"() {
+        def obj = [wrappedType, 12] as ArrayType
+
         when:
-        arrayType1.encode(new Boolean[length])
+        obj.encode(new Boolean[length])
 
         then:
         thrown IllegalArgumentException
@@ -207,47 +168,43 @@ class ArrayTypeSpec extends Specification {
         _ | 21
     }
 
-    def "should catch empty data to decode"() {
+    def "should catch empty array to encode"() {
+        def obj = [wrappedType] as ArrayType
+
         when:
-        arrayType1.decode([] as Hex32[])
+        obj.encode([] as Boolean[])
 
         then:
         thrown IllegalArgumentException
     }
 
     def "should catch wrong data to decode"() {
-        def parser1 = {
-            it == 'type1' ? Optional.of(wrappedType1) : Optional.empty()
-        } as Function
+        def parser = { Optional.of(wrappedType) } as Function
 
-        def parser2 = {
-            it == 'type2' ? Optional.of(wrappedType2) : Optional.empty()
-        } as Function
-
-        def obj = ArrayType.from({ -> [parser1, parser2] }, str).get()
+        def obj = ArrayType.from({ -> [parser] }, str).get()
 
         when:
-        obj.decode(hex as Hex32[])
+        obj.decode hex
 
         then:
         thrown IllegalArgumentException
 
         where:
-        str         | hex
-        'type1[1]'  | wrappedType1.encode(true) + wrappedType1.encode(true)
-        'type1[3]'  | wrappedType1.encode(true) + wrappedType1.encode(true)
-        'type1[]'   | [Type.encodeLength(2)] + wrappedType1.encode(true)
-        'type1[]'   | [Type.encodeLength(1)] + wrappedType1.encode(true) + wrappedType1.encode(true)
-        'type2[1]'  | [Type.encodeLength(Hex32.SIZE_BYTES)]
-        'type2[1]'  | [Type.encodeLength(2 * Hex32.SIZE_BYTES)] + wrappedType2.encode('xxx')
-        'type2[1]'  | [Type.encodeLength(Hex32.SIZE_BYTES)] + wrappedType2.encode('xxx') + wrappedType2.encode('xxx')
-        'type2[2]'  | [Type.encodeLength(2 * Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('A')
-        'type2[2]'  | [Type.encodeLength(2 * Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('A') + wrappedType2.encode('B') + wrappedType2.encode('C')
-        'type2[2]'  | [Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES), Type.encodeLength(2 * Hex32.SIZE_BYTES)] + wrappedType2.encode('A') + wrappedType2.encode('B')
-        'type2[2]'  | [Type.encodeLength(Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)] + wrappedType2.encode('A') + wrappedType2.encode('B')
-        'type2[]'   | [Type.encodeLength(1)] + [Type.encodeLength(Hex32.SIZE_BYTES)]
-        'type2[]'   | [Type.encodeLength(1)] + [Type.encodeLength(Hex32.SIZE_BYTES)] + wrappedType2.encode('1') + wrappedType2.encode('2')
-        'type2[]'   | [Type.encodeLength(2)] + [Type.encodeLength(2 * Hex32.SIZE_BYTES), Type.encodeLength((2 + wrappedType2.encode('A').size()) * Hex32.SIZE_BYTES)]
+        str     | hex
+        '_[1]'  | HexData.combine([wrappedType.encode(true)] * 2)
+        '_[3]'  | HexData.combine([wrappedType.encode(true)] * 2)
+        '_[]'   | Type.encodeLength(2).concat(wrappedType.encode(true))
+        '_[]'   | Type.encodeLength(1).concat([wrappedType.encode(true)] * 2)
+    }
+
+    def "should catch empty data to decode"() {
+        def obj = [wrappedType] as ArrayType
+
+        when:
+        obj.decode(HexData.EMPTY)
+
+        then:
+        thrown IllegalArgumentException
     }
 
     def "should calculate consistent hashcode"() {
@@ -256,22 +213,18 @@ class ArrayTypeSpec extends Specification {
 
         where:
         first                           | second
-        [wrappedType1] as ArrayType     | [wrappedType1] as ArrayType
-        [wrappedType2] as ArrayType     | [wrappedType2] as ArrayType
-        [wrappedType1, 12] as ArrayType | [wrappedType1, 12] as ArrayType
-        [wrappedType2, 21] as ArrayType | [wrappedType2, 21] as ArrayType
+        [wrappedType] as ArrayType      | [wrappedType] as ArrayType
+        [wrappedType, 12] as ArrayType  | [wrappedType, 12] as ArrayType
     }
 
     def "should be equal"() {
-        expect:
-        first == second
+        def obj = [wrappedType, 12] as ArrayType
 
-        where:
-        first                                       | second
-        arrayType1                                  | arrayType1
-        arrayType2                                  | arrayType2
-        arrayType1                                  | [wrappedType1, 12] as ArrayType
-        arrayType2                                  | [wrappedType2, 21] as ArrayType
+        expect:
+        obj == obj
+
+        and:
+        obj == [wrappedType, 12] as ArrayType
     }
 
     def "should not be equal"() {
@@ -279,35 +232,35 @@ class ArrayTypeSpec extends Specification {
         first != second
 
         where:
-        first                                       | second
-        arrayType1                                  | null
-        arrayType1                                  | arrayType2
-        arrayType2                                  | arrayType1
-        arrayType1                                  | [wrappedType1, 8] as ArrayType
-        arrayType2                                  | [wrappedType2, 12] as ArrayType
-        arrayType1                                  | new UIntType()
-        arrayType2                                  | "ABC"
+        first   | second
+        [wrappedType, 12] as ArrayType  | null
+        [wrappedType, 12] as ArrayType  | [wrappedType] as ArrayType
+        [wrappedType, 12] as ArrayType  | [wrappedType, 8] as ArrayType
+        [wrappedType, 12] as ArrayType  | new UIntType()
+        [wrappedType, 12] as ArrayType  | "ABC"
     }
 
     def "should be converted to a string representation with fixed length"() {
-        when:
-        def str = arrayType1 as String
-
-        then:
-        str ==~ /ArrayType\{.+}/
-        str.contains "type=${wrappedType1}"
-        str.contains 'length=12'
-    }
-
-    def "should be converted to a string representation without fixed length"() {
-        def obj = [wrappedType1] as ArrayType
+        def obj = [wrappedType, 12] as ArrayType
 
         when:
         def str = obj as String
 
         then:
         str ==~ /ArrayType\{.+}/
-        str.contains "type=${wrappedType1}"
+        str.contains "type=${wrappedType}"
+        str.contains 'length=12'
+    }
+
+    def "should be converted to a string representation without fixed length"() {
+        def obj = [wrappedType] as ArrayType
+
+        when:
+        def str = obj as String
+
+        then:
+        str ==~ /ArrayType\{.+}/
+        str.contains "type=${wrappedType}"
         str.contains 'length=-1'
     }
 }

@@ -44,21 +44,22 @@ class HexDataSpec extends Specification {
         x.bytes == bytes
 
         where:
-        hex         | bytes
-        '0x0'       | [0] as byte[]
-        '0x1'       | [1] as byte[]
-        '0x00'      | [0] as byte[]
-        '0x01'      | [1] as byte[]
-        '0x0f'      | [15] as byte[]
-        '0x23'      | [35] as byte[]
-        '0xff'      | [-1] as byte[]
-        '0x123'     | [1, 35] as byte[]
-        '0x0001'    | [0, 1] as byte[]
-        '0xABcD'    | [-85, -51] as byte[]
-        '0xff01'    | [-1, 1] as byte[]
-        '0x000000'  | [0, 0, 0] as byte[]
-        '0x000001'  | [0, 0, 1] as byte[]
-        '0xffffff'  | [-1, -1, -1] as byte[]
+        hex             | bytes
+        '0x0'           | [0] as byte[]
+        '0x1'           | [1] as byte[]
+        '0x00'          | [0] as byte[]
+        '0x01'          | [1] as byte[]
+        '0x0f'          | [15] as byte[]
+        '0x23'          | [35] as byte[]
+        '0xff'          | [-1] as byte[]
+        '0x123'         | [1, 35] as byte[]
+        '0x0001'        | [0, 1] as byte[]
+        '0xABcD'        | [-85, -51] as byte[]
+        '0xff01'        | [-1, 1] as byte[]
+        '0x000000'      | [0, 0, 0] as byte[]
+        '0x000001'      | [0, 0, 1] as byte[]
+        '0xffffff'      | [-1, -1, -1] as byte[]
+        '0x00000000'    | [0, 0, 0, 0] as byte[]
     }
 
     def "should throw on null value"() {
@@ -271,6 +272,7 @@ class HexDataSpec extends Specification {
         [0, 0, 0] as byte[]     | '0x000000'
         [0, 0, 1] as byte[]     | '0x000001'
         [-1, -1, -1] as byte[]  | '0xffffff'
+        [0, 0, 0, 0] as byte[]  | '0x00000000'
     }
 
     def "Equal"() {

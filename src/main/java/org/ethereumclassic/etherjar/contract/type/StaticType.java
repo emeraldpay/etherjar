@@ -1,13 +1,10 @@
 package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.ethereumclassic.etherjar.model.HexData;
 
 /**
- * Fixed-size elementary types.
+ * Fixed-size static elementary types.
  *
  * @see DynamicType
  * @see ReferenceType
@@ -25,40 +22,41 @@ public interface StaticType<T> extends Type<T> {
     }
 
     @Override
-    default long getFixedSize() {
+    default int getFixedSize() {
         return Hex32.SIZE_BYTES;
     }
 
     @Override
-    default List<? extends Hex32> encode(T obj) {
-        return Collections.singletonList(encodeSingle(obj));
+    default HexData encode(T obj) {
+        return encodeStatic(obj);
     }
 
     @Override
-    default T decode(Collection<? extends Hex32> data) {
-        if (data.size() != 1)
-            throw new IllegalArgumentException("Not single data length to decode: " + data.size());
+    default T decode(HexData data) {
+        if (data.getSize() != getFixedSize())
+            throw new IllegalArgumentException(
+                    "Wrong hex data length to decode: " + data.getSize());
 
-        return decodeSingle(data.iterator().next());
+        return decodeStatic(Hex32.from(data));
     }
 
     /**
-     * Encode an object to a single {@link Hex32}.
+     * Encode an object to a {@link Hex32}.
      *
      * @param obj an object
      * @return encoded hex
      *
-     * @see #encode(Object)
+     * @see #decodeStatic(Hex32)
      */
-    Hex32 encodeSingle(T obj);
+    Hex32 encodeStatic(T obj);
 
     /**
-     * Decode a single {@link Hex32} to an object.
+     * Decode a {@link Hex32} to an object.
      *
      * @param hex32 a hex32
      * @return decoded object
      *
-     * @see #decode(Hex32[])
+     * @see #encodeStatic(Object)
      */
-    T decodeSingle(Hex32 hex32);
+    T decodeStatic(Hex32 hex32);
 }

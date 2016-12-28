@@ -1,9 +1,8 @@
 package org.ethereumclassic.etherjar.contract.type
 
 import org.ethereumclassic.etherjar.model.Hex32
+import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
-
-import java.util.function.Function
 
 class StaticTypeSpec extends Specification {
 
@@ -15,12 +14,12 @@ class StaticTypeSpec extends Specification {
         }
 
         @Override
-        Hex32 encodeSingle(T obj) {
+        Hex32 encodeStatic(T obj) {
             throw new UnsupportedOperationException()
         }
 
         @Override
-        T decodeSingle(Hex32 hex32) {
+        T decodeStatic(Hex32 hex32) {
             throw new UnsupportedOperationException()
         }
     }
@@ -44,27 +43,22 @@ class StaticTypeSpec extends Specification {
         DEFAULT_TYPE.visit visitor
     }
 
-    def "should encode an object into a singleton list"() {
+    def "should encode an object into hex data"() {
         def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
 
-        def m = Stub(Function) { apply(123) >> hex }
-
-        def t = [encodeSingle: { m.apply it }] as StaticType
+        def t = [encodeStatic: { hex }] as StaticType
 
         when:
-        def arr = t.encode 123
+        def x = t.encode 123
 
         then:
-        arr.size() == 1
-        arr[0] == hex
+        x == hex
     }
 
-    def "should decode a singleton collection into an object"() {
-        def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
+    def "should decode hex data into an object"() {
+        def hex = HexData.from('0x0000000000000000000000000000000000000000000000000000000000000123')
 
-        def m = Stub(Function) { apply(hex) >> 123 }
-
-        def t = [decodeSingle: { m.apply it }] as StaticType
+        def t = [decodeStatic: { 123 }] as StaticType
 
         when:
         def obj = t.decode hex
@@ -73,7 +67,7 @@ class StaticTypeSpec extends Specification {
         obj == 123
     }
 
-    def "should catch empty or not single data to decode"() {
+    def "should catch empty or too long data to decode"() {
         when:
         DEFAULT_TYPE.decode data
 
@@ -82,7 +76,8 @@ class StaticTypeSpec extends Specification {
 
         where:
         _ | data
-        _ | []
-        _ | [Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000000')] * 2
+        _ | HexData.EMPTY
+        _ | HexData.from('0x' + '12' * 48)
+        _ | HexData.from('0x' + '00' * 64)
     }
 }

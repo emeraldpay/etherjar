@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.contract.type
 
 import org.ethereumclassic.etherjar.model.Hex32
+import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
 
 class DynamicTypeSpec extends Specification {
@@ -13,12 +14,12 @@ class DynamicTypeSpec extends Specification {
         }
 
         @Override
-        List<Hex32> encode(T obj) {
+        HexData encode(T obj) {
             throw new UnsupportedOperationException()
         }
 
         @Override
-        T decode(Collection<? extends Hex32> data) {
+        T decode(HexData data) {
             throw new UnsupportedOperationException()
         }
     }
