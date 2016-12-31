@@ -19,10 +19,13 @@ class ContractMethodSpec extends Specification {
 
     def setup() {
         def t1 = [
-                getCanonicalName: { 'fixed128x128' },
+                getCanonicalName: { 'fixed128x128[2]' },
                 isDynamic: { false },
-                getFixedSize: { Hex32.SIZE_BYTES },
-                encode: { Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000') },
+                getFixedSize: { Hex32.SIZE_BYTES * 2 },
+                encode: { HexData.combine(
+                        Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
+                        Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000'),
+                ) },
         ] as Type
 
         def t2 = [
@@ -33,13 +36,13 @@ class ContractMethodSpec extends Specification {
         ] as Type
 
         method = new ContractMethod.Builder()
-                .withName('bar').withInputTypes(t1, t1).withOutputTypes(t2).build()
+                .withName('bar').withInputTypes(t1).withOutputTypes(t2).build()
 
+        assert method.id == MethodId.fromSignature('bar', 'fixed128x128[2]')
         assert method.name == 'bar'
         assert !method.constant
-        assert method.inputTypes == [t1, t1] as ContractParametersTypes
+        assert method.inputTypes == [t1] as ContractParametersTypes
         assert method.outputTypes == [t2] as ContractParametersTypes
-        assert method.id == MethodId.fromSignature('bar', 'fixed128x128', 'fixed128x128')
     }
 
     def "should check method signature validity"() {
@@ -160,24 +163,15 @@ class ContractMethodSpec extends Specification {
         obj.outputTypes.isEmpty()
     }
 
-    def "should encode call 'bar(fixed[2])' with the with the argument [2.125, 8.5]"() {
+    def "should encode contract method call"() {
         def args = [[BigDecimal.valueOf(2.125), BigDecimal.valueOf(8.5)]]
 
         def data = HexData.combine(
                 Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
                 Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000'))
 
-        def type = [
-                getCanonicalName: { 'fixed128x128[2]' },
-                isDynamic: { false },
-                getFixedSize: { Hex32.SIZE_BYTES * 2 },
-                encode: { data },
-        ] as Type
-
-        def obj = new ContractMethod('bar', [type] as ContractParametersTypes)
-
         when:
-        def enc = obj.encodeCall(args as Object[])
+        def enc = method.encodeCall(args as Object[])
 
         then:
         enc.size == MethodId.SIZE_BYTES + Hex32.SIZE_BYTES * 2
@@ -195,7 +189,6 @@ class ContractMethodSpec extends Specification {
         where:
         _ | params
         _ | [] as Object[]
-        _ | [1] as Object[]
         _ | [1, 2, 3] as Object[]
     }
 
@@ -205,9 +198,9 @@ class ContractMethodSpec extends Specification {
 
         where:
         obj                                                 | str
-        method                                              | 'bar(fixed128x128,fixed128x128):(address)'
+        method                                              | 'bar(fixed128x128[2]):(address)'
         new ContractMethod.Builder().withName('bar')
-                .withInputTypes(method.inputTypes).build()  | 'bar(fixed128x128,fixed128x128)'
+                .withInputTypes(method.inputTypes).build()  | 'bar(fixed128x128[2])'
     }
 
     def "should calculate consistent hashcode"() {

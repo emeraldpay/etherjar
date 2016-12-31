@@ -50,7 +50,7 @@ public class ContractParametersTypes {
         Matcher m = ABI_PATTERN.matcher(signature);
 
         if (!m.matches())
-            throw new IllegalArgumentException("Wrong ABI parameters signature: " + signature);
+            throw new IllegalArgumentException("Wrong ABI parameters types signature: " + signature);
 
         List<Type> types = new ArrayList<>();
 
