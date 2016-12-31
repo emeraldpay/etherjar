@@ -9,13 +9,9 @@ import java.util.function.Function
 class TypeSpec extends Specification {
 
     def "should find an appropriate type"() {
-        def type = Stub(Type)
+        def type = Stub Type
 
-        def mock = Mock(Function) {
-            0 * apply(_)
-        }
-
-        Type.Repository repo = { -> [{ Optional.of type } as Function, mock] }
+        Type.Repository repo = { -> [{ Optional.of type } as Function] }
 
         when:
         def opt = repo.search '_'
@@ -26,7 +22,7 @@ class TypeSpec extends Specification {
     }
 
     def "should not find a type"() {
-        Type.Repository repo = { -> [{ Optional.empty() } as Function] }
+        Type.Repository repo = { -> [] }
 
         when:
         def opt = repo.search '_'
@@ -36,24 +32,28 @@ class TypeSpec extends Specification {
     }
 
     def "should catch null type string representation"() {
+        Type.Repository repo = { -> [] }
+
         when:
-        ({ -> [] } as Type.Repository).search null
+        repo.search null
 
         then:
         thrown NullPointerException
     }
 
     def "should catch empty type string representation"() {
+        Type.Repository repo = { -> [] }
+
         when:
-        ({ -> [] } as Type.Repository).search ''
+        repo.search ''
 
         then:
         thrown IllegalArgumentException
     }
 
     def "should append an ordinal type parser"() {
-        def parser1 = Stub(Function)
-        def parser2 = Stub(Function)
+        def parser1 = Stub Function
+        def parser2 = Stub Function
 
         Type.Repository repo1 = { -> [parser1] }
 
@@ -71,8 +71,8 @@ class TypeSpec extends Specification {
     }
 
     def "should append a recursive type parser"() {
-        def parser1 = Stub(Function)
-        def parser2 = Mock(BiFunction)
+        def parser1 = Stub Function
+        def parser2 = Mock BiFunction
 
         Type.Repository repo1 = { -> [parser1] }
 
@@ -136,17 +136,17 @@ class TypeSpec extends Specification {
     }
 
     def "should catch zero length after decoding"() {
+        def empty = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000000'
+
         when:
-        DynamicType.decodeLength(Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000000'))
+        DynamicType.decodeLength empty
 
         then:
         thrown IllegalArgumentException
     }
 
     def "should oppose static property to dynamic property"() {
-        def t = [
-                isDynamic: { flag },
-        ] as Type
+        def t = { flag } as Type
 
         expect:
         t.static == !t.dynamic

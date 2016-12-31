@@ -37,7 +37,7 @@ public class Extractor {
         return new FutureMap<>(result, new Function<String, Wei>() {
             @Override
             public Wei apply(String value) {
-                return new Wei(value);
+                return Wei.from(value);
             }
         });
     }

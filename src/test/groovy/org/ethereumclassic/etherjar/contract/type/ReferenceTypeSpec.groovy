@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.contract.type
 
 import org.ethereumclassic.etherjar.model.Hex32
+import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
 
 class ReferenceTypeSpec extends Specification {
@@ -13,7 +14,7 @@ class ReferenceTypeSpec extends Specification {
         }
 
         @Override
-        OptionalLong getFixedLength() {
+        OptionalInt getLength() {
             throw new UnsupportedOperationException()
         }
 
@@ -23,12 +24,12 @@ class ReferenceTypeSpec extends Specification {
         }
 
         @Override
-        List<Hex32> encode(T obj) {
+        HexData encode(T obj) {
             throw new UnsupportedOperationException()
         }
 
         @Override
-        T decode(Collection<? extends Hex32> data) {
+        T decode(HexData data) {
             throw new UnsupportedOperationException()
         }
     }
@@ -39,9 +40,9 @@ class ReferenceTypeSpec extends Specification {
         def t = [
                 getWrappedType: { [
                         isDynamic: { false },
-                        getFixedSize: { Hex32.SIZE_BYTES as long },
+                        getFixedSize: { Hex32.SIZE_BYTES },
                 ] as Type },
-                getFixedLength: { OptionalLong.of 123 },
+                getLength: { OptionalInt.of 123 },
         ] as ReferenceType
 
         expect:
@@ -53,9 +54,9 @@ class ReferenceTypeSpec extends Specification {
         def t = [
                 getWrappedType: { [
                         isDynamic: { true },
-                        getFixedSize: { Hex32.SIZE_BYTES as long },
+                        getFixedSize: { Hex32.SIZE_BYTES },
                 ] as Type },
-                getFixedLength: { OptionalLong.of 321 },
+                getLength: { OptionalInt.of 321 },
         ] as ReferenceType
 
         expect:
@@ -65,10 +66,8 @@ class ReferenceTypeSpec extends Specification {
 
     def "should recognize dynamic instance without fixed length "() {
         def t = [
-                getWrappedType: { [
-                        isDynamic: { true },
-                ] as Type },
-                getFixedLength: { OptionalLong.empty() },
+                getWrappedType: { ({ true } as Type) },
+                getLength: { OptionalInt.empty() },
         ] as ReferenceType
 
         expect:

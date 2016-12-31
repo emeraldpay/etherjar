@@ -13,9 +13,8 @@ import java.util.stream.Stream;
 public class UIntType extends NumericType {
 
     final static Map<Integer, BigInteger> MOST_POPULAR_MAX_VALUES =
-            Collections.unmodifiableMap(
-                    Stream.of(8, 16, 32, 64, 128, 256).collect(
-                            Collectors.toMap(Function.identity(), UIntType::maxValue)));
+            Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
+                    Collectors.toMap(Function.identity(), UIntType::maxValue), Collections::unmodifiableMap));
 
     final static String NAME_PREFIX = "uint";
 

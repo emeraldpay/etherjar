@@ -2,7 +2,7 @@ package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.Hex32;
 
-import java.util.OptionalLong;
+import java.util.OptionalInt;
 
 /**
  * A Fixed-size or non-fixed-size reference type with a wrapped {@link Type}.
@@ -21,13 +21,13 @@ public interface ReferenceType<T, W> extends Type<T> {
 
     @Override
     default boolean isDynamic() {
-        return getWrappedType().isDynamic() || !getFixedLength().isPresent();
+        return getWrappedType().isDynamic() || !getLength().isPresent();
     }
 
     @Override
-    default long getFixedSize() {
-        return getFixedLength().isPresent() ?
-                getFixedLength().getAsLong() * getWrappedType().getFixedSize() : Hex32.SIZE_BYTES;
+    default int getFixedSize() {
+        return getLength().isPresent() ?
+                getLength().getAsInt() * getWrappedType().getFixedSize() : Hex32.SIZE_BYTES;
     }
 
     /**
@@ -36,8 +36,8 @@ public interface ReferenceType<T, W> extends Type<T> {
     Type<W> getWrappedType();
 
     /**
-     * @return a fixed number of wrapped {@link Type} instances as {@link OptionalLong} value,
-     * or {@link OptionalLong#empty()} if this type has not fixed number of wrapped elements
+     * @return a fixed number of wrapped {@link Type} instances as {@link OptionalInt} value,
+     * or {@link OptionalInt#empty()} if this type has not fixed number of wrapped elements
      */
-    OptionalLong getFixedLength();
+    OptionalInt getLength();
 }
