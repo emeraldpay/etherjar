@@ -74,7 +74,7 @@ class ContractParametersTypesSpec extends Specification {
         obj == arr
     }
 
-    def "should catch not exist ABI types"() {
+    def "should catch not-exist ABI types"() {
         when:
         ContractParametersTypes.fromAbi({ -> [] }, abi)
 

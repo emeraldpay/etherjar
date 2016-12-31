@@ -84,7 +84,7 @@ class ContractMethodSpec extends Specification {
         obj == method
     }
 
-    def "should catch not exist ABI types"() {
+    def "should catch wrong ABI method signature"() {
         when:
         ContractMethod.fromAbi({ -> [] }, abi)
 
@@ -93,8 +93,9 @@ class ContractMethodSpec extends Specification {
 
         where:
         _ | abi
-        _ | 'baz(_)'
-        _ | 'baz(_,_)'
+        _ | 'baz(a, b)'
+        _ | 'bara,b)'
+        _ | 'bar(a,b'
     }
 
     def "should catch null ABIs"() {
@@ -203,10 +204,10 @@ class ContractMethodSpec extends Specification {
         obj.toAbi() == str
 
         where:
-        obj                                                                 | str
-        method                                                              | 'bar(fixed128x128,fixed128x128):(address)'
-        new ContractMethod.Builder()
-                .withName('bar').withInputTypes(method.inputTypes).build()  | 'bar(fixed128x128,fixed128x128)'
+        obj                                                 | str
+        method                                              | 'bar(fixed128x128,fixed128x128):(address)'
+        new ContractMethod.Builder().withName('bar')
+                .withInputTypes(method.inputTypes).build()  | 'bar(fixed128x128,fixed128x128)'
     }
 
     def "should calculate consistent hashcode"() {
