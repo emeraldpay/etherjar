@@ -37,7 +37,7 @@ class ContractParametersTypesSpec extends Specification {
         assert arr.types.size() == 3
     }
 
-    def "should check parameters array signature validity"() {
+    def "should check parameters types signature validity"() {
         expect:
         ContractParametersTypes.isAbiValid valid_sign
 
@@ -50,7 +50,7 @@ class ContractParametersTypesSpec extends Specification {
         _ | 'uint256,uint32[],bytes10,bytes'
     }
 
-    def "should check parameters array signature invalidity"() {
+    def "should check parameters types signature invalidity"() {
         expect:
         !ContractParametersTypes.isAbiValid(invalid_sign)
 
@@ -74,6 +74,19 @@ class ContractParametersTypesSpec extends Specification {
         obj == arr
     }
 
+    def "should catch wrong parameters types signature"() {
+        when:
+        ContractParametersTypes.fromAbi({ -> [] }, abi)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | abi
+        _ | 'a, b'
+        _ | 'abc,'
+    }
+
     def "should catch not-exist ABI types"() {
         when:
         ContractParametersTypes.fromAbi({ -> [] }, abi)
@@ -83,8 +96,8 @@ class ContractParametersTypesSpec extends Specification {
 
         where:
         _ | abi
-        _ | 'abc'
         _ | 'a,b'
+        _ | 'abc'
     }
 
     def "should create empty parameters from empty ABI"() {
@@ -247,7 +260,7 @@ class ContractParametersTypesSpec extends Specification {
         dec == [val1, val2, val3]
     }
 
-    def "should encode & decode empty parameters array"() {
+    def "should encode & decode empty parameters types"() {
         when:
         def hex = ContractParametersTypes.EMPTY.encode()
         def args = ContractParametersTypes.EMPTY.decode hex

@@ -22,7 +22,7 @@ public class ContractParametersTypes {
     final static Pattern ABI_PATTERN = Pattern.compile("[a-z0-9<>\\[\\]]*(,[a-z0-9<>\\[\\]]+)*");
 
     /**
-     * Check parameters array types ABI signature.
+     * Check parameters types ABI signature.
      *
      * @param signature a parameters signature string representation
      * @return {@code true} if <code>signature</code> is valid, otherwise
