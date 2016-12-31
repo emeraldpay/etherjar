@@ -83,8 +83,8 @@ class ContractParametersTypesSpec extends Specification {
 
         where:
         _ | abi
-        _ | '_'
-        _ | '_,_'
+        _ | 'abc'
+        _ | 'a,b'
     }
 
     def "should create empty parameters from empty ABI"() {
@@ -286,7 +286,7 @@ class ContractParametersTypesSpec extends Specification {
     }
 
     def "should throw exception when illegal tail bytes offset to decode"() {
-        def data = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000040'
+        def data = Hex32.from hex
 
         def type = [
                 getCanonicalName: { 'ccc' },
@@ -301,6 +301,11 @@ class ContractParametersTypesSpec extends Specification {
 
         then:
         thrown IllegalArgumentException
+
+        where:
+        _ | hex
+        _ | '0x0000000000000000000000000000000000000000000000000000000000000018'
+        _ | '0x0000000000000000000000000000000000000000000000000000000000000040'
     }
 
     def "should throw exception when wrong tail part of data to decode"() {

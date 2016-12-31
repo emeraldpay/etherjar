@@ -84,6 +84,19 @@ class ContractMethodSpec extends Specification {
         obj == method
     }
 
+    def "should catch not exist ABI types"() {
+        when:
+        ContractMethod.fromAbi({ -> [] }, abi)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | abi
+        _ | 'baz(_)'
+        _ | 'baz(_,_)'
+    }
+
     def "should catch null ABIs"() {
         when:
         ContractMethod.fromAbi({ -> [] }, abi)
