@@ -13,14 +13,12 @@ import java.util.stream.Stream;
 public class IntType extends NumericType {
 
     final static Map<Integer, BigInteger> MOST_POPULAR_MIN_VALUES =
-            Collections.unmodifiableMap(
-                    Stream.of(8, 16, 32, 64, 128, 256).collect(
-                            Collectors.toMap(Function.identity(), IntType::minValue)));
+            Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
+                    Collectors.toMap(Function.identity(), IntType::minValue), Collections::unmodifiableMap));
 
     final static Map<Integer, BigInteger> MOST_POPULAR_MAX_VALUES =
-            Collections.unmodifiableMap(
-                    Stream.of(8, 16, 32, 64, 128, 256).collect(
-                            Collectors.toMap(Function.identity(), IntType::maxValue)));
+            Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
+                    Collectors.toMap(Function.identity(), IntType::maxValue), Collections::unmodifiableMap));
 
     final static String NAME_PREFIX = "int";
 

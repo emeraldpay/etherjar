@@ -66,9 +66,7 @@ class ReferenceTypeSpec extends Specification {
 
     def "should recognize dynamic instance without fixed length "() {
         def t = [
-                getWrappedType: { [
-                        isDynamic: { true },
-                ] as Type },
+                getWrappedType: { ({ true } as Type) },
                 getLength: { OptionalInt.empty() },
         ] as ReferenceType
 

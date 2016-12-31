@@ -1,14 +1,15 @@
 package org.ethereumclassic.etherjar.contract;
 
 import org.ethereumclassic.etherjar.contract.type.Type;
-import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.MethodId;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * A smart contract methods (either a constructor or a function).
@@ -18,7 +19,8 @@ import java.util.stream.Collectors;
  */
 public class ContractMethod {
 
-    final static Pattern ABI_PATTERN = Pattern.compile("([_a-zA-Z][_a-zA-Z0-9]*)\\((\\S*)\\)");
+    final static Pattern ABI_PATTERN =
+            Pattern.compile("([_a-zA-Z]\\w*)\\(([^:()\\s]*)\\)(?::\\((\\S*)\\))?");
 
     /**
      * Check contract method ABI signature.
@@ -53,18 +55,10 @@ public class ContractMethod {
 
         String name = m.group(1);
 
-        List<Type> types = new ArrayList<>();
+        ContractParametersTypes in = ContractParametersTypes.fromAbi(repo, m.group(2));
+        ContractParametersTypes out = ContractParametersTypes.fromAbi(repo, m.group(3));
 
-        for (String str : m.group(2).split(",")) {
-            Optional<Type> type = repo.search(str);
-
-            if (!type.isPresent())
-                throw new IllegalArgumentException("Unknown input parameter type format: " + str);
-
-            types.add(type.get());
-        }
-
-        return new Builder().name(name).inputTypes(types).build();
+        return new Builder().withName(name).withInputTypes(in).withOutputTypes(out).build();
     }
 
     public static class Builder {
@@ -73,15 +67,15 @@ public class ContractMethod {
 
         private boolean isConstant = false;
 
-        private Collection<? extends Type> inputTypes = Collections.emptyList();
+        private ContractParametersTypes inputTypes = ContractParametersTypes.EMPTY;
 
-        private Collection<? extends Type> outputTypes = Collections.emptyList();
+        private ContractParametersTypes outputTypes = ContractParametersTypes.EMPTY;
 
         /**
          * @param name a contract methods name
          * @return builder instance
          */
-        public Builder name(String name) {
+        public Builder withName(String name) {
             this.name = Objects.requireNonNull(name);
 
             return this;
@@ -99,36 +93,52 @@ public class ContractMethod {
         }
 
         /**
-         * @param types contract methods input types
+         * @param types input parameters types
          * @return builder instance
          */
-        public Builder inputTypes(Type... types) {
-            return inputTypes(Arrays.asList(types));
+        public Builder withInputTypes(Type... types) {
+            return withInputTypes(new ContractParametersTypes(types));
         }
 
         /**
-         * @param types a contract methods input types collection
+         * @param types input parameters types
          * @return builder instance
          */
-        public Builder inputTypes(Collection<? extends Type> types) {
+        public Builder withInputTypes(Collection<? extends Type> types) {
+            return withInputTypes(new ContractParametersTypes(types));
+        }
+
+        /**
+         * @param types input parameters array
+         * @return builder instance
+         */
+        public Builder withInputTypes(ContractParametersTypes types) {
             inputTypes = Objects.requireNonNull(types);
 
             return this;
         }
 
         /**
-         * @param types contract methods output types
+         * @param types output parameters types
          * @return builder instance
          */
-        public Builder outputTypes(Type... types) {
-            return outputTypes(Arrays.asList(types));
+        public Builder withOutputTypes(Type... types) {
+            return withOutputTypes(new ContractParametersTypes(types));
         }
 
         /**
-         * @param types a contract methods output types collection
+         * @param types output parameters types
          * @return builder instance
          */
-        public Builder outputTypes(Collection<? extends Type> types) {
+        public Builder withOutputTypes(Collection<? extends Type> types) {
+            return withOutputTypes(new ContractParametersTypes(types));
+        }
+
+        /**
+         * @param types output parameters array
+         * @return builder instance
+         */
+        public Builder withOutputTypes(ContractParametersTypes types) {
             outputTypes = Objects.requireNonNull(types);
 
             return this;
@@ -147,74 +157,35 @@ public class ContractMethod {
         }
     }
 
-    /**
-     * Calculate a summary number of encoded fixed-size bytes for given types.
-     *
-     * @param types a {@link Collection} of {@link Type}
-     * @return a number of encoded fixed-size bytes
-     */
-    static long sumFixedSize(Collection<? extends Type> types) {
-        return types.stream().mapToLong(Type::getFixedSize).sum();
-    }
-
-    /**
-     * Convert a type collection to a collection of canonical names.
-     *
-     * @param types a {@link Collection} of {@link Type}
-     * @return a {@link Collection} of {@link String}
-     */
-    static Collection<String> convert(Collection<? extends Type> types) {
-        return types.stream().map(Type::getCanonicalName).collect(Collectors.toList());
-    }
-
-    /**
-     * Join a type collection to a string with the help of {@code delimiter}.
-     *
-     * @param types a {@link Collection} of {@link Type}
-     * @param delimiter the delimiter to be used between each names
-     * @return a joined by {@code delimiter} string
-     */
-    static String join(Collection<? extends Type> types, CharSequence delimiter) {
-        return types.stream().map(Type::getCanonicalName).collect(Collectors.joining(delimiter));
-    }
-
     private final MethodId id;
 
     private final String name;
 
     private final boolean isConstant;
 
-    private final List<Type> inputTypes;
+    private final ContractParametersTypes inputTypes;
 
-    private final List<Type> outputTypes;
+    private final ContractParametersTypes outputTypes;
 
-    private final transient long encodedFixedSize;
-
-    public ContractMethod(String name, Type... inputTypes) {
-        this(name, false, Arrays.asList(inputTypes), Collections.emptyList());
+    public ContractMethod(String name) {
+        this(name, false, ContractParametersTypes.EMPTY, ContractParametersTypes.EMPTY);
     }
 
-    public ContractMethod(String name, Collection<? extends Type> inputTypes) {
-        this(name, false, inputTypes, Collections.emptyList());
+    public ContractMethod(String name, ContractParametersTypes inputTypes) {
+        this(name, false, inputTypes, ContractParametersTypes.EMPTY);
     }
 
-    public ContractMethod(String name, boolean isConstant, Type... inputTypes) {
-        this(name, isConstant, Arrays.asList(inputTypes), Collections.emptyList());
-    }
-
-    public ContractMethod(String name, boolean isConstant, Collection<? extends Type> inputTypes) {
-        this(name, isConstant, inputTypes, Collections.emptyList());
+    public ContractMethod(String name, boolean isConstant, ContractParametersTypes inputTypes) {
+        this(name, isConstant, inputTypes, ContractParametersTypes.EMPTY);
     }
 
     public ContractMethod(String name, boolean isConstant,
-                          Collection<? extends Type> inputTypes,
-                          Collection<? extends Type> outputTypes) {
-        this.id = MethodId.fromSignature(name, convert(inputTypes));
+                          ContractParametersTypes inputTypes, ContractParametersTypes outputTypes) {
+        this.id = MethodId.fromSignature(name, inputTypes.toCanonicalNames());
         this.name = Objects.requireNonNull(name);
         this.isConstant = isConstant;
-        this.inputTypes = Collections.unmodifiableList(new ArrayList<>(inputTypes));
-        this.outputTypes = Collections.unmodifiableList(new ArrayList<>(outputTypes));
-        this.encodedFixedSize = sumFixedSize(inputTypes);
+        this.inputTypes = Objects.requireNonNull(inputTypes);
+        this.outputTypes = Objects.requireNonNull(outputTypes);
     }
 
     /**
@@ -242,86 +213,62 @@ public class ContractMethod {
     }
 
     /**
-     * @return the methods parameter types
+     * @return the method's expect parameters
      */
-    public List<Type> getInputTypes() {
+    public ContractParametersTypes getInputTypes() {
         return inputTypes;
     }
 
     /**
-     * @return the methods return types
+     * @return the method's return parameters
      */
-    public List<Type> getOutputTypes() {
+    public ContractParametersTypes getOutputTypes() {
         return outputTypes;
     }
 
     /**
-     * Get a head fixed-size bytes required for encoding.
+     * Encode call data, so you can call the contract through some other means (for example, through RPC).
      *
-     * @return a number of head fixed-size bytes
-     */
-    public long getEncodedFixedSize() {
-        return encodedFixedSize;
-    }
-
-    /**
-     * Encodes call data, so you can call the contract through some other means (for example, through RPC).
-     *
-     * @param params parameters of the call
+     * @param args parameters of the call
      * @return {@link HexData} encoded call
      *
      * @see #encodeCall(Collection)
+     * @see #decodeResponse(HexData)
      */
-    public HexData encodeCall(Object... params) {
-        return encodeCall(Arrays.asList(params));
+    public HexData encodeCall(Object... args) {
+        return encodeCall(Arrays.asList(args));
     }
 
     /**
-     * Encodes call data, so you can call the contract through some other means (for example, through RPC).
+     * Encode call data, so you can call the contract through some other means (for example, through RPC).
      *
      * <p><b>Example:</b> <code>baz(uint32,bool)</code> with arguments <tt>(69, true)</tt> becomes
      * <tt>0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001</tt>
      *
-     * @param params parameters of the call
+     * @param args arguments values of the call
      * @return {@link HexData} encoded call
+     *
+     * @see #encodeCall(Object...)
+     * @see #decodeResponse(HexData)
      *
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector-and-argument-encoding">Function Selector and Argument Encoding</a>
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
-    @SuppressWarnings("unchecked")
-    public HexData encodeCall(Collection<?> params) {
-        if (inputTypes.size() != params.size())
-            throw new IllegalArgumentException("Wrong number of input parameters: " + params.size());
+    public HexData encodeCall(Collection<?> args) {
+        return id.concat(inputTypes.encode(args));
+    }
 
-        List<HexData> buf =
-                new ArrayList<>((int) (encodedFixedSize / Hex32.SIZE_BYTES) + 1);
-
-        buf.add(id);
-
-        int i = 0;
-
-        long tailBytesSize = 0;
-
-        List<Hex32> tail = new ArrayList<>();
-
-        for (Object obj : params) {
-            Type type = inputTypes.get(i++);
-
-            List<Hex32> data = type.encode(obj);
-
-            if (type.isStatic()) {
-                buf.addAll(data);
-            } else {
-                buf.add(Type.encodeLength(encodedFixedSize + tailBytesSize));
-
-                tailBytesSize += data.size() * Hex32.SIZE_BYTES;
-                tail.addAll(data);
-            }
-        }
-
-        buf.addAll(tail);
-
-        return HexData.from(buf);
+    /**
+     * Decode contract method response {@link HexData}.
+     *
+     * @param data a hex data
+     * @return a list of decoded objects
+     *
+     * @see #encodeCall(Object...)
+     * @see #encodeCall(Collection)
+     */
+    public List<?> decodeResponse(HexData data) {
+        return outputTypes.decode(data);
     }
 
     /**
@@ -330,7 +277,8 @@ public class ContractMethod {
      * @return a string
      */
     public String toAbi() {
-        return name + '(' + join(inputTypes, ",") + ')';
+        return String.format("%s(%s)", name, inputTypes.toAbi())
+                + (outputTypes.isEmpty() ? "" : String.format(":(%s)", outputTypes.toAbi()));
     }
 
     @Override
@@ -354,7 +302,7 @@ public class ContractMethod {
 
     @Override
     public String toString() {
-        return String.format("%s{id=%s,name=%s,isConstant=%b,expects=%s,returns=%s}",
+        return String.format("%s{id=%s,name=%s,isConstant=%b,inputTypes=%s,outputTypes=%s}",
                 getClass().getSimpleName(), id, name, isConstant, inputTypes, outputTypes);
     }
 }

@@ -44,9 +44,9 @@ class StaticTypeSpec extends Specification {
     }
 
     def "should encode an object into hex data"() {
-        def hex = Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000123')
+        def hex = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000123'
 
-        def t = [encodeStatic: { hex }] as StaticType
+        def t = { hex } as StaticType
 
         when:
         def x = t.encode 123
@@ -56,9 +56,9 @@ class StaticTypeSpec extends Specification {
     }
 
     def "should decode hex data into an object"() {
-        def hex = HexData.from('0x0000000000000000000000000000000000000000000000000000000000000123')
+        def hex = HexData.from '0x0000000000000000000000000000000000000000000000000000000000000123'
 
-        def t = [decodeStatic: { 123 }] as StaticType
+        def t = { 123 } as StaticType
 
         when:
         def obj = t.decode hex

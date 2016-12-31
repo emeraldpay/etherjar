@@ -24,8 +24,8 @@ class ArrayTypeSpec extends Specification {
     }
 
     def "should parse string representation"() {
-        def type = Stub(Type)
-        def parser = Mock(Function)
+        def type = Stub Type
+        def parser = Mock Function
 
         when:
         ArrayType.from({ -> [parser] }, input)
@@ -82,7 +82,7 @@ class ArrayTypeSpec extends Specification {
 
     def "should detect unknown array wrapped type"() {
         when:
-        ArrayType.from({ -> [{ Optional.empty() } as Function] }, input)
+        ArrayType.from({ -> [] }, input)
 
         then:
         thrown IllegalArgumentException
@@ -114,7 +114,7 @@ class ArrayTypeSpec extends Specification {
 
     def "should detect dynamic wrapped types"() {
         when:
-        new ArrayType([isDynamic: { true }] as Type)
+        new ArrayType({ true } as Type)
 
         then:
         thrown IllegalArgumentException
@@ -133,7 +133,7 @@ class ArrayTypeSpec extends Specification {
     }
 
     def "should encode & decode array values"() {
-        def parser = { Optional.of(wrappedType) } as Function
+        def parser = { Optional.of wrappedType } as Function
 
         def obj = ArrayType.from({ -> [parser] }, str).get()
 
@@ -179,7 +179,7 @@ class ArrayTypeSpec extends Specification {
     }
 
     def "should catch wrong data to decode"() {
-        def parser = { Optional.of(wrappedType) } as Function
+        def parser = { Optional.of wrappedType } as Function
 
         def obj = ArrayType.from({ -> [parser] }, str).get()
 
@@ -248,7 +248,7 @@ class ArrayTypeSpec extends Specification {
 
         then:
         str ==~ /ArrayType\{.+}/
-        str.contains "type=${wrappedType}"
+        str.contains "type=$wrappedType"
         str.contains 'length=12'
     }
 
@@ -260,7 +260,7 @@ class ArrayTypeSpec extends Specification {
 
         then:
         str ==~ /ArrayType\{.+}/
-        str.contains "type=${wrappedType}"
+        str.contains "type=$wrappedType"
         str.contains 'length=-1'
     }
 }

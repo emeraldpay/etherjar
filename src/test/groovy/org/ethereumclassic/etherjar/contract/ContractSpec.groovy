@@ -17,68 +17,35 @@ class ContractSpec extends Specification {
         methods << new ContractMethod('sam')
 
         contract = new Contract(Address.EMPTY, methods as ContractMethod[])
+
+        assert contract.address == Address.EMPTY
+        assert contract.methods == methods
     }
 
     def "should build an empty contract by default"() {
         def obj = new Contract.Builder().build()
 
         expect:
-        obj == new Contract(Address.EMPTY)
+        obj == [Address.EMPTY] as Contract
     }
 
     def "should rebuild similar contract"() {
-        def obj = new Contract.Builder().address(contract.address)
-                .methods(contract.methods as ContractMethod[]).build()
+        def obj = new Contract.Builder().withAddress(contract.address)
+                .withMethods(contract.methods as ContractMethod[]).build()
 
         expect:
         obj == contract
     }
 
-    def "should be created correctly"() {
-        expect:
-        contract.address == Address.EMPTY
-        contract.getMethods().size() == 3
-    }
-
     def "should be steady for external modifications"() {
         def coll = [] + contract.methods
-        def obj = new Contract(contract.address, coll)
+        def obj = [contract.address, coll] as Contract
 
         when:
         coll.clear()
 
         then:
         obj.methods.size() == 3
-    }
-
-    def "should find a contract method by a signature id"() {
-        when:
-        def opt = contract.findMethod(id)
-
-        then:
-        opt.present
-        opt.get().id == id
-
-        where:
-        id << contract.methods*.id
-    }
-
-    def "should catch a non-existent contract method signatures id"() {
-        expect:
-        !contract.findMethod(id).present
-
-        where:
-        _ | id
-        _ | new MethodId([0xff, 0xff, 0xff, 0xff] as byte[])
-        _ | new MethodId([0x11, 0x11, 0x11, 0x11] as byte[])
-    }
-
-    def "should catch null method signature ids"() {
-        when:
-        contract.findMethod null
-
-        then:
-        thrown NullPointerException
     }
 
     def "should return the contract methods collection"() {
@@ -93,7 +60,7 @@ class ContractSpec extends Specification {
         id << contract.methods*.id
     }
 
-    def "should check the returned methods collection for immutability"() {
+    def "should return immutable methods collection"() {
         def coll = contract.methods
 
         when:
@@ -101,6 +68,38 @@ class ContractSpec extends Specification {
 
         then:
         thrown UnsupportedOperationException
+    }
+
+    def "should find a contract method by a signature id"() {
+        when:
+        def opt = contract.findMethod id
+
+        then:
+        opt.get().id == id
+
+        where:
+        id << contract.methods*.id
+    }
+
+    def "should catch a non-existent contract method signatures id"() {
+        when:
+        def opt = contract.findMethod id
+
+        then:
+        !opt.present
+
+        where:
+        _ | id
+        _ | new MethodId([0xff, 0xff, 0xff, 0xff] as byte[])
+        _ | new MethodId([0x11, 0x11, 0x11, 0x11] as byte[])
+    }
+
+    def "should catch null method signature ids"() {
+        when:
+        contract.findMethod null
+
+        then:
+        thrown NullPointerException
     }
 
     def "should calculate consistent hashcode"() {
@@ -141,6 +140,6 @@ class ContractSpec extends Specification {
         expect:
         str ==~ /Contract\{.+}/
         str.contains 'address=0x0000000000000000000000000000000000000000'
-        str.contains "methods=${contract.methods}"
+        str.contains "methods=$contract.methods"
     }
 }

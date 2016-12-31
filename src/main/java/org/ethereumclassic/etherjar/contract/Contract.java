@@ -22,7 +22,7 @@ public class Contract {
          * @param address a contract address
          * @return the current builder object
          */
-        public Builder address(Address address) {
+        public Builder withAddress(Address address) {
             this.address = Objects.requireNonNull(address);
 
             return this;
@@ -32,15 +32,15 @@ public class Contract {
          * @param methods contract methods
          * @return the current builder object
          */
-        public Builder methods(ContractMethod... methods) {
-            return methods(Arrays.asList(methods));
+        public Builder withMethods(ContractMethod... methods) {
+            return withMethods(Arrays.asList(methods));
         }
 
         /**
          * @param methods a contract methods collection
          * @return the current builder object
          */
-        public Builder methods(Collection<ContractMethod> methods) {
+        public Builder withMethods(Collection<ContractMethod> methods) {
             this.methods = Objects.requireNonNull(methods);
 
             return this;
@@ -58,7 +58,7 @@ public class Contract {
 
     private final Address address;
 
-    private final Collection<ContractMethod> methods;
+    private final List<ContractMethod> methods;
 
     public Contract(Address address, ContractMethod... methods) {
         this(address, Arrays.asList(methods));
@@ -66,7 +66,7 @@ public class Contract {
 
     public Contract(Address address, Collection<ContractMethod> methods) {
         this.address = Objects.requireNonNull(address);
-        this.methods = Collections.unmodifiableCollection(new ArrayList<>(methods));
+        this.methods = Collections.unmodifiableList(new ArrayList<>(methods));
     }
 
     /**
@@ -81,9 +81,9 @@ public class Contract {
     /**
      * Get all contract's methods.
      *
-     * @return a methods collection
+     * @return a list of methods
      */
-    public Collection<ContractMethod> getMethods() {
+    public List<ContractMethod> getMethods() {
         return methods;
     }
 

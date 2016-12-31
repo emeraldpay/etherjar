@@ -2,8 +2,6 @@ package org.ethereumclassic.etherjar.model
 
 import spock.lang.Specification
 
-import java.util.function.Function
-
 /**
  * @author Igor Artamonov
  */
@@ -120,7 +118,7 @@ class HexDataSpec extends Specification {
 
     def "should extract hex data"() {
         when:
-        def x = hex.extract(size, offset)
+        def x = hex.extract size, offset
 
         then:
         x == res
@@ -140,7 +138,7 @@ class HexDataSpec extends Specification {
         def x = HexData.from '0x0123456789abcdef'
 
         when:
-        def y = x.extract(size, offset, conv as Function)
+        def y = x.extract size, offset, conv
 
         then:
         y == res
@@ -178,15 +176,15 @@ class HexDataSpec extends Specification {
 
     def "should split empty data"() {
         expect:
-        HexData.EMPTY.split(0).size() == 0
+        !HexData.EMPTY.split(0)
     }
 
     def "should split hex data"() {
         when:
-        def x = hex.split(size, offset)
+        def x = hex.split size, offset
 
         then:
-        x == res
+        Arrays.equals(x, res as HexData[])
 
         where:
         hex                                 | size  | offset    | res
@@ -203,16 +201,15 @@ class HexDataSpec extends Specification {
         def x = HexData.from '0x0123456789abcdef'
 
         when:
-        def y = x.split(size, offset, conv as Function)
+        def y = x.split size, offset, gen, conv
 
         then:
-        y == res
+        Arrays.deepEquals(y, res.asType(gen(0).getClass()))
 
         where:
-        size    | offset    | conv              | res
-        1       | 4         | { it.toHex() }    | ['0x89', '0xab', '0xcd', '0xef']
-        2       | 2         | { it.getSize() }  | [2, 2, 2]
-        4       | 4         | { it.bytes }      | [[0x89, 0xab, 0xcd, 0xef]] as byte[][]
+        size    | offset    | gen                   | conv              | res
+        1       | 4         | { new String[it] }    | { it.toHex() }    | ['0x89', '0xab', '0xcd', '0xef']
+        4       | 4         | { new byte[it][] }    | { it.bytes }      | [[0x89, 0xab, 0xcd, 0xef]] as byte[][]
     }
 
     def "should catch wrong split arguments"() {
@@ -234,19 +231,17 @@ class HexDataSpec extends Specification {
         HexData.from('0x0123456789abcdef')  | 2     | 3
     }
 
-    def "should split to unmodified list"() {
-        def x = HexData.from('0x0123456789abcdef').split(8)
-
+    def "should catch null split array generator"() {
         when:
-        x.clear()
+        HexData.from(1).split(1, null, { it.toHex() })
 
         then:
-        thrown UnsupportedOperationException
+        thrown NullPointerException
     }
 
-    def "should catch null split converter"() {
+    def "should catch null split type converter"() {
         when:
-        HexData.from(1).split(1, null)
+        HexData.from(1).split(1, { new int[it] }, null)
 
         then:
         thrown NullPointerException
@@ -296,8 +291,8 @@ class HexDataSpec extends Specification {
     }
 
     def "Equal is symmetric"() {
-        def x = HexData.from'0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
-        def y = BlockHash.from'0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def x = HexData.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def y = BlockHash.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
 
         expect:
         x == y

@@ -3,13 +3,13 @@ package org.ethereumclassic.etherjar.model;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Fixed size value, such as Wallet Address, represented in Hex.
@@ -192,69 +192,73 @@ public class HexData {
     }
 
     /**
-     * Returns a list of {@link HexData} were split by required <tt>size</tt>
+     * Returns an array of {@link HexData} were split by required <tt>size</tt>
      * bytes from start.
      *
      * @param size a size in bytes to split by
-     * @return a list of created type instances
+     * @return an array of split hex data
      * @throws IllegalArgumentException if the hex data length
      * is not a multiple of given <tt>size</tt>
      * @see #split(int, int)
      */
-    public List<HexData> split(int size) {
-        return split(size, 0, Function.identity());
+    public HexData[] split(int size) {
+        return split(size, 0, HexData[]::new, Function.identity());
     }
 
     /**
-     * Returns a list of the elements were split by required <tt>size</tt>
+     * Returns an array of the elements were split by required <tt>size</tt>
      * bytes from start.
      *
      * @param size a size in bytes to split by
+     * @param gen a function which produces a new array of the desired
+     *            type and the provided length
      * @param conv a converter from hex data into required object type
      * @param <T> the element type of the resulting array
-     * @return a list of created type instances
+     * @return an array of split type instances
      * @throws IllegalArgumentException if the hex data length
      * is not a multiple of given <tt>size</tt>
-     * @see #split(int, int, Function)
+     * @see #split(int, int, IntFunction, Function)
      */
-    public <T> List<T> split(int size, Function<? super HexData, T> conv) {
-        return split(size, 0, conv);
+    public <T> T[] split(int size, IntFunction<T[]> gen, Function<? super HexData, T> conv) {
+        return split(size, 0, gen, conv);
     }
 
     /**
-     * Returns a list of {@link HexData} were split by required <tt>size</tt>
+     * Returns an array of {@link HexData} were split by required <tt>size</tt>
      * bytes and from <tt>offset</tt>.
      *
      * @param size a size in bytes to split by
      * @param offset an offset in bytes to split from
-     * @return a list of created type instances
+     * @return an array of split hex data
      * @throws IllegalArgumentException if the summary length to split
      * is not a multiple of given <tt>size</tt>
      * @see #split(int)
      */
-    public List<HexData> split(int size, int offset) {
-        return split(size, offset, Function.identity());
+    public HexData[] split(int size, int offset) {
+        return split(size, offset, HexData[]::new, Function.identity());
     }
 
     /**
-     * Returns a list of the elements were split by required <tt>size</tt>
+     * Returns an array of the elements were split by required <tt>size</tt>
      * bytes and from <tt>offset</tt>, using the provided {@code conv}
-     * function to convert {@link HexData} into required object type:
+     * function to convert {@link HexData} into required object type.
      *
      * <pre>{@code
-     *     List<String> coll = data.split(32, 0, data::toHex);
+     *     List<String> coll = data.split(32, 0, String[]::new, data::toHex);
      * }</pre>
      *
      * @param size a size in bytes to split by
      * @param offset an offset in bytes to split from
+     * @param gen a function which produces a new array of the desired
+     *            type and the provided length
      * @param conv a converter from hex data into required object type
      * @param <T> the element type of the resulting array
-     * @return a list of created type instances
+     * @return an array of split type instances
      * @throws IllegalArgumentException if the summary length to split
      * is not a multiple of given <tt>size</tt>
-     * @see #split(int, Function)
+     * @see #split(int, IntFunction, Function)
      */
-    public <T> List<T> split(int size, int offset, Function<? super HexData, T> conv) {
+    public <T> T[] split(int size, int offset, IntFunction<T[]> gen, Function<? super HexData, T> conv) {
         Objects.requireNonNull(conv);
 
         if (size < 0 || offset < 0)
@@ -267,13 +271,12 @@ public class HexData {
             throw new IllegalArgumentException("Length to split is not a multiple of " + size);
 
         if (size == 0)
-            return Collections.emptyList();
+            return gen.apply(0);
 
         Stream<byte[]> stream = IntStream.range(0, (getSize() - offset) / size)
-                .map(i -> i * size + offset).mapToObj(i -> Arrays.copyOfRange(value, i, i + size));
+                .map(i -> i * size + offset).mapToObj(j -> Arrays.copyOfRange(value, j, j + size));
 
-        return stream.map(HexData::new).map(conv::apply)
-                .collect(Collectors.collectingAndThen(toList(), Collections::unmodifiableList));
+        return stream.map(HexData::new).map(conv::apply).toArray(gen);
     }
 
     public String toHex() {
