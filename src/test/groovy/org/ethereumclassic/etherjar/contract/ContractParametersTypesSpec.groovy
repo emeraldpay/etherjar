@@ -391,10 +391,7 @@ class ContractParametersTypesSpec extends Specification {
     }
 
     def "should be converted to a string representation"() {
-        def str = arr as String
-
         expect:
-        str ==~ /ContractParametersTypes\{.+}/
-        str.contains "types=$arr.types"
+        arr as String == 'a,bb,ccc'
     }
 }

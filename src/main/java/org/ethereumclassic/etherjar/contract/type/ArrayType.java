@@ -152,7 +152,6 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
 
     @Override
     public String toString() {
-        return String.format("%s{type=%s,length=%d}",
-                getClass().getSimpleName(), type, length);
+        return getCanonicalName();
     }
 }

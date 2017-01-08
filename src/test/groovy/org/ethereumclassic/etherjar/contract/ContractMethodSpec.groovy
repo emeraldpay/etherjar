@@ -234,14 +234,7 @@ class ContractMethodSpec extends Specification {
     }
 
     def "should be converted to a string representation"() {
-        def str = method as String
-
         expect:
-        str ==~ /ContractMethod\{.+}/
-        str.contains "id=$method.id"
-        str.contains "name=$method.name"
-        str.contains "isConstant=$method.constant"
-        str.contains "inputTypes=$method.inputTypes"
-        str.contains "outputTypes=$method.outputTypes"
+        method as String == 'bar(fixed128x128[2]):(address)'
     }
 }

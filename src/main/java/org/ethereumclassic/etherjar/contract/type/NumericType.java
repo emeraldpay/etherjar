@@ -134,4 +134,9 @@ public abstract class NumericType implements StaticType<BigInteger> {
         return bytes == other.bytes
                 && isSigned == other.isSigned;
     }
+
+    @Override
+    public String toString() {
+        return getCanonicalName();
+    }
 }

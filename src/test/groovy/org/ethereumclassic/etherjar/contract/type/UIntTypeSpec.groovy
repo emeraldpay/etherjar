@@ -130,15 +130,4 @@ class UIntTypeSpec extends Specification {
         128     | 'uint128'
         256     | 'uint256'
     }
-
-    def "should be converted to a string representation"() {
-        def type = [64] as UIntType
-
-        when:
-        def str = type as String
-
-        then:
-        str ==~ /UIntType\{.+}/
-        str.contains 'bytes=8'
-    }
 }

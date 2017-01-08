@@ -247,6 +247,6 @@ public class ContractParametersTypes {
 
     @Override
     public String toString() {
-        return String.format("%s{types=%s}", getClass().getSimpleName(), types);
+        return toAbi();
     }
 }

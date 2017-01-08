@@ -302,7 +302,6 @@ public class ContractMethod {
 
     @Override
     public String toString() {
-        return String.format("%s{id=%s,name=%s,isConstant=%b,inputTypes=%s,outputTypes=%s}",
-                getClass().getSimpleName(), id, name, isConstant, inputTypes, outputTypes);
+        return toAbi();
     }
 }

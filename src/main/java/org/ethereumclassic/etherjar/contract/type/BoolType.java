@@ -48,6 +48,6 @@ public class BoolType extends NumericType {
 
     @Override
     public String toString() {
-        return String.format("%s{}", getClass().getSimpleName());
+        return getCanonicalName();
     }
 }

@@ -143,15 +143,4 @@ class IntTypeSpec extends Specification {
         128     | 'int128'
         256     | 'int256'
     }
-
-    def "should be converted to a string representation"() {
-        def type = [64] as IntType
-
-        when:
-        def str = type as String
-
-        then:
-        str ==~ /IntType\{.+}/
-        str.contains 'bytes=8'
-    }
 }
