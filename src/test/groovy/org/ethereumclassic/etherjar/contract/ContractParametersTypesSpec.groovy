@@ -37,7 +37,7 @@ class ContractParametersTypesSpec extends Specification {
         assert arr.types.size() == 3
     }
 
-    def "should check parameters array signature validity"() {
+    def "should check parameters types signature validity"() {
         expect:
         ContractParametersTypes.isAbiValid valid_sign
 
@@ -50,7 +50,7 @@ class ContractParametersTypesSpec extends Specification {
         _ | 'uint256,uint32[],bytes10,bytes'
     }
 
-    def "should check parameters array signature invalidity"() {
+    def "should check parameters types signature invalidity"() {
         expect:
         !ContractParametersTypes.isAbiValid(invalid_sign)
 
@@ -74,7 +74,7 @@ class ContractParametersTypesSpec extends Specification {
         obj == arr
     }
 
-    def "should catch not exist ABI types"() {
+    def "should catch wrong parameters types signature"() {
         when:
         ContractParametersTypes.fromAbi({ -> [] }, abi)
 
@@ -83,8 +83,21 @@ class ContractParametersTypesSpec extends Specification {
 
         where:
         _ | abi
-        _ | '_'
-        _ | '_,_'
+        _ | 'a, b'
+        _ | 'abc,'
+    }
+
+    def "should catch not-exist ABI types"() {
+        when:
+        ContractParametersTypes.fromAbi({ -> [] }, abi)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | abi
+        _ | 'a,b'
+        _ | 'abc'
     }
 
     def "should create empty parameters from empty ABI"() {
@@ -247,7 +260,7 @@ class ContractParametersTypesSpec extends Specification {
         dec == [val1, val2, val3]
     }
 
-    def "should encode & decode empty parameters array"() {
+    def "should encode & decode empty parameters types"() {
         when:
         def hex = ContractParametersTypes.EMPTY.encode()
         def args = ContractParametersTypes.EMPTY.decode hex
@@ -286,7 +299,7 @@ class ContractParametersTypesSpec extends Specification {
     }
 
     def "should throw exception when illegal tail bytes offset to decode"() {
-        def data = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000040'
+        def data = Hex32.from hex
 
         def type = [
                 getCanonicalName: { 'ccc' },
@@ -301,6 +314,11 @@ class ContractParametersTypesSpec extends Specification {
 
         then:
         thrown IllegalArgumentException
+
+        where:
+        _ | hex
+        _ | '0x0000000000000000000000000000000000000000000000000000000000000018'
+        _ | '0x0000000000000000000000000000000000000000000000000000000000000040'
     }
 
     def "should throw exception when wrong tail part of data to decode"() {
@@ -373,10 +391,7 @@ class ContractParametersTypesSpec extends Specification {
     }
 
     def "should be converted to a string representation"() {
-        def str = arr as String
-
         expect:
-        str ==~ /ContractParametersTypes\{.+}/
-        str.contains "types=$arr.types"
+        arr as String == 'a,bb,ccc'
     }
 }

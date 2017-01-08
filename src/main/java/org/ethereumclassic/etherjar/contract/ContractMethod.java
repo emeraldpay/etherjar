@@ -109,7 +109,7 @@ public class ContractMethod {
         }
 
         /**
-         * @param types input parameters array
+         * @param types input parameters types
          * @return builder instance
          */
         public Builder withInputTypes(ContractParametersTypes types) {
@@ -135,7 +135,7 @@ public class ContractMethod {
         }
 
         /**
-         * @param types output parameters array
+         * @param types output parameters types
          * @return builder instance
          */
         public Builder withOutputTypes(ContractParametersTypes types) {
@@ -302,7 +302,6 @@ public class ContractMethod {
 
     @Override
     public String toString() {
-        return String.format("%s{id=%s,name=%s,isConstant=%b,inputTypes=%s,outputTypes=%s}",
-                getClass().getSimpleName(), id, name, isConstant, inputTypes, outputTypes);
+        return toAbi();
     }
 }

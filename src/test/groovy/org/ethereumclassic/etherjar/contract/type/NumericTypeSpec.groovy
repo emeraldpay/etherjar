@@ -31,7 +31,7 @@ class NumericTypeSpec extends Specification {
 
         @Override
         String getCanonicalName() {
-            throw new UnsupportedOperationException()
+            'impl'
         }
     }
 
@@ -363,5 +363,10 @@ class NumericTypeSpec extends Specification {
         DEFAULT_TYPE    | null
         DEFAULT_TYPE    | [64, true] as NumericTypeImpl
         DEFAULT_TYPE    | new UIntType()
+    }
+
+    def "should be converted to a string representation"() {
+        expect:
+        DEFAULT_TYPE as String == 'impl'
     }
 }

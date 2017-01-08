@@ -22,7 +22,7 @@ public class ContractParametersTypes {
     final static Pattern ABI_PATTERN = Pattern.compile("[a-z0-9<>\\[\\]]*(,[a-z0-9<>\\[\\]]+)*");
 
     /**
-     * Check parameters array types ABI signature.
+     * Check parameters types ABI signature.
      *
      * @param signature a parameters signature string representation
      * @return {@code true} if <code>signature</code> is valid, otherwise
@@ -50,7 +50,7 @@ public class ContractParametersTypes {
         Matcher m = ABI_PATTERN.matcher(signature);
 
         if (!m.matches())
-            throw new IllegalArgumentException("Wrong ABI parameters signature: " + signature);
+            throw new IllegalArgumentException("Wrong ABI parameters types signature: " + signature);
 
         List<Type> types = new ArrayList<>();
 
@@ -247,6 +247,6 @@ public class ContractParametersTypes {
 
     @Override
     public String toString() {
-        return String.format("%s{types=%s}", getClass().getSimpleName(), types);
+        return toAbi();
     }
 }

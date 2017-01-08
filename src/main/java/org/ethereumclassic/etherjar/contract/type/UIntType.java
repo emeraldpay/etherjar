@@ -78,9 +78,4 @@ public class UIntType extends NumericType {
 
     @Override
     public String getCanonicalName() { return "uint" + getBits(); }
-
-    @Override
-    public String toString() {
-        return String.format("%s{bytes=%s}", getClass().getSimpleName(), getBytes());
-    }
 }

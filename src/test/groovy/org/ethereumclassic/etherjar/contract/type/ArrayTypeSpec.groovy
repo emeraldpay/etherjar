@@ -243,24 +243,14 @@ class ArrayTypeSpec extends Specification {
     def "should be converted to a string representation with fixed length"() {
         def obj = [wrappedType, 12] as ArrayType
 
-        when:
-        def str = obj as String
-
-        then:
-        str ==~ /ArrayType\{.+}/
-        str.contains "type=$wrappedType"
-        str.contains 'length=12'
+        expect:
+        obj as String == 'ABC[12]'
     }
 
     def "should be converted to a string representation without fixed length"() {
         def obj = [wrappedType] as ArrayType
 
-        when:
-        def str = obj as String
-
-        then:
-        str ==~ /ArrayType\{.+}/
-        str.contains "type=$wrappedType"
-        str.contains 'length=-1'
+        expect:
+        obj as String == 'ABC[]'
     }
 }

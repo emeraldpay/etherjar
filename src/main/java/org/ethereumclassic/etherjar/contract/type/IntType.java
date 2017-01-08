@@ -91,9 +91,4 @@ public class IntType extends NumericType {
 
     @Override
     public String getCanonicalName() { return "int" + getBits(); }
-
-    @Override
-    public String toString() {
-        return String.format("%s{bytes=%s}", getClass().getSimpleName(), getBytes());
-    }
 }

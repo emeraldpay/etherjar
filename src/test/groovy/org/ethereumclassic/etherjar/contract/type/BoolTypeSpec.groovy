@@ -65,10 +65,7 @@ class BoolTypeSpec extends Specification {
     }
 
     def "should be converted to a string representation"() {
-        when:
-        def str = DEFAULT_TYPE as String
-
-        then:
-        str == 'BoolType{}'
+        expect:
+        DEFAULT_TYPE as String == 'bool'
     }
 }
