@@ -11,10 +11,12 @@ import java.util.List;
 @JsonDeserialize(using = TraceItemJsonDeserializer.class)
 public class TraceItemJson {
 
+    private TraceType type;
     private Action action;
     private BlockHash blockHash;
     private Long blockNumber;
     private Result result;
+    private String error;
     private Long subtraces;
     private List<Long> traceAddress;
     private TransactionId transactionHash;
@@ -22,6 +24,14 @@ public class TraceItemJson {
 
     public Action getAction() {
         return action;
+    }
+
+    public TraceType getType() {
+        return type;
+    }
+
+    public void setType(TraceType type) {
+        this.type = type;
     }
 
     public void setAction(Action action) {
@@ -50,6 +60,14 @@ public class TraceItemJson {
 
     public void setResult(Result result) {
         this.result = result;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 
     public Long getSubtraces() {
@@ -85,81 +103,17 @@ public class TraceItemJson {
     }
 
     public static class Action {
-        private ActionCall call;
-        private ActionCreate create;
-        private ActionSuicide suicide;
 
-        public ActionCall getCall() {
-            return call;
-        }
-
-        public void setCall(ActionCall call) {
-            this.call = call;
-        }
-
-        public ActionCreate getCreate() {
-            return create;
-        }
-
-        public void setCreate(ActionCreate create) {
-            this.create = create;
-        }
-
-        public ActionSuicide getSuicide() {
-            return suicide;
-        }
-
-        public void setSuicide(ActionSuicide suicide) {
-            this.suicide = suicide;
-        }
-    }
-
-    public static class ActionCreate {
-        private Address from;
-        private HexQuantity gas;
-        private HexData init;
-        private Wei value;
-
-        public Address getFrom() {
-            return from;
-        }
-
-        public void setFrom(Address from) {
-            this.from = from;
-        }
-
-        public HexQuantity getGas() {
-            return gas;
-        }
-
-        public void setGas(HexQuantity gas) {
-            this.gas = gas;
-        }
-
-        public HexData getInit() {
-            return init;
-        }
-
-        public void setInit(HexData init) {
-            this.init = init;
-        }
-
-        public Wei getValue() {
-            return value;
-        }
-
-        public void setValue(Wei value) {
-            this.value = value;
-        }
-    }
-
-    public static class ActionCall {
         private CallType callType;
         private Address from;
         private HexQuantity gas;
+        private HexData init;
         private HexData input;
         private Address to;
         private Wei value;
+        private Address address;
+        private Wei balance;
+        private Address refundAddress;
 
         public CallType getCallType() {
             return callType;
@@ -185,6 +139,14 @@ public class TraceItemJson {
             this.gas = gas;
         }
 
+        public HexData getInit() {
+            return init;
+        }
+
+        public void setInit(HexData init) {
+            this.init = init;
+        }
+
         public HexData getInput() {
             return input;
         }
@@ -208,12 +170,6 @@ public class TraceItemJson {
         public void setValue(Wei value) {
             this.value = value;
         }
-    }
-
-    public static class ActionSuicide {
-        private Address address;
-        private Wei balance;
-        private Address refundAddress;
 
         public Address getAddress() {
             return address;
@@ -240,60 +196,19 @@ public class TraceItemJson {
         }
     }
 
-    public static class CallType {
-        private List call;
+    public static enum CallType {
+        NONE, CALL, CALLCODE, DELEGATECALL;
+    }
 
-        public List getCall() {
-            return call;
-        }
-
-        public void setCall(List call) {
-            this.call = call;
-        }
+    public static enum TraceType {
+        CREATE, CALL, SUICIDE;
     }
 
     public static class Result {
-        private ResultCall call;
-        private ResultCreate create;
-        private List failedCall;
-        private List none;
-
-        public ResultCall getCall() {
-            return call;
-        }
-
-        public void setCall(ResultCall call) {
-            this.call = call;
-        }
-
-        public ResultCreate getCreate() {
-            return create;
-        }
-
-        public void setCreate(ResultCreate create) {
-            this.create = create;
-        }
-
-        public List getFailedCall() {
-            return failedCall;
-        }
-
-        public void setFailedCall(List failedCall) {
-            this.failedCall = failedCall;
-        }
-
-        public List getNone() {
-            return none;
-        }
-
-        public void setNone(List none) {
-            this.none = none;
-        }
-    }
-
-    public static class ResultCall {
         private HexQuantity gasUsed;
         private HexData output;
+        private Address address;
+        private HexData code;
 
         public HexQuantity getGasUsed() {
             return gasUsed;
@@ -310,12 +225,6 @@ public class TraceItemJson {
         public void setOutput(HexData output) {
             this.output = output;
         }
-    }
-
-    public static class ResultCreate {
-        private Address address;
-        private HexData code;
-        private HexQuantity gasUsed;
 
         public Address getAddress() {
             return address;
@@ -331,14 +240,6 @@ public class TraceItemJson {
 
         public void setCode(HexData code) {
             this.code = code;
-        }
-
-        public HexQuantity getGasUsed() {
-            return gasUsed;
-        }
-
-        public void setGasUsed(HexQuantity gasUsed) {
-            this.gasUsed = gasUsed;
         }
     }
 

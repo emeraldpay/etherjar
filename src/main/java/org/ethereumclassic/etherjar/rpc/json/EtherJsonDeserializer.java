@@ -2,6 +2,7 @@ package org.ethereumclassic.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NumericNode;
 import org.ethereumclassic.etherjar.model.*;
 
 /**
@@ -32,11 +33,12 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
     }
 
     protected HexQuantity getQuantity(JsonNode node, String name) {
-        String value = getHexString(node, name);
-        if (value == null) return null;
-        return HexQuantity.from(value);
+        return getQuantity(node.get(name));
     }
     protected HexQuantity getQuantity(JsonNode node) {
+        if (node instanceof NumericNode) {
+            return HexQuantity.from(node.longValue());
+        }
         String value = getHexString(node);
         if (value == null) return null;
         return HexQuantity.from(value);
