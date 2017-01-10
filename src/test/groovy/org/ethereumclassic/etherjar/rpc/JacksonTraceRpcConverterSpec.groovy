@@ -1,7 +1,5 @@
 package org.ethereumclassic.etherjar.rpc
 
-import oracle.jvm.hotspot.jfr.TraceTypes
-import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.TraceItemJson
 import spock.lang.Specification
 
