@@ -20,42 +20,36 @@ public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJs
         JsonNode node = jp.readValueAsTree();
         TraceItemJson trace = new TraceItemJson();
 
+        JsonNode typeNode = node.get("type");
+        if (typeNode != null) {
+            String type = typeNode.asText();
+            if (type != null) {
+                trace.setType(TraceItemJson.TraceType.valueOf(type.toUpperCase()));
+            }
+        }
+
         JsonNode actionNode = node.get("action");
         if (actionNode != null && actionNode.isObject()) {
             TraceItemJson.Action action = new TraceItemJson.Action();
             trace.setAction(action);
-            JsonNode callNode = actionNode.get("call");
-            if (callNode != null && callNode.isObject()) {
-                TraceItemJson.ActionCall call = new TraceItemJson.ActionCall();
-                action.setCall(call);
-                JsonNode callType = callNode.get("callType");
-                if (callType != null && callType.isObject()) {
-                    //TODO fill with data
-                    call.setCallType(new TraceItemJson.CallType());
+
+            JsonNode callType = actionNode.get("callType");
+            if (callType != null) {
+                String name = callType.asText();
+                if (name != null && name.length() > 0) {
+                    action.setCallType(TraceItemJson.CallType.valueOf(name.toUpperCase()));
                 }
-                call.setFrom(getAddress(callNode, "from"));
-                call.setGas(getQuantity(callNode, "gas"));
-                call.setInput(getData(callNode, "input"));
-                call.setTo(getAddress(callNode, "to"));
-                call.setValue(getWei(callNode, "value"));
             }
-            JsonNode createNode = actionNode.get("create");
-            if (createNode != null && createNode.isObject()) {
-                TraceItemJson.ActionCreate create = new TraceItemJson.ActionCreate();
-                action.setCreate(create);
-                create.setFrom(getAddress(createNode, "from"));
-                create.setGas(getQuantity(createNode, "gas"));
-                create.setInit(getData(createNode, "init"));
-                create.setValue(getWei(createNode, "value"));
-            }
-            JsonNode suicideNode = actionNode.get("suicide");
-            if (suicideNode != null && suicideNode.isObject()) {
-                TraceItemJson.ActionSuicide suicide = new TraceItemJson.ActionSuicide();
-                action.setSuicide(suicide);
-                suicide.setAddress(getAddress(suicideNode, "address"));
-                suicide.setBalance(getWei(suicideNode, "balance"));
-                suicide.setRefundAddress(getAddress(suicideNode, "refundAddress"));
-            }
+            action.setFrom(getAddress(actionNode, "from"));
+            action.setGas(getQuantity(actionNode, "gas"));
+            action.setInput(getData(actionNode, "input"));
+            action.setTo(getAddress(actionNode, "to"));
+            action.setValue(getWei(actionNode, "value"));
+            action.setInit(getData(actionNode, "init"));
+            action.setAddress(getAddress(actionNode, "address"));
+            action.setBalance(getWei(actionNode, "balance"));
+            action.setRefundAddress(getAddress(actionNode, "refundAddress"));
+
         }
         trace.setBlockHash(getBlockHash(node, "blockHash"));
         trace.setBlockNumber(getLong(node, "blockNumber"));
@@ -64,31 +58,18 @@ public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJs
         if (resultNode != null && resultNode.isObject()) {
             TraceItemJson.Result result = new TraceItemJson.Result();
             trace.setResult(result);
-            JsonNode callNode = resultNode.get("call");
-            if (callNode != null && callNode.isObject()) {
-                TraceItemJson.ResultCall call = new TraceItemJson.ResultCall();
-                result.setCall(call);
-                call.setGasUsed(getQuantity(callNode, "gasUsed"));
-                call.setOutput(getData(callNode, "output"));
-            }
-            JsonNode createNode = resultNode.get("create");
-            if (createNode != null && createNode.isObject()) {
-                TraceItemJson.ResultCreate create = new TraceItemJson.ResultCreate();
-                result.setCreate(create);
-                create.setAddress(getAddress(createNode, "address"));
-                create.setCode(getData(createNode, "code"));
-                create.setGasUsed(getQuantity(createNode, "gasUsed"));
-            }
-            JsonNode failedCallNode = resultNode.get("failedCall");
-            if (failedCallNode != null) {
-                result.setFailedCall(Collections.emptyList());
-            }
-            JsonNode noneNode = resultNode.get("none");
-            if (noneNode != null) {
-                result.setNone(Collections.emptyList());
-            }
-        }
 
+            result.setGasUsed(getQuantity(resultNode, "gasUsed"));
+            result.setOutput(getData(resultNode, "output"));
+
+            result.setAddress(getAddress(resultNode, "address"));
+            result.setCode(getData(resultNode, "code"));
+            result.setGasUsed(getQuantity(resultNode, "gasUsed"));
+        }
+        JsonNode errorNode = node.get("error");
+        if (errorNode != null) {
+            trace.setError(errorNode.textValue());
+        }
         trace.setSubtraces(getLong(node, "subtraces"));
         JsonNode traceAddrNode = node.get("traceAddress");
         if (traceAddrNode != null && traceAddrNode.isArray()) {
