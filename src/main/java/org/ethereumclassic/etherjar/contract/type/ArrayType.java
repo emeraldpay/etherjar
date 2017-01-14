@@ -109,7 +109,7 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
         }
 
         if (arr.length == 0) {
-            buf.add(Hex32.EMPTY);
+            buf.add(new HexData(new byte[getWrappedType().getFixedSize()]));
         }
 
         for (T obj : arr) {

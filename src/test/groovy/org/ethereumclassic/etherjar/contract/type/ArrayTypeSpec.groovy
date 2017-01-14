@@ -15,9 +15,9 @@ class ArrayTypeSpec extends Specification {
         wrappedType = [
                 getCanonicalName: { 'ABC' },
                 isDynamic: { false },
-                getFixedSize: { Hex32.SIZE_BYTES },
+                getFixedSize: { 64 },
                 encode: { Boolean bool ->
-                    Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000001')
+                    HexData.from('0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001')
                 },
                 decode: { true },
         ] as Type
@@ -152,7 +152,7 @@ class ArrayTypeSpec extends Specification {
         '_[1]'  | [true]                | wrappedType.encode(true)
         '_[3]'  | [true, true, true]    | HexData.combine([wrappedType.encode(true)] * 3)
         '_[]'   | [true, true]          | Type.encodeLength(2).concat([wrappedType.encode(true)] * 2)
-        '_[]'   | []                    | Type.encodeLength(0).concat(Hex32.EMPTY)
+        '_[]'   | []                    | Type.encodeLength(0).concat(HexData.from('0x' + '00' * wrappedType.fixedSize))
     }
 
     def "should catch wrong array length to encode"() {

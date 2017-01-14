@@ -35,9 +35,6 @@ public class BytesType implements DynamicType<byte[]> {
 
     @Override
     public HexData encode(byte... bytes) {
-        if (bytes.length == 0)
-            throw new IllegalArgumentException("Empty array of bytes to encode");
-
         HexData len = Type.encodeLength(bytes.length);
 
         return len.concat(new HexData(bytes),
@@ -48,7 +45,8 @@ public class BytesType implements DynamicType<byte[]> {
     public byte[] decode(HexData data) {
         int len = Type.decodeLength(data.extract(Hex32.SIZE_BYTES, Hex32::from)).intValueExact();
 
-        if (data.getSize() < len + Hex32.SIZE_BYTES)
+        if ((len == 0 && data.getSize() != Hex32.SIZE_BYTES * 2)
+                || (len != 0 && data.getSize() < Hex32.SIZE_BYTES + len))
             throw new IllegalArgumentException("Insufficient data to decode bytes: " + data);
 
         return data.extract(len, Hex32.SIZE_BYTES).getBytes();
