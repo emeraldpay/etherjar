@@ -74,8 +74,11 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
         if (type.isDynamic())
             throw new IllegalArgumentException("Array wrapped type is not static: " + type);
 
+        if (length == 0)
+            throw new IllegalArgumentException("Empty array fixed length");
+
         this.type = type;
-        this.length = length <= 0 ? -1 : length;
+        this.length = length < 0 ? -1 : length;
     }
 
     @Override
@@ -96,9 +99,6 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
 
     @Override
     public HexData encode(T[] arr) {
-        if (arr.length == 0)
-            throw new IllegalArgumentException("Empty array to encode");
-
         if (getLength().isPresent() && arr.length != getLength().getAsInt())
             throw new IllegalArgumentException("Wrong array length to encode: " + arr.length);
 
@@ -106,6 +106,10 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
 
         if (!getLength().isPresent()) {
             buf.add(Type.encodeLength(arr.length));
+        }
+
+        if (arr.length == 0) {
+            buf.add(Hex32.EMPTY);
         }
 
         for (T obj : arr) {
@@ -124,10 +128,11 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
         HexData[] arr = data.split(
                 getWrappedType().getFixedSize(), getLength().isPresent() ? 0 : Hex32.SIZE_BYTES);
 
-        if (arr.length != len)
+        if ((len == 0 && arr.length != 1) || (len != 0 && arr.length != len))
             throw new IllegalArgumentException("Wrong data length to decode: " + arr.length);
 
-        return (T[]) Arrays.stream(arr).map(it -> getWrappedType().decode(it)).toArray();
+        return (T[]) (len == 0 ? new Object[0] :
+                Arrays.stream(arr).map(it -> getWrappedType().decode(it)).toArray());
     }
 
     @Override

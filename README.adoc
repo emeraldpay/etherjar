@@ -18,7 +18,7 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 
 ## Principles
 
-* Async first
+* Async first approach
 * Value objects (thread-safe immutability)
 * HTTP Transport and JSON parser agnostic
 

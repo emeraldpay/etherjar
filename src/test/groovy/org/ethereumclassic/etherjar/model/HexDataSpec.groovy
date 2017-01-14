@@ -176,7 +176,7 @@ class HexDataSpec extends Specification {
 
     def "should split empty data"() {
         expect:
-        !HexData.EMPTY.split(0)
+        !HexData.EMPTY.split(8)
     }
 
     def "should split hex data"() {
@@ -195,6 +195,7 @@ class HexDataSpec extends Specification {
         HexData.from('0x0123456789abcdef')  | 2     | 4         | [HexData.from('0x89ab'), HexData.from('0xcdef')]
         HexData.from('0x0123456789abcdef')  | 3     | 2         | [HexData.from('0x456789'), HexData.from('0xabcdef')]
         HexData.from('0x0123456789abcdef')  | 8     | 0         | [HexData.from('0x0123456789abcdef')]
+        HexData.from('0x0123456789abcdef')  | 8     | 8         | []
     }
 
     def "should split custom instances"() {
@@ -210,6 +211,7 @@ class HexDataSpec extends Specification {
         size    | offset    | gen                   | conv              | res
         1       | 4         | { new String[it] }    | { it.toHex() }    | ['0x89', '0xab', '0xcd', '0xef']
         4       | 4         | { new byte[it][] }    | { it.bytes }      | [[0x89, 0xab, 0xcd, 0xef]] as byte[][]
+        4       | 8         | { new byte[it][] }    | { it.bytes }      | [] as byte[][]
     }
 
     def "should catch wrong split arguments"() {
@@ -225,7 +227,6 @@ class HexDataSpec extends Specification {
         HexData.EMPTY                       | -1    | 0
         HexData.EMPTY                       | 0     | -1
         HexData.from('0x1234')              | 2     | 1
-        HexData.from('0x1234')              | 1     | 2
         HexData.from('0x0123456789abcdef')  | 3     | 0
         HexData.from('0x0123456789abcdef')  | 4     | 2
         HexData.from('0x0123456789abcdef')  | 2     | 3
