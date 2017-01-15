@@ -35,19 +35,22 @@ public class BytesType implements DynamicType<byte[]> {
 
     @Override
     public HexData encode(byte... bytes) {
-        HexData len = Type.encodeLength(bytes.length);
+        int rem = bytes.length % Hex32.SIZE_BYTES;
 
-        return len.concat(new HexData(bytes),
-                new HexData(new byte[Hex32.SIZE_BYTES - (bytes.length % Hex32.SIZE_BYTES)]));
+        HexData data = Type.encodeLength(bytes.length).concat(new HexData(bytes));
+
+        return rem == 0 ? data : data.concat(new HexData(new byte[Hex32.SIZE_BYTES - rem]));
     }
 
     @Override
     public byte[] decode(HexData data) {
         int len = Type.decodeLength(data.extract(Hex32.SIZE_BYTES, Hex32::from)).intValueExact();
 
-        if ((len == 0 && data.getSize() != Hex32.SIZE_BYTES * 2)
-                || (len != 0 && data.getSize() < Hex32.SIZE_BYTES + len))
-            throw new IllegalArgumentException("Insufficient data to decode bytes: " + data);
+        int size = len % Hex32.SIZE_BYTES == 0 ? len :
+                len + Hex32.SIZE_BYTES - len % Hex32.SIZE_BYTES;
+
+        if (data.getSize() != Hex32.SIZE_BYTES + size)
+            throw new IllegalArgumentException("Wrong data length to decode bytes: " + data);
 
         return data.extract(len, Hex32.SIZE_BYTES).getBytes();
     }

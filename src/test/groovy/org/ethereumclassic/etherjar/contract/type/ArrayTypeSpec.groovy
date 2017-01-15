@@ -1,6 +1,5 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Shared
 import spock.lang.Specification
@@ -152,7 +151,7 @@ class ArrayTypeSpec extends Specification {
         '_[1]'  | [true]                | wrappedType.encode(true)
         '_[3]'  | [true, true, true]    | HexData.combine([wrappedType.encode(true)] * 3)
         '_[]'   | [true, true]          | Type.encodeLength(2).concat([wrappedType.encode(true)] * 2)
-        '_[]'   | []                    | Type.encodeLength(0).concat(HexData.from('0x' + '00' * wrappedType.fixedSize))
+        '_[]'   | []                    | Type.encodeLength(0)
     }
 
     def "should catch wrong array length to encode"() {
@@ -184,7 +183,10 @@ class ArrayTypeSpec extends Specification {
 
         where:
         str     | hex
-        '_[]'   | Type.encodeLength(0)
+        '_[]'   | Type.encodeLength(0).concat(wrappedType.encode(true))
+        '_[]'   | Type.encodeLength(2).concat(wrappedType.encode(true))
+        '_[1]'   | Type.encodeLength(1).concat([wrappedType.encode(true)] * 2)
+        '_[3]'   | Type.encodeLength(3)
     }
 
     def "should catch empty data to decode"() {

@@ -108,10 +108,6 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
             buf.add(Type.encodeLength(arr.length));
         }
 
-        if (arr.length == 0) {
-            buf.add(new HexData(new byte[getWrappedType().getFixedSize()]));
-        }
-
         for (T obj : arr) {
             buf.add(getWrappedType().encode(obj));
         }
@@ -128,11 +124,10 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
         HexData[] arr = data.split(
                 getWrappedType().getFixedSize(), getLength().isPresent() ? 0 : Hex32.SIZE_BYTES);
 
-        if ((len == 0 && arr.length != 1) || (len != 0 && arr.length != len))
-            throw new IllegalArgumentException("Wrong data length to decode: " + arr.length);
+        if (arr.length != len)
+            throw new IllegalArgumentException("Wrong data length to decode array: " + data);
 
-        return (T[]) (len == 0 ? new Object[0] :
-                Arrays.stream(arr).map(it -> getWrappedType().decode(it)).toArray());
+        return (T[]) Arrays.stream(arr).map(it -> getWrappedType().decode(it)).toArray();
     }
 
     @Override
