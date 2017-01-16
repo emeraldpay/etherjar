@@ -121,11 +121,12 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
         int len = getLength().isPresent() ? getLength().getAsInt() :
                 Type.decodeLength(data.extract(Hex32.SIZE_BYTES, Hex32::from)).intValueExact();
 
-        HexData[] arr = data.split(
-                getWrappedType().getFixedSize(), getLength().isPresent() ? 0 : Hex32.SIZE_BYTES);
+        int offset = getLength().isPresent() ? 0 : Hex32.SIZE_BYTES;
 
-        if (arr.length != len)
+        if (data.getSize() != offset + getWrappedType().getFixedSize() * len)
             throw new IllegalArgumentException("Wrong data length to decode array: " + data);
+
+        HexData[] arr = data.split(getWrappedType().getFixedSize(), offset);
 
         return (T[]) Arrays.stream(arr).map(it -> getWrappedType().decode(it)).toArray();
     }

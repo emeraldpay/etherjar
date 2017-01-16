@@ -2,6 +2,10 @@ package org.ethereumclassic.etherjar.contract.type;
 
 import org.ethereumclassic.etherjar.model.HexData;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -9,6 +13,10 @@ import java.util.Optional;
  * Dynamic sized unicode string assumed to be UTF-8 encoded.
  */
 public class StringType implements DynamicType<String> {
+
+    final static Charset UTF_8_CHARSET = Charset.forName(StandardCharsets.UTF_8.name());
+
+    final static BytesType BYTES_TYPE = new BytesType();
 
     /**
      * Try to parse a {@link StringType} string representation (either canonical form or not).
@@ -33,13 +41,19 @@ public class StringType implements DynamicType<String> {
     }
 
     @Override
-    public HexData encode(String obj) {
-        return null;
+    public HexData encode(String str) {
+        return BYTES_TYPE.encode(str.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public String decode(HexData data) {
-        return null;
+        ByteBuffer buffer = ByteBuffer.wrap(BYTES_TYPE.decode(data));
+
+        try {
+            return UTF_8_CHARSET.newDecoder().decode(buffer).toString();
+        } catch (CharacterCodingException e) {
+            throw new IllegalArgumentException("Incorrect 'UTF-8' character encoding: " + data);
+        }
     }
 
     @Override
