@@ -25,6 +25,6 @@ Vagrant.configure("2") do |config|
       dpkg -i ${DEB}
     fi
 
-    parity --chain dev --jsonrpc-interface all
+    parity --chain dev --jsonrpc-interface all --jsonrpc-hosts all
   SHELL
 end
