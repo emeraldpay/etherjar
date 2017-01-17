@@ -1,13 +1,12 @@
 = EtherJar
 
-:page-layout: base
+:rootdir: .
+:imagesdir: {rootdir}/images
+:toclevels: 2
+:toc:
 
-:idprefix:
-:idseparator: -
-:experimental:
-
-ifdef::env-github[:badges:]
-ifdef::env-github[:outfilesuffix: .adoc]
+ifdef::env-github,env-browser[:badges:]
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
 ifdef::badges[]
 image:http://build.ethereumclassic.org/app/rest/builds/buildType:(id:Etherjar_Master)/statusIcon[TC Build Status, link=http://build.ethereumclassic.org/viewType.html?buildTypeId=Etherjar_Master]
@@ -36,6 +35,7 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 
 * Java 8
 * https://gradle.org/[Gradle]
+* https://www.vagrantup.com/[Vagrant]
 
 == Installation
 
@@ -45,11 +45,49 @@ gradle build
 
 == Usage
 
-TODO
+Set up local development environment:
 
-== API
+----
+vagrant up
+----
 
-<<docs/API.adoc#,API>>
+Check client version:
+
+[source,java]
+----
+package example;
+
+import org.ethereumclassic.etherjar.rpc.transport.DefaultRpcTransport;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+public class Main {
+
+    public static void main(String[] args)
+            throws URISyntaxException, IOException, ExecutionException, InterruptedException {
+        DefaultRpcTransport transport =
+                new DefaultRpcTransport(new URI("http://127.0.0.1:8545"));
+
+        Future<String> req =
+                transport.execute("web3_clientVersion", Collections.EMPTY_LIST, String.class);
+
+        System.out.println(String.format("Client version: %s", req.get()));
+    }
+}
+----
+
+----
+Client version: Parity//v1.5.0-unstable-1ee5ba1-20170116/x86_64-linux-gnu/rustc1.14.0
+----
+
+== References
+
+<<docs/API.adoc#,API Reference>>
 
 == Licence
 
