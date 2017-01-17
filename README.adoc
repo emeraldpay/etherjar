@@ -1,9 +1,20 @@
 = EtherJar
 
+:page-layout: base
+
+:idprefix:
+:idseparator: -
+:experimental:
+
+ifdef::env-github[:badges:]
+ifdef::env-github[:outfilesuffix: .adoc]
+
+ifdef::badges[]
 image:http://build.ethereumclassic.org/app/rest/builds/buildType:(id:Etherjar_Master)/statusIcon[TC Build Status, link=http://build.ethereumclassic.org/viewType.html?buildTypeId=Etherjar_Master]
 image:https://travis-ci.org/ethereumproject/etherjar.png?branch=master[Travis CI Build Status, link=https://travis-ci.org/ethereumproject/etherjar]
 image:https://codecov.io/gh/ethereumproject/etherjar/branch/master/graph/badge.svg[Codecov, link=https://codecov.io/gh/ethereumproject/etherjar]
 image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE"]
+endif::[]
 
 Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum Classic (ETC) and Ethereum (ETH).
 
@@ -28,7 +39,9 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 
 == Installation
 
- gradle build
+----
+gradle build
+----
 
 == Usage
 
