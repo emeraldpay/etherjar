@@ -1,5 +1,4 @@
-EtherJar
-========
+= EtherJar
 
 image:http://build.ethereumclassic.org/app/rest/builds/buildType:(id:Etherjar_Master)/statusIcon[TC Build Status, link=http://build.ethereumclassic.org/viewType.html?buildTypeId=Etherjar_Master]
 image:https://travis-ci.org/ethereumproject/etherjar.png?branch=master[Travis CI Build Status, link=https://travis-ci.org/ethereumproject/etherjar]
@@ -8,7 +7,7 @@ image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=
 
 Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum Classic (ETC) and Ethereum (ETH).
 
-## Features
+== Features
 
 * Blockchain information through Ethereum RPC calls
 * (_in progress_) Offline transaction signing
@@ -16,24 +15,29 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 * (_in progress_) ABI encoding/decoding
 * Parity RPC extensions support
 
-## Principles
+== Principles
 
 * Async first
 * Value objects (thread-safe immutability)
 * HTTP Transport and JSON parser agnostic
 
-## Installation
+== Requirements
+
+* Java 8
+* https://gradle.org/[Gradle]
+
+== Installation
+
+ gradle build
+
+== Usage
 
 TODO
 
-## Usage Examples
+== API
 
-TODO
+<<docs/API.adoc#,API>>
 
-## API
-
-<<docs/API, API>>
-
-## Licence
+== Licence
 
 Apache 2.0
