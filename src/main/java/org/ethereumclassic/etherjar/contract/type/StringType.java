@@ -52,7 +52,8 @@ public class StringType implements DynamicType<String> {
         try {
             return UTF_8_CHARSET.newDecoder().decode(buffer).toString();
         } catch (CharacterCodingException e) {
-            throw new IllegalArgumentException("Incorrect 'UTF-8' character encoding: " + data);
+            throw new RuntimeException(
+                    "Incorrect 'UTF-8' character encoding: " + data, e);
         }
     }
 

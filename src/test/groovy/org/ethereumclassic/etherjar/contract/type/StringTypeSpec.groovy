@@ -75,7 +75,7 @@ class StringTypeSpec extends Specification {
         DEFAULT_TYPE.decode hex
 
         then:
-        thrown IllegalArgumentException
+        thrown RuntimeException
 
         where:
         _ | hex
