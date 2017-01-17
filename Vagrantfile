@@ -24,7 +24,9 @@ Vagrant.configure("2") do |config|
       wget -q ${URL}
       dpkg -i ${DEB}
     fi
+  SHELL
 
-    parity --chain dev --jsonrpc-interface all --jsonrpc-hosts all
+  config.vm.provision "shell", privileged: false, run: 'always', inline: <<-SHELL
+    nohup parity --chain /vagrant/chain/default.json --jsonrpc-interface all --jsonrpc-hosts all --no-dapps &
   SHELL
 end
