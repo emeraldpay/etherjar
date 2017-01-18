@@ -18,7 +18,9 @@ Vagrant.configure("2") do |config|
     DEB=${NAME}_${VERSION}_amd64.deb
     URL=https://smartbrood.com/${NAME}/${DEB}
 
-    if [ ! `dpkg-query -W parity 2>/dev/null | grep ${VERSION}` ] ; then
+    if dpkg-query -W parity 2>/dev/null | grep ${VERSION}; then
+      echo "${NAME} already installed."
+    else
       echo "wget -q ${URL}"
       wget -q ${URL}
       dpkg -i ${DEB}
