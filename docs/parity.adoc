@@ -28,4 +28,4 @@ env CONFIG=with_dapps CHAIN=example1 vagrant provision
 
 In these examples are used simple name conventions.
 '`with_dapps`' implies the existence of configuration file at 'parity/with_dapps.toml'.
-For '`with_dapps`' it corresponds to 'parity/chain/example1.json' respectively.
+For chain '`example1`' it corresponds to 'parity/chain/example1.json' respectively.
