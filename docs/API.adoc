@@ -1,7 +1,0 @@
-= API
-
-ifdef::env-github,env-browser[:outfilesuffix: .adoc]
-ifndef::rootdir[:rootdir: ../]
-:imagesdir: {rootdir}/images
-
-TODO

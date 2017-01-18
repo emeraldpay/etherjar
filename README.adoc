@@ -45,7 +45,7 @@ gradle build
 
 == Usage
 
-Set up local development environment:
+Set up local https://ethcore.io/parity.html[parity node]:
 
 ----
 vagrant up
@@ -70,6 +70,7 @@ public class Main {
 
     public static void main(String[] args)
             throws URISyntaxException, IOException, ExecutionException, InterruptedException {
+
         DefaultRpcTransport transport =
                 new DefaultRpcTransport(new URI("http://127.0.0.1:8545"));
 
@@ -85,9 +86,13 @@ public class Main {
 Client version: Parity//v1.5.0-unstable-1ee5ba1-20170116/x86_64-linux-gnu/rustc1.14.0
 ----
 
-== References
+Tear down local parity node:
 
-<<docs/API.adoc#,API Reference>>
+----
+vagrant halt
+----
+
+<<docs/parity.adoc#,Read more>> about local parity node customizing.
 
 == Licence
 
