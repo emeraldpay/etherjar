@@ -30,14 +30,10 @@ Vagrant.configure("2") do |config|
     fi
   SHELL
 
-$script = <<SCRIPT
-export CONFIG=${CONFIG-:default} CHAIN=${CHAIN-:default} ; /etc/init.d/parity restart
-SCRIPT
-
-  config.vm.provision "shell" do |s|
-    s.name = "restart parity"
-    s.inline = $script
-    s.env = { "CONFIG": ENV['CONFIG'], "CHAIN": ENV['CHAIN']}
+  config.vm.provision "shell", name: "restart parity" do |s|
+    s.env = {"CONFIG": ENV['CONFIG'], "CHAIN": ENV['CHAIN']}
+    s.inline = <<-SHELL
+        export CONFIG=${CONFIG-:default} CHAIN=${CHAIN-:default} ; /etc/init.d/parity restart
+    SHELL
   end
-
 end

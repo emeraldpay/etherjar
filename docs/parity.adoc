@@ -1,0 +1,31 @@
+= Parity
+
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+ifndef::rootdir[:rootdir: ../]
+:imagesdir: {rootdir}/images
+
+https://ethcore.io/parity.html[Parity] is an Ethereum client
+actively developed as an open source project on https://github.com/ethcore/parity[github].
+
+There are a default configuration (link:parity/default.toml[parity/default.toml])
+used by default by Vagrant.
+
+----
+vagrant up
+----
+
+However, you can free to use your own alternative variants, for example:
+
+----
+env CONFIG=with_dapps CHAIN=example1 vagrant up
+----
+
+or even:
+
+----
+env CONFIG=with_dapps CHAIN=example1 vagrant provision
+----
+
+In these examples are used simple name conventions.
+'`with_dapps`' implies the existence of configuration file at 'parity/with_dapps.toml'.
+For '`with_dapps`' it corresponds to 'parity/chain/example1.json' respectively.
