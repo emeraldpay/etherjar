@@ -7,14 +7,14 @@ ifndef::rootdir[:rootdir: ../]
 https://ethcore.io/parity.html[Parity] is an Ethereum client
 actively developed as an open source project on https://github.com/ethcore/parity[github].
 
-There are a default configuration (link:parity/default.toml[parity/default.toml])
+There are a default configuration (link:../parity/default.toml[parity/default.toml])
 used by default by Vagrant.
 
 ----
 vagrant up
 ----
 
-However, you can free to use your own alternative variants, for example:
+However, you are free to use your own alternative variants, for example:
 
 ----
 env CONFIG=with_dapps CHAIN=example1 vagrant up
