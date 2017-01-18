@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.ethereumclassic.etherjar.model.BlockHash;
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.TransactionId;
 
@@ -50,7 +51,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
         List<HexData> uncles = new ArrayList<>();
         for (JsonNode tx: node.get("uncles")) {
-            uncles.add(HexData.from(tx.textValue()));
+            uncles.add(BlockHash.from(tx.textValue()));
         }
         blockJson.setUncles(uncles);
 

@@ -64,6 +64,8 @@ public class TransactionJson {
      */
     private HexData input;
 
+    private TransactionSignature signature;
+
     public TransactionId getHash() {
         return hash;
     }
@@ -150,5 +152,13 @@ public class TransactionJson {
 
     public void setInput(HexData input) {
         this.input = input;
+    }
+
+    public TransactionSignature getSignature() {
+        return signature;
+    }
+
+    public void setSignature(TransactionSignature signature) {
+        this.signature = signature;
     }
 }

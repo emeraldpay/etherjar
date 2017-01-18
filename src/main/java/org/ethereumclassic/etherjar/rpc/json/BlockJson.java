@@ -104,7 +104,7 @@ public class BlockJson<T> {
     /**
      * list of uncle hashes.
      */
-    private List<HexData> uncles;
+    private List<BlockHash> uncles;
 
     public Long getNumber() {
         return number;
@@ -242,11 +242,11 @@ public class BlockJson<T> {
         this.transactions = transactions;
     }
 
-    public List<HexData> getUncles() {
+    public List<BlockHash> getUncles() {
         return uncles;
     }
 
-    public void setUncles(List<HexData> uncles) {
+    public void setUncles(List<BlockHash> uncles) {
         this.uncles = uncles;
     }
 }

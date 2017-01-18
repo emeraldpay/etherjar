@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.ethereumclassic.etherjar.model.ChainId;
+import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.HexQuantity;
+import org.ethereumclassic.etherjar.model.TransactionSignature;
 
 import java.io.IOException;
 
@@ -38,6 +41,20 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
         tx.setGasPrice(getWei(node, "gasPrice"));
         tx.setGas(getQuantity(node, "gas"));
         tx.setInput(getData(node, "input"));
+
+        if (node.has("r") && node.has("v") && node.has("s")) {
+            TransactionSignature signature = new TransactionSignature();
+
+            if (node.hasNonNull("networkId")) {
+                signature.setChainId(new ChainId(node.get("networkId").intValue()));
+            }
+            signature.setR(getData(node, "r"));
+            signature.setS(getData(node, "s"));
+            signature.setV(getLong(node, "v").intValue());
+            signature.setPublicKey(getData(node, "publicKey"));
+
+            tx.setSignature(signature);
+        }
 
         return tx;
     }

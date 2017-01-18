@@ -230,6 +230,7 @@ class JacksonEthRpcConverterSpec extends Specification {
         act.input.bytes.length == 4
         act.value.value.longValue() == 0
         act.nonce == 15524L
+        act.signature == null
     }
 
     def "Parse receipt 0x5929b3"() {
@@ -274,4 +275,35 @@ class JacksonEthRpcConverterSpec extends Specification {
         act.logs[0].transactionHash.toHex() == "0x8883dd2f424407e7ecfa1181496fcb5a17e2dc8cd38507582b6af239aa215f46"
         act.logs[0].transactionIndex == 8
     }
+
+    def "Parse unprotected tx 0x5c7851"() {
+        setup:
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("tx/0x5c7851.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+        then:
+        act.signature != null
+        act.signature.chainId == null
+        !act.signature.protected
+        act.signature.r.toHex() == '0xe28800dc73a56b5c687ad6b38789f5a485a5ead8236b3d1fc04143fbc1b12c40'
+        act.signature.s.toHex() == '0x690014487d34d1881461f89edf6662e2efb833f08c5d6913bace4289f2f7736e'
+        act.signature.v == 27
+        act.signature.publicKey.toHex() == '0x2d4fa87b8e395b5e3f9ff674e0ec109e32d9db99b2b20387cf2f2079c9c041aa2199a67390b8696457020e0aae324cfd1b5e21f86a17683b8afd3660c3ed8c01'
+    }
+
+    def "Parse protected tx 0xb35804"() {
+        setup:
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("tx/0xb35804.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+        then:
+        act.signature != null
+        act.signature.chainId.value == 61
+        act.signature.protected
+        act.signature.r.toHex() == '0x9873696b852c34c3da10dda993f02eb800892e30cb5acacd335d47109e73e51b'
+        act.signature.s.toHex() == '0x45adb2148a0f37d30d0a2b4ac3bf4ec0f4d8b938181b45635f02e054ae750759'
+        act.signature.v == 157
+        act.signature.publicKey.toHex() == '0x7ac35ec4a59a772186573ed9d26787889cde2042110572ddf79a1f9ef2c7bc28b55b35d4fc5497c50e90cdf53b5a6be6174c456d98ba479a86ff4753d652fba3'
+    }
+
 }
