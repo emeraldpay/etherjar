@@ -13,13 +13,11 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 8545, host: 8545
 
   config.vm.provision "shell", inline: <<-SHELL
-    DEB=parity_1.5.0_amd64.deb
+    VERSION=1.5.0
+    DEB=parity_${VERSION}_amd64.deb
     URL=https://smartbrood.com/parity/${DEB}
 
-    if [ ! -f ${PWD}/${DEB} ] ; then
-      apt-get update
-      apt-get install -y wget
-
+    if [ ! `dpkg-query -W parity 2>/dev/null | grep ${VERSION}` ] ; then
       echo "wget -q ${URL}"
       wget -q ${URL}
       dpkg -i ${DEB}
@@ -27,6 +25,7 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.provision "shell", privileged: false, run: 'always', inline: <<-SHELL
-    nohup parity --chain /vagrant/chain/default.json --jsonrpc-interface all --jsonrpc-hosts all --no-dapps &
+    nohup parity --config /vagrant/config.toml &
+    sleep 2
   SHELL
 end
