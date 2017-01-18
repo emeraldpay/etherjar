@@ -18,7 +18,9 @@ DESC="Parity ETHC node"
 NAME=parity
 DAEMON=/usr/bin/$NAME
 PIDFILE=/var/run/$NAME.pid
-DAEMON_ARGS="daemon ${PIDFILE} --config /etc/parity/config.toml"
+CONFIG=${CONFIG:-default}
+CHAIN=${CHAIN:-default}
+DAEMON_ARGS="daemon ${PIDFILE} --config /etc/parity/${CONFIG}.toml --chain  /etc/parity/chain/${CHAIN}.json"
 SCRIPTNAME=/etc/init.d/$NAME
 
 # Exit if the package is not installed

@@ -24,13 +24,20 @@ Vagrant.configure("2") do |config|
       echo "wget -q ${URL}"
       wget -q ${URL}
       dpkg -i ${DEB}
-      ln -s /vagrant/${NAME}/etc/${NAME} /etc/${NAME}
-      cp /vagrant/${NAME}/etc/init.d/${NAME} /etc/init.d/${NAME}
+      ln -s /vagrant/${NAME} /etc/${NAME}
+      cp /vagrant/${NAME}/init /etc/init.d/${NAME}
       update-rc.d ${NAME} defaults
     fi
   SHELL
 
-  config.vm.provision "shell", name: "restart service", run: 'always', inline: <<-SHELL
-    service parity restart
-  SHELL
+$script = <<SCRIPT
+export CONFIG=${CONFIG-:default} CHAIN=${CHAIN-:default} ; /etc/init.d/parity restart
+SCRIPT
+
+  config.vm.provision "shell" do |s|
+    s.name = "restart parity"
+    s.inline = $script
+    s.env = { "CONFIG": ENV['CONFIG'], "CHAIN": ENV['CHAIN']}
+  end
+
 end
