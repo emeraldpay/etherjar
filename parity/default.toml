@@ -1,5 +1,5 @@
 [parity]
-chain = "/vagrant/chain/default.json"
+chain = "/etc/parity/chain/default.json"
 
 [rpc]
 interface = "all"
@@ -9,4 +9,4 @@ hosts = ["all"]
 disable = true
 
 [misc]
-log_file = "/home/vagrant/parity_log"
+log_file = "/var/log/parity"
