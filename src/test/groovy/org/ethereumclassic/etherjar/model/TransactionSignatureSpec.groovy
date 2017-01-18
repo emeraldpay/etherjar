@@ -79,4 +79,15 @@ class TransactionSignatureSpec extends Specification {
         signature.normalizedV == 27
         signature.protected
     }
+
+    def "decline invalid v"() {
+        when:
+        signature.setV(1024)
+        then:
+        thrown(IllegalArgumentException)
+        when:
+        signature.setV(-1)
+        then:
+        thrown(IllegalArgumentException)
+    }
 }
