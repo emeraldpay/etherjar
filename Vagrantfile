@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
     NAME=parity
     VERSION=1.5.0
     DEB=${NAME}_${VERSION}_amd64.deb
-    URL=https://smartbrood.com/${NAME}/${DEB}
+    URL=http://d1h4xl4cr1h0mo.cloudfront.net/v${VERSION}/x86_64-unknown-linux-gnu/${DEB}
 
     if dpkg-query -W parity 2>/dev/null | grep ${VERSION}; then
       echo "${NAME} already installed."
