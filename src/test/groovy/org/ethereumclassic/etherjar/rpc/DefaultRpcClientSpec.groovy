@@ -9,6 +9,7 @@ import org.ethereumclassic.etherjar.model.TransactionId
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
 import org.ethereumclassic.etherjar.rpc.json.TraceItemJson
+import org.ethereumclassic.etherjar.rpc.json.TransactionCallJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport
@@ -343,5 +344,18 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_getCompilers", [], String[]) >> new CompletedFuture<>(data)
         act.get().size() == data.size()
         act.get() as Set == data as Set
+    }
+
+    def "Call"() {
+        setup:
+        def call = new TransactionCallJson(
+                Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
+                HexData.from('0x18160ddd')
+        )
+        when:
+        def act = defaultRpcClient.eth().call(call, BlockTag.LATEST)
+        then:
+        1 * rpcTransport.execute("eth_call", [call, 'latest'], String) >> new CompletedFuture<>('0x000000000000000000000000000000000000000000000000000039bc22c57200')
+        act.get().toHex() == '0x000000000000000000000000000000000000000000000000000039bc22c57200'
     }
 }

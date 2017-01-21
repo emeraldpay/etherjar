@@ -2,9 +2,9 @@ package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.*;
 import org.ethereumclassic.etherjar.rpc.json.*;
+import org.ethereumclassic.etherjar.rpc.json.TransactionCallJson;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -243,6 +243,16 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<String[]> getCompilers() throws IOException;
+
+        /**
+         * Executes a new message call immediately without creating a transaction on the block chain.
+         *
+         * @param call the transaction call object
+         * @param block target block
+         * @return return value of executed contract
+         * @throws IOException
+         */
+        public Future<HexData> call(TransactionCallJson call, BlockTag block) throws IOException;
     }
 
     interface TraceCommands {

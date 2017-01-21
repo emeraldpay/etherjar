@@ -12,6 +12,7 @@ import org.ethereumclassic.etherjar.rpc.json.BlockJson;
 import org.ethereumclassic.etherjar.rpc.json.BlockTag;
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
 import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
+import org.ethereumclassic.etherjar.rpc.json.TransactionCallJson;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
@@ -274,6 +275,14 @@ public class DefaultRpcClient implements RpcClient {
                     Collections.emptyList(),
                     String[].class);
             return resp;
+        }
+
+        @Override
+        public Future<HexData> call(TransactionCallJson call, BlockTag block) throws IOException {
+            Future<String> resp = transport.execute("eth_call",
+                Arrays.asList(call, block.getCode()),
+                String.class);
+            return extractor.extractData(resp);
         }
     }
 
