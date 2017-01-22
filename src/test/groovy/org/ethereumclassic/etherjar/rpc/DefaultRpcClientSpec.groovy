@@ -385,4 +385,15 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_sendRawTransaction", ['0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
         act.get() == txid
     }
+
+    def "Sign"() {
+        setup:
+        def addr = Address.from('0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab')
+        def data = HexData.from('0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470')
+        when:
+        def act = defaultRpcClient.eth().sign(addr, data)
+        then:
+        1 * rpcTransport.execute("eth_sign", ['0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab', '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'], String) >> new CompletedFuture<>('0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001')
+        act.get().toHex() == '0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001'
+    }
 }

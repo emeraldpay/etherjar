@@ -271,6 +271,17 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<TransactionId> sendTransaction(HexData raw) throws IOException;
+
+        /**
+         * Signs data with a given address.
+         * Note: the address to sign must be unlocked.
+         *
+         * @param signer signer address
+         * @param hash sha3 hash of data to sign
+         * @return signature
+         * @throws IOException
+         */
+        public Future<HexData> sign(Address signer, HexData hash) throws IOException;
     }
 
     interface TraceCommands {

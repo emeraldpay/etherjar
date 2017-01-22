@@ -300,6 +300,14 @@ public class DefaultRpcClient implements RpcClient {
                 String.class);
             return extractor.extractTransactionId(resp);
         }
+
+        @Override
+        public Future<HexData> sign(Address signer, HexData hash) throws IOException {
+            Future<String> resp = transport.execute("eth_sign",
+                Arrays.asList(signer.toHex(), hash.toHex()),
+                String.class);
+            return extractor.extractData(resp);
+        }
     }
 
     public static class TraceCommandsImpl implements TraceCommands {
