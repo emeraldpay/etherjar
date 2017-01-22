@@ -284,6 +284,14 @@ public class DefaultRpcClient implements RpcClient {
                 String.class);
             return extractor.extractData(resp);
         }
+
+        @Override
+        public Future<TransactionId> sendTransaction(TransactionCallJson data) throws IOException {
+            Future<String> resp = transport.execute("eth_sendTransaction",
+                Collections.singletonList(data),
+                String.class);
+            return extractor.extractTransactionId(resp);
+        }
     }
 
     public static class TraceCommandsImpl implements TraceCommands {

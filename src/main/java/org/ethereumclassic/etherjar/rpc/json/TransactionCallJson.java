@@ -19,12 +19,27 @@ public class TransactionCallJson {
     private Wei gasPrice;
     private Wei value;
     private HexData data;
+    private HexQuantity nonce;
 
     public TransactionCallJson() {
     }
 
     public TransactionCallJson(Address to, HexData data) {
         this.to = to;
+        this.data = data;
+    }
+
+    public TransactionCallJson(Address from, Address to, Wei value) {
+        this.from = from;
+        this.to = to;
+        this.value = value;
+    }
+
+    public TransactionCallJson(Address from, Address to, Long gas, Wei value, HexData data) {
+        this.from = from;
+        this.to = to;
+        this.gas = gas;
+        this.value = value;
         this.data = data;
     }
 
@@ -76,6 +91,14 @@ public class TransactionCallJson {
         this.data = data;
     }
 
+    public HexQuantity getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(HexQuantity nonce) {
+        this.nonce = nonce;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -88,6 +111,7 @@ public class TransactionCallJson {
         if (gas != null ? !gas.equals(that.gas) : that.gas != null) return false;
         if (gasPrice != null ? !gasPrice.equals(that.gasPrice) : that.gasPrice != null) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (nonce != null ? !nonce.equals(that.nonce) : that.nonce != null) return false;
         return data != null ? data.equals(that.data) : that.data == null;
     }
 

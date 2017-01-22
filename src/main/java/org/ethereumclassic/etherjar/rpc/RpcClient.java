@@ -253,6 +253,15 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<HexData> call(TransactionCallJson call, BlockTag block) throws IOException;
+
+        /**
+         * Creates new message call transaction or a contract creation, if the data.data field contains code.
+         *
+         * @param data transaction object
+         * @return transaction id
+         * @throws IOException
+         */
+        public Future<TransactionId> sendTransaction(TransactionCallJson data) throws IOException;
     }
 
     interface TraceCommands {

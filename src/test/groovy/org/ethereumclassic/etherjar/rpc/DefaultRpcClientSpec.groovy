@@ -6,6 +6,7 @@ import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
 import org.ethereumclassic.etherjar.model.Nonce
 import org.ethereumclassic.etherjar.model.TransactionId
+import org.ethereumclassic.etherjar.model.Wei
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
 import org.ethereumclassic.etherjar.rpc.json.TraceItemJson
@@ -357,5 +358,20 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_call", [call, 'latest'], String) >> new CompletedFuture<>('0x000000000000000000000000000000000000000000000000000039bc22c57200')
         act.get().toHex() == '0x000000000000000000000000000000000000000000000000000039bc22c57200'
+    }
+
+    def "Send Transaction"() {
+        setup:
+        def tx = new TransactionCallJson(
+                Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
+                Address.from('0x1e45c30168ba23a0dac51911079d0fcff1a9e4ad'),
+                Wei.fromEther(12.345)
+        )
+        def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        when:
+        def act = defaultRpcClient.eth().sendTransaction(tx)
+        then:
+        1 * rpcTransport.execute("eth_sendTransaction", [tx], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        act.get() == txid
     }
 }

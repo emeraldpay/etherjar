@@ -2,6 +2,7 @@ package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.HexData;
 import org.ethereumclassic.etherjar.model.HexQuantity;
+import org.ethereumclassic.etherjar.model.TransactionId;
 import org.ethereumclassic.etherjar.model.Wei;
 import org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.Function;
 import org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.FutureMap;
@@ -47,6 +48,15 @@ public class Extractor {
             @Override
             public HexData apply(String value) {
                 return HexData.from(value);
+            }
+        });
+    }
+
+    public Future<TransactionId> extractTransactionId(final Future<String> result) {
+        return new FutureMap<>(result, new Function<String, TransactionId>() {
+            @Override
+            public TransactionId apply(String value) {
+                return TransactionId.from(value);
             }
         });
     }

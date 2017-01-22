@@ -46,6 +46,10 @@ public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCal
             gen.writeFieldName("data");
             gen.writeString(value.getData().toHex());
         }
+        if (value.getNonce() != null) {
+            gen.writeFieldName("nonce");
+            gen.writeString(value.getNonce().toHex());
+        }
         gen.writeEndObject();
     }
 }
