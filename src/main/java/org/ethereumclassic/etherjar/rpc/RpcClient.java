@@ -2,9 +2,9 @@ package org.ethereumclassic.etherjar.rpc;
 
 import org.ethereumclassic.etherjar.model.*;
 import org.ethereumclassic.etherjar.rpc.json.*;
+import org.ethereumclassic.etherjar.rpc.json.TransactionCallJson;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -243,6 +243,45 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<String[]> getCompilers() throws IOException;
+
+        /**
+         * Executes a new message call immediately without creating a transaction on the block chain.
+         *
+         * @param call the transaction call object
+         * @param block target block
+         * @return return value of executed contract
+         * @throws IOException
+         */
+        public Future<HexData> call(TransactionCallJson call, BlockTag block) throws IOException;
+
+        /**
+         * Creates new message call transaction or a contract creation, if the data.data field contains code.
+         *
+         * @param data transaction object
+         * @return transaction id
+         * @throws IOException
+         */
+        public Future<TransactionId> sendTransaction(TransactionCallJson data) throws IOException;
+
+        /**
+         * Creates new message call transaction or a contract creation for signed transactions
+         *
+         * @param raw signed transaction data
+         * @return transaction id
+         * @throws IOException
+         */
+        public Future<TransactionId> sendTransaction(HexData raw) throws IOException;
+
+        /**
+         * Signs data with a given address.
+         * Note: the address to sign must be unlocked.
+         *
+         * @param signer signer address
+         * @param hash sha3 hash of data to sign
+         * @return signature
+         * @throws IOException
+         */
+        public Future<HexData> sign(Address signer, HexData hash) throws IOException;
     }
 
     interface TraceCommands {
