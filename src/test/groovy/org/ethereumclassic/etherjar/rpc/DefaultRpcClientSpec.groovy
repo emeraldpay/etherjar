@@ -374,4 +374,15 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_sendTransaction", [tx], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
         act.get() == txid
     }
+
+    def "Send Raw Transaction"() {
+        setup:
+        def tx = HexData.from('0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675')
+        def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        when:
+        def act = defaultRpcClient.eth().sendTransaction(tx)
+        then:
+        1 * rpcTransport.execute("eth_sendRawTransaction", ['0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        act.get() == txid
+    }
 }

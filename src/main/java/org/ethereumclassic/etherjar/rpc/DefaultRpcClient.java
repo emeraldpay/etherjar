@@ -292,6 +292,14 @@ public class DefaultRpcClient implements RpcClient {
                 String.class);
             return extractor.extractTransactionId(resp);
         }
+
+        @Override
+        public Future<TransactionId> sendTransaction(HexData raw) throws IOException {
+            Future<String> resp = transport.execute("eth_sendRawTransaction",
+                Collections.singletonList(raw.toHex()),
+                String.class);
+            return extractor.extractTransactionId(resp);
+        }
     }
 
     public static class TraceCommandsImpl implements TraceCommands {

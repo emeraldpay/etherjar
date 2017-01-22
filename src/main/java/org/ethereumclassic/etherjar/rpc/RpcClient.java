@@ -262,6 +262,15 @@ public interface RpcClient {
          * @throws IOException
          */
         public Future<TransactionId> sendTransaction(TransactionCallJson data) throws IOException;
+
+        /**
+         * Creates new message call transaction or a contract creation for signed transactions
+         *
+         * @param raw signed transaction data
+         * @return transaction id
+         * @throws IOException
+         */
+        public Future<TransactionId> sendTransaction(HexData raw) throws IOException;
     }
 
     interface TraceCommands {
