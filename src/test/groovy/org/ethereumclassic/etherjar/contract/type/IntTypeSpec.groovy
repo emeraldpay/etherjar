@@ -84,8 +84,8 @@ class IntTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        IntType.DEFAULT_TYPE.bits == 256
-        IntType.DEFAULT_TYPE.signed
+        IntType.DEFAULT.bits == 256
+        IntType.DEFAULT.signed
     }
 
     def "should create an instance with specified number of bits"() {

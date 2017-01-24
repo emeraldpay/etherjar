@@ -6,6 +6,7 @@ import spock.lang.Specification
 class DecimalTypeTest extends Specification {
 
     static class DecimalTypeImpl extends DecimalType {
+        public minMock, maxMock
 
         protected DecimalTypeImpl() {
             super(128, 128, false)
@@ -21,6 +22,12 @@ class DecimalTypeTest extends Specification {
 
         protected DecimalTypeImpl(int mBits, int nBits, boolean signed) {
             super(mBits, nBits, signed)
+        }
+
+        protected DecimalTypeImpl (int mBits, int nBits, boolean signed, BigDecimal min, BigDecimal max) {
+            super(mBits, nBits, signed)
+            minMock = min
+            maxMock = max
         }
 
         @Override
@@ -39,16 +46,16 @@ class DecimalTypeTest extends Specification {
         }
     }
 
-    final static DEFAULT_TYPE = [] as DecimalTypeImpl
+    final static DEFAULT = [] as DecimalTypeImpl
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.MBits == 128
-        DEFAULT_TYPE.NBits == 128
-        DEFAULT_TYPE.bits == 256
-        !DEFAULT_TYPE.signed
-        DEFAULT_TYPE.static
-        DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
+        DEFAULT.MBits == 128
+        DEFAULT.NBits == 128
+        DEFAULT.bits == 256
+        !DEFAULT.signed
+        DEFAULT.static
+        DEFAULT.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should return a power of two"() {
@@ -235,13 +242,13 @@ class DecimalTypeTest extends Specification {
     }
 
     def "should catch out of range before encoding"() {
-        def obj = [
-                mBits: m,
-                nBits: n,
-                isSigned: sign,
-                getMinValue: min as BigDecimal,
-                getMaxValue: max as BigDecimal,
-        ] as DecimalTypeImpl
+        def obj = new DecimalTypeImpl(m, n, sign, min, max) {
+            @Override
+            BigDecimal getMinValue() { minMock }
+
+            @Override
+            BigDecimal getMaxValue() { maxMock }
+        }
 
         when:
         obj.encodeStatic(val as BigDecimal)
@@ -286,8 +293,8 @@ class DecimalTypeTest extends Specification {
 
         where:
         first                               | second
-        DEFAULT_TYPE                        | [] as DecimalTypeImpl
-        DEFAULT_TYPE                        | [128] as DecimalTypeImpl
+        DEFAULT                        | [] as DecimalTypeImpl
+        DEFAULT                        | [128] as DecimalTypeImpl
         [64, 24, true] as DecimalTypeImpl   | [64, 24, true] as DecimalTypeImpl
     }
 
@@ -297,9 +304,9 @@ class DecimalTypeTest extends Specification {
 
         where:
         first                               | second
-        DEFAULT_TYPE                        | DEFAULT_TYPE
-        DEFAULT_TYPE                        | [] as DecimalTypeImpl
-        DEFAULT_TYPE                        | [128] as DecimalTypeImpl
+        DEFAULT                        | DEFAULT
+        DEFAULT                        | [] as DecimalTypeImpl
+        DEFAULT                        | [128] as DecimalTypeImpl
         [64, 24, true] as DecimalTypeImpl   | [64, 24, true] as DecimalTypeImpl
     }
 
@@ -309,9 +316,9 @@ class DecimalTypeTest extends Specification {
 
         where:
         first           | second
-        DEFAULT_TYPE    | null
-        DEFAULT_TYPE    | [64, 24, true] as DecimalTypeImpl
-        DEFAULT_TYPE    | BoolType.DEFAULT_TYPE
+        DEFAULT    | null
+        DEFAULT    | [64, 24, true] as DecimalTypeImpl
+        DEFAULT    | BoolType.DEFAULT
     }
 
     def "should be converted to a string representation"() {

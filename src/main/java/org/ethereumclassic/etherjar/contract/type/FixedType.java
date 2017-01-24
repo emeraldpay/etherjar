@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 public class FixedType extends DecimalType {
 
-    public final static FixedType DEFAULT_TYPE = new FixedType();
+    public final static FixedType DEFAULT = new FixedType();
 
     final static Map<Integer, FixedType> CACHED_TYPES =
             Stream.of(8, 16, 32, 64, 128).collect(Collectors.collectingAndThen(
@@ -44,7 +44,7 @@ public class FixedType extends DecimalType {
             throw new IllegalArgumentException("Wrong 'fixed' type format: " + str);
 
         if (Objects.isNull(matcher.group(1)))
-            return Optional.of(DEFAULT_TYPE);
+            return Optional.of(DEFAULT);
 
         int mBits = Integer.parseInt(matcher.group(2));
         int nBits = Integer.parseInt(matcher.group(3));
@@ -54,13 +54,10 @@ public class FixedType extends DecimalType {
     }
 
     static BigDecimal minValue(int mBits) {
-        return powerOfTwo(mBits-1).negate();
+        return maxValue(mBits).negate();
     }
 
-    static BigDecimal maxValue(int mBits, int nBits) {
-        return powerOfTwo(mBits-1);
-    }
-
+    static BigDecimal maxValue(int mBits) { return powerOfTwo(mBits - 1); }
 
     private final BigDecimal minValue;
 
@@ -78,7 +75,7 @@ public class FixedType extends DecimalType {
         super(mBits, nBits, true);
 
         minValue = minValue(mBits);
-        maxValue = maxValue(mBits, nBits);
+        maxValue = maxValue(mBits);
     }
 
     @Override

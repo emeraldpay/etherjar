@@ -24,12 +24,12 @@ class DynamicTypeSpec extends Specification {
         }
     }
 
-    final static DEFAULT_TYPE = [] as DynamicTypeImpl
+    final static DEFAULT = [] as DynamicTypeImpl
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.dynamic
-        DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
+        DEFAULT.dynamic
+        DEFAULT.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should accept visitor"() {
@@ -40,6 +40,6 @@ class DynamicTypeSpec extends Specification {
         }
 
         expect:
-        DEFAULT_TYPE.visit visitor
+        DEFAULT.visit visitor
     }
 }

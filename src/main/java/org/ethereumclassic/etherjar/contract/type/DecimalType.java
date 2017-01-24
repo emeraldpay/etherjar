@@ -4,7 +4,6 @@ import org.ethereumclassic.etherjar.model.Hex32;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Objects;
 
@@ -15,10 +14,6 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
 
     static BigDecimal powerOfTwo(int bits) {
         return new BigDecimal(NumericType.powerOfTwo(bits));
-    }
-
-    static BigDecimal fraction(int bits) {
-        return BigDecimal.valueOf(2.0).pow(-bits, new MathContext(bits, RoundingMode.HALF_EVEN));
     }
 
     private final int mBits;
@@ -81,20 +76,6 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
     }
 
     /**
-     * @return a minimal value (inclusive)
-     */
-    public abstract BigDecimal getMinValue();
-
-    /**
-     * @return a maximum value (exclusive)
-     */
-    public abstract BigDecimal getMaxValue();
-
-    public Hex32 encode(double value) {
-        return encodeStatic(BigDecimal.valueOf(value));
-    }
-
-    /**
      * Is a {@code value} is in a valid {@link Type} range.
      *
      * @param value a decimal value
@@ -104,16 +85,32 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
         return value.compareTo(getMinValue()) >= 0 && value.compareTo(getMaxValue()) < 0;
     }
 
+    /**
+     * @return a maximum value (exclusive)
+     */
+    public abstract BigDecimal getMaxValue();
+
+    /**
+     * @return a minimal value (inclusive)
+     */
+    public abstract BigDecimal getMinValue();
+
+    public Hex32 encode(double value) {
+        return encodeStatic(BigDecimal.valueOf(value));
+    }
+
     @Override
     public Hex32 encodeStatic(BigDecimal value) {
         BigInteger integer = value.multiply(fractionFactor)
                 .setScale(0, RoundingMode.HALF_UP).toBigInteger();
 
-        if (!isValueValid(value))
-            throw new IllegalArgumentException("Decimal value out of range: " + value);
+        if (!numericType.isValueValid(integer)) {
+            if (!isValueValid(value))
+                throw new IllegalArgumentException("Decimal value out of range: " + value);
 
-        if (!numericType.isValueValid(integer))
             integer = integer.subtract(BigInteger.ONE);
+        }
+
 
         return numericType.encodeStatic(integer);
     }

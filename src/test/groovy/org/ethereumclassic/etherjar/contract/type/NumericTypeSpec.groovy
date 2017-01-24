@@ -35,14 +35,14 @@ class NumericTypeSpec extends Specification {
         }
     }
 
-    final static DEFAULT_TYPE = [] as NumericTypeImpl
+    final static DEFAULT = [] as NumericTypeImpl
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.bits == 256
-        !DEFAULT_TYPE.signed
-        DEFAULT_TYPE.static
-        DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
+        DEFAULT.bits == 256
+        !DEFAULT.signed
+        DEFAULT.static
+        DEFAULT.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should return a power of two"() {
@@ -353,8 +353,8 @@ class NumericTypeSpec extends Specification {
 
         where:
         first                           | second
-        DEFAULT_TYPE                    | [] as NumericTypeImpl
-        DEFAULT_TYPE                    | [256] as NumericTypeImpl
+        DEFAULT                    | [] as NumericTypeImpl
+        DEFAULT                    | [256] as NumericTypeImpl
         [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
     }
 
@@ -364,9 +364,9 @@ class NumericTypeSpec extends Specification {
 
         where:
         first                           | second
-        DEFAULT_TYPE                    | DEFAULT_TYPE
-        DEFAULT_TYPE                    | [] as NumericTypeImpl
-        DEFAULT_TYPE                    | [256] as NumericTypeImpl
+        DEFAULT                    | DEFAULT
+        DEFAULT                    | [] as NumericTypeImpl
+        DEFAULT                    | [256] as NumericTypeImpl
         [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
     }
 
@@ -376,9 +376,9 @@ class NumericTypeSpec extends Specification {
 
         where:
         first           | second
-        DEFAULT_TYPE    | null
-        DEFAULT_TYPE    | [64] as NumericTypeImpl
-        DEFAULT_TYPE    | UIntType.DEFAULT_TYPE
+        DEFAULT    | null
+        DEFAULT    | [64] as NumericTypeImpl
+        DEFAULT    | UIntType.DEFAULT
     }
 
     def "should be converted to a string representation"() {

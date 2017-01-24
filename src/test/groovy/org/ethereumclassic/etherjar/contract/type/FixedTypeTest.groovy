@@ -52,10 +52,10 @@ class FixedTypeTest extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        FixedType.DEFAULT_TYPE.MBits == 128
-        FixedType.DEFAULT_TYPE.NBits == 128
-        FixedType.DEFAULT_TYPE.bits == 256
-        FixedType.DEFAULT_TYPE.signed
+        FixedType.DEFAULT.MBits == 128
+        FixedType.DEFAULT.NBits == 128
+        FixedType.DEFAULT.bits == 256
+        FixedType.DEFAULT.signed
     }
 
     def "should return max value"() {

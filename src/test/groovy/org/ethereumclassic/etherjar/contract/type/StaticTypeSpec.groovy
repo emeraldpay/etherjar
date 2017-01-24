@@ -24,12 +24,12 @@ class StaticTypeSpec extends Specification {
         }
     }
 
-    final static DEFAULT_TYPE = [] as StaticTypeImpl
+    final static DEFAULT = [] as StaticTypeImpl
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.static
-        DEFAULT_TYPE.fixedSize == Hex32.SIZE_BYTES
+        DEFAULT.static
+        DEFAULT.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should accept visitor"() {
@@ -40,7 +40,7 @@ class StaticTypeSpec extends Specification {
         }
 
         expect:
-        DEFAULT_TYPE.visit visitor
+        DEFAULT.visit visitor
     }
 
     def "should encode an object into hex data"() {
@@ -69,7 +69,7 @@ class StaticTypeSpec extends Specification {
 
     def "should catch empty or too long data to decode"() {
         when:
-        DEFAULT_TYPE.decode data
+        DEFAULT.decode data
 
         then:
         thrown IllegalArgumentException

@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class BoolType extends NumericType {
 
-    public final static BoolType DEFAULT_TYPE = new BoolType();
+    public final static BoolType DEFAULT = new BoolType();
 
     /**
      * Try to parse a {@link BoolType} string representation (either canonical form or not).
@@ -22,7 +22,7 @@ public class BoolType extends NumericType {
         Objects.requireNonNull(str);
 
         return Objects.equals(str, "bool") ?
-                Optional.of(DEFAULT_TYPE) : Optional.empty();
+                Optional.of(DEFAULT) : Optional.empty();
     }
 
     public BoolType() {

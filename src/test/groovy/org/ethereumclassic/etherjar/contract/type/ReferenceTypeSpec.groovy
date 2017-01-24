@@ -34,7 +34,7 @@ class ReferenceTypeSpec extends Specification {
         }
     }
 
-    final static DEFAULT_TYPE = [] as ReferenceTypeImpl
+    final static DEFAULT = [] as ReferenceTypeImpl
 
     def "should recognize static instance"() {
         def t = [
@@ -83,6 +83,6 @@ class ReferenceTypeSpec extends Specification {
         }
 
         expect:
-        DEFAULT_TYPE.visit visitor
+        DEFAULT.visit visitor
     }
 }

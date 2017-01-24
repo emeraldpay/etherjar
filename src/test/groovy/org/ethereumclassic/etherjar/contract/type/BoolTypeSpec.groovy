@@ -43,27 +43,27 @@ class BoolTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        BoolType.DEFAULT_TYPE.bits == 8
-        !BoolType.DEFAULT_TYPE.signed
+        BoolType.DEFAULT.bits == 8
+        !BoolType.DEFAULT.signed
     }
 
     def "should return a minimal value (inclusive)"() {
         expect:
-        BoolType.DEFAULT_TYPE.minValue == 0G
+        BoolType.DEFAULT.minValue == 0G
     }
 
     def "should return a maximal value (exclusive)"() {
         expect:
-        BoolType.DEFAULT_TYPE.maxValue == 2G
+        BoolType.DEFAULT.maxValue == 2G
     }
 
     def "should return a canonical string representation" () {
         expect:
-        BoolType.DEFAULT_TYPE.canonicalName == 'bool'
+        BoolType.DEFAULT.canonicalName == 'bool'
     }
 
     def "should be converted to a string representation"() {
         expect:
-        BoolType.DEFAULT_TYPE as String == 'bool'
+        BoolType.DEFAULT as String == 'bool'
     }
 }

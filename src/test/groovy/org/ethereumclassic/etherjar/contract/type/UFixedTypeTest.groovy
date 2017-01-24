@@ -52,10 +52,10 @@ class UFixedTypeTest extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        UFixedType.DEFAULT_TYPE.MBits == 128
-        UFixedType.DEFAULT_TYPE.NBits == 128
-        UFixedType.DEFAULT_TYPE.bits == 256
-        !UFixedType.DEFAULT_TYPE.signed
+        UFixedType.DEFAULT.MBits == 128
+        UFixedType.DEFAULT.NBits == 128
+        UFixedType.DEFAULT.bits == 256
+        !UFixedType.DEFAULT.signed
     }
 
     def "should return max value"() {

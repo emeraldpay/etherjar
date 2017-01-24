@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class UIntType extends NumericType {
 
-    public final static UIntType DEFAULT_TYPE = new UIntType();
+    public final static UIntType DEFAULT = new UIntType();
 
     final static Map<Integer, UIntType> CACHED_TYPES =
             Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
@@ -45,7 +45,7 @@ public class UIntType extends NumericType {
         String digits = matcher.group(1);
 
         if (digits.isEmpty())
-            return Optional.of(DEFAULT_TYPE);
+            return Optional.of(DEFAULT);
 
         int bits = Integer.parseInt(digits);
 

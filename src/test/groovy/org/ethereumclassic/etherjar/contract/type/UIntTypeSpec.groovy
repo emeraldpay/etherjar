@@ -76,8 +76,8 @@ class UIntTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        UIntType.DEFAULT_TYPE.bits == 256
-        !UIntType.DEFAULT_TYPE.signed
+        UIntType.DEFAULT.bits == 256
+        !UIntType.DEFAULT.signed
     }
 
     def "should create an instance with specified number of bits"() {

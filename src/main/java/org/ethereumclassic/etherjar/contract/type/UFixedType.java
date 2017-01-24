@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 public class UFixedType extends DecimalType {
 
-    public final static UFixedType DEFAULT_TYPE = new UFixedType();
+    public final static UFixedType DEFAULT = new UFixedType();
 
     final static Map<Integer, UFixedType> CACHED_TYPES =
             Stream.of(8, 16, 32, 64, 128).collect(Collectors.collectingAndThen(
@@ -44,7 +44,7 @@ public class UFixedType extends DecimalType {
             throw new IllegalArgumentException("Wrong 'ufixed' type format: " + str);
 
         if (Objects.isNull(matcher.group(1)))
-            return Optional.of(DEFAULT_TYPE);
+            return Optional.of(DEFAULT);
 
         int mBits = Integer.parseInt(matcher.group(2));
         int nBits = Integer.parseInt(matcher.group(3));
@@ -53,9 +53,7 @@ public class UFixedType extends DecimalType {
                 CACHED_TYPES.get(mBits) : new UFixedType(mBits, nBits));
     }
 
-    static BigDecimal maxValue(int mBits, int nBits) {
-        return powerOfTwo(mBits);
-    }
+    static BigDecimal maxValue(int mBits) { return powerOfTwo(mBits); }
 
     private final BigDecimal maxValue;
 
@@ -70,7 +68,7 @@ public class UFixedType extends DecimalType {
     public UFixedType(int mBits, int nBits) {
         super(mBits, nBits, false);
 
-        maxValue = maxValue(mBits, nBits);
+        maxValue = maxValue(mBits);
     }
 
     @Override
