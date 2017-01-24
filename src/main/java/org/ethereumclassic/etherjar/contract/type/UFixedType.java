@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.contract.type;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +53,12 @@ public class UFixedType extends DecimalType {
                 CACHED_TYPES.get(mBits) : new UFixedType(mBits, nBits));
     }
 
+    static BigDecimal maxValue(int mBits, int nBits) {
+        return powerOfTwo(mBits);
+    }
+
+    private final BigDecimal maxValue;
+
     public UFixedType() {
         this(128, 128);
     }
@@ -62,6 +69,18 @@ public class UFixedType extends DecimalType {
 
     public UFixedType(int mBits, int nBits) {
         super(mBits, nBits, false);
+
+        maxValue = maxValue(mBits, nBits);
+    }
+
+    @Override
+    public BigDecimal getMinValue() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public BigDecimal getMaxValue() {
+        return maxValue;
     }
 
     @Override

@@ -58,6 +58,38 @@ class UFixedTypeTest extends Specification {
         !UFixedType.DEFAULT_TYPE.signed
     }
 
+    def "should return max value"() {
+        when:
+        UFixedType obj = new UFixedType(M, N)
+
+        then:
+        obj.maxValue == new BigDecimal(str)
+
+        where:
+        M   | N   | str
+        8   | 8   | '256'
+        64  | 64  | '18446744073709551616'
+        128 | 128 | '340282366920938463463374607431768211456'
+        40  | 8   | '1099511627776'
+        8   | 40  | '256'
+    }
+
+    def "should return min value"() {
+        when:
+        UFixedType obj = new UFixedType(M, N)
+
+        then:
+        obj.minValue == BigDecimal.ZERO
+
+        where:
+        M   | N
+        8   | 8
+        64  | 64
+        128 | 128
+        40  | 8
+        8   | 40
+    }
+
     def "should create an instance with specified number of bits"() {
         def type = [40, 8] as UFixedType
 

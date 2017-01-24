@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.contract.type;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +53,19 @@ public class FixedType extends DecimalType {
                 CACHED_TYPES.get(mBits) : new FixedType(mBits, nBits));
     }
 
+    static BigDecimal minValue(int mBits) {
+        return powerOfTwo(mBits-1).negate();
+    }
+
+    static BigDecimal maxValue(int mBits, int nBits) {
+        return powerOfTwo(mBits-1);
+    }
+
+
+    private final BigDecimal minValue;
+
+    private final BigDecimal maxValue;
+
     public FixedType() {
         this(128, 128);
     }
@@ -62,6 +76,19 @@ public class FixedType extends DecimalType {
 
     public FixedType(int mBits, int nBits) {
         super(mBits, nBits, true);
+
+        minValue = minValue(mBits);
+        maxValue = maxValue(mBits, nBits);
+    }
+
+    @Override
+    public BigDecimal getMinValue() {
+        return minValue;
+    }
+
+    @Override
+    public BigDecimal getMaxValue() {
+        return maxValue;
     }
 
     @Override

@@ -24,6 +24,16 @@ class DecimalTypeTest extends Specification {
         }
 
         @Override
+        BigDecimal getMinValue() {
+            throw new UnsupportedOperationException()
+        }
+
+        @Override
+        BigDecimal getMaxValue() {
+            throw new UnsupportedOperationException()
+        }
+
+        @Override
         String getCanonicalName() {
             throw new UnsupportedOperationException()
         }
@@ -120,8 +130,16 @@ class DecimalTypeTest extends Specification {
     }
 
     def "should encode double values"() {
+        def obj = [
+                mBits: 128,
+                nBits: 128,
+                isSigned: true,
+                getMinValue: -0x80000000000000000000000000000000 as BigDecimal,
+                getMaxValue: 0x80000000000000000000000000000000 as BigDecimal,
+        ] as DecimalTypeImpl
+
         when:
-        def data = DEFAULT_TYPE.encode val
+        def data = obj.encode val
 
         then:
         data.toHex() == hex
@@ -134,9 +152,17 @@ class DecimalTypeTest extends Specification {
     }
 
     def "should round before encode"() {
+        def obj = [
+                mBits: 64,
+                nBits: 64,
+                isSigned: true,
+                getMinValue: -0x8000000000000000 as BigDecimal,
+                getMaxValue: 0x8000000000000000 as BigDecimal,
+        ] as DecimalTypeImpl
+
         when:
-        def data = DEFAULT_TYPE.encode before
-        def res = DEFAULT_TYPE.decode data
+        def data = obj.encode before
+        def res = obj.decode data
 
         then:
         res == after
@@ -147,7 +173,21 @@ class DecimalTypeTest extends Specification {
     }
 
     def "should encode & decode "() {
-        def obj = [m, n, sign] as DecimalTypeImpl
+        def obj = new DecimalTypeImpl(m, n, sign) {
+            @Override
+            BigDecimal getMinValue() {
+                isSigned() ?
+                        -0x80000000000000000000000000000000 :
+                        0G
+            }
+
+            @Override
+            BigDecimal getMaxValue() {
+                isSigned() ?
+                        0x80000000000000000000000000000000 :
+                        0x100000000000000000000000000000000
+            }
+        }
 
         when:
         def data = obj.encodeStatic(val as BigDecimal)
@@ -186,7 +226,7 @@ class DecimalTypeTest extends Specification {
         16  | 16    | true  | 32767.0000152587890625    | '0x000000000000000000000000000000000000000000000000000000007fff0001'
         16  | 16    | true  | 32767.9999847412109375    | '0x000000000000000000000000000000000000000000000000000000007fffffff'
         16  | 16    | false | 32768                     | '0x0000000000000000000000000000000000000000000000000000000080000000'
-        16  | 16    | false | 65535.9999847412109375    | '0x00000000000000000000000000000000000000000000000000000000ffffffff'
+        16  | 16    | false | 65535.9999847412109375    | '0x00000000000000000000000000000000000000000000000000000000ffffffff'-1701-1701
 
         128 | 128   | true  | -0.5  | '0xffffffffffffffffffffffffffffffff80000000000000000000000000000000'
         128 | 128   | true  | 0.5   | '0x0000000000000000000000000000000080000000000000000000000000000000'
@@ -195,7 +235,13 @@ class DecimalTypeTest extends Specification {
     }
 
     def "should catch out of range before encoding"() {
-        def obj = [m, n, sign] as DecimalTypeImpl
+        def obj = [
+                mBits: m,
+                nBits: n,
+                isSigned: sign,
+                getMinValue: min as BigDecimal,
+                getMaxValue: max as BigDecimal,
+        ] as DecimalTypeImpl
 
         when:
         obj.encodeStatic(val as BigDecimal)
@@ -204,15 +250,15 @@ class DecimalTypeTest extends Specification {
         thrown IllegalArgumentException
 
         where:
-        m   | n     | sign  | val
-        8   | 8     | true  | -129
-        8   | 8     | true  | 128
-        8   | 8     | false | 256
-        16  | 16    | true  | -32769
-        16  | 16    | true  | 32768
-        16  | 16    | false | 65536
-        128 | 128   | true  | 0x80000000000000000000000000000000
-        128 | 128   | false | 0x100000000000000000000000000000000
+        m   | n     | sign  | min    | max   | val
+        8   | 8     | true  | -128   | 128   | -129
+        8   | 8     | true  | -128   | 128   | 128
+        8   | 8     | false |  0     | 256   | 256
+        16  | 16    | true  | -32768 | 32768 | -32769
+        16  | 16    | true  | -32768 | 32768 | 32768
+        16  | 16    | false |  0     | 65536 | 65536
+        128 | 128   | true  | -0x80000000000000000000000000000000  | 0x80000000000000000000000000000000 | 0x80000000000000000000000000000000
+        128 | 128   | false | 0      | 0x100000000000000000000000000000000 | 0x100000000000000000000000000000000
     }
 
     def "should catch out of range after decoding"() {

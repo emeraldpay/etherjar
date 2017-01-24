@@ -58,6 +58,38 @@ class FixedTypeTest extends Specification {
         FixedType.DEFAULT_TYPE.signed
     }
 
+    def "should return max value"() {
+        when:
+        FixedType obj = new FixedType(M, N)
+
+        then:
+        obj.maxValue == new BigDecimal(str)
+
+        where:
+        M   | N   | str
+        8   | 8   | '128'
+        64  | 64  | '9223372036854775808'
+        128 | 128 | '170141183460469231731687303715884105728'
+        40  | 8   | '549755813888'
+        8   | 40  | '128'
+    }
+
+    def "should return min value"() {
+        when:
+        FixedType obj = new FixedType(M, N)
+
+        then:
+        obj.minValue == new BigDecimal(str)
+
+        where:
+        M   | N   | str
+        8   | 8   | '-128'
+        64  | 64  | '-9.223372036854775808e+18'
+        128 | 128 | '-1.70141183460469231731687303715884105728e+38'
+        40  | 8   | '-549755813888'
+        8   | 40  | '-128'
+    }
+
     def "should create an instance with specified number of bits"() {
         def type = [40, 8] as FixedType
 
