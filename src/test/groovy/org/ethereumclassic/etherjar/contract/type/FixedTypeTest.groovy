@@ -60,10 +60,10 @@ class FixedTypeTest extends Specification {
 
     def "should return max value"() {
         when:
-        FixedType obj = new FixedType(M, N)
+        def obj = [M, N] as FixedType
 
         then:
-        obj.maxValue == new BigDecimal(str)
+        obj.maxValue == str as BigDecimal
 
         where:
         M   | N   | str
@@ -76,10 +76,10 @@ class FixedTypeTest extends Specification {
 
     def "should return min value"() {
         when:
-        FixedType obj = new FixedType(M, N)
+        def obj = [M, N] as FixedType
 
         then:
-        obj.minValue == new BigDecimal(str)
+        obj.minValue == str as BigDecimal
 
         where:
         M   | N   | str

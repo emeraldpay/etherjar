@@ -6,25 +6,25 @@ import spock.lang.Specification
 class DecimalTypeTest extends Specification {
 
     static class DecimalTypeImpl extends DecimalType {
-        public minMock, maxMock
+        def minMock, maxMock
 
-        protected DecimalTypeImpl() {
+        DecimalTypeImpl() {
             super(128, 128, false)
         }
 
-        protected DecimalTypeImpl(int bits) {
+        DecimalTypeImpl(int bits) {
             super(bits, bits, false)
         }
 
-        protected DecimalTypeImpl(int mBits, int nBits) {
+        DecimalTypeImpl(int mBits, int nBits) {
             super(mBits, nBits, false)
         }
 
-        protected DecimalTypeImpl(int mBits, int nBits, boolean signed) {
+        DecimalTypeImpl(int mBits, int nBits, boolean signed) {
             super(mBits, nBits, signed)
         }
 
-        protected DecimalTypeImpl (int mBits, int nBits, boolean signed, BigDecimal min, BigDecimal max) {
+        DecimalTypeImpl (int mBits, int nBits, boolean signed, BigDecimal min, BigDecimal max) {
             super(mBits, nBits, signed)
             minMock = min
             maxMock = max
@@ -293,8 +293,8 @@ class DecimalTypeTest extends Specification {
 
         where:
         first                               | second
-        DEFAULT                        | [] as DecimalTypeImpl
-        DEFAULT                        | [128] as DecimalTypeImpl
+        DEFAULT                             | [] as DecimalTypeImpl
+        DEFAULT                             | [128] as DecimalTypeImpl
         [64, 24, true] as DecimalTypeImpl   | [64, 24, true] as DecimalTypeImpl
     }
 
@@ -304,9 +304,9 @@ class DecimalTypeTest extends Specification {
 
         where:
         first                               | second
-        DEFAULT                        | DEFAULT
-        DEFAULT                        | [] as DecimalTypeImpl
-        DEFAULT                        | [128] as DecimalTypeImpl
+        DEFAULT                             | DEFAULT
+        DEFAULT                             | [] as DecimalTypeImpl
+        DEFAULT                             | [128] as DecimalTypeImpl
         [64, 24, true] as DecimalTypeImpl   | [64, 24, true] as DecimalTypeImpl
     }
 
@@ -315,7 +315,7 @@ class DecimalTypeTest extends Specification {
         first != second
 
         where:
-        first           | second
+        first      | second
         DEFAULT    | null
         DEFAULT    | [64, 24, true] as DecimalTypeImpl
         DEFAULT    | BoolType.DEFAULT

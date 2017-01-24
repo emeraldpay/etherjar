@@ -60,10 +60,10 @@ class UFixedTypeTest extends Specification {
 
     def "should return max value"() {
         when:
-        UFixedType obj = new UFixedType(M, N)
+        def obj = [M, N] as UFixedType
 
         then:
-        obj.maxValue == new BigDecimal(str)
+        obj.maxValue == str as BigDecimal
 
         where:
         M   | N   | str
@@ -76,10 +76,10 @@ class UFixedTypeTest extends Specification {
 
     def "should return min value"() {
         when:
-        UFixedType obj = new UFixedType(M, N)
+        def obj = [M, N] as UFixedType
 
         then:
-        obj.minValue == BigDecimal.ZERO
+        obj.minValue == 0G
 
         where:
         M   | N
