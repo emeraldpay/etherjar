@@ -28,7 +28,6 @@ dependencies {
     compile "org.apache.httpcomponents:httpmime:$httpClientVersion"
     compile "org.apache.httpcomponents:httpclient:$httpClientVersion"
     compile "org.bouncycastle:bcprov-jdk15on:$bcprovVersion"
-
     testCompile "org.objenesis:objenesis:$objenesisVersion"
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
     testCompile "org.spockframework:spock-core:$spockVersion"

@@ -1,11 +1,8 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
 import spock.lang.Specification
 
 class IntTypeSpec extends Specification {
-
-    final static DEFAULT_TYPE = [] as IntType
 
     def "should parse string representation"() {
         when:
@@ -87,46 +84,46 @@ class IntTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.bytes == Hex32.SIZE_BYTES
-        !DEFAULT_TYPE.signed
+        IntType.DEFAULT.bits == 256
+        IntType.DEFAULT.signed
     }
 
     def "should create an instance with specified number of bits"() {
         def type = [40] as IntType
 
         expect:
-        type.bytes == 5
-        !type.signed
+        type.bits == 40
+        type.signed
     }
 
     def "should return a minimal value (inclusive)"() {
         def type = [bits] as IntType
 
         expect:
-        type.minValue == new BigInteger(str, 16)
+        type.minValue == val
 
         where:
-        bits    | str
-        8       | '-80'
-        40      | '-8000000000'
-        64      | '-8000000000000000'
-        128     | '-80000000000000000000000000000000'
-        256     | '-8000000000000000000000000000000000000000000000000000000000000000'
+        bits    | val
+        8       | -0x80G
+        40      | -0x8000000000G
+        64      | -0x8000000000000000G
+        128     | -0x80000000000000000000000000000000G
+        256     | -0x8000000000000000000000000000000000000000000000000000000000000000G
     }
 
     def "should return a maximal value (exclusive)"() {
         def type = [bits] as IntType
 
         expect:
-        type.maxValue == new BigInteger(str, 16)
+        type.maxValue == val
 
         where:
-        bits    | str
-        8       | '+80'
-        40      | '+8000000000'
-        64      | '+8000000000000000'
-        128     | '+80000000000000000000000000000000'
-        256     | '+8000000000000000000000000000000000000000000000000000000000000000'
+        bits    | val
+        8       | 0x80G
+        40      | 0x8000000000G
+        64      | 0x8000000000000000G
+        128     | 0x80000000000000000000000000000000G
+        256     | 0x8000000000000000000000000000000000000000000000000000000000000000G
     }
 
     def "should return a canonical string representation" () {

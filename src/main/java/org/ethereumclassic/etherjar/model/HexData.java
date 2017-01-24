@@ -27,6 +27,7 @@ public class HexData {
      *
      * @param data an array of hex data
      * @return a hex data
+     *
      * @see #combine(Collection)
      */
     public static HexData combine(HexData... data) {
@@ -38,6 +39,7 @@ public class HexData {
      *
      * @param data a collection of hex data
      * @return a hex data
+     *
      * @see #combine(HexData...)
      */
     public static HexData combine(Collection<? extends HexData> data) {
@@ -98,6 +100,7 @@ public class HexData {
      *
      * @param data an array of {@link HexData}
      * @return hex value
+     *
      * @see #concat(Collection)
      */
     public HexData concat(HexData... data) {
@@ -109,6 +112,7 @@ public class HexData {
      *
      * @param data a collection of {@link HexData}
      * @return hex value
+     *
      * @see #concat(HexData...)
      */
     public HexData concat(Collection<? extends HexData> data) {
@@ -132,6 +136,7 @@ public class HexData {
      *
      * @param size a size in bytes
      * @return an extracted {@link HexData} instance
+     *
      * @see #extract(int, int)
      */
     public HexData extract(int size) {
@@ -145,6 +150,7 @@ public class HexData {
      * @param conv a converter from hex data into required object type
      * @param <T> a java object type is needed to return
      * @return an extracted object
+     *
      * @see #extract(int, int, Function)
      */
     public <T> T extract(int size, Function<? super HexData, T> conv) {
@@ -158,6 +164,7 @@ public class HexData {
      * @param size a size in bytes
      * @param offset an offset in bytes
      * @return an extracted {@link HexData} instance
+     *
      * @see #extract(int, int, Function)
      */
     public HexData extract(int size, int offset) {
@@ -173,6 +180,7 @@ public class HexData {
      * @param conv a converter from hex data into required object type
      * @param <T> a java object type is needed to return
      * @return an extracted object
+     *
      * @see #extract(int, Function)
      */
     public <T> T extract(int size, int offset, Function<? super HexData, T> conv) {
@@ -199,6 +207,7 @@ public class HexData {
      * @return an array of split hex data
      * @throws IllegalArgumentException if the hex data length
      * is not a multiple of given <tt>size</tt>
+     *
      * @see #split(int, int)
      */
     public HexData[] split(int size) {
@@ -217,6 +226,7 @@ public class HexData {
      * @return an array of split type instances
      * @throws IllegalArgumentException if the hex data length
      * is not a multiple of given <tt>size</tt>
+     *
      * @see #split(int, int, IntFunction, Function)
      */
     public <T> T[] split(int size, IntFunction<T[]> gen, Function<? super HexData, T> conv) {
@@ -232,6 +242,7 @@ public class HexData {
      * @return an array of split hex data
      * @throws IllegalArgumentException if the summary length to split
      * is not a multiple of given <tt>size</tt>
+     *
      * @see #split(int)
      */
     public HexData[] split(int size, int offset) {
@@ -256,6 +267,7 @@ public class HexData {
      * @return an array of split type instances
      * @throws IllegalArgumentException if the summary length to split
      * is not a multiple of given <tt>size</tt>
+     *
      * @see #split(int, IntFunction, Function)
      */
     public <T> T[] split(int size, int offset, IntFunction<T[]> gen, Function<? super HexData, T> conv) {

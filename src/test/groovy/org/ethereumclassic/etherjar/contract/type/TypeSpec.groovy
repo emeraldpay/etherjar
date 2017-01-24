@@ -101,19 +101,19 @@ class TypeSpec extends Specification {
 
         then:
         data.toHex() == hex
-        res == val
+        res == val as BigInteger
 
         where:
-        val                                                                                     | hex
-        1                                                                                       | '0x0000000000000000000000000000000000000000000000000000000000000001'
-        12                                                                                      | '0x000000000000000000000000000000000000000000000000000000000000000c'
-        123                                                                                     | '0x000000000000000000000000000000000000000000000000000000000000007b'
-        123456789                                                                               | '0x00000000000000000000000000000000000000000000000000000000075bcd15'
-        Integer.MAX_VALUE                                                                       | '0x000000000000000000000000000000000000000000000000000000007fffffff'
-        Long.MAX_VALUE                                                                          | '0x0000000000000000000000000000000000000000000000007fffffffffffffff'
-        new BigInteger('+80000000000000000000000000000', 16)                                    | '0x0000000000000000000000000000000000080000000000000000000000000000'
-        new BigInteger('+8000000000000000000000000000000000000000000000000000000000000000', 16) | '0x8000000000000000000000000000000000000000000000000000000000000000'
-        new BigInteger('+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16) | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        val                                                                 | hex
+        1                                                                   | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        12                                                                  | '0x000000000000000000000000000000000000000000000000000000000000000c'
+        123                                                                 | '0x000000000000000000000000000000000000000000000000000000000000007b'
+        123456789                                                           | '0x00000000000000000000000000000000000000000000000000000000075bcd15'
+        Integer.MAX_VALUE                                                   | '0x000000000000000000000000000000000000000000000000000000007fffffff'
+        Long.MAX_VALUE                                                      | '0x0000000000000000000000000000000000000000000000007fffffffffffffff'
+        0x80000000000000000000000000000                                     | '0x0000000000000000000000000000000000080000000000000000000000000000'
+        0x8000000000000000000000000000000000000000000000000000000000000000  | '0x8000000000000000000000000000000000000000000000000000000000000000'
+        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
     }
 
     def "should catch negative or zero length before encoding"() {
@@ -130,9 +130,9 @@ class TypeSpec extends Specification {
         _ | -123
         _ | Integer.MIN_VALUE
         _ | Long.MIN_VALUE
-        _ | new BigInteger('-80000000000000000000000000000', 16)
-        _ | new BigInteger('-8000000000000000000000000000000000000000000000000000000000000000', 16)
-        _ | new BigInteger('-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+        _ | -0x80000000000000000000000000000
+        _ | -0x8000000000000000000000000000000000000000000000000000000000000000
+        _ | -0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     }
 
     def "should catch zero length after decoding"() {

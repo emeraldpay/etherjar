@@ -12,13 +12,11 @@ import java.util.stream.Stream;
 
 public class IntType extends NumericType {
 
-    final static Map<Integer, BigInteger> MOST_POPULAR_MIN_VALUES =
-            Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
-                    Collectors.toMap(Function.identity(), IntType::minValue), Collections::unmodifiableMap));
+    public final static IntType DEFAULT = new IntType();
 
-    final static Map<Integer, BigInteger> MOST_POPULAR_MAX_VALUES =
+    final static Map<Integer, IntType> CACHED_TYPES =
             Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
-                    Collectors.toMap(Function.identity(), IntType::maxValue), Collections::unmodifiableMap));
+                    Collectors.toMap(Function.identity(), IntType::new), Collections::unmodifiableMap));
 
     final static String NAME_PREFIX = "int";
 
@@ -46,8 +44,13 @@ public class IntType extends NumericType {
 
         String digits = matcher.group(1);
 
-        return Optional.of(
-                digits.isEmpty() ? new IntType() : new IntType(Integer.parseInt(digits)));
+        if (digits.isEmpty())
+            return Optional.of(DEFAULT);
+
+        int bits = Integer.parseInt(digits);
+
+        return Optional.of(CACHED_TYPES.containsKey(bits) ?
+                CACHED_TYPES.get(bits) : new IntType(bits));
     }
 
     static BigInteger minValue(int bits) {
@@ -58,7 +61,7 @@ public class IntType extends NumericType {
         if (bits < 0)
             throw new IllegalArgumentException("Negative number of bits: " + bits);
 
-        return BigInteger.valueOf(2).shiftLeft(bits - 2);
+        return powerOfTwo(bits - 1);
     }
 
     private final BigInteger minValue;
@@ -70,13 +73,10 @@ public class IntType extends NumericType {
     }
 
     public IntType(int bits) {
-        super(bits, false);
+        super(bits, true);
 
-        minValue = MOST_POPULAR_MIN_VALUES.containsKey(bits) ?
-                MOST_POPULAR_MIN_VALUES.get(bits) : minValue(bits);
-
-        maxValue = MOST_POPULAR_MAX_VALUES.containsKey(bits) ?
-                MOST_POPULAR_MAX_VALUES.get(bits) : maxValue(bits);
+        minValue = minValue(bits);
+        maxValue = maxValue(bits);
     }
 
     @Override

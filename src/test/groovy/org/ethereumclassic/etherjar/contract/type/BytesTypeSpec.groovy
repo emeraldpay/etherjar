@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class BytesTypeSpec extends Specification {
 
-    final static DEFAULT_TYPE = [] as BytesType
+    final static DEFAULT = [] as BytesType
 
     def "should parse string representation"() {
         when:
@@ -46,15 +46,15 @@ class BytesTypeSpec extends Specification {
 
     def "should return a canonical string representation" () {
         expect:
-        DEFAULT_TYPE.canonicalName == 'bytes'
+        DEFAULT.canonicalName == 'bytes'
     }
 
     def "should encode & decode list of bytes"() {
         def obj = bytes as byte[]
 
         when:
-        def data = DEFAULT_TYPE.encode obj
-        def res = DEFAULT_TYPE.decode data
+        def data = DEFAULT.encode obj
+        def res = DEFAULT.decode data
 
         then:
         data == hex
@@ -69,7 +69,7 @@ class BytesTypeSpec extends Specification {
 
     def "should catch empty array to encode"() {
         when:
-        DEFAULT_TYPE.encode([] as byte[])
+        DEFAULT.encode([] as byte[])
 
         then:
         thrown IllegalArgumentException
@@ -77,7 +77,7 @@ class BytesTypeSpec extends Specification {
 
     def "should catch wrong data to decode"() {
         when:
-        DEFAULT_TYPE.decode hex
+        DEFAULT.decode hex
 
         then:
         thrown IllegalArgumentException
@@ -90,7 +90,7 @@ class BytesTypeSpec extends Specification {
 
     def "should catch empty data to decode"() {
         when:
-        DEFAULT_TYPE.decode(HexData.EMPTY)
+        DEFAULT.decode(HexData.EMPTY)
 
         then:
         thrown IllegalArgumentException
@@ -102,7 +102,7 @@ class BytesTypeSpec extends Specification {
 
         where:
         first           | second
-        DEFAULT_TYPE    | [] as BytesType
+        DEFAULT    | [] as BytesType
     }
 
     def "should be equal"() {
@@ -111,8 +111,8 @@ class BytesTypeSpec extends Specification {
 
         where:
         first           | second
-        DEFAULT_TYPE    | DEFAULT_TYPE
-        DEFAULT_TYPE    | [] as BytesType
+        DEFAULT    | DEFAULT
+        DEFAULT    | [] as BytesType
     }
 
     def "should not be equal"() {
@@ -121,13 +121,13 @@ class BytesTypeSpec extends Specification {
 
         where:
         first           | second
-        DEFAULT_TYPE    | null
-        DEFAULT_TYPE    | 'ABC'
-        DEFAULT_TYPE    | new UIntType()
+        DEFAULT    | null
+        DEFAULT    | 'ABC'
+        DEFAULT    | UIntType.DEFAULT
     }
 
     def "should be converted to a string representation"() {
         expect:
-        DEFAULT_TYPE as String == 'bytes'
+        DEFAULT as String == 'bytes'
     }
 }

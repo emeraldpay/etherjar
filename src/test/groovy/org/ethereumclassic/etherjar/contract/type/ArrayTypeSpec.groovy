@@ -236,7 +236,7 @@ class ArrayTypeSpec extends Specification {
         [wrappedType, 12] as ArrayType  | null
         [wrappedType, 12] as ArrayType  | [wrappedType] as ArrayType
         [wrappedType, 12] as ArrayType  | [wrappedType, 8] as ArrayType
-        [wrappedType, 12] as ArrayType  | new UIntType()
+        [wrappedType, 12] as ArrayType  | UIntType.DEFAULT
         [wrappedType, 12] as ArrayType  | "ABC"
     }
 
