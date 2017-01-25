@@ -68,14 +68,6 @@ class BytesTypeSpec extends Specification {
         [0x12] * 123                | Type.encodeLength(123).concat(HexData.from('0x' + '12' * 123 + '00' * 5))
     }
 
-    def "should catch empty array to encode"() {
-        when:
-        DEFAULT.encode([] as byte[])
-
-        then:
-        thrown IllegalArgumentException
-    }
-
     def "should catch wrong data to decode"() {
         when:
         DEFAULT.decode hex
