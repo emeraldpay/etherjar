@@ -158,9 +158,6 @@ public interface Type<T> {
      * @see #decodeLength(Hex32)
      */
     static Hex32 encodeLength(BigInteger val) {
-        if (val.compareTo(BigInteger.ZERO) == 0)
-            throw new IllegalArgumentException("Zero dynamic type length to encode");
-
         return new UIntType().encodeStatic(val);
     }
 
@@ -174,12 +171,7 @@ public interface Type<T> {
      * @see #encodeLength(BigInteger)
      */
     static BigInteger decodeLength(Hex32 hex32) {
-        BigInteger val = new UIntType().decodeStatic(hex32);
-
-        if (val.compareTo(BigInteger.ZERO) == 0)
-            throw new IllegalArgumentException("Zero decoded dynamic type length");
-
-        return val;
+        return new UIntType().decodeStatic(hex32);
     }
 
     /**

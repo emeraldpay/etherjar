@@ -1,5 +1,6 @@
 package org.ethereumclassic.etherjar.contract.type
 
+import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
 
@@ -49,7 +50,7 @@ class BytesTypeSpec extends Specification {
         DEFAULT.canonicalName == 'bytes'
     }
 
-    def "should encode & decode list of bytes"() {
+    def "should encode & decode array of bytes"() {
         def obj = bytes as byte[]
 
         when:
@@ -67,14 +68,6 @@ class BytesTypeSpec extends Specification {
         [0x12] * 123                | Type.encodeLength(123).concat(HexData.from('0x' + '12' * 123 + '00' * 5))
     }
 
-    def "should catch empty array to encode"() {
-        when:
-        DEFAULT.encode([] as byte[])
-
-        then:
-        thrown IllegalArgumentException
-    }
-
     def "should catch wrong data to decode"() {
         when:
         DEFAULT.decode hex
@@ -84,8 +77,10 @@ class BytesTypeSpec extends Specification {
 
         where:
         _ | hex
-        _ | Type.encodeLength(4)
+        _ | Type.encodeLength(1)
+        _ | Type.encodeLength(32).concat(Hex32.EMPTY, Hex32.EMPTY)
         _ | Type.encodeLength(34).concat(HexData.from('0x6461766500000000000000000000000000000000000000000000000000000000'))
+        _ | Type.encodeLength(0).concat(Hex32.EMPTY)
     }
 
     def "should catch empty data to decode"() {

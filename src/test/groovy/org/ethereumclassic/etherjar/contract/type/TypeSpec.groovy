@@ -1,6 +1,5 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
 import spock.lang.Specification
 
 import java.util.function.BiFunction
@@ -116,7 +115,7 @@ class TypeSpec extends Specification {
         0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
     }
 
-    def "should catch negative or zero length before encoding"() {
+    def "should catch negative length before encoding"() {
         when:
         DynamicType.encodeLength val
 
@@ -125,7 +124,6 @@ class TypeSpec extends Specification {
 
         where:
         _ | val
-        _ | 0
         _ | -1
         _ | -123
         _ | Integer.MIN_VALUE
@@ -133,16 +131,6 @@ class TypeSpec extends Specification {
         _ | -0x80000000000000000000000000000
         _ | -0x8000000000000000000000000000000000000000000000000000000000000000
         _ | -0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-    }
-
-    def "should catch zero length after decoding"() {
-        def empty = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000000'
-
-        when:
-        DynamicType.decodeLength empty
-
-        then:
-        thrown IllegalArgumentException
     }
 
     def "should oppose static property to dynamic property"() {

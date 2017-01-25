@@ -276,7 +276,7 @@ public class HexData {
         if (size < 0 || offset < 0)
             throw new IllegalArgumentException("Negative extract arguments");
 
-        if (getSize() < size + offset)
+        if (getSize() < offset)
             throw new IllegalArgumentException("Insufficient size to extract");
 
         if (size != 0 && (getSize() - offset) % size != 0)

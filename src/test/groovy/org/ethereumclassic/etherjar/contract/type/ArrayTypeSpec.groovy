@@ -1,6 +1,5 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Shared
 import spock.lang.Specification
@@ -15,9 +14,9 @@ class ArrayTypeSpec extends Specification {
         wrappedType = [
                 getCanonicalName: { 'ABC' },
                 isDynamic: { false },
-                getFixedSize: { Hex32.SIZE_BYTES },
+                getFixedSize: { 64 },
                 encode: { Boolean bool ->
-                    HexData.from('0x0000000000000000000000000000000000000000000000000000000000000001')
+                    HexData.from('0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001')
                 },
                 decode: { true },
         ] as Type
@@ -75,8 +74,10 @@ class ArrayTypeSpec extends Specification {
         where:
         _ | input
         _ | 'int16]'
+        _ | 'int16[0]'
         _ | 'int16[-1]'
         _ | 'int16[abc]'
+        _ | 'int16[][0]'
         _ | 'int16[][-3]'
     }
 
@@ -150,6 +151,7 @@ class ArrayTypeSpec extends Specification {
         '_[1]'  | [true]                | wrappedType.encode(true)
         '_[3]'  | [true, true, true]    | HexData.combine([wrappedType.encode(true)] * 3)
         '_[]'   | [true, true]          | Type.encodeLength(2).concat([wrappedType.encode(true)] * 2)
+        '_[]'   | []                    | Type.encodeLength(0)
     }
 
     def "should catch wrong array length to encode"() {
@@ -168,16 +170,6 @@ class ArrayTypeSpec extends Specification {
         _ | 21
     }
 
-    def "should catch empty array to encode"() {
-        def obj = [wrappedType] as ArrayType
-
-        when:
-        obj.encode([] as Boolean[])
-
-        then:
-        thrown IllegalArgumentException
-    }
-
     def "should catch wrong data to decode"() {
         def parser = { Optional.of wrappedType } as Function
 
@@ -191,10 +183,10 @@ class ArrayTypeSpec extends Specification {
 
         where:
         str     | hex
-        '_[1]'  | HexData.combine([wrappedType.encode(true)] * 2)
-        '_[3]'  | HexData.combine([wrappedType.encode(true)] * 2)
+        '_[]'   | Type.encodeLength(0).concat(wrappedType.encode(true))
         '_[]'   | Type.encodeLength(2).concat(wrappedType.encode(true))
-        '_[]'   | Type.encodeLength(1).concat([wrappedType.encode(true)] * 2)
+        '_[1]'   | Type.encodeLength(1).concat([wrappedType.encode(true)] * 2)
+        '_[3]'   | Type.encodeLength(3)
     }
 
     def "should catch empty data to decode"() {
@@ -232,7 +224,7 @@ class ArrayTypeSpec extends Specification {
         first != second
 
         where:
-        first   | second
+        first                           | second
         [wrappedType, 12] as ArrayType  | null
         [wrappedType, 12] as ArrayType  | [wrappedType] as ArrayType
         [wrappedType, 12] as ArrayType  | [wrappedType, 8] as ArrayType
