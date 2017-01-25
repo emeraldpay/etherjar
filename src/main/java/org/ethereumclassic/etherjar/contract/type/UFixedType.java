@@ -15,7 +15,7 @@ public class UFixedType extends DecimalType {
 
     public final static UFixedType DEFAULT = new UFixedType();
 
-    final static Map<Integer, UFixedType> CACHED_TYPES =
+    final static Map<Integer, UFixedType> CACHED_INSTANCES =
             Stream.of(8, 16, 32, 64, 128).collect(Collectors.collectingAndThen(
                     Collectors.toMap(Function.identity(), UFixedType::new), Collections::unmodifiableMap));
 
@@ -49,13 +49,15 @@ public class UFixedType extends DecimalType {
         int mBits = Integer.parseInt(matcher.group(2));
         int nBits = Integer.parseInt(matcher.group(3));
 
-        return Optional.of(mBits == nBits && CACHED_TYPES.containsKey(mBits) ?
-                CACHED_TYPES.get(mBits) : new UFixedType(mBits, nBits));
+        return Optional.of(mBits == nBits && CACHED_INSTANCES.containsKey(mBits) ?
+                CACHED_INSTANCES.get(mBits) : new UFixedType(mBits, nBits));
     }
 
-    static BigDecimal maxValue(int mBits) { return powerOfTwo(mBits); }
+    private final BigDecimal minValue;
 
     private final BigDecimal maxValue;
+
+    private final NumericType numericType;
 
     public UFixedType() {
         this(128, 128);
@@ -66,19 +68,29 @@ public class UFixedType extends DecimalType {
     }
 
     public UFixedType(int mBits, int nBits) {
-        super(mBits, nBits, false);
+        super(mBits, nBits);
 
-        maxValue = maxValue(mBits);
+        numericType = new UIntType(mBits + nBits);
+
+        minValue = new BigDecimal(
+                numericType.getMinValue().shiftRight(nBits));
+        maxValue = new BigDecimal(
+                numericType.getMaxValue().shiftRight(nBits));
     }
 
     @Override
     public BigDecimal getMinValue() {
-        return BigDecimal.ZERO;
+        return minValue;
     }
 
     @Override
     public BigDecimal getMaxValue() {
         return maxValue;
+    }
+
+    @Override
+    public NumericType getNumericType() {
+        return numericType;
     }
 
     @Override

@@ -18,6 +18,10 @@ public abstract class NumericType implements StaticType<BigInteger> {
     }
 
     static BigInteger powerOfTwo(int bits) {
+        if (bits < 0)
+            throw new IllegalArgumentException(
+                    "Negative number of bits to calculate the power of two: " + bits);
+
         return BigInteger.ONE.shiftLeft(bits);
     }
 
@@ -104,7 +108,7 @@ public abstract class NumericType implements StaticType<BigInteger> {
         }
 
         if (!isValueValid(value))
-            throw new IllegalArgumentException("Numeric value out of range: " + value);
+            throw new IllegalArgumentException("Data exceeding to decode numeric value: " + hex32);
 
         return value;
     }

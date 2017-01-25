@@ -45,7 +45,7 @@ class FixedTypeTest extends Specification {
         _ | input
         _ | 'fixed<-1>x<-1>'
         _ | 'fixed<-1>x<8>'
-        _ | 'fixed<1>x<1>'
+        _ | 'fixed<8>x<1>'
         _ | 'fixed<0>x<128>'
         _ | 'fixed<256>x<8>'
     }
@@ -58,38 +58,6 @@ class FixedTypeTest extends Specification {
         FixedType.DEFAULT.signed
     }
 
-    def "should return max value"() {
-        when:
-        def obj = [M, N] as FixedType
-
-        then:
-        obj.maxValue == str as BigDecimal
-
-        where:
-        M   | N   | str
-        8   | 8   | '128'
-        64  | 64  | '9223372036854775808'
-        128 | 128 | '170141183460469231731687303715884105728'
-        40  | 8   | '549755813888'
-        8   | 40  | '128'
-    }
-
-    def "should return min value"() {
-        when:
-        def obj = [M, N] as FixedType
-
-        then:
-        obj.minValue == str as BigDecimal
-
-        where:
-        M   | N   | str
-        8   | 8   | '-128'
-        64  | 64  | '-9.223372036854775808e+18'
-        128 | 128 | '-1.70141183460469231731687303715884105728e+38'
-        40  | 8   | '-549755813888'
-        8   | 40  | '-128'
-    }
-
     def "should create an instance with specified number of bits"() {
         def type = [40, 8] as FixedType
 
@@ -98,6 +66,34 @@ class FixedTypeTest extends Specification {
         type.NBits == 8
         type.bits == 48
         type.signed
+    }
+
+    def "should return a minimal value (inclusive)"() {
+        def type = [bits] as FixedType
+
+        expect:
+        type.minValue == val as BigDecimal
+
+        where:
+        bits    | val
+        8       | -0x80G
+        40      | -0x8000000000G
+        64      | -0x8000000000000000G
+        128     | -0x80000000000000000000000000000000G
+    }
+
+    def "should return a maximal value (exclusive)"() {
+        def type = [bits] as FixedType
+
+        expect:
+        type.maxValue == val as BigDecimal
+
+        where:
+        bits    | val
+        8       | 0x80G
+        40      | 0x8000000000G
+        64      | 0x8000000000000000G
+        128     | 0x80000000000000000000000000000000G
     }
 
     def "should parse string representation"() {

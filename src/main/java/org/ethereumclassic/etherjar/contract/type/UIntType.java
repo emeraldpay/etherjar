@@ -14,7 +14,7 @@ public class UIntType extends NumericType {
 
     public final static UIntType DEFAULT = new UIntType();
 
-    final static Map<Integer, UIntType> CACHED_TYPES =
+    final static Map<Integer, UIntType> CACHED_INSTANCES =
             Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
                     Collectors.toMap(Function.identity(), UIntType::new), Collections::unmodifiableMap));
 
@@ -49,15 +49,8 @@ public class UIntType extends NumericType {
 
         int bits = Integer.parseInt(digits);
 
-        return Optional.of(CACHED_TYPES.containsKey(bits) ?
-                CACHED_TYPES.get(bits) : new UIntType(bits));
-    }
-
-    static BigInteger maxValue(int bits) {
-        if (bits < 0)
-            throw new IllegalArgumentException("Negative number of bits: " + bits);
-
-        return powerOfTwo(bits);
+        return Optional.of(CACHED_INSTANCES.containsKey(bits) ?
+                CACHED_INSTANCES.get(bits) : new UIntType(bits));
     }
 
     private final BigInteger maxValue;
@@ -69,7 +62,7 @@ public class UIntType extends NumericType {
     public UIntType(int bits) {
         super(bits, false);
 
-        maxValue = maxValue(bits);
+        maxValue = powerOfTwo(bits);
     }
 
     @Override
