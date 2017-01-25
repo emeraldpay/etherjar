@@ -6,9 +6,11 @@ import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
 import org.ethereumclassic.etherjar.model.Nonce
 import org.ethereumclassic.etherjar.model.TransactionId
+import org.ethereumclassic.etherjar.model.Wei
 import org.ethereumclassic.etherjar.rpc.json.BlockJson
 import org.ethereumclassic.etherjar.rpc.json.BlockTag
 import org.ethereumclassic.etherjar.rpc.json.TraceItemJson
+import org.ethereumclassic.etherjar.rpc.json.TransactionCallJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionJson
 import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport
@@ -343,5 +345,55 @@ class DefaultRpcClientSpec extends Specification {
         1 * rpcTransport.execute("eth_getCompilers", [], String[]) >> new CompletedFuture<>(data)
         act.get().size() == data.size()
         act.get() as Set == data as Set
+    }
+
+    def "Call"() {
+        setup:
+        def call = new TransactionCallJson(
+                Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
+                HexData.from('0x18160ddd')
+        )
+        when:
+        def act = defaultRpcClient.eth().call(call, BlockTag.LATEST)
+        then:
+        1 * rpcTransport.execute("eth_call", [call, 'latest'], String) >> new CompletedFuture<>('0x000000000000000000000000000000000000000000000000000039bc22c57200')
+        act.get().toHex() == '0x000000000000000000000000000000000000000000000000000039bc22c57200'
+    }
+
+    def "Send Transaction"() {
+        setup:
+        def tx = new TransactionCallJson(
+                Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
+                Address.from('0x1e45c30168ba23a0dac51911079d0fcff1a9e4ad'),
+                Wei.fromEther(12.345)
+        )
+        def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        when:
+        def act = defaultRpcClient.eth().sendTransaction(tx)
+        then:
+        1 * rpcTransport.execute("eth_sendTransaction", [tx], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        act.get() == txid
+    }
+
+    def "Send Raw Transaction"() {
+        setup:
+        def tx = HexData.from('0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675')
+        def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        when:
+        def act = defaultRpcClient.eth().sendTransaction(tx)
+        then:
+        1 * rpcTransport.execute("eth_sendRawTransaction", ['0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        act.get() == txid
+    }
+
+    def "Sign"() {
+        setup:
+        def addr = Address.from('0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab')
+        def data = HexData.from('0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470')
+        when:
+        def act = defaultRpcClient.eth().sign(addr, data)
+        then:
+        1 * rpcTransport.execute("eth_sign", ['0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab', '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'], String) >> new CompletedFuture<>('0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001')
+        act.get().toHex() == '0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001'
     }
 }

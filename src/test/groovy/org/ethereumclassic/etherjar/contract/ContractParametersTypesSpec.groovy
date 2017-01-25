@@ -144,7 +144,7 @@ class ContractParametersTypesSpec extends Specification {
                 Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
                 Hex32.from('0x0000000000000000000000000000000880000000000000000000000000000000'))
 
-        def val = [BigDecimal.valueOf(2.125), BigDecimal.valueOf(8.5)] as BigDecimal[]
+        def val = [2.125, 8.5] as BigDecimal[]
 
         def type = Stub(Type) {
             isStatic() >> true
@@ -171,7 +171,7 @@ class ContractParametersTypesSpec extends Specification {
         def data1 = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000045'
         def data2 = Hex32.from '0x0000000000000000000000000000000000000000000000000000000000000001'
 
-        def val1 = BigInteger.valueOf(69)
+        def val1 = 69
         def val2 = Boolean.TRUE
 
         def type1 = Stub(Type) {
@@ -221,7 +221,7 @@ class ContractParametersTypesSpec extends Specification {
 
         def val1 = 'dave'
         def val2 = Boolean.TRUE
-        def val3 = [BigInteger.ONE, BigInteger.valueOf(2), BigInteger.valueOf(3)] as BigInteger[]
+        def val3 = [1, 2, 3] as BigInteger[]
 
         def type1 = Stub(Type) {
             isDynamic() >> true

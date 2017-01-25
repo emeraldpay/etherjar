@@ -1,14 +1,23 @@
-EtherJar
-========
+= EtherJar
 
+:rootdir: .
+:imagesdir: {rootdir}/images
+:toclevels: 2
+:toc:
+
+ifdef::env-github,env-browser[:badges:]
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+
+ifdef::badges[]
 image:http://build.ethereumclassic.org/app/rest/builds/buildType:(id:Etherjar_Master)/statusIcon[TC Build Status, link=http://build.ethereumclassic.org/viewType.html?buildTypeId=Etherjar_Master]
 image:https://travis-ci.org/ethereumproject/etherjar.png?branch=master[Travis CI Build Status, link=https://travis-ci.org/ethereumproject/etherjar]
 image:https://codecov.io/gh/ethereumproject/etherjar/branch/master/graph/badge.svg[Codecov, link=https://codecov.io/gh/ethereumproject/etherjar]
 image:https://img.shields.io/github/license/ethereumproject/etherjar.svg?maxAge=2592000["License", link="https://github.com/ethereumproject/etherjar/blob/master/LICENSE"]
+endif::[]
 
 Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum Classic (ETC) and Ethereum (ETH).
 
-## Features
+== Features
 
 * Blockchain information through Ethereum RPC calls
 * (_in progress_) Offline transaction signing
@@ -16,20 +25,75 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 * (_in progress_) ABI encoding/decoding
 * Parity RPC extensions support
 
-## Principles
+== Principles
 
 * Async first approach
 * Value objects (thread-safe immutability)
 * HTTP Transport and JSON parser agnostic
 
-## Installation
+== Requirements
 
-TODO
+* Java 8
+* https://gradle.org/[Gradle]
+* https://www.vagrantup.com/[Vagrant]
 
-## Usage Examples
+== Installation
 
-TODO
+----
+gradle build
+----
 
-## Licence
+== Usage
+
+Set up local https://ethcore.io/parity.html[parity node]:
+
+----
+vagrant up
+----
+
+Check client version:
+
+[source,java]
+----
+package example;
+
+import org.ethereumclassic.etherjar.rpc.transport.DefaultRpcTransport;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+public class Main {
+
+    public static void main(String[] args)
+            throws URISyntaxException, IOException, ExecutionException, InterruptedException {
+
+        DefaultRpcTransport transport =
+                new DefaultRpcTransport(new URI("http://127.0.0.1:8545"));
+
+        Future<String> req =
+                transport.execute("web3_clientVersion", Collections.EMPTY_LIST, String.class);
+
+        System.out.println(String.format("Client version: %s", req.get()));
+    }
+}
+----
+
+----
+Client version: Parity//v1.5.0-unstable-1ee5ba1-20170116/x86_64-linux-gnu/rustc1.14.0
+----
+
+Tear down local parity node:
+
+----
+vagrant halt
+----
+
+<<docs/parity.adoc#,Read more>> about local parity node customizing.
+
+== Licence
 
 Apache 2.0

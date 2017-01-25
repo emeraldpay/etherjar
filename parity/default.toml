@@ -1,0 +1,12 @@
+[parity]
+chain = "/etc/parity/chain/default.json"
+
+[rpc]
+interface = "all"
+hosts = ["all"]
+
+[dapps]
+disable = true
+
+[misc]
+log_file = "/var/log/parity"

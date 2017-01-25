@@ -55,7 +55,6 @@ public interface StaticType<T> extends Type<T> {
      *
      * @param hex32 a hex32
      * @return decoded object
-     *
      * @see #encodeStatic(Object)
      */
     T decodeStatic(Hex32 hex32);

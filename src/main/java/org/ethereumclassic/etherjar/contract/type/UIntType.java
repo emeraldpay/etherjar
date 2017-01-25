@@ -12,9 +12,11 @@ import java.util.stream.Stream;
 
 public class UIntType extends NumericType {
 
-    final static Map<Integer, BigInteger> MOST_POPULAR_MAX_VALUES =
+    public final static UIntType DEFAULT = new UIntType();
+
+    final static Map<Integer, UIntType> CACHED_INSTANCES =
             Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
-                    Collectors.toMap(Function.identity(), UIntType::maxValue), Collections::unmodifiableMap));
+                    Collectors.toMap(Function.identity(), UIntType::new), Collections::unmodifiableMap));
 
     final static String NAME_PREFIX = "uint";
 
@@ -42,15 +44,13 @@ public class UIntType extends NumericType {
 
         String digits = matcher.group(1);
 
-        return Optional.of(
-                digits.isEmpty() ? new UIntType() : new UIntType(Integer.parseInt(digits)));
-    }
+        if (digits.isEmpty())
+            return Optional.of(DEFAULT);
 
-    static BigInteger maxValue(int bits) {
-        if (bits < 0)
-            throw new IllegalArgumentException("Negative number of bits: " + bits);
+        int bits = Integer.parseInt(digits);
 
-        return BigInteger.valueOf(2).shiftLeft(bits - 1);
+        return Optional.of(CACHED_INSTANCES.containsKey(bits) ?
+                CACHED_INSTANCES.get(bits) : new UIntType(bits));
     }
 
     private final BigInteger maxValue;
@@ -62,8 +62,7 @@ public class UIntType extends NumericType {
     public UIntType(int bits) {
         super(bits, false);
 
-        maxValue = MOST_POPULAR_MAX_VALUES.containsKey(bits) ?
-                MOST_POPULAR_MAX_VALUES.get(bits) : maxValue(bits);
+        maxValue = powerOfTwo(bits);
     }
 
     @Override

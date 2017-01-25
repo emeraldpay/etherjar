@@ -4,8 +4,6 @@ import spock.lang.Specification
 
 class BoolTypeSpec extends Specification {
 
-    final static DEFAULT_TYPE = [] as BoolType
-
     def "should parse string representation"() {
         when:
         def opt = BoolType.from 'bool'
@@ -45,27 +43,27 @@ class BoolTypeSpec extends Specification {
 
     def "should create a correct default instance"() {
         expect:
-        DEFAULT_TYPE.bytes == 1
-        !DEFAULT_TYPE.signed
+        BoolType.DEFAULT.bits == 8
+        !BoolType.DEFAULT.signed
     }
 
     def "should return a minimal value (inclusive)"() {
         expect:
-        DEFAULT_TYPE.minValue == BigInteger.ZERO
+        BoolType.DEFAULT.minValue == 0G
     }
 
     def "should return a maximal value (exclusive)"() {
         expect:
-        DEFAULT_TYPE.maxValue == BigInteger.valueOf(2)
+        BoolType.DEFAULT.maxValue == 2G
     }
 
     def "should return a canonical string representation" () {
         expect:
-        DEFAULT_TYPE.canonicalName == 'bool'
+        BoolType.DEFAULT.canonicalName == 'bool'
     }
 
     def "should be converted to a string representation"() {
         expect:
-        DEFAULT_TYPE as String == 'bool'
+        BoolType.DEFAULT as String == 'bool'
     }
 }

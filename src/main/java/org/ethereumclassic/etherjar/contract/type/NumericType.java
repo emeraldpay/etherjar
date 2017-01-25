@@ -6,6 +6,9 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Signed & unsigned integer type.
+ */
 public abstract class NumericType implements StaticType<BigInteger> {
 
     private final static byte[] NEGATIVE_ARRAY_FOR_PADDING = new byte[32];
@@ -14,42 +17,35 @@ public abstract class NumericType implements StaticType<BigInteger> {
         Arrays.fill(NEGATIVE_ARRAY_FOR_PADDING, (byte) 0xFF);
     }
 
-    private final int bytes;
+    static BigInteger powerOfTwo(int bits) {
+        if (bits < 0)
+            throw new IllegalArgumentException(
+                    "Negative number of bits to calculate the power of two: " + bits);
+
+        return BigInteger.ONE.shiftLeft(bits);
+    }
+
+    private final int bits;
 
     private final boolean isSigned;
 
-    protected NumericType() {
-        this(Hex32.SIZE_BYTES << 3);
-    }
-
-    protected NumericType(int bits) {
-        this(bits, false);
-    }
-
     protected NumericType(int bits, boolean isSigned) {
         if (bits <= 0 || bits > 256 || bits % 8 != 0)
-            throw new IllegalArgumentException("Invalid bits count: " + bits);
+            throw new IllegalArgumentException("Numeric type invalid bits count: " + bits);
 
-        this.bytes = bits >>> 3;
+        this.bits = bits;
         this.isSigned = isSigned;
-    }
-
-    /**
-     * @return number of bytes
-     */
-    public int getBytes() {
-        return bytes;
     }
 
     /**
      * @return number of bits
      */
     public int getBits() {
-        return bytes << 3;
+        return bits;
     }
 
     /**
-     * @return {@code true} if this {@link Type} is isSigned, otherwise {@code false}
+     * @return {@code true} if this {@link Type} is signed, otherwise {@code false}
      */
     public boolean isSigned() {
         return isSigned;
@@ -82,7 +78,7 @@ public abstract class NumericType implements StaticType<BigInteger> {
     @Override
     public Hex32 encodeStatic(BigInteger value) {
         if (!isValueValid(value))
-            throw new IllegalArgumentException("Out of range: " + value);
+            throw new IllegalArgumentException("Numeric value out of range: " + value);
 
         byte[] data = value.toByteArray();
 
@@ -91,6 +87,8 @@ public abstract class NumericType implements StaticType<BigInteger> {
         if (value.signum() == -1) {
             System.arraycopy(NEGATIVE_ARRAY_FOR_PADDING, 0, arr, 0, Hex32.SIZE_BYTES);
         }
+
+        int bytes = bits >>> 3;
 
         if (data.length > bytes) {
             System.arraycopy(data, data.length - bytes, arr, Hex32.SIZE_BYTES - bytes, bytes);
@@ -110,14 +108,14 @@ public abstract class NumericType implements StaticType<BigInteger> {
         }
 
         if (!isValueValid(value))
-            throw new IllegalArgumentException("Out of range: " + value);
+            throw new IllegalArgumentException("Data exceeding to decode numeric value: " + hex32);
 
         return value;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), bytes, isSigned);
+        return Objects.hash(getClass(), bits, isSigned);
     }
 
     @Override
@@ -131,7 +129,7 @@ public abstract class NumericType implements StaticType<BigInteger> {
 
         NumericType other = (NumericType) obj;
 
-        return bytes == other.bytes
+        return bits == other.bits
                 && isSigned == other.isSigned;
     }
 

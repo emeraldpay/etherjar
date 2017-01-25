@@ -6,9 +6,7 @@ import java.util.Optional;
 
 public class BoolType extends NumericType {
 
-    public final static BigInteger FALSE = BigInteger.ZERO;
-
-    public final static BigInteger TRUE = BigInteger.ONE;
+    public final static BoolType DEFAULT = new BoolType();
 
     /**
      * Try to parse a {@link BoolType} string representation (either canonical form or not).
@@ -24,7 +22,7 @@ public class BoolType extends NumericType {
         Objects.requireNonNull(str);
 
         return Objects.equals(str, "bool") ?
-                Optional.of(new BoolType()) : Optional.empty();
+                Optional.of(DEFAULT) : Optional.empty();
     }
 
     public BoolType() {
@@ -44,10 +42,5 @@ public class BoolType extends NumericType {
     @Override
     public String getCanonicalName() {
         return "bool";
-    }
-
-    @Override
-    public String toString() {
-        return getCanonicalName();
     }
 }

@@ -164,7 +164,7 @@ class ContractMethodSpec extends Specification {
     }
 
     def "should encode contract method call"() {
-        def args = [[BigDecimal.valueOf(2.125), BigDecimal.valueOf(8.5)]]
+        def args = [[2.125, 8.5]]
 
         def data = HexData.combine(
                 Hex32.from('0x0000000000000000000000000000000220000000000000000000000000000000'),
