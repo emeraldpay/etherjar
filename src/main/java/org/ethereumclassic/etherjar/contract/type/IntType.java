@@ -14,7 +14,7 @@ public class IntType extends NumericType {
 
     public final static IntType DEFAULT = new IntType();
 
-    final static Map<Integer, IntType> CACHED_TYPES =
+    final static Map<Integer, IntType> CACHED_INSTANCES =
             Stream.of(8, 16, 32, 64, 128, 256).collect(Collectors.collectingAndThen(
                     Collectors.toMap(Function.identity(), IntType::new), Collections::unmodifiableMap));
 
@@ -49,19 +49,8 @@ public class IntType extends NumericType {
 
         int bits = Integer.parseInt(digits);
 
-        return Optional.of(CACHED_TYPES.containsKey(bits) ?
-                CACHED_TYPES.get(bits) : new IntType(bits));
-    }
-
-    static BigInteger minValue(int bits) {
-        return maxValue(bits).negate();
-    }
-
-    static BigInteger maxValue(int bits) {
-        if (bits < 0)
-            throw new IllegalArgumentException("Negative number of bits: " + bits);
-
-        return powerOfTwo(bits - 1);
+        return Optional.of(CACHED_INSTANCES.containsKey(bits) ?
+                CACHED_INSTANCES.get(bits) : new IntType(bits));
     }
 
     private final BigInteger minValue;
@@ -75,8 +64,8 @@ public class IntType extends NumericType {
     public IntType(int bits) {
         super(bits, true);
 
-        minValue = minValue(bits);
-        maxValue = maxValue(bits);
+        minValue = powerOfTwo(bits - 1).negate();
+        maxValue = powerOfTwo(bits - 1);
     }
 
     @Override

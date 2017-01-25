@@ -66,22 +66,6 @@ class IntTypeSpec extends Specification {
         _ | 'int140x'
     }
 
-    def "should detect negative bits before min value calculation"() {
-        when:
-        IntType.minValue(-1)
-
-        then:
-        thrown IllegalArgumentException
-    }
-
-    def "should detect negative bits before max value calculation"() {
-        when:
-        IntType.maxValue(-2)
-
-        then:
-        thrown IllegalArgumentException
-    }
-
     def "should create a correct default instance"() {
         expect:
         IntType.DEFAULT.bits == 256

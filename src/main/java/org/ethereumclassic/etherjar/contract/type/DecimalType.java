@@ -12,26 +12,18 @@ import java.util.Objects;
  */
 public abstract class DecimalType implements StaticType<BigDecimal> {
 
-    static BigDecimal powerOfTwo(int bits) {
-        return new BigDecimal(NumericType.powerOfTwo(bits));
-    }
-
     private final int mBits;
 
     private final int nBits;
 
-    private final boolean isSigned;
-
     private final BigDecimal fractionFactor;
 
-    private final NumericType numericType;
-
-    protected DecimalType(int mBits, int nBits, boolean isSigned) {
+    protected DecimalType(int mBits, int nBits) {
         if (mBits <= 0 || mBits % 8 != 0)
-            throw new IllegalArgumentException("Decimal type invalid mBits count: " + mBits);
+            throw new IllegalArgumentException("Decimal type invalid 'mBits' count: " + mBits);
 
         if (nBits <= 0 || nBits % 8 != 0)
-            throw new IllegalArgumentException("Decimal type invalid nBits count: " + nBits);
+            throw new IllegalArgumentException("Decimal type invalid 'nBits' count: " + nBits);
 
         if (mBits + nBits > 256)
             throw new IllegalArgumentException(
@@ -39,12 +31,8 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
 
         this.mBits = mBits;
         this.nBits = nBits;
-        this.isSigned = isSigned;
 
-        fractionFactor = powerOfTwo(nBits);
-
-        numericType = isSigned ?
-                new IntType(mBits + nBits) : new UIntType(mBits + nBits);
+        this.fractionFactor = new BigDecimal(NumericType.powerOfTwo(nBits));
     }
 
     /**
@@ -72,7 +60,7 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
      * @return {@code true} if this {@link Type} is signed, otherwise {@code false}
      */
     public boolean isSigned() {
-        return isSigned;
+        return getNumericType().isSigned();
     }
 
     /**
@@ -86,14 +74,19 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
     }
 
     /**
+     * @return a minimal value (inclusive)
+     */
+    public abstract BigDecimal getMinValue();
+
+    /**
      * @return a maximum value (exclusive)
      */
     public abstract BigDecimal getMaxValue();
 
     /**
-     * @return a minimal value (inclusive)
+     * @return an underlying numeric type
      */
-    public abstract BigDecimal getMinValue();
+    public abstract NumericType getNumericType();
 
     public Hex32 encode(double value) {
         return encodeStatic(BigDecimal.valueOf(value));
@@ -101,23 +94,22 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
 
     @Override
     public Hex32 encodeStatic(BigDecimal value) {
+        if (!isValueValid(value))
+            throw new IllegalArgumentException("Decimal value out of range: " + value);
+
         BigInteger integer = value.multiply(fractionFactor)
                 .setScale(0, RoundingMode.HALF_UP).toBigInteger();
 
-        if (!numericType.isValueValid(integer)) {
-            if (!isValueValid(value))
-                throw new IllegalArgumentException("Decimal value out of range: " + value);
-
+        if (integer.compareTo(getNumericType().getMaxValue()) == 0) {
             integer = integer.subtract(BigInteger.ONE);
         }
 
-
-        return numericType.encodeStatic(integer);
+        return getNumericType().encodeStatic(integer);
     }
 
     @Override
     public BigDecimal decodeStatic(Hex32 hex32) {
-        BigInteger integer = numericType.decode(hex32);
+        BigInteger integer = getNumericType().decodeStatic(hex32);
 
         //noinspection BigDecimalMethodWithoutRoundingCalled
         return new BigDecimal(integer).divide(fractionFactor);
@@ -125,7 +117,7 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), nBits, mBits, isSigned);
+        return Objects.hash(getClass(), nBits, mBits);
     }
 
     @Override
@@ -139,8 +131,7 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
         DecimalType other = (DecimalType) obj;
 
         return nBits == other.nBits
-                && mBits == other.mBits
-                && isSigned == other.isSigned;
+                && mBits == other.mBits;
     }
 
     @Override

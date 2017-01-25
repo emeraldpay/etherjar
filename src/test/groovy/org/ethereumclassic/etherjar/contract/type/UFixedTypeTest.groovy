@@ -45,7 +45,7 @@ class UFixedTypeTest extends Specification {
         _ | input
         _ | 'ufixed<-1>x<-1>'
         _ | 'ufixed<-1>x<8>'
-        _ | 'ufixed<1>x<1>'
+        _ | 'ufixed<8>x<1>'
         _ | 'ufixed<0>x<128>'
         _ | 'ufixed<256>x<8>'
     }
@@ -58,38 +58,6 @@ class UFixedTypeTest extends Specification {
         !UFixedType.DEFAULT.signed
     }
 
-    def "should return max value"() {
-        when:
-        def obj = [M, N] as UFixedType
-
-        then:
-        obj.maxValue == str as BigDecimal
-
-        where:
-        M   | N   | str
-        8   | 8   | '256'
-        64  | 64  | '18446744073709551616'
-        128 | 128 | '340282366920938463463374607431768211456'
-        40  | 8   | '1099511627776'
-        8   | 40  | '256'
-    }
-
-    def "should return min value"() {
-        when:
-        def obj = [M, N] as UFixedType
-
-        then:
-        obj.minValue == 0G
-
-        where:
-        M   | N
-        8   | 8
-        64  | 64
-        128 | 128
-        40  | 8
-        8   | 40
-    }
-
     def "should create an instance with specified number of bits"() {
         def type = [40, 8] as UFixedType
 
@@ -98,6 +66,30 @@ class UFixedTypeTest extends Specification {
         type.NBits == 8
         type.bits == 48
         !type.signed
+    }
+
+    def "should return a minimal value (inclusive)"() {
+        def type = [bits] as UFixedType
+
+        expect:
+        type.minValue == BigDecimal.ZERO
+
+        where:
+        bits << [8, 40, 64, 128]
+    }
+
+    def "should return a maximal value (exclusive)"() {
+        def type = [bits] as UFixedType
+
+        expect:
+        type.maxValue == val as BigDecimal
+
+        where:
+        bits    | val
+        8       | 0x100G
+        40      | 0x10000000000G
+        64      | 0x10000000000000000G
+        128     | 0x100000000000000000000000000000000G
     }
 
     def "should parse string representation"() {

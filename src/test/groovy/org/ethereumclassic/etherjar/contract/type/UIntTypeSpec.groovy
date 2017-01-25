@@ -66,14 +66,6 @@ class UIntTypeSpec extends Specification {
         _ | 'uint16x'
     }
 
-    def "should detect negative bits before max value calculation"() {
-        when:
-        UIntType.maxValue(-1)
-
-        then:
-        thrown IllegalArgumentException
-    }
-
     def "should create a correct default instance"() {
         expect:
         UIntType.DEFAULT.bits == 256

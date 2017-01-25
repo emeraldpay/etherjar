@@ -41,8 +41,6 @@ class NumericTypeSpec extends Specification {
         expect:
         DEFAULT.bits == 256
         !DEFAULT.signed
-        DEFAULT.static
-        DEFAULT.fixedSize == Hex32.SIZE_BYTES
     }
 
     def "should return a power of two"() {
@@ -62,6 +60,20 @@ class NumericTypeSpec extends Specification {
         128     | 340282366920938463463374607431768211456G
         253     | 14474011154664524427946373126085988481658748083205070504932198000989141204992G
         256     | 115792089237316195423570985008687907853269984665640564039457584007913129639936G
+    }
+
+    def "should detect negative bits before calculate a power of two"() {
+        when:
+        NumericType.powerOfTwo bits
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | bits
+        _ | -1
+        _ | -2
+        _ | -8
     }
 
     def "should create an unsigned instance with specified number of bits"() {
@@ -136,13 +148,8 @@ class NumericTypeSpec extends Specification {
         def obj = new NumericTypeImpl(128, true) {
 
             @Override
-            BigInteger getMinValue() {
-                -0x8000000000000000000000000000000000000000000000000000000000000000
-            }
-
-            @Override
-            BigInteger getMaxValue() {
-                0x8000000000000000000000000000000000000000000000000000000000000000
+            boolean isValueValid(BigInteger value) {
+                true
             }
         }
 
@@ -167,17 +174,13 @@ class NumericTypeSpec extends Specification {
         def obj = new NumericTypeImpl(bits, sign) {
 
             @Override
-            BigInteger getMinValue() {
-                isSigned() ?
-                        -0x8000000000000000000000000000000000000000000000000000000000000000 :
-                        0G
+            boolean isValueValid(BigInteger value) {
+                true
             }
 
             @Override
             BigInteger getMaxValue() {
-                isSigned() ?
-                        0x8000000000000000000000000000000000000000000000000000000000000000 :
-                        0x10000000000000000000000000000000000000000000000000000000000000000
+                0x10000000000000000000000000000000000000000000000000000000000000000
             }
         }
 
@@ -305,46 +308,27 @@ class NumericTypeSpec extends Specification {
 
     def "should catch out of range before encoding"() {
         def obj = [
-                getMinValue: 0G,
-                getMaxValue: 10G,
+                isValueValid: false,
         ] as NumericTypeImpl
 
         when:
-        obj.encodeStatic value
+        obj.encodeStatic 0G
 
         then:
         thrown IllegalArgumentException
-
-        where:
-        _ | value
-        _ | -1G
-        _ | 10G
     }
 
     def "should catch out of range after decoding"() {
-        def obj = new NumericTypeImpl(bits, sign) {
-
-            @Override
-            BigInteger getMinValue() {
-                1
-            }
-
-            @Override
-            BigInteger getMaxValue() {
-                256
-            }
-        }
+        def obj = [
+                isValueValid: false,
+        ] as NumericTypeImpl
 
         when:
-        obj.decodeStatic(Hex32.from(hex))
+        obj.decodeStatic(
+                Hex32.from('0x0000000000000000000000000000000000000000000000000000000000000000'))
 
         then:
         thrown IllegalArgumentException
-
-        where:
-        bits    |sign   | hex
-        8       | true  | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        16      | false | '0x000000000000000000000000000000000000000000000000000000000000ffff'
     }
 
     def "should calculate consistent hashcode"() {
@@ -353,8 +337,8 @@ class NumericTypeSpec extends Specification {
 
         where:
         first                           | second
-        DEFAULT                    | [] as NumericTypeImpl
-        DEFAULT                    | [256] as NumericTypeImpl
+        DEFAULT                         | [] as NumericTypeImpl
+        DEFAULT                         | [256] as NumericTypeImpl
         [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
     }
 
@@ -364,9 +348,9 @@ class NumericTypeSpec extends Specification {
 
         where:
         first                           | second
-        DEFAULT                    | DEFAULT
-        DEFAULT                    | [] as NumericTypeImpl
-        DEFAULT                    | [256] as NumericTypeImpl
+        DEFAULT                         | DEFAULT
+        DEFAULT                         | [] as NumericTypeImpl
+        DEFAULT                         | [256] as NumericTypeImpl
         [64, true] as NumericTypeImpl   | [64, true] as NumericTypeImpl
     }
 
@@ -375,10 +359,10 @@ class NumericTypeSpec extends Specification {
         first != second
 
         where:
-        first           | second
-        DEFAULT    | null
-        DEFAULT    | [64] as NumericTypeImpl
-        DEFAULT    | UIntType.DEFAULT
+        first       | second
+        DEFAULT     | null
+        DEFAULT     | [64] as NumericTypeImpl
+        DEFAULT     | UIntType.DEFAULT
     }
 
     def "should be converted to a string representation"() {

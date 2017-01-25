@@ -15,7 +15,7 @@ public class FixedType extends DecimalType {
 
     public final static FixedType DEFAULT = new FixedType();
 
-    final static Map<Integer, FixedType> CACHED_TYPES =
+    final static Map<Integer, FixedType> CACHED_INSTANCES =
             Stream.of(8, 16, 32, 64, 128).collect(Collectors.collectingAndThen(
                     Collectors.toMap(Function.identity(), FixedType::new), Collections::unmodifiableMap));
 
@@ -49,19 +49,15 @@ public class FixedType extends DecimalType {
         int mBits = Integer.parseInt(matcher.group(2));
         int nBits = Integer.parseInt(matcher.group(3));
 
-        return Optional.of(mBits == nBits && CACHED_TYPES.containsKey(mBits) ?
-                CACHED_TYPES.get(mBits) : new FixedType(mBits, nBits));
+        return Optional.of(mBits == nBits && CACHED_INSTANCES.containsKey(mBits) ?
+                CACHED_INSTANCES.get(mBits) : new FixedType(mBits, nBits));
     }
-
-    static BigDecimal minValue(int mBits) {
-        return maxValue(mBits).negate();
-    }
-
-    static BigDecimal maxValue(int mBits) { return powerOfTwo(mBits - 1); }
 
     private final BigDecimal minValue;
 
     private final BigDecimal maxValue;
+
+    private final NumericType numericType;
 
     public FixedType() {
         this(128, 128);
@@ -72,10 +68,14 @@ public class FixedType extends DecimalType {
     }
 
     public FixedType(int mBits, int nBits) {
-        super(mBits, nBits, true);
+        super(mBits, nBits);
 
-        minValue = minValue(mBits);
-        maxValue = maxValue(mBits);
+        numericType = new IntType(mBits + nBits);
+
+        minValue = new BigDecimal(
+                numericType.getMinValue().shiftRight(nBits));
+        maxValue = new BigDecimal(
+                numericType.getMaxValue().shiftRight(nBits));
     }
 
     @Override
@@ -86,6 +86,11 @@ public class FixedType extends DecimalType {
     @Override
     public BigDecimal getMaxValue() {
         return maxValue;
+    }
+
+    @Override
+    public NumericType getNumericType() {
+        return numericType;
     }
 
     @Override

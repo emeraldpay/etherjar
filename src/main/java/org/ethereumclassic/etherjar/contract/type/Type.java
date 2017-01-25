@@ -56,7 +56,7 @@ public interface Type<T> {
         @SuppressWarnings("unchecked")
         default Optional<Type> search(String str) {
             if (str.isEmpty())
-                throw new IllegalArgumentException("Empty type string representation.");
+                throw new IllegalArgumentException("Empty type string representation");
 
             return getTypeParsers().stream()
                     .map(t -> (Optional<Type>) t.apply(str))
