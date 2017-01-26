@@ -62,6 +62,8 @@ class UIntTypeSpec extends Specification {
 
         where:
         _ | input
+        _ | 'uinty'
+        _ | 'uint0'
         _ | 'uint257'
         _ | 'uint1024'
         _ | 'uint16x'

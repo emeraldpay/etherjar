@@ -91,7 +91,7 @@ class UFixedTypeTest extends Specification {
         def type = [bits] as UFixedType
 
         expect:
-        type.minValue == BigDecimal.ZERO
+        type.minValue == 0.0G
 
         where:
         bits << [8, 40, 64, 128]

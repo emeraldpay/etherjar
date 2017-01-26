@@ -48,7 +48,8 @@ public class DynamicBytesType implements DynamicType<byte[]> {
 
     @Override
     public byte[] decode(HexData data) {
-        int len = Type.decodeLength(data.extract(Hex32.SIZE_BYTES, Hex32::from)).intValueExact();
+        int len = Type.decodeLength(
+                data.extract(Hex32.SIZE_BYTES, Hex32::from)).intValueExact();
 
         int size = len % Hex32.SIZE_BYTES == 0 ? len :
                 len + Hex32.SIZE_BYTES - len % Hex32.SIZE_BYTES;
