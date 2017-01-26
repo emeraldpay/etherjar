@@ -21,7 +21,7 @@ public class FixedType extends DecimalType {
 
     final static String NAME_PREFIX = "fixed";
 
-    final static Pattern NAME_PATTERN = Pattern.compile("fixed(<(\\d{1,3})>x<(\\d{1,3})>)?");
+    final static Pattern NAME_PATTERN = Pattern.compile("fixed((\\d{1,3})x(\\d{1,3}))?");
 
     /**
      * Try to parse a {@link FixedType} string representation (either canonical form or not).
@@ -95,6 +95,6 @@ public class FixedType extends DecimalType {
 
     @Override
     public String getCanonicalName() {
-        return String.format("fixed<%d>x<%d>", getMBits(), getNBits());
+        return String.format("fixed%dx%d", getMBits(), getNBits());
     }
 }
