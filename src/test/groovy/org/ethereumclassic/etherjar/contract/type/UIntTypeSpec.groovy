@@ -10,6 +10,7 @@ class UIntTypeSpec extends Specification {
 
         then:
         opt.present
+        opt.get() in UIntType
         opt.get().canonicalName == output
 
         where:

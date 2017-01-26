@@ -4,21 +4,20 @@ import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
 
-class BytesTypeSpec extends Specification {
-
-    final static DEFAULT = [] as BytesType
+class DynamicBytesTypeSpec extends Specification {
 
     def "should parse string representation"() {
         when:
-        def opt = BytesType.from 'bytes'
+        def opt = DynamicBytesType.from 'bytes'
 
         then:
         opt.present
+        opt.get() in DynamicType
     }
 
     def "should detect null string representation"() {
         when:
-        BytesType.from null
+        DynamicBytesType.from null
 
         then:
         thrown NullPointerException
@@ -26,7 +25,7 @@ class BytesTypeSpec extends Specification {
 
     def "should ignore empty string representation"() {
         when:
-        def opt = BytesType.from ''
+        def opt = DynamicBytesType.from ''
 
         then:
         !opt.present
@@ -34,7 +33,7 @@ class BytesTypeSpec extends Specification {
 
     def "should ignore wrong string representation"() {
         when:
-        def opt = BytesType.from input
+        def opt = DynamicBytesType.from input
 
         then:
         !opt.present
@@ -47,15 +46,15 @@ class BytesTypeSpec extends Specification {
 
     def "should return a canonical string representation" () {
         expect:
-        DEFAULT.canonicalName == 'bytes'
+        DynamicBytesType.DEFAULT.canonicalName == 'bytes'
     }
 
     def "should encode & decode array of bytes"() {
         def obj = bytes as byte[]
 
         when:
-        def data = DEFAULT.encode obj
-        def res = DEFAULT.decode data
+        def data = DynamicBytesType.DEFAULT.encode obj
+        def res = DynamicBytesType.DEFAULT.decode data
 
         then:
         data == hex
@@ -70,7 +69,7 @@ class BytesTypeSpec extends Specification {
 
     def "should catch wrong data to decode"() {
         when:
-        DEFAULT.decode hex
+        DynamicBytesType.DEFAULT.decode hex
 
         then:
         thrown IllegalArgumentException
@@ -85,7 +84,7 @@ class BytesTypeSpec extends Specification {
 
     def "should catch empty data to decode"() {
         when:
-        DEFAULT.decode(HexData.EMPTY)
+        DynamicBytesType.DEFAULT.decode(HexData.EMPTY)
 
         then:
         thrown IllegalArgumentException
@@ -96,8 +95,8 @@ class BytesTypeSpec extends Specification {
         first.hashCode() == second.hashCode()
 
         where:
-        first           | second
-        DEFAULT    | [] as BytesType
+        first                       | second
+        DynamicBytesType.DEFAULT    | [] as DynamicBytesType
     }
 
     def "should be equal"() {
@@ -105,9 +104,9 @@ class BytesTypeSpec extends Specification {
         first == second
 
         where:
-        first           | second
-        DEFAULT    | DEFAULT
-        DEFAULT    | [] as BytesType
+        first                       | second
+        DynamicBytesType.DEFAULT    | DynamicBytesType.DEFAULT
+        DynamicBytesType.DEFAULT    | [] as DynamicBytesType
     }
 
     def "should not be equal"() {
@@ -115,14 +114,14 @@ class BytesTypeSpec extends Specification {
         first != second
 
         where:
-        first           | second
-        DEFAULT    | null
-        DEFAULT    | 'ABC'
-        DEFAULT    | UIntType.DEFAULT
+        first                       | second
+        DynamicBytesType.DEFAULT    | null
+        DynamicBytesType.DEFAULT    | 'ABC'
+        DynamicBytesType.DEFAULT    | UIntType.DEFAULT
     }
 
     def "should be converted to a string representation"() {
         expect:
-        DEFAULT as String == 'bytes'
+        DynamicBytesType.DEFAULT as String == 'bytes'
     }
 }

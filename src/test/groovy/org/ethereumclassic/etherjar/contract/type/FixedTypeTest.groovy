@@ -4,6 +4,25 @@ import spock.lang.Specification
 
 class FixedTypeTest extends Specification {
 
+    def "should parse string representation"() {
+        when:
+        def opt = FixedType.from input
+
+        then:
+        opt.present
+        opt.get() in FixedType
+        opt.get().canonicalName == output
+
+        where:
+        input               | output
+        'fixed'             | 'fixed<128>x<128>'
+        'fixed<8>x<8>'      | 'fixed<8>x<8>'
+        'fixed<64>x<64>'    | 'fixed<64>x<64>'
+        'fixed<64>x<8>'     | 'fixed<64>x<8>'
+        'fixed<40>x<120>'   | 'fixed<40>x<120>'
+        'fixed<128>x<128>'  | 'fixed<128>x<128>'
+    }
+
     def "should detect null string representation"() {
         when:
         FixedType.from null
@@ -94,23 +113,5 @@ class FixedTypeTest extends Specification {
         40      | 0x8000000000G
         64      | 0x8000000000000000G
         128     | 0x80000000000000000000000000000000G
-    }
-
-    def "should parse string representation"() {
-        when:
-        def opt = FixedType.from input
-
-        then:
-        opt.present
-        opt.get().canonicalName == output
-
-        where:
-        input               | output
-        'fixed'             | 'fixed<128>x<128>'
-        'fixed<8>x<8>'      | 'fixed<8>x<8>'
-        'fixed<64>x<64>'    | 'fixed<64>x<64>'
-        'fixed<64>x<8>'     | 'fixed<64>x<8>'
-        'fixed<40>x<120>'   | 'fixed<40>x<120>'
-        'fixed<128>x<128>'  | 'fixed<128>x<128>'
     }
 }

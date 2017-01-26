@@ -9,23 +9,27 @@ import java.util.Optional;
 /**
  *  Dynamic sized byte sequence.
  */
-public class BytesType implements DynamicType<byte[]> {
+public class DynamicBytesType implements DynamicType<byte[]> {
+
+    public final static DynamicBytesType DEFAULT = new DynamicBytesType();
 
     /**
-     * Try to parse a {@link BytesType} string representation (either canonical form or not).
+     * Try to parse a {@link DynamicBytesType} string representation (either canonical form or not).
      *
      * @param str a string
-     * @return a {@link BytesType} instance is packed as {@link Optional} value,
+     * @return a {@link DynamicBytesType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
      *
      * @see #getCanonicalName()
      */
-    public static Optional<BytesType> from(String str) {
+    public static Optional<DynamicBytesType> from(String str) {
         Objects.requireNonNull(str);
 
-        return Objects.equals(str, "bytes") ?
-                Optional.of(new BytesType()) : Optional.empty();
+        if (!Objects.equals(str, "bytes"))
+            return Optional.empty();
+
+        return Optional.of(DEFAULT);
     }
 
     @Override

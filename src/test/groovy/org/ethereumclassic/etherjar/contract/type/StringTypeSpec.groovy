@@ -6,14 +6,13 @@ import spock.lang.Specification
 
 class StringTypeSpec extends Specification {
 
-    final static DEFAULT_TYPE = [] as StringType
-
     def "should parse string representation"() {
         when:
         def opt = StringType.from 'string'
 
         then:
         opt.present
+        opt.get() in StringType
     }
 
     def "should detect null string representation"() {
@@ -47,13 +46,13 @@ class StringTypeSpec extends Specification {
 
     def "should return a canonical string representation" () {
         expect:
-        DEFAULT_TYPE.canonicalName == 'string'
+        StringType.DEFAULT.canonicalName == 'string'
     }
 
     def "should encode & decode array of bytes"() {
         when:
-        def data = DEFAULT_TYPE.encode str
-        def res = DEFAULT_TYPE.decode data
+        def data = StringType.DEFAULT.encode str
+        def res = StringType.DEFAULT.decode data
 
         then:
         data == hex
@@ -72,7 +71,7 @@ class StringTypeSpec extends Specification {
 
     def "should catch incorrect utf-8 encoded data"() {
         when:
-        DEFAULT_TYPE.decode hex
+        StringType.DEFAULT.decode hex
 
         then:
         thrown RuntimeException
@@ -86,7 +85,7 @@ class StringTypeSpec extends Specification {
 
     def "should catch wrong data to decode"() {
         when:
-        DEFAULT_TYPE.decode hex
+        StringType.DEFAULT.decode hex
 
         then:
         thrown IllegalArgumentException
@@ -102,7 +101,7 @@ class StringTypeSpec extends Specification {
 
     def "should catch empty data to decode"() {
         when:
-        DEFAULT_TYPE.decode(HexData.EMPTY)
+        StringType.DEFAULT.decode(HexData.EMPTY)
 
         then:
         thrown IllegalArgumentException
@@ -113,8 +112,8 @@ class StringTypeSpec extends Specification {
         first.hashCode() == second.hashCode()
 
         where:
-        first           | second
-        DEFAULT_TYPE    | [] as StringType
+        first               | second
+        StringType.DEFAULT  | [] as StringType
     }
 
     def "should be equal"() {
@@ -122,9 +121,9 @@ class StringTypeSpec extends Specification {
         first == second
 
         where:
-        first           | second
-        DEFAULT_TYPE    | DEFAULT_TYPE
-        DEFAULT_TYPE    | [] as StringType
+        first               | second
+        StringType.DEFAULT  | StringType.DEFAULT
+        StringType.DEFAULT  | [] as StringType
     }
 
     def "should not be equal"() {
@@ -132,14 +131,14 @@ class StringTypeSpec extends Specification {
         first != second
 
         where:
-        first           | second
-        DEFAULT_TYPE    | null
-        DEFAULT_TYPE    | 'ABC'
-        DEFAULT_TYPE    | new UIntType()
+        first               | second
+        StringType.DEFAULT  | null
+        StringType.DEFAULT  | 'ABC'
+        StringType.DEFAULT  | new UIntType()
     }
 
     def "should be converted to a string representation"() {
         expect:
-        DEFAULT_TYPE as String == 'string'
+        StringType.DEFAULT as String == 'string'
     }
 }

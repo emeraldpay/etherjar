@@ -4,6 +4,25 @@ import spock.lang.Specification
 
 class UFixedTypeTest extends Specification {
 
+    def "should parse string representation"() {
+        when:
+        def opt = UFixedType.from input
+
+        then:
+        opt.present
+        opt.get() in UFixedType
+        opt.get().canonicalName == output
+
+        where:
+        input               | output
+        'ufixed'            | 'ufixed<128>x<128>'
+        'ufixed<8>x<8>'     | 'ufixed<8>x<8>'
+        'ufixed<64>x<64>'   | 'ufixed<64>x<64>'
+        'ufixed<64>x<8>'    | 'ufixed<64>x<8>'
+        'ufixed<40>x<120>'  | 'ufixed<40>x<120>'
+        'ufixed<128>x<128>' | 'ufixed<128>x<128>'
+    }
+
     def "should detect null string representation"() {
         when:
         UFixedType.from null
@@ -90,23 +109,5 @@ class UFixedTypeTest extends Specification {
         40      | 0x10000000000G
         64      | 0x10000000000000000G
         128     | 0x100000000000000000000000000000000G
-    }
-
-    def "should parse string representation"() {
-        when:
-        def opt = UFixedType.from input
-
-        then:
-        opt.present
-        opt.get().canonicalName == output
-
-        where:
-        input               | output
-        'ufixed'            | 'ufixed<128>x<128>'
-        'ufixed<8>x<8>'     | 'ufixed<8>x<8>'
-        'ufixed<64>x<64>'   | 'ufixed<64>x<64>'
-        'ufixed<64>x<8>'    | 'ufixed<64>x<8>'
-        'ufixed<40>x<120>'  | 'ufixed<40>x<120>'
-        'ufixed<128>x<128>' | 'ufixed<128>x<128>'
     }
 }
