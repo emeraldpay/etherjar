@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- *  Binary type of fixed bytes.
+ * Binary type of fixed bytes.
  */
 public class BytesType implements StaticType<byte[]> {
 

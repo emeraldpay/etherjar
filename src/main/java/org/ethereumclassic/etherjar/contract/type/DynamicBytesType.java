@@ -43,7 +43,8 @@ public class DynamicBytesType implements DynamicType<byte[]> {
 
         HexData data = Type.encodeLength(bytes.length).concat(new HexData(bytes));
 
-        return rem == 0 ? data : data.concat(new HexData(new byte[Hex32.SIZE_BYTES - rem]));
+        return rem == 0 ? data :
+                data.concat(new HexData(new byte[Hex32.SIZE_BYTES - rem]));
     }
 
     @Override

@@ -1,7 +1,5 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
-import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
 
 class BytesTypeSpec extends Specification {
@@ -85,23 +83,15 @@ class BytesTypeSpec extends Specification {
         def res = obj.decodeStatic data
 
         then:
-        data == hex
+        data.toHex() == hex
         Arrays.equals res, arr
 
         where:
         bytes                       | hex
-        [0x37]                      | Hex32.from('0x3700000000000000000000000000000000000000000000000000000000000000')
-        [0x64, 0x61, 0x76, 0x65]    | Hex32.from('0x6461766500000000000000000000000000000000000000000000000000000000')
-        [0x01] * 24                 | Hex32.from('0x0101010101010101010101010101010101010101010101010000000000000000')
-        [0x12] * 32                 | Hex32.from('0x1212121212121212121212121212121212121212121212121212121212121212')
-    }
-
-    def "should catch empty data to decode"() {
-        when:
-        BytesType.DEFAULT.decode(HexData.EMPTY)
-
-        then:
-        thrown IllegalArgumentException
+        [0x37]                      | '0x3700000000000000000000000000000000000000000000000000000000000000'
+        [0x64, 0x61, 0x76, 0x65]    | '0x6461766500000000000000000000000000000000000000000000000000000000'
+        [0x01] * 24                 | '0x0101010101010101010101010101010101010101010101010000000000000000'
+        [0x12] * 32                 | '0x1212121212121212121212121212121212121212121212121212121212121212'
     }
 
     def "should calculate consistent hashcode"() {
