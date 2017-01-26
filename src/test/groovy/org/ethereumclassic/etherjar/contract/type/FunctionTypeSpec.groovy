@@ -1,6 +1,5 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import javafx.util.Pair
 import org.ethereumclassic.etherjar.model.Address
 import org.ethereumclassic.etherjar.model.Hex32
 import org.ethereumclassic.etherjar.model.MethodId
@@ -52,7 +51,7 @@ class FunctionTypeSpec extends Specification {
     }
 
     def "should encode & decode bytes"() {
-        def obj = new Pair<>(Address.from(addr), MethodId.from(id))
+        def obj = new AbstractMap.SimpleEntry<Address, MethodId>(Address.from(addr), MethodId.from(id))
 
         when:
         def data = FunctionType.DEFAULT.encodeStatic obj
