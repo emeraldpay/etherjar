@@ -56,8 +56,8 @@ class MethodIdSpec extends Specification {
         where:
         _ | invalid_string
         _ | null
-        _ | "123"
-        _ | "-850932852093457982375"
+        _ | '123'
+        _ | '-850932852093457982375'
     }
 
     def "check from valid bytes"() {
@@ -84,9 +84,9 @@ class MethodIdSpec extends Specification {
 
         where:
         _ | valid_string
-        _ | "0x11223344"
-        _ | "0x00000000"
-        _ | "0xABCDEFFF"
-        _ | "0x12345678"
+        _ | '0x11223344'
+        _ | '0x00000000'
+        _ | '0xabcdefff'
+        _ | '0x12345678'
     }
 }

@@ -81,7 +81,7 @@ class AddressTypeSpec extends Specification {
         _ | hex
         _ | '0x0000000000000000000000010000000000000000000000000000000000000000'
         _ | '0x000000000000000000000001ffffffffffffffffffffffffffffffffffffffff'
-        _ | '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffff9c00000'
+        _ | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
     }
 
     def "should calculate consistent hashcode"() {
