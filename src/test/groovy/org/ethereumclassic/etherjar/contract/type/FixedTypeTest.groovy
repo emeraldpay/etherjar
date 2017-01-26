@@ -30,7 +30,7 @@ class FixedTypeTest extends Specification {
         where:
         _ | input
         _ | 'fxed'
-        _ | 'fexid<8>x<40>'
+        _ | 'fexid8x40'
         _ | 'bool'
     }
 
@@ -43,11 +43,11 @@ class FixedTypeTest extends Specification {
 
         where:
         _ | input
-        _ | 'fixed<-1>x<-1>'
-        _ | 'fixed<-1>x<8>'
-        _ | 'fixed<8>x<1>'
-        _ | 'fixed<0>x<128>'
-        _ | 'fixed<256>x<8>'
+        _ | 'fixed-1x-1'
+        _ | 'fixed-1x8'
+        _ | 'fixed8x1'
+        _ | 'fixed0x128'
+        _ | 'fixed256x8'
     }
 
     def "should create a correct default instance"() {
@@ -106,11 +106,11 @@ class FixedTypeTest extends Specification {
 
         where:
         input               | output
-        'fixed'             | 'fixed<128>x<128>'
-        'fixed<8>x<8>'      | 'fixed<8>x<8>'
-        'fixed<64>x<64>'    | 'fixed<64>x<64>'
-        'fixed<64>x<8>'     | 'fixed<64>x<8>'
-        'fixed<40>x<120>'   | 'fixed<40>x<120>'
-        'fixed<128>x<128>'  | 'fixed<128>x<128>'
+        'fixed'             | 'fixed128x128'
+        'fixed8x8'      | 'fixed8x8'
+        'fixed64x64'    | 'fixed64x64'
+        'fixed64x8'     | 'fixed64x8'
+        'fixed40x120'   | 'fixed40x120'
+        'fixed128x128'  | 'fixed128x128'
     }
 }

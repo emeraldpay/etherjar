@@ -30,7 +30,7 @@ class UFixedTypeTest extends Specification {
         where:
         _ | input
         _ | 'ufxed'
-        _ | 'ufexid<8>x<40>'
+        _ | 'ufexid8x40'
         _ | 'uint16'
     }
 
@@ -43,11 +43,11 @@ class UFixedTypeTest extends Specification {
 
         where:
         _ | input
-        _ | 'ufixed<-1>x<-1>'
-        _ | 'ufixed<-1>x<8>'
-        _ | 'ufixed<8>x<1>'
-        _ | 'ufixed<0>x<128>'
-        _ | 'ufixed<256>x<8>'
+        _ | 'ufixed-1x-1'
+        _ | 'ufixed-1x8'
+        _ | 'ufixed8x1'
+        _ | 'ufixed0x128'
+        _ | 'ufixed256x8'
     }
 
     def "should create a correct default instance"() {
@@ -102,11 +102,11 @@ class UFixedTypeTest extends Specification {
 
         where:
         input               | output
-        'ufixed'            | 'ufixed<128>x<128>'
-        'ufixed<8>x<8>'     | 'ufixed<8>x<8>'
-        'ufixed<64>x<64>'   | 'ufixed<64>x<64>'
-        'ufixed<64>x<8>'    | 'ufixed<64>x<8>'
-        'ufixed<40>x<120>'  | 'ufixed<40>x<120>'
-        'ufixed<128>x<128>' | 'ufixed<128>x<128>'
+        'ufixed'            | 'ufixed128x128'
+        'ufixed8x8'         | 'ufixed8x8'
+        'ufixed64x64'       | 'ufixed64x64'
+        'ufixed64x8'        | 'ufixed64x8'
+        'ufixed40x120'      | 'ufixed40x120'
+        'ufixed128x128'     | 'ufixed128x128'
     }
 }
