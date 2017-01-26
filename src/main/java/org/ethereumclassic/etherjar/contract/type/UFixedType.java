@@ -21,7 +21,7 @@ public class UFixedType extends DecimalType {
 
     final static String NAME_PREFIX = "ufixed";
 
-    final static Pattern NAME_PATTERN = Pattern.compile("ufixed(<(\\d{1,3})>x<(\\d{1,3})>)?");
+    final static Pattern NAME_PATTERN = Pattern.compile("ufixed((\\d{1,3})x(\\d{1,3}))?");
 
     /**
      * Try to parse a {@link UFixedType} string representation (either canonical form or not).
@@ -95,6 +95,6 @@ public class UFixedType extends DecimalType {
 
     @Override
     public String getCanonicalName() {
-        return String.format("ufixed<%d>x<%d>", getMBits(), getNBits());
+        return String.format("ufixed%dx%d", getMBits(), getNBits());
     }
 }
