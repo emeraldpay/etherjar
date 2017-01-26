@@ -95,6 +95,6 @@ public class FixedType extends DecimalType {
 
     @Override
     public String getCanonicalName() {
-        return String.format("fixed<%d>x<%d>", getMBits(), getNBits());
+        return String.format("fixed%dx%d", getMBits(), getNBits());
     }
 }

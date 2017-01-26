@@ -95,6 +95,6 @@ public class UFixedType extends DecimalType {
 
     @Override
     public String getCanonicalName() {
-        return String.format("ufixed<%d>x<%d>", getMBits(), getNBits());
+        return String.format("ufixed%dx%d", getMBits(), getNBits());
     }
 }
