@@ -14,9 +14,9 @@ import java.util.Optional;
  */
 public class StringType implements DynamicType<String> {
 
-    final static Charset UTF_8_CHARSET = Charset.forName(StandardCharsets.UTF_8.name());
+    public final static StringType DEFAULT = new StringType();
 
-    final static BytesType BYTES_TYPE = new BytesType();
+    final static Charset UTF8_CHARSET = Charset.forName(StandardCharsets.UTF_8.name());
 
     /**
      * Try to parse a {@link StringType} string representation (either canonical form or not).
@@ -28,11 +28,13 @@ public class StringType implements DynamicType<String> {
      *
      * @see #getCanonicalName()
      */
-    public static Optional<BytesType> from(String str) {
+    public static Optional<StringType> from(String str) {
         Objects.requireNonNull(str);
 
-        return Objects.equals(str, "string") ?
-                Optional.of(new BytesType()) : Optional.empty();
+        if (!Objects.equals(str, "string"))
+            return Optional.empty();
+
+        return Optional.of(DEFAULT);
     }
 
     @Override
@@ -42,15 +44,17 @@ public class StringType implements DynamicType<String> {
 
     @Override
     public HexData encode(String str) {
-        return BYTES_TYPE.encode(str.getBytes(StandardCharsets.UTF_8));
+        return DynamicBytesType.DEFAULT.encode(
+                str.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public String decode(HexData data) {
-        ByteBuffer buffer = ByteBuffer.wrap(BYTES_TYPE.decode(data));
+        ByteBuffer buffer = ByteBuffer.wrap(
+                DynamicBytesType.DEFAULT.decode(data));
 
         try {
-            return UTF_8_CHARSET.newDecoder().decode(buffer).toString();
+            return UTF8_CHARSET.newDecoder().decode(buffer).toString();
         } catch (CharacterCodingException e) {
             throw new RuntimeException(
                     "Incorrect 'UTF-8' character encoding: " + data, e);

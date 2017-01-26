@@ -10,6 +10,7 @@ class IntTypeSpec extends Specification {
 
         then:
         opt.present
+        opt.get() in IntType
         opt.get().canonicalName == output
 
         where:
@@ -61,6 +62,8 @@ class IntTypeSpec extends Specification {
 
         where:
         _ | input
+        _ | 'intx'
+        _ | 'int0'
         _ | 'int257'
         _ | 'int1024'
         _ | 'int140x'

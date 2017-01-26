@@ -10,6 +10,7 @@ class BoolTypeSpec extends Specification {
 
         then:
         opt.present
+        opt.get() in BoolType
     }
 
     def "should detect null string representation"() {

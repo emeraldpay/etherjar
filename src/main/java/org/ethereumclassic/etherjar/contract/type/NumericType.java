@@ -31,7 +31,7 @@ public abstract class NumericType implements StaticType<BigInteger> {
 
     protected NumericType(int bits, boolean isSigned) {
         if (bits <= 0 || bits > 256 || bits % 8 != 0)
-            throw new IllegalArgumentException("Numeric type invalid bits count: " + bits);
+            throw new IllegalArgumentException("Invalid numeric type bits count: " + bits);
 
         this.bits = bits;
         this.isSigned = isSigned;
@@ -108,7 +108,7 @@ public abstract class NumericType implements StaticType<BigInteger> {
         }
 
         if (!isValueValid(value))
-            throw new IllegalArgumentException("Data exceeding to decode numeric value: " + hex32);
+            throw new IllegalArgumentException("Excess data to decode numeric value: " + hex32);
 
         return value;
     }

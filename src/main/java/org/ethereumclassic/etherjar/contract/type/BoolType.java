@@ -21,8 +21,10 @@ public class BoolType extends NumericType {
     public static Optional<BoolType> from(String str) {
         Objects.requireNonNull(str);
 
-        return Objects.equals(str, "bool") ?
-                Optional.of(DEFAULT) : Optional.empty();
+        if (!Objects.equals(str, "bool"))
+            return Optional.empty();
+
+        return Optional.of(DEFAULT);
     }
 
     public BoolType() {

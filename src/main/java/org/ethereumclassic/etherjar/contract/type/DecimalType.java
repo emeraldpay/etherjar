@@ -20,14 +20,14 @@ public abstract class DecimalType implements StaticType<BigDecimal> {
 
     protected DecimalType(int mBits, int nBits) {
         if (mBits <= 0 || mBits % 8 != 0)
-            throw new IllegalArgumentException("Decimal type invalid 'mBits' count: " + mBits);
+            throw new IllegalArgumentException("Invalid decimal type 'mBits' count: " + mBits);
 
         if (nBits <= 0 || nBits % 8 != 0)
-            throw new IllegalArgumentException("Decimal type invalid 'nBits' count: " + nBits);
+            throw new IllegalArgumentException("Invalid decimal type 'nBits' count: " + nBits);
 
         if (mBits + nBits > 256)
             throw new IllegalArgumentException(
-                    "Decimal type invalid total bits count: " + (nBits + mBits));
+                    "Invalid decimal type total bits count: " + (nBits + mBits));
 
         this.mBits = mBits;
         this.nBits = nBits;

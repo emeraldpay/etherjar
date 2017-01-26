@@ -1,19 +1,25 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Hex32
-import org.ethereumclassic.etherjar.model.HexData
 import spock.lang.Specification
 
 class BytesTypeSpec extends Specification {
 
-    final static DEFAULT = [] as BytesType
-
     def "should parse string representation"() {
         when:
-        def opt = BytesType.from 'bytes'
+        def opt = BytesType.from input
 
         then:
         opt.present
+        opt.get() in BytesType
+        opt.get().canonicalName == output
+
+        where:
+        input       | output
+        'byte'      | 'bytes1'
+        'bytes1'    | 'bytes1'
+        'bytes7'    | 'bytes7'
+        'bytes8'    | 'bytes8'
+        'bytes32'   | 'bytes32'
     }
 
     def "should detect null string representation"() {
@@ -41,54 +47,51 @@ class BytesTypeSpec extends Specification {
 
         where:
         _ | input
+        _ | 'bytes'
         _ | 'uint40'
         _ | 'int256'
     }
 
-    def "should return a canonical string representation" () {
-        expect:
-        DEFAULT.canonicalName == 'bytes'
-    }
-
-    def "should encode & decode array of bytes"() {
-        def obj = bytes as byte[]
-
+    def "should detect wrong inputs in string representation"() {
         when:
-        def data = DEFAULT.encode obj
-        def res = DEFAULT.decode data
+        BytesType.from input
 
         then:
-        data == hex
-        Arrays.equals res, obj
+        thrown IllegalArgumentException
+
+        where:
+        _ | input
+        _ | 'bytes_'
+        _ | 'bytes0'
+        _ | 'bytes37'
+        _ | 'bytes128'
+        _ | 'bytes3x'
+    }
+
+    def "should return a canonical string representation" () {
+        expect:
+        BytesType.DEFAULT.canonicalName == 'bytes32'
+        BytesType.DEFAULT_ONE_BYTE.canonicalName == 'bytes1'
+    }
+
+    def "should encode & decode bytes"() {
+        def obj = [bytes.size()] as BytesType
+        def arr = bytes as byte[]
+
+        when:
+        def data = obj.encodeStatic arr
+        def res = obj.decodeStatic data
+
+        then:
+        data.toHex() == hex
+        Arrays.equals res, arr
 
         where:
         bytes                       | hex
-        [0x37]                      | Type.encodeLength(1).concat(HexData.from('0x3700000000000000000000000000000000000000000000000000000000000000'))
-        [0x64, 0x61, 0x76, 0x65]    | Type.encodeLength(4).concat(HexData.from('0x6461766500000000000000000000000000000000000000000000000000000000'))
-        [0x12] * 123                | Type.encodeLength(123).concat(HexData.from('0x' + '12' * 123 + '00' * 5))
-    }
-
-    def "should catch wrong data to decode"() {
-        when:
-        DEFAULT.decode hex
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | hex
-        _ | Type.encodeLength(1)
-        _ | Type.encodeLength(32).concat(Hex32.EMPTY, Hex32.EMPTY)
-        _ | Type.encodeLength(34).concat(HexData.from('0x6461766500000000000000000000000000000000000000000000000000000000'))
-        _ | Type.encodeLength(0).concat(Hex32.EMPTY)
-    }
-
-    def "should catch empty data to decode"() {
-        when:
-        DEFAULT.decode(HexData.EMPTY)
-
-        then:
-        thrown IllegalArgumentException
+        [0x37]                      | '0x3700000000000000000000000000000000000000000000000000000000000000'
+        [0x64, 0x61, 0x76, 0x65]    | '0x6461766500000000000000000000000000000000000000000000000000000000'
+        [0x01] * 24                 | '0x0101010101010101010101010101010101010101010101010000000000000000'
+        [0x12] * 32                 | '0x1212121212121212121212121212121212121212121212121212121212121212'
     }
 
     def "should calculate consistent hashcode"() {
@@ -96,8 +99,10 @@ class BytesTypeSpec extends Specification {
         first.hashCode() == second.hashCode()
 
         where:
-        first           | second
-        DEFAULT    | [] as BytesType
+        first               | second
+        BytesType.DEFAULT   | [] as BytesType
+        BytesType.DEFAULT   | [32] as BytesType
+        [24] as BytesType   | [24] as BytesType
     }
 
     def "should be equal"() {
@@ -105,9 +110,11 @@ class BytesTypeSpec extends Specification {
         first == second
 
         where:
-        first           | second
-        DEFAULT    | DEFAULT
-        DEFAULT    | [] as BytesType
+        first               | second
+        BytesType.DEFAULT   | BytesType.DEFAULT
+        BytesType.DEFAULT   | [] as BytesType
+        BytesType.DEFAULT   | [32] as BytesType
+        [24] as BytesType   | [24] as BytesType
     }
 
     def "should not be equal"() {
@@ -115,14 +122,14 @@ class BytesTypeSpec extends Specification {
         first != second
 
         where:
-        first           | second
-        DEFAULT    | null
-        DEFAULT    | 'ABC'
-        DEFAULT    | UIntType.DEFAULT
+        first               | second
+        BytesType.DEFAULT   | null
+        BytesType.DEFAULT   | UIntType.DEFAULT
+        BytesType.DEFAULT   | DynamicBytesType.DEFAULT
     }
 
     def "should be converted to a string representation"() {
         expect:
-        DEFAULT as String == 'bytes'
+        BytesType.DEFAULT as String == 'bytes32'
     }
 }
