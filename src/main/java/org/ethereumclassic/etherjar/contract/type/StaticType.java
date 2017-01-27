@@ -1,9 +1,7 @@
 package org.ethereumclassic.etherjar.contract.type;
 
 /**
- * A Fixed-size or non-fixed-size reference type with a wrapped {@link Type}.
- *
- * @param <W> a wrapped {@link Type}
+ * A fixed-size static type.
  *
  * @see DynamicType
  */

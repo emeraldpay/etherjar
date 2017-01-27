@@ -25,7 +25,7 @@ public class DynamicArrayType<T> implements DynamicType<T[]> {
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
      * @throws IllegalArgumentException if an {@link DynamicArrayType} has invalid
-     * input or not a {@link SimpleType} wrapped type
+     * input or not a {@link StaticType} wrapped type
      *
      * @see #getCanonicalName()
      */

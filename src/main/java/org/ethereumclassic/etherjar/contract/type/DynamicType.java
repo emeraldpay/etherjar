@@ -3,9 +3,9 @@ package org.ethereumclassic.etherjar.contract.type;
 import org.ethereumclassic.etherjar.model.Hex32;
 
 /**
- * Non-fixed-size dynamic advanced types.
+ * Non-fixed-size dynamic type.
  *
- * @see SimpleType
+ * @see StaticType
  */
 public interface DynamicType<T> extends Type<T> {
 
