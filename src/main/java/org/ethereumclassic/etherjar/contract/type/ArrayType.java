@@ -1,6 +1,5 @@
 package org.ethereumclassic.etherjar.contract.type;
 
-import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 
 import java.util.*;
@@ -8,13 +7,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *  An array of a given wrapped static type.
+ * A fixed-size static array of a given wrapped static type.
  */
-public class ArrayType<T> implements ReferenceType<T[], T> {
+public class ArrayType<T> implements StaticType<T[]> {
 
     final static String NAME_POSTFIX = "]";
 
-    final static Pattern NAME_PATTERN = Pattern.compile("(.+)\\[(\\d*)]");
+    final static String EX_NAME_POSTFIX = "[]";
+
+    final static Pattern NAME_PATTERN = Pattern.compile("(.+)\\[(\\d+)]");
 
     /**
      * Try to parse an {@link ArrayType} string representation (either canonical form or not).
@@ -25,19 +26,19 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
      * @throws IllegalArgumentException if an {@link ArrayType} has invalid
-     * input or not a {@link StaticType} wrapped type
+     * input or not a {@link SimpleType} wrapped type
      *
      * @see #getCanonicalName()
      */
     @SuppressWarnings("unchecked")
     public static Optional<ArrayType> from(Type.Repository repo, String str) {
-        if (!str.endsWith(NAME_POSTFIX))
+        if (!str.endsWith(NAME_POSTFIX) || str.endsWith(EX_NAME_POSTFIX))
             return Optional.empty();
 
         Matcher matcher = NAME_PATTERN.matcher(str);
 
         if (!matcher.matches())
-            throw new IllegalArgumentException("Wrong 'array' type format: " + str);
+            throw new IllegalArgumentException("Wrong array type format: " + str);
 
         Optional<Type> type = repo.search(matcher.group(1));
 
@@ -45,68 +46,58 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
             throw new IllegalArgumentException(
                     "Unknown array wrapped type: " + matcher.group(1));
 
+        if (type.get().isDynamic())
+            throw new IllegalArgumentException(
+                    "Array wrapped type is not static: " + type.get());
+
         String digits = matcher.group(2);
 
-        return Optional.of(digits.isEmpty() ?
-                new ArrayType(type.get()) : new ArrayType(type.get(), Integer.parseInt(digits)));
+        return Optional.of(new ArrayType(
+                (StaticType) type.get(), Integer.parseInt(digits)));
     }
 
-    private final Type<T> type;
+    private final StaticType<T> type;
 
     private final int length;
 
     /**
-     * Create a dynamic array without fixed length.
+     * Create an array with a fixed length.
      *
-     * @param type an array wrapped {@link Type}
-     */
-    public ArrayType(Type<T> type) {
-        this(type, -1);
-    }
-
-    /**
-     * Create a static array with a fixed length.
-     *
-     * @param type an array wrapped {@link Type}
+     * @param type an array wrapped {@link StaticType}
      * @param length a fixed number of array elements, should be positive
      */
-    public ArrayType(Type<T> type, int length) {
-        if (type.isDynamic())
-            throw new IllegalArgumentException("Array wrapped type is not static: " + type);
+    public ArrayType(StaticType<T> type, int length) {
+        if (length <= 0)
+            throw new IllegalArgumentException("Illegal array length: " + length);
 
-        if (length == 0)
-            throw new IllegalArgumentException("Empty array fixed length");
-
-        this.type = type;
-        this.length = length < 0 ? -1 : length;
+        this.type = Objects.requireNonNull(type);
+        this.length = length;
     }
 
-    @Override
-    public Type<T> getWrappedType() {
+    public StaticType<T> getWrappedType() {
         return type;
     }
 
-    @Override
-    public OptionalInt getLength() {
-        return length == -1 ? OptionalInt.empty() : OptionalInt.of(length);
+    public int getLength() {
+        return length;
     }
 
     @Override
     public String getCanonicalName() {
-        return type.getCanonicalName() +
-                '[' + (getLength().isPresent() ? getLength().getAsInt() : "") + ']';
+        return type.getCanonicalName() + '[' + length + ']';
+    }
+
+    @Override
+    public int getFixedSize() {
+        return getWrappedType().getFixedSize() * length;
     }
 
     @Override
     public HexData encode(T[] arr) {
-        if (getLength().isPresent() && arr.length != getLength().getAsInt())
+        if (arr.length != length)
             throw new IllegalArgumentException("Wrong array length to encode: " + arr.length);
 
-        List<HexData> buf = new ArrayList<>();
-
-        if (!getLength().isPresent()) {
-            buf.add(Type.encodeLength(arr.length));
-        }
+        List<HexData> buf = new ArrayList<>(arr.length);
 
         for (T obj : arr) {
             buf.add(getWrappedType().encode(obj));
@@ -118,15 +109,10 @@ public class ArrayType<T> implements ReferenceType<T[], T> {
     @Override
     @SuppressWarnings("unchecked")
     public T[] decode(HexData data) {
-        int len = getLength().isPresent() ? getLength().getAsInt() :
-                Type.decodeLength(data.extract(Hex32.SIZE_BYTES, Hex32::from)).intValueExact();
-
-        int offset = getLength().isPresent() ? 0 : Hex32.SIZE_BYTES;
-
-        if (data.getSize() != offset + getWrappedType().getFixedSize() * len)
+        if (data.getSize() != getFixedSize())
             throw new IllegalArgumentException("Wrong data length to decode array: " + data);
 
-        HexData[] arr = data.split(getWrappedType().getFixedSize(), offset);
+        HexData[] arr = data.split(getWrappedType().getFixedSize());
 
         return (T[]) Arrays.stream(arr).map(it -> getWrappedType().decode(it)).toArray();
     }

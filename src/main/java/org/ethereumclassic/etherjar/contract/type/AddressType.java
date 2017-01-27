@@ -12,13 +12,11 @@ import java.util.Optional;
  *
  * @see Address
  */
-public class AddressType implements StaticType<Address> {
+public class AddressType implements SimpleType<Address> {
 
     public final static AddressType DEFAULT = new AddressType();
 
     final static int OFFSET_BYTES = Hex32.SIZE_BYTES - Address.SIZE_BYTES;
-
-    final static byte[] PADDING_EMPTY_ARRAY = new byte[OFFSET_BYTES];
 
     /**
      * Try to parse a {@link AddressType} string representation (either canonical form or not).
@@ -53,12 +51,9 @@ public class AddressType implements StaticType<Address> {
 
     @Override
     public Address decodeStatic(Hex32 hex32) {
-        byte[] buf = hex32.getBytes();
+        byte[] buf = Arrays.copyOfRange(hex32.getBytes(), OFFSET_BYTES, Hex32.SIZE_BYTES);
 
-        if (!Arrays.equals(Arrays.copyOf(buf, OFFSET_BYTES), PADDING_EMPTY_ARRAY))
-            throw new IllegalArgumentException("Excess data to decode address: " + hex32);
-
-        return Address.from(Arrays.copyOfRange(buf, OFFSET_BYTES, Hex32.SIZE_BYTES));
+        return Address.from(buf);
     }
 
     @Override

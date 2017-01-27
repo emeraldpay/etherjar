@@ -5,8 +5,7 @@ import org.ethereumclassic.etherjar.model.Hex32;
 /**
  * Non-fixed-size dynamic advanced types.
  *
- * @see StaticType
- * @see ReferenceType
+ * @see SimpleType
  */
 public interface DynamicType<T> extends Type<T> {
 

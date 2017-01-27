@@ -136,7 +136,7 @@ public interface Type<T> {
     }
 
     /**
-     * Encode a {@link DynamicType} or {@link ReferenceType} length.
+     * Encode a {@link DynamicType} length.
      *
      * @param val a length
      * @return a length encoded as {@link Hex32}
@@ -149,7 +149,7 @@ public interface Type<T> {
     }
 
     /**
-     * Encode a {@link DynamicType} or {@link ReferenceType} length.
+     * Encode a {@link DynamicType} length.
      *
      * @param val a {@link BigInteger} instance
      * @return a length encoded as {@link Hex32}
@@ -162,7 +162,7 @@ public interface Type<T> {
     }
 
     /**
-     * Decode a {@link DynamicType} or {@link ReferenceType} length.
+     * Decode a {@link DynamicType} length.
      *
      * @param hex32 a length encoded as {@link Hex32}
      * @return a {@link BigInteger} instance
@@ -195,8 +195,6 @@ public interface Type<T> {
         <T> V visit(StaticType<T> type);
 
         <T> V visit(DynamicType<T> type);
-
-        <T, W> V visit(ReferenceType<T, W> type);
     }
 
     /**
@@ -215,11 +213,6 @@ public interface Type<T> {
 
         @Override
         public <T> V visit(DynamicType<T> type) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public <T, W> V visit(ReferenceType<T, W> type) {
             throw new UnsupportedOperationException();
         }
     }

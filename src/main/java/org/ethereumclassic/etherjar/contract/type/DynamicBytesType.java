@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- *  Dynamic sized byte sequence.
+ * Dynamic sized byte sequence.
  */
 public class DynamicBytesType implements DynamicType<byte[]> {
 

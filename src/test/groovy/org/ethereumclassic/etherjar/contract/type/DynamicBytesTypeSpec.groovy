@@ -46,7 +46,7 @@ class DynamicBytesTypeSpec extends Specification {
         _ | 'int256'
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         expect:
         DynamicBytesType.DEFAULT.canonicalName == 'bytes'
     }

@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 /**
  * Binary type of fixed bytes.
  */
-public class BytesType implements StaticType<byte[]> {
+public class BytesType implements SimpleType<byte[]> {
 
     public final static BytesType DEFAULT = new BytesType();
 
@@ -57,42 +57,42 @@ public class BytesType implements StaticType<byte[]> {
                 CACHED_INSTANCES.get(bytes) : new BytesType(bytes));
     }
 
-    private final int bytes;
+    private final int length;
 
     public BytesType() {
         this(32);
     }
 
-    public BytesType(int bytes) {
-        if (bytes <= 0 || bytes > 32)
-            throw new IllegalArgumentException("Illegal bytes type length: " + bytes);
+    public BytesType(int length) {
+        if (length <= 0 || length > 32)
+            throw new IllegalArgumentException("Illegal bytes type length: " + length);
 
-        this.bytes = bytes;
+        this.length = length;
     }
 
-    public int getBytes() {
-        return bytes;
+    public int getLength() {
+        return length;
     }
 
     @Override
-    public String getCanonicalName() { return "bytes" + bytes; }
+    public String getCanonicalName() { return "bytes" + length; }
 
     @Override
-    public Hex32 encodeStatic(byte... obj) {
-        if (obj.length != bytes)
-            throw new IllegalArgumentException("Wrong bytes length to encode: " + obj.length);
+    public Hex32 encodeStatic(byte... bytes) {
+        if (bytes.length != length)
+            throw new IllegalArgumentException("Wrong bytes length to encode: " + bytes.length);
 
-        return new Hex32(Arrays.copyOf(obj, Hex32.SIZE_BYTES));
+        return new Hex32(Arrays.copyOf(bytes, Hex32.SIZE_BYTES));
     }
 
     @Override
     public byte[] decodeStatic(Hex32 hex32) {
-        return Arrays.copyOf(hex32.getBytes(), bytes);
+        return Arrays.copyOf(hex32.getBytes(), length);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), bytes);
+        return Objects.hash(getClass(), length);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class BytesType implements StaticType<byte[]> {
 
         BytesType other = (BytesType) obj;
 
-        return bytes == other.bytes;
+        return length == other.length;
     }
 
     @Override

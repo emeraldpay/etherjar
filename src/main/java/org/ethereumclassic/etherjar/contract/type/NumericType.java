@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * Signed & unsigned integer type.
  */
-public abstract class NumericType implements StaticType<BigInteger> {
+public abstract class NumericType implements SimpleType<BigInteger> {
 
     private final static byte[] NEGATIVE_ARRAY_FOR_PADDING = new byte[32];
 

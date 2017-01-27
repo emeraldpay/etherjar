@@ -113,7 +113,7 @@ class IntTypeSpec extends Specification {
         256     | 0x8000000000000000000000000000000000000000000000000000000000000000G
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         def type  = [size] as IntType
 
         expect:

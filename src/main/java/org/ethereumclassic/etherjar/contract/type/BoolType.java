@@ -6,6 +6,10 @@ import java.util.Optional;
 
 public class BoolType extends NumericType {
 
+    public final static BigInteger FALSE = BigInteger.ZERO;
+
+    public final static BigInteger TRUE = BigInteger.ONE;
+
     public final static BoolType DEFAULT = new BoolType();
 
     /**
