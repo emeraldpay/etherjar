@@ -72,11 +72,11 @@ public abstract class NumericType implements SimpleType<BigInteger> {
     public abstract BigInteger getMaxValue();
 
     public Hex32 encode(long value) {
-        return encodeStatic(BigInteger.valueOf(value));
+        return encodeSimple(BigInteger.valueOf(value));
     }
 
     @Override
-    public Hex32 encodeStatic(BigInteger value) {
+    public Hex32 encodeSimple(BigInteger value) {
         if (!isValueValid(value))
             throw new IllegalArgumentException("Numeric value out of range: " + value);
 
@@ -100,7 +100,7 @@ public abstract class NumericType implements SimpleType<BigInteger> {
     }
 
     @Override
-    public BigInteger decodeStatic(Hex32 hex32) {
+    public BigInteger decodeSimple(Hex32 hex32) {
         BigInteger value = new BigInteger(hex32.getBytes());
 
         if (!isSigned && value.signum() < 0) {

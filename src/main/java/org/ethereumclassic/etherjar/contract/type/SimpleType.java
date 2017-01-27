@@ -4,7 +4,7 @@ import org.ethereumclassic.etherjar.model.Hex32;
 import org.ethereumclassic.etherjar.model.HexData;
 
 /**
- * Fixed-size static elementary types (32 bytes length only).
+ * Fixed-size elementary type (32 bytes length only).
  */
 public interface SimpleType<T> extends StaticType<T> {
 
@@ -15,16 +15,16 @@ public interface SimpleType<T> extends StaticType<T> {
 
     @Override
     default HexData encode(T obj) {
-        return encodeStatic(obj);
+        return encodeSimple(obj);
     }
 
     @Override
     default T decode(HexData data) {
         if (data.getSize() != getFixedSize())
             throw new IllegalArgumentException(
-                    "Wrong hex data length to decode: " + data.getSize());
+                    "Wrong hex data length to decode simple type: " + data.getSize());
 
-        return decodeStatic(Hex32.from(data));
+        return decodeSimple(Hex32.from(data));
     }
 
     /**
@@ -33,16 +33,17 @@ public interface SimpleType<T> extends StaticType<T> {
      * @param obj an object
      * @return encoded hex
      *
-     * @see #decodeStatic(Hex32)
+     * @see #decodeSimple(Hex32)
      */
-    Hex32 encodeStatic(T obj);
+    Hex32 encodeSimple(T obj);
 
     /**
      * Decode a {@link Hex32} to an object.
      *
      * @param hex32 a hex32
      * @return decoded object
-     * @see #encodeStatic(Object)
+     *
+     * @see #encodeSimple(Object)
      */
-    T decodeStatic(Hex32 hex32);
+    T decodeSimple(Hex32 hex32);
 }

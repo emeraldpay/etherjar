@@ -52,8 +52,8 @@ class FunctionTypeSpec extends Specification {
         def obj = Function.from str
 
         when:
-        def data = FunctionType.DEFAULT.encodeStatic obj
-        def res = FunctionType.DEFAULT.decodeStatic data
+        def data = FunctionType.DEFAULT.encodeSimple obj
+        def res = FunctionType.DEFAULT.decodeSimple data
 
         then:
         data.toHex() == hex

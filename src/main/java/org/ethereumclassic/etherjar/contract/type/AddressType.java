@@ -41,7 +41,7 @@ public class AddressType implements SimpleType<Address> {
     public String getCanonicalName() { return "address"; }
 
     @Override
-    public Hex32 encodeStatic(Address obj) {
+    public Hex32 encodeSimple(Address obj) {
         byte[] buf = new byte[Hex32.SIZE_BYTES];
 
         System.arraycopy(obj.getBytes(), 0, buf, OFFSET_BYTES, Address.SIZE_BYTES);
@@ -50,7 +50,7 @@ public class AddressType implements SimpleType<Address> {
     }
 
     @Override
-    public Address decodeStatic(Hex32 hex32) {
+    public Address decodeSimple(Hex32 hex32) {
         byte[] buf = Arrays.copyOfRange(hex32.getBytes(), OFFSET_BYTES, Hex32.SIZE_BYTES);
 
         return Address.from(buf);

@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Dynamic sized array of a given wrapped static type.
+ * Dynamic sized array with given wrapped static type.
  */
 public class DynamicArrayType<T> implements DynamicType<T[]> {
 

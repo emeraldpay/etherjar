@@ -185,8 +185,8 @@ class NumericTypeSpec extends Specification {
         }
 
         when:
-        def data = obj.encodeStatic(val as BigInteger)
-        def res = obj.decodeStatic data
+        def data = obj.encodeSimple(val as BigInteger)
+        def res = obj.decodeSimple data
 
         then:
         data.toHex() == hex
@@ -312,7 +312,7 @@ class NumericTypeSpec extends Specification {
         ] as NumericTypeImpl
 
         when:
-        obj.encodeStatic 0G
+        obj.encodeSimple 0G
 
         then:
         thrown IllegalArgumentException
@@ -324,7 +324,7 @@ class NumericTypeSpec extends Specification {
         ] as NumericTypeImpl
 
         when:
-        obj.decodeStatic(Hex32.EMPTY)
+        obj.decodeSimple(Hex32.EMPTY)
 
         then:
         thrown IllegalArgumentException
