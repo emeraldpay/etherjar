@@ -14,12 +14,12 @@ class SimpleTypeSpec extends Specification {
         }
 
         @Override
-        Hex32 encodeStatic(T obj) {
+        Hex32 encodeSimple(T obj) {
             throw new UnsupportedOperationException()
         }
 
         @Override
-        T decodeStatic(Hex32 hex32) {
+        T decodeSimple(Hex32 hex32) {
             throw new UnsupportedOperationException()
         }
     }

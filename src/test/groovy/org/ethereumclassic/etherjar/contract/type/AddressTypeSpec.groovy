@@ -52,8 +52,8 @@ class AddressTypeSpec extends Specification {
         def obj = Address.from str
 
         when:
-        def data = AddressType.DEFAULT.encodeStatic obj
-        def res = AddressType.DEFAULT.decodeStatic data
+        def data = AddressType.DEFAULT.encodeSimple obj
+        def res = AddressType.DEFAULT.decodeSimple data
 
         then:
         data.toHex() == hex

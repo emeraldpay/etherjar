@@ -190,8 +190,8 @@ class DecimalTypeTest extends Specification {
         }
 
         when:
-        def data = obj.encodeStatic(val as BigDecimal)
-        def res = obj.decodeStatic data
+        def data = obj.encodeSimple(val as BigDecimal)
+        def res = obj.decodeSimple data
 
         then:
         data.toHex() == hex
@@ -254,8 +254,8 @@ class DecimalTypeTest extends Specification {
         }
 
         when:
-        def data = obj.encodeStatic(before as BigDecimal)
-        def res = obj.decodeStatic data
+        def data = obj.encodeSimple(before as BigDecimal)
+        def res = obj.decodeSimple data
 
         then:
         res == after
@@ -274,7 +274,7 @@ class DecimalTypeTest extends Specification {
         ] as DecimalTypeImpl
 
         when:
-        obj.encodeStatic 0.0G
+        obj.encodeSimple 0.0G
 
         then:
         thrown IllegalArgumentException

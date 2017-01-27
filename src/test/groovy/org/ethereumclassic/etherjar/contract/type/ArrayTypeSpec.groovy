@@ -97,6 +97,19 @@ class ArrayTypeSpec extends Specification {
         DEFAULT.static
     }
 
+    def "should detect a negative array length"() {
+        when:
+        new ArrayType<>(UIntType.DEFAULT, len)
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | len
+        _ | -1
+        _ | -12
+    }
+
     def "should return a canonical string representation"() {
         expect:
         type.canonicalName == str
@@ -129,13 +142,13 @@ class ArrayTypeSpec extends Specification {
 
     def "should catch wrong array length to encode"() {
         when:
-        DEFAULT.encode(new BigInteger[length])
+        DEFAULT.encode(new BigInteger[len])
 
         then:
         thrown IllegalArgumentException
 
         where:
-        _ | length
+        _ | len
         _ | 1
         _ | 8
         _ | 21

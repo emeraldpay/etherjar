@@ -89,11 +89,11 @@ public abstract class DecimalType implements SimpleType<BigDecimal> {
     public abstract NumericType getNumericType();
 
     public Hex32 encode(double value) {
-        return encodeStatic(BigDecimal.valueOf(value));
+        return encodeSimple(BigDecimal.valueOf(value));
     }
 
     @Override
-    public Hex32 encodeStatic(BigDecimal value) {
+    public Hex32 encodeSimple(BigDecimal value) {
         if (!isValueValid(value))
             throw new IllegalArgumentException("Decimal value out of range: " + value);
 
@@ -104,12 +104,12 @@ public abstract class DecimalType implements SimpleType<BigDecimal> {
             integer = integer.subtract(BigInteger.ONE);
         }
 
-        return getNumericType().encodeStatic(integer);
+        return getNumericType().encodeSimple(integer);
     }
 
     @Override
-    public BigDecimal decodeStatic(Hex32 hex32) {
-        BigInteger integer = getNumericType().decodeStatic(hex32);
+    public BigDecimal decodeSimple(Hex32 hex32) {
+        BigInteger integer = getNumericType().decodeSimple(hex32);
 
         //noinspection BigDecimalMethodWithoutRoundingCalled
         return new BigDecimal(integer).divide(fractionFactor);

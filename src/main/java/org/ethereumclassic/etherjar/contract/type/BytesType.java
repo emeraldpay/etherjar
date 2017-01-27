@@ -78,7 +78,7 @@ public class BytesType implements SimpleType<byte[]> {
     public String getCanonicalName() { return "bytes" + length; }
 
     @Override
-    public Hex32 encodeStatic(byte... bytes) {
+    public Hex32 encodeSimple(byte... bytes) {
         if (bytes.length != length)
             throw new IllegalArgumentException("Wrong bytes length to encode: " + bytes.length);
 
@@ -86,7 +86,7 @@ public class BytesType implements SimpleType<byte[]> {
     }
 
     @Override
-    public byte[] decodeStatic(Hex32 hex32) {
+    public byte[] decodeSimple(Hex32 hex32) {
         return Arrays.copyOf(hex32.getBytes(), length);
     }
 

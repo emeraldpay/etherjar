@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A fixed-size static array of a given wrapped static type.
+ * A fixed-size static array with given wrapped static type.
  */
 public class ArrayType<T> implements StaticType<T[]> {
 

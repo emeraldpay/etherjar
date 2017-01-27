@@ -70,6 +70,7 @@ class BytesTypeSpec extends Specification {
 
     def "should return a canonical string representation"() {
         expect:
+        BytesType.DEFAULT.length == 32
         BytesType.DEFAULT.canonicalName == 'bytes32'
         BytesType.DEFAULT_ONE_BYTE.canonicalName == 'bytes1'
     }
@@ -79,8 +80,8 @@ class BytesTypeSpec extends Specification {
         def arr = bytes as byte[]
 
         when:
-        def data = obj.encodeStatic arr
-        def res = obj.decodeStatic data
+        def data = obj.encodeSimple arr
+        def res = obj.decodeSimple data
 
         then:
         data.toHex() == hex
@@ -92,6 +93,20 @@ class BytesTypeSpec extends Specification {
         [0x64, 0x61, 0x76, 0x65]    | '0x6461766500000000000000000000000000000000000000000000000000000000'
         [0x01] * 24                 | '0x0101010101010101010101010101010101010101010101010000000000000000'
         [0x12] * 32                 | '0x1212121212121212121212121212121212121212121212121212121212121212'
+    }
+
+    def "should catch wrong bytes length to encode"() {
+        when:
+        BytesType.DEFAULT.encode(new byte[len])
+
+        then:
+        thrown IllegalArgumentException
+
+        where:
+        _ | len
+        _ | 1
+        _ | 8
+        _ | 21
     }
 
     def "should calculate consistent hashcode"() {

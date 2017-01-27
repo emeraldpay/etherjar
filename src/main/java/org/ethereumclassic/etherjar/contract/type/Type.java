@@ -158,7 +158,7 @@ public interface Type<T> {
      * @see #decodeLength(Hex32)
      */
     static Hex32 encodeLength(BigInteger val) {
-        return new UIntType().encodeStatic(val);
+        return new UIntType().encodeSimple(val);
     }
 
     /**
@@ -171,7 +171,7 @@ public interface Type<T> {
      * @see #encodeLength(BigInteger)
      */
     static BigInteger decodeLength(Hex32 hex32) {
-        return new UIntType().decodeStatic(hex32);
+        return new UIntType().decodeSimple(hex32);
     }
 
     /**

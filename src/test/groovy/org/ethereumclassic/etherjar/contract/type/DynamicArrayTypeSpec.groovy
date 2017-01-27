@@ -50,6 +50,14 @@ class DynamicArrayTypeSpec extends Specification {
         _ | '_[1][2][3]'
     }
 
+    def "should detect wrong inputs in string representation"() {
+        when:
+        DynamicArrayType.from({ -> [] }, '[]')
+
+        then:
+        thrown IllegalArgumentException
+    }
+
     def "should detect unknown array wrapped type"() {
         when:
         DynamicArrayType.from({ -> [] }, '_[]')
