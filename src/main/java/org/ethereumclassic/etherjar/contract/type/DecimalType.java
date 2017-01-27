@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Signed & unsigned fixed-point number.
  */
-public abstract class DecimalType implements StaticType<BigDecimal> {
+public abstract class DecimalType implements SimpleType<BigDecimal> {
 
     private final int mBits;
 

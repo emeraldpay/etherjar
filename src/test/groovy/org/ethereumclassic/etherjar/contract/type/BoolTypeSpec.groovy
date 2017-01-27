@@ -58,7 +58,7 @@ class BoolTypeSpec extends Specification {
         BoolType.DEFAULT.maxValue == 2G
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         expect:
         BoolType.DEFAULT.canonicalName == 'bool'
     }

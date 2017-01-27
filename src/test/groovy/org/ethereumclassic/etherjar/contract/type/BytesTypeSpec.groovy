@@ -68,7 +68,7 @@ class BytesTypeSpec extends Specification {
         _ | 'bytes3x'
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         expect:
         BytesType.DEFAULT.canonicalName == 'bytes32'
         BytesType.DEFAULT_ONE_BYTE.canonicalName == 'bytes1'

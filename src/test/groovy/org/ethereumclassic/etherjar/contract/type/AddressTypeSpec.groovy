@@ -1,7 +1,6 @@
 package org.ethereumclassic.etherjar.contract.type
 
 import org.ethereumclassic.etherjar.model.Address
-import org.ethereumclassic.etherjar.model.Hex32
 import spock.lang.Specification
 
 class AddressTypeSpec extends Specification {
@@ -44,13 +43,13 @@ class AddressTypeSpec extends Specification {
         _ | 'byte'
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         expect:
         AddressType.DEFAULT.canonicalName == 'address'
     }
 
     def "should encode & decode bytes"() {
-        def obj = Address.from addr
+        def obj = Address.from str
 
         when:
         def data = AddressType.DEFAULT.encodeStatic obj
@@ -61,27 +60,11 @@ class AddressTypeSpec extends Specification {
         res == obj
 
         where:
-        addr                                            | hex
+        str                                             | hex
         '0x0000000000015b23c7e20b0ea5ebd84c39dcbe60'    | '0x0000000000000000000000000000000000015b23c7e20b0ea5ebd84c39dcbe60'
         '0xfffffffff3984f569b4c7ff5143499d94abe2ff2'    | '0x000000000000000000000000fffffffff3984f569b4c7ff5143499d94abe2ff2'
         '0x0000000000000000000000000000000000000000'    | '0x0000000000000000000000000000000000000000000000000000000000000000'
         '0xffffffffffffffffffffffffffffffffffffffff'    | '0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff'
-    }
-
-    def "should catch wrong data to decode"() {
-        def data = Hex32.from hex
-
-        when:
-        AddressType.DEFAULT.decodeStatic data
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | hex
-        _ | '0x0000000000000000000000010000000000000000000000000000000000000000'
-        _ | '0x000000000000000000000001ffffffffffffffffffffffffffffffffffffffff'
-        _ | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
     }
 
     def "should calculate consistent hashcode"() {

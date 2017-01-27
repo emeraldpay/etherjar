@@ -6,15 +6,15 @@ import spock.lang.Specification
 
 import java.util.function.Function
 
-class ArrayTypeSpec extends Specification {
+class DynamicArrayTypeSpec extends Specification {
 
-    @Shared DEFAULT = [UIntType.DEFAULT, 12] as ArrayType<BigInteger>
+    @Shared DEFAULT = [UIntType.DEFAULT] as DynamicArrayType<BigInteger>
 
     def "should parse string representation"() {
         def parser = Mock Function
 
         when:
-        ArrayType.from({ -> [parser] }, input)
+        DynamicArrayType.from({ -> [parser] }, input)
 
         then:
         1 * parser.apply(inter) >> Optional.of(UIntType.DEFAULT)
@@ -22,14 +22,13 @@ class ArrayTypeSpec extends Specification {
 
         where:
         input           | inter
-        'abc[123]'      | 'abc'
-        '_[][123]'      | '_[]'
-        '_[1][2][3]'    | '_[1][2]'
+        '_[]'           | '_'
+        '_[123][]'      | '_[123]'
     }
 
     def "should detect null string representation"() {
         when:
-        ArrayType.from({ -> [] }, null)
+        DynamicArrayType.from({ -> [] }, null)
 
         then:
         thrown NullPointerException
@@ -37,7 +36,7 @@ class ArrayTypeSpec extends Specification {
 
     def "should ignore wrong string representation"() {
         when:
-        def opt = ArrayType.from({ -> [] }, input)
+        def opt = DynamicArrayType.from({ -> [] }, input)
 
         then:
         !opt.present
@@ -47,34 +46,13 @@ class ArrayTypeSpec extends Specification {
         _ | ''
         _ | 'int16'
         _ | 'int16['
-        _ | 'int16[]'
-        _ | '_[1][]'
-        _ | '_[]'
-        _ | '[[]'
-        _ | '[]'
-    }
-
-    def "should detect wrong inputs in string representation"() {
-        when:
-        ArrayType.from({ -> [] }, input)
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | input
-        _ | '[123]'
-        _ | 'int16]'
-        _ | 'int16[0]'
-        _ | 'int16[-1]'
-        _ | 'int16[abc]'
-        _ | 'int16[][0]'
-        _ | 'int16[][-3]'
+        _ | 'int16[1]'
+        _ | '_[1][2][3]'
     }
 
     def "should detect unknown array wrapped type"() {
         when:
-        ArrayType.from({ -> [] }, '_[1]')
+        DynamicArrayType.from({ -> [] }, '_[]')
 
         then:
         thrown IllegalArgumentException
@@ -84,7 +62,7 @@ class ArrayTypeSpec extends Specification {
         def parser = { Optional.of({ true } as Type) } as Function
 
         when:
-        ArrayType.from({ -> [parser] }, '_[1]')
+        DynamicArrayType.from({ -> [parser] }, '_[]')
 
         then:
         thrown IllegalArgumentException
@@ -93,8 +71,7 @@ class ArrayTypeSpec extends Specification {
     def "should create a correct default instance"() {
         expect:
         DEFAULT.wrappedType == UIntType.DEFAULT
-        DEFAULT.length == 12
-        DEFAULT.static
+        DEFAULT.dynamic
     }
 
     def "should return a canonical string representation"() {
@@ -102,16 +79,16 @@ class ArrayTypeSpec extends Specification {
         type.canonicalName == str
 
         where:
-        type                                                                | str
-        DEFAULT                                                             | 'uint256[12]'
-        [DEFAULT, 21] as ArrayType<BigInteger>                              | 'uint256[12][21]'
-        [[DEFAULT, 1] as ArrayType<BigInteger>, 2] as ArrayType<BigInteger> | 'uint256[12][1][2]'
+        type                                                                                | str
+        DEFAULT                                                                             | 'uint256[]'
+        [BoolType.DEFAULT] as DynamicArrayType<BigInteger>                                  | 'bool[]'
+        [[UIntType.DEFAULT, 12] as ArrayType<BigInteger>] as DynamicArrayType<BigInteger>   | 'uint256[12][]'
     }
 
     def "should encode & decode array values"() {
         def parser = { Optional.of(BoolType.DEFAULT) } as Function
 
-        def obj = ArrayType.from({ -> [parser] }, str).get()
+        def obj = DynamicArrayType.from({ -> [parser] }, str).get()
 
         when:
         def data = obj.encode(arr as Object[])
@@ -122,29 +99,15 @@ class ArrayTypeSpec extends Specification {
         Arrays.equals(res, arr as Object[])
 
         where:
-        str     | arr                                               | hex
-        '_[1]'  | [BoolType.TRUE]                                   | BoolType.DEFAULT.encode(BoolType.TRUE)
-        '_[3]'  | [BoolType.TRUE, BoolType.FALSE, BoolType.FALSE]   | HexData.combine(BoolType.DEFAULT.encode(BoolType.TRUE), BoolType.DEFAULT.encode(BoolType.FALSE), BoolType.DEFAULT.encode(BoolType.FALSE))
-    }
-
-    def "should catch wrong array length to encode"() {
-        when:
-        DEFAULT.encode(new BigInteger[length])
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | length
-        _ | 1
-        _ | 8
-        _ | 21
+        str     | arr                               | hex
+        '_[]'   | []                                | Type.encodeLength(0)
+        '_[]'   | [BoolType.FALSE, BoolType.TRUE]   | Type.encodeLength(2).concat(BoolType.DEFAULT.encode(BoolType.FALSE), BoolType.DEFAULT.encode(BoolType.TRUE))
     }
 
     def "should catch wrong data to decode"() {
         def parser = { Optional.of(BoolType.DEFAULT) } as Function
 
-        def obj = ArrayType.from({ -> [parser] }, str).get()
+        def obj = DynamicArrayType.from({ -> [parser] }, str).get()
 
         when:
         obj.decode hex
@@ -154,8 +117,8 @@ class ArrayTypeSpec extends Specification {
 
         where:
         str     | hex
-        '_[3]'   | Type.encodeLength(3)
-        '_[1]'   | Type.encodeLength(1).concat(BoolType.DEFAULT.encode(BoolType.FALSE), BoolType.DEFAULT.encode(BoolType.FALSE))
+        '_[]'   | Type.encodeLength(0).concat(BoolType.DEFAULT.encode(BoolType.FALSE))
+        '_[]'   | Type.encodeLength(2).concat(BoolType.DEFAULT.encode(BoolType.TRUE))
     }
 
     def "should catch empty data to decode"() {
@@ -172,7 +135,7 @@ class ArrayTypeSpec extends Specification {
 
         where:
         first   | second
-        DEFAULT | [UIntType.DEFAULT, 12] as ArrayType
+        DEFAULT | [UIntType.DEFAULT] as DynamicArrayType
     }
 
     def "should be equal"() {
@@ -182,7 +145,7 @@ class ArrayTypeSpec extends Specification {
         where:
         first   | second
         DEFAULT | DEFAULT
-        DEFAULT | [UIntType.DEFAULT, 12] as ArrayType
+        DEFAULT | [UIntType.DEFAULT] as DynamicArrayType
     }
 
     def "should not be equal"() {
@@ -192,14 +155,13 @@ class ArrayTypeSpec extends Specification {
         where:
         first   | second
         DEFAULT | null
-        DEFAULT | [UIntType.DEFAULT, 8] as ArrayType
-        DEFAULT | [IntType.DEFAULT, 12] as ArrayType
+        DEFAULT | [IntType.DEFAULT] as DynamicArrayType
         DEFAULT | UIntType.DEFAULT
         DEFAULT | 'ABC'
     }
 
     def "should be converted to a string representation"() {
         expect:
-        DEFAULT as String == 'uint256[12]'
+        DEFAULT as String == 'uint256[]'
     }
 }

@@ -108,7 +108,7 @@ class UIntTypeSpec extends Specification {
         256     | 0x10000000000000000000000000000000000000000000000000000000000000000G
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         def type  = [size] as UIntType
 
         expect:

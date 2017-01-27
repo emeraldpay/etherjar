@@ -1,8 +1,6 @@
 package org.ethereumclassic.etherjar.contract.type
 
-import org.ethereumclassic.etherjar.model.Address
-import org.ethereumclassic.etherjar.model.Hex32
-import org.ethereumclassic.etherjar.model.MethodId
+import org.ethereumclassic.etherjar.model.Function
 import spock.lang.Specification
 
 class FunctionTypeSpec extends Specification {
@@ -45,13 +43,13 @@ class FunctionTypeSpec extends Specification {
         _ | 'byte'
     }
 
-    def "should return a canonical string representation" () {
+    def "should return a canonical string representation"() {
         expect:
         FunctionType.DEFAULT.canonicalName == 'function'
     }
 
     def "should encode & decode bytes"() {
-        def obj = new AbstractMap.SimpleEntry<Address, MethodId>(Address.from(addr), MethodId.from(id))
+        def obj = Function.from str
 
         when:
         def data = FunctionType.DEFAULT.encodeStatic obj
@@ -62,27 +60,11 @@ class FunctionTypeSpec extends Specification {
         res == obj
 
         where:
-        addr                                            | id            | hex
-        '0x0000000000015b23c7e20b0ea5ebd84c39dcbe60'    | '0x11223344'  | '0x00000000000000000000000000015b23c7e20b0ea5ebd84c39dcbe6011223344'
-        '0xfffffffff3984f569b4c7ff5143499d94abe2ff2'    | '0xabcdefff'  | '0x0000000000000000fffffffff3984f569b4c7ff5143499d94abe2ff2abcdefff'
-        '0x0000000000000000000000000000000000000000'    | '0x00000000'  | '0x0000000000000000000000000000000000000000000000000000000000000000'
-        '0xffffffffffffffffffffffffffffffffffffffff'    | '0xffffffff'  | '0x0000000000000000ffffffffffffffffffffffffffffffffffffffffffffffff'
-    }
-
-    def "should catch wrong data to decode"() {
-        def data = Hex32.from hex
-
-        when:
-        FunctionType.DEFAULT.decodeStatic data
-
-        then:
-        thrown IllegalArgumentException
-
-        where:
-        _ | hex
-        _ | '0x0000000000000001000000000000000000000000000000000000000000000000'
-        _ | '0x0000000000000001ffffffffffffffffffffffffffffffffffffffffffffffff'
-        _ | '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+        str                                                    | hex
+        '0x0000000000015b23c7e20b0ea5ebd84c39dcbe6011223344'    | '0x00000000000000000000000000015b23c7e20b0ea5ebd84c39dcbe6011223344'
+        '0xfffffffff3984f569b4c7ff5143499d94abe2ff2abcdefff'    | '0x0000000000000000fffffffff3984f569b4c7ff5143499d94abe2ff2abcdefff'
+        '0x000000000000000000000000000000000000000000000000'    | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        '0xffffffffffffffffffffffffffffffffffffffffffffffff'    | '0x0000000000000000ffffffffffffffffffffffffffffffffffffffffffffffff'
     }
 
     def "should calculate consistent hashcode"() {

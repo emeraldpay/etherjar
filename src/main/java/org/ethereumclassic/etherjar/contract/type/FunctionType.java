@@ -1,25 +1,20 @@
 package org.ethereumclassic.etherjar.contract.type;
 
-import org.ethereumclassic.etherjar.model.Address;
+import org.ethereumclassic.etherjar.model.Function;
 import org.ethereumclassic.etherjar.model.Hex32;
-import org.ethereumclassic.etherjar.model.MethodId;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
- * An address, followed by a function selector, equivalent to 'bytes24'.
- *
- * @see Address
- * @see MethodId
+ * A function (an address with a function selector), equivalent to 'bytes24'.
  */
-public class FunctionType implements StaticType<Map.Entry<Address, MethodId>> {
+public class FunctionType implements SimpleType<Function> {
 
     public final static FunctionType DEFAULT = new FunctionType();
 
-    final static int OFFSET_ADDRESS_BYTES = Hex32.SIZE_BYTES - Address.SIZE_BYTES - MethodId.SIZE_BYTES;
-    final static int OFFSET_METHODID_BYTES = Hex32.SIZE_BYTES - MethodId.SIZE_BYTES;
-
-    final static byte[] PADDING_EMPTY_ARRAY = new byte[OFFSET_ADDRESS_BYTES];
+    final static int OFFSET_BYTES = Hex32.SIZE_BYTES - Function.SIZE_BYTES;
 
     /**
      * Try to parse a {@link FunctionType} string representation (either canonical form or not).
@@ -44,29 +39,19 @@ public class FunctionType implements StaticType<Map.Entry<Address, MethodId>> {
     public String getCanonicalName() { return "function"; }
 
     @Override
-    public Hex32 encodeStatic(Map.Entry<Address, MethodId> obj) {
+    public Hex32 encodeStatic(Function obj) {
         byte[] buf = new byte[Hex32.SIZE_BYTES];
 
-        System.arraycopy(obj.getKey().getBytes(), 0, buf, OFFSET_ADDRESS_BYTES, Address.SIZE_BYTES);
-        System.arraycopy(obj.getValue().getBytes(), 0, buf, OFFSET_METHODID_BYTES, MethodId.SIZE_BYTES);
+        System.arraycopy(obj.getBytes(), 0, buf, OFFSET_BYTES, Function.SIZE_BYTES);
 
         return new Hex32(buf);
     }
 
     @Override
-    public Map.Entry<Address, MethodId> decodeStatic(Hex32 hex32) {
-        byte[] buf = hex32.getBytes();
+    public Function decodeStatic(Hex32 hex32) {
+        byte[] buf = Arrays.copyOfRange(hex32.getBytes(), OFFSET_BYTES, Hex32.SIZE_BYTES);
 
-        if (!Arrays.equals(Arrays.copyOf(buf, OFFSET_ADDRESS_BYTES), PADDING_EMPTY_ARRAY))
-            throw new IllegalArgumentException("Excess data to decode address: " + hex32);
-
-        Address address = Address.from(
-                Arrays.copyOfRange(buf, OFFSET_ADDRESS_BYTES, OFFSET_METHODID_BYTES));
-
-        MethodId methodId = MethodId.from(
-                Arrays.copyOfRange(buf, OFFSET_METHODID_BYTES, Hex32.SIZE_BYTES));
-
-        return new AbstractMap.SimpleEntry<>(address, methodId);
+        return Function.from(buf);
     }
 
     @Override
