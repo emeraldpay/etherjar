@@ -22,7 +22,7 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 * Blockchain information through Ethereum RPC calls
 * (_in progress_) Offline transaction signing
 * (_in progress_) Smart Contracts for Java
-* (_in progress_) ABI encoding/decoding
+* ABI encoding/decoding
 * Parity RPC extensions support
 
 == Principles
