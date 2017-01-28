@@ -22,7 +22,7 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 * Blockchain information through Ethereum RPC calls
 * (_in progress_) Offline transaction signing
 * (_in progress_) Smart Contracts for Java
-* ABI encoding/decoding
+* ABI types encoding/decoding
 * Parity RPC extensions support
 
 == Principles
@@ -31,19 +31,25 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 * Value objects (thread-safe immutability)
 * HTTP Transport and JSON parser agnostic
 
-== Requirements
-
-* Java 8
-* https://gradle.org/[Gradle]
-* https://www.vagrantup.com/[Vagrant]
-
-== Installation
-
-----
-gradle build
-----
-
 == Usage
+
+=== Maven
+
+----
+<dependency>
+  <groupId>org.ethereumclassic</groupId>
+  <artifactId>etherjar</artifactId>
+  <version>0.4.0</version>
+</dependency>
+----
+
+=== Gradle
+
+----
+compile ('org.ethereumclassic:etherjar:0.4.0')
+----
+
+== How to start up
 
 Set up local https://ethcore.io/parity.html[parity node]:
 

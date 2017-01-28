@@ -10,8 +10,8 @@ apply plugin: 'jacoco'
 apply plugin: 'idea'
 
 group = 'org.ethereumclassic'
-version = '0.3-SNAPSHOT'
-def description = 'Lightweight Java client to Ethereum blockchain'
+version = '0.4.0'
+description = 'Lightweight Java client to Ethereum blockchain'
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
@@ -88,4 +88,3 @@ jacocoTestReport {
 }
 
 test.finalizedBy(jacocoTestReport)
-
