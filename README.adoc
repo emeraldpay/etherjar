@@ -46,11 +46,7 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 === Gradle
 
 ----
-<dependency>
-  <groupId>org.ethereumclassic</groupId>
-  <artifactId>etherjar</artifactId>
-  <version>0.4.0</version>
-</dependency>
+compile ('org.ethereumclassic:etherjar:0.4.0')
 ----
 
 == How to start up
