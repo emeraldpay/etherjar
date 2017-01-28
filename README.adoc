@@ -36,6 +36,15 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 === Maven
 
 ----
+<repository>
+  <snapshots>
+    <enabled>false</enabled>
+  </snapshots>
+  <id>bintray-splix-etherjar</id>
+  <name>bintray</name>
+  <url>http://dl.bintray.com/splix/etherjar</url>
+</repository>
+
 <dependency>
   <groupId>org.ethereumclassic</groupId>
   <artifactId>etherjar</artifactId>
@@ -46,7 +55,15 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 === Gradle
 
 ----
-compile ('org.ethereumclassic:etherjar:0.4.0')
+repositories {
+    maven {
+        url  "http://dl.bintray.com/splix/etherjar"
+    }
+}
+
+dependencies {
+   compile "org.ethereumclassic:etherjar:0.4.0"
+}
 ----
 
 == How to start up

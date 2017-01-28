@@ -67,12 +67,11 @@ bintray {
             project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
     publications = ['EtherJarPublication']
     pkg {
-        repo = 'EtherJar'
+        repo = 'etherjar'
         name = 'etherjar'
-        userOrg = 'ethereumproject'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/ethereumproject/etherjar.git'
-        labels = ['etherjar', 'etc']
+        labels = ['etherjar', 'etc', 'ethereum', 'blockchain']
         publicDownloadNumbers = true
         version {
             name = project.version
