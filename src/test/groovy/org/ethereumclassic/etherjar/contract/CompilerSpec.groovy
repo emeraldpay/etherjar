@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.contract
 
 import org.ethereumclassic.etherjar.rpc.JacksonEthRpcConverterSpec
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -60,5 +61,37 @@ class CompilerSpec extends Specification {
         act.names.sort() == ["SimpleToken", "ERC20", "StandardToken"].sort()
         act.getContract("SimpleToken").compiled != null
         act.getContract("SimpleToken").abi.contains("\"name\":\"transferFrom\"")
+    }
+
+    def "Fail with invalid path to solc"() {
+        setup:
+        InputStream contract = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("contract/SimpleToken.sol")
+        Compiler compiler = Compiler.newBuilder()
+                .withSolc('./fake_solcjs')
+                .build()
+        when:
+        def act = compiler.compile(contract)
+        then:
+        !act.success
+        act.errors.size() > 0
+        act.count == 0
+    }
+
+    @Ignore("solc doesn't give any hint")
+    def "Faile to compile invalid contract"() {
+        setup:
+        String contract = """
+        contract SimpleContract {
+            uint651256 x
+        }
+        """
+        Compiler compiler = Compiler.newBuilder()
+                .withSolc('./node_modules/solc/solcjs')
+                .build()
+        when:
+        def act = compiler.compile(contract)
+        then:
+        !act.success
+        act.count == 0
     }
 }

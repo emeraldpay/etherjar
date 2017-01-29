@@ -73,7 +73,16 @@ public class Compiler {
         Path contractSource = Files.createTempFile(tmp, "contract", ".sol");
         Files.copy(source, contractSource, StandardCopyOption.REPLACE_EXISTING);
 
-        Process process = executeSolc(tmp, contractSource, optimize);
+        Result result;
+
+        Process process = null;
+        try {
+            process = executeSolc(tmp, contractSource, optimize);
+        } catch (IOException e) {
+            result = new Result(false);
+            result.setErrors(Arrays.asList(e.getMessage()));
+            return result;
+        }
 
         BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -89,7 +98,6 @@ public class Compiler {
 
         int status = process.waitFor();
 
-        Result result;
         if (status != 0) {
             result = new Result(false);
         } else {
