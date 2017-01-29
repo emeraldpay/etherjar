@@ -3,6 +3,7 @@ package org.ethereumclassic.etherjar.contract;
 import org.ethereumclassic.etherjar.model.HexData;
 
 import java.io.*;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -63,14 +64,12 @@ public class Compiler {
 
         int status = process.waitFor();
 
-
-        Stream<Path> bins = Files.list(tmp).filter((f) -> f.getFileName().toString().endsWith(".bin"));
-
-        //TODO delete temp files after processing
-
         if (status != 0) {
+            clean(tmp);
             return new Result(false);
         }
+
+        Stream<Path> bins = Files.list(tmp).filter((f) -> f.getFileName().toString().endsWith(".bin"));
 
         List<CompiledContract> contracts = bins.map((path -> {
             String name = path.getFileName().toString();
@@ -100,6 +99,13 @@ public class Compiler {
         }).collect(Collectors.toList());
 
         return new Result(true).add(contracts);
+    }
+
+    private void clean(Path tmp) throws IOException {
+        Files.walk(tmp, FileVisitOption.FOLLOW_LINKS)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
     }
 
     public static class Result {
