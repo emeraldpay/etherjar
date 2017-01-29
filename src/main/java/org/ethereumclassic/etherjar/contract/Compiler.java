@@ -30,25 +30,12 @@ public class Compiler {
         return compile(new ByteArrayInputStream(source.getBytes("UTF-8")), optimize);
     }
 
-    //TODO support multiple sources
     public Result compile(InputStream source, boolean optimize) throws IOException, InterruptedException {
         Path tmp = Files.createTempDirectory("etherjar-compile");
         Path contractSource = Files.createTempFile(tmp, "contract", ".sol");
         Files.copy(source, contractSource, StandardCopyOption.REPLACE_EXISTING);
 
-        List<String> args = new ArrayList<>();
-        args.add(solc.getAbsolutePath());
-        if (optimize) {
-            args.add("--optimize");
-        }
-        args.add("--abi");
-        args.add("--bin");
-        args.add("--output-dir"); args.add("./");
-        args.add("./" + contractSource.getFileName().toString());
-
-        ProcessBuilder processBuilder = new ProcessBuilder(args)
-            .directory(tmp.toFile());
-        Process process = processBuilder.start();
+        Process process = executeSolc(tmp, contractSource, optimize);
 
         BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
         BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -64,41 +51,70 @@ public class Compiler {
 
         int status = process.waitFor();
 
+        Result result;
         if (status != 0) {
-            clean(tmp);
-            return new Result(false);
+            result = new Result(false);
+        } else {
+            result = processCompiledResult(tmp);
         }
+        result.setStderr(stderrLines);
+        result.setStdout(stdoutLines);
+        clean(tmp);
+        return result;
+    }
 
-        Stream<Path> bins = Files.list(tmp).filter((f) -> f.getFileName().toString().endsWith(".bin"));
+    public Process executeSolc(Path dir, Path contractSource, boolean optimize) throws IOException {
+        List<String> args = new ArrayList<>();
+        args.add(solc.getAbsolutePath());
+        if (optimize) {
+            args.add("--optimize");
+        }
+        args.add("--abi");
+        args.add("--bin");
+        args.add("--output-dir");
+        args.add("./");
+        args.add("./" + contractSource.getFileName().toString());
 
-        List<CompiledContract> contracts = bins.map((path -> {
+        ProcessBuilder processBuilder = new ProcessBuilder(args)
+            .directory(dir.toFile());
+        return processBuilder.start();
+    }
+
+    public Result processCompiledResult(Path dir) throws IOException {
+        List<String> errors = new ArrayList<>();
+        List<CompiledContract> contracts = Files.list(dir).filter((f) ->
+            f.getFileName().toString().endsWith(".bin")
+        ).map((path -> {
             String name = path.getFileName().toString();
-            name = name.substring(0, name.length() - ".bin".length());
-            return name;
+            return name.substring(0, name.length() - ".bin".length());
         })).map((name) -> {
-            Path bin = tmp.resolve(name + ".bin");
+            Path bin = dir.resolve(name + ".bin");
             HexData binData = null;
             try {
                 if (bin.toFile().length() > 0) {
-                    List<String> data = Files.readAllLines(bin);
-                    binData = HexData.from("0x" + data.get(0));
+                    binData = HexData.from(
+                        "0x" + String.join("", Files.readAllLines(bin))
+                    );
                 }
             } catch (IOException e) {
-                stderrLines.add(e.getMessage());
+                errors.add(e.getMessage());
             }
 
-            Path abi = tmp.resolve(name + ".abi");
+            Path abi = dir.resolve(name + ".abi");
             String json = null;
             try {
                 json = String.join("", Files.readAllLines(abi));
             } catch (IOException e) {
-                stderrLines.add(e.getMessage());
+                errors.add(e.getMessage());
             }
 
             return new CompiledContract(name, binData, json);
         }).collect(Collectors.toList());
 
-        return new Result(true).add(contracts);
+        Result result = new Result(true);
+        result.add(contracts);
+        result.setErrors(errors);
+        return result;
     }
 
     private void clean(Path tmp) throws IOException {
@@ -110,6 +126,9 @@ public class Compiler {
 
     public static class Result {
         private boolean success;
+        private List<String> stdout;
+        private List<String> stderr;
+        private List<String> errors;
         private List<CompiledContract> contracts;
 
         public Result(boolean success) {
@@ -147,6 +166,34 @@ public class Compiler {
 
         public int getCount() {
             return contracts.size();
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public List<String> getStdout() {
+            return stdout;
+        }
+
+        public void setStdout(List<String> stdout) {
+            this.stdout = stdout;
+        }
+
+        public List<String> getStderr() {
+            return stderr;
+        }
+
+        public void setStderr(List<String> stderr) {
+            this.stderr = stderr;
+        }
+
+        public List<String> getErrors() {
+            return errors;
+        }
+
+        public void setErrors(List<String> errors) {
+            this.errors = errors;
         }
     }
 
