@@ -16,21 +16,59 @@ import java.util.stream.Stream;
  */
 public class Compiler {
 
-    private File solc;
+    private final File solc;
+    private final boolean optimize;
 
-    public Compiler(String solc) {
-        this.solc = new File(solc);
+    public static class Builder {
+
+        private File solc;
+        private boolean optimize = true;
+
+        public Builder withSolc(File solc) {
+            this.solc = solc;
+            return this;
+        }
+        public Builder withSolc(String solc) {
+            this.solc = new File(solc);
+            return this;
+        }
+        public Builder withSolc(Path solc) {
+            this.solc = solc.toFile();
+            return this;
+        }
+
+        public Builder optimize(boolean optimize) {
+            this.optimize = optimize;
+            return this;
+        }
+
+        public Compiler build() {
+            if (solc == null) {
+                throw new IllegalStateException("Solc path is not set");
+            }
+            return new Compiler(solc, optimize);
+        }
+
     }
 
-    public Result compile(File source, boolean optimize) throws IOException, InterruptedException {
-        return compile(new FileInputStream(source), optimize);
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
-    public Result compile(String source, boolean optimize) throws IOException, InterruptedException {
-        return compile(new ByteArrayInputStream(source.getBytes("UTF-8")), optimize);
+    public Compiler(File solc, boolean optimize) {
+        this.solc = solc;
+        this.optimize = optimize;
     }
 
-    public Result compile(InputStream source, boolean optimize) throws IOException, InterruptedException {
+    public Result compile(File source) throws IOException, InterruptedException {
+        return compile(new FileInputStream(source));
+    }
+
+    public Result compile(String source) throws IOException, InterruptedException {
+        return compile(new ByteArrayInputStream(source.getBytes("UTF-8")));
+    }
+
+    public Result compile(InputStream source) throws IOException, InterruptedException {
         Path tmp = Files.createTempDirectory("etherjar-compile");
         Path contractSource = Files.createTempFile(tmp, "contract", ".sol");
         Files.copy(source, contractSource, StandardCopyOption.REPLACE_EXISTING);

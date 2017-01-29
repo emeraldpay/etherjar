@@ -18,10 +18,13 @@ class CompilerSpec extends Specification {
     //
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //
-    Compiler compiler = new Compiler('./node_modules/solc/solcjs')
 
     def "Basic compile"() {
         setup:
+        Compiler compiler = Compiler.newBuilder()
+                .withSolc('./node_modules/solc/solcjs')
+                .optimize(false)
+                .build()
         String contract = """
         pragma solidity ^0.4.4;
 
@@ -34,7 +37,7 @@ class CompilerSpec extends Specification {
         }
         """
         when:
-        def act = compiler.compile(contract, false)
+        def act = compiler.compile(contract)
         then:
         act.success
         act.count == 1
@@ -46,8 +49,11 @@ class CompilerSpec extends Specification {
     def "Multicontract compiler"() {
         setup:
         InputStream contract = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("contract/SimpleToken.sol")
+        Compiler compiler = Compiler.newBuilder()
+                .withSolc('./node_modules/solc/solcjs')
+                .build()
         when:
-        def act = compiler.compile(contract, true)
+        def act = compiler.compile(contract)
         then:
         act.success
         act.count == 3
