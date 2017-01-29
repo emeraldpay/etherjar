@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -64,7 +65,6 @@ public class Compiler {
 
 
         Stream<Path> bins = Files.list(tmp).filter((f) -> f.getFileName().toString().endsWith(".bin"));
-        Stream<Path> abis = Files.list(tmp).filter((f) -> f.getFileName().toString().endsWith(".abi"));
 
         //TODO delete temp files after processing
 
@@ -72,42 +72,99 @@ public class Compiler {
             return new Result(false);
         }
 
-        //TODO extract contract name
-
-        Optional<Path> bin = bins.findFirst();
-        HexData binData = null;
-        if (bin.isPresent()) {
-            List<String> data = Files.readAllLines(bin.get());
-            binData = HexData.from("0x" + data.get(0));
-        }
-
-        Optional<Path> abi = abis.findFirst();
-        String json = null;
-        if (abi.isPresent()) {
-            BufferedReader rdr = Files.newBufferedReader(abi.get());
-            StringBuffer buf = new StringBuffer();
-            while ((line = rdr.readLine()) != null) {
-                buf.append(line);
+        List<CompiledContract> contracts = bins.map((path -> {
+            String name = path.getFileName().toString();
+            name = name.substring(0, name.length() - ".bin".length());
+            return name;
+        })).map((name) -> {
+            Path bin = tmp.resolve(name + ".bin");
+            HexData binData = null;
+            try {
+                if (bin.toFile().length() > 0) {
+                    List<String> data = Files.readAllLines(bin);
+                    binData = HexData.from("0x" + data.get(0));
+                }
+            } catch (IOException e) {
+                stderrLines.add(e.getMessage());
             }
-            json = buf.toString();
-        }
 
-        return new Result(binData, json, true);
+            Path abi = tmp.resolve(name + ".abi");
+            String json = null;
+            try {
+                json = String.join("", Files.readAllLines(abi));
+            } catch (IOException e) {
+                stderrLines.add(e.getMessage());
+            }
+
+            return new CompiledContract(name, binData, json);
+        }).collect(Collectors.toList());
+
+        return new Result(true).add(contracts);
     }
 
     public static class Result {
-        private HexData compiled;
-        private String abi;
         private boolean success;
+        private List<CompiledContract> contracts;
 
         public Result(boolean success) {
             this.success = success;
+            contracts = new ArrayList<>();
         }
 
-        public Result(HexData compiled, String abi, boolean success) {
+        public List<String> getNames() {
+            return contracts.stream()
+                .map(CompiledContract::getName)
+                .collect(Collectors.toList());
+        }
+
+        public CompiledContract getContract(String name) {
+            for(CompiledContract c: contracts) {
+                if (c.getName().equals(name)) {
+                    return c;
+                }
+            }
+            return null;
+        }
+
+        public List<CompiledContract> getContracts() {
+            return contracts;
+        }
+
+        public Result add(CompiledContract contract) {
+            contracts.add(contract);
+            return this;
+        }
+        public Result add(List<CompiledContract> contracts) {
+            this.contracts.addAll(contracts);
+            return this;
+        }
+
+        public int getCount() {
+            return contracts.size();
+        }
+    }
+
+    public static class CompiledContract {
+        private final String name;
+        private HexData compiled;
+        private String abi;
+
+        public CompiledContract(String name) {
+            this.name = name;
+        }
+
+        public CompiledContract(String name, HexData compiled, String abi) {
+            this(name);
             this.compiled = compiled;
             this.abi = abi;
-            this.success = success;
+        }
+
+        public void setCompiled(HexData compiled) {
+            this.compiled = compiled;
+        }
+
+        public void setAbi(String abi) {
+            this.abi = abi;
         }
 
         public HexData getCompiled() {
@@ -118,8 +175,9 @@ public class Compiler {
             return abi;
         }
 
-        public boolean isSuccess() {
-            return success;
+        public String getName() {
+            return name;
         }
     }
+
 }
