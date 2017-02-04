@@ -1,12 +1,10 @@
-= EtherJar
-
 :rootdir: .
 :imagesdir: {rootdir}/images
-:toclevels: 2
-:toc:
 
 ifdef::env-github,env-browser[:badges:]
 ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+
+= EtherJar
 
 ifdef::badges[]
 image:http://build.ethereumclassic.org/app/rest/builds/buildType:(id:Etherjar_Master)/statusIcon[TC Build Status, link=http://build.ethereumclassic.org/viewType.html?buildTypeId=Etherjar_Master]
@@ -30,6 +28,24 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 * Async first approach
 * Value objects (thread-safe immutability)
 * HTTP Transport and JSON parser agnostic
+
+== Quickstart
+
+The quickest way to get started with EtherJar is using https://github.com/ethereumproject/etherup[EtherUp bootstrap project]
+(only https://www.vagrantup.com/[Vagrant] tool must be preinstalled):
+
+----
+git clone https://github.com/ethereumproject/etherup
+cd etherup
+vagrant up
+examples/client_version.groovy
+#other examples written in Groovy DSL
+vagrant halt
+----
+
+EtherUp is a predefined ethereum classic demo environment with a collection of examples written in Groovy DSL.
+
+For more details please look at https://github.com/ethereumproject/etherup[project github page].
 
 == Usage
 
@@ -66,15 +82,9 @@ dependencies {
 }
 ----
 
-== How to start up
+== Examples
 
-Set up local https://ethcore.io/parity.html[parity node]:
-
-----
-vagrant up
-----
-
-Check client version:
+How to make 'web3_clientVersion' JSON-RPC call:
 
 [source,java]
 ----
@@ -104,18 +114,6 @@ public class Main {
     }
 }
 ----
-
-----
-Client version: Parity//v1.5.0-unstable-1ee5ba1-20170116/x86_64-linux-gnu/rustc1.14.0
-----
-
-Tear down local parity node:
-
-----
-vagrant halt
-----
-
-<<docs/parity.adoc#,Read more>> about local parity node customizing.
 
 == Licence
 
