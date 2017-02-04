@@ -31,7 +31,7 @@ Lightweight Java 8 client to Ethereum blockchain nodes, supports both Ethereum C
 
 == Quickstart
 
-The quickest way to get started with EtherJar is using https://github.com/ethereumproject/etherup[EtherUp bootstrap project]
+The easiest way to get started with EtherJar is using https://github.com/ethereumproject/etherup[EtherUp bootstrap project]
 (only https://www.vagrantup.com/[Vagrant] tool must be preinstalled):
 
 ----
