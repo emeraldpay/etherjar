@@ -2,6 +2,7 @@ package org.ethereumclassic.etherjar.rpc.transport;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -9,6 +10,6 @@ import java.util.concurrent.Future;
  */
 public interface RpcTransport {
 
-    <T> Future<T> execute(String method, List params, Class<T> resultType) throws IOException;
+    <T> CompletableFuture<T> execute(String method, List params, Class<T> resultType);
 
 }

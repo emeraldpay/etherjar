@@ -13,10 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 /**
@@ -64,13 +61,16 @@ public class DefaultRpcTransport implements RpcTransport {
     }
 
     @Override
-    public <T> Future<T> execute(final String method, final List params, final Class<T> resultType) throws IOException {
-        return executorService.submit(new Callable<T>() {
-            @Override
-            public T call() throws Exception {
-                return executeSync(method, params, resultType);
+    public <T> CompletableFuture<T> execute(final String method, final List params, final Class<T> resultType) {
+        CompletableFuture<T> f = new CompletableFuture<T>();
+        executorService.submit(() -> {
+            try {
+                f.complete(executeSync(method, params, resultType));
+            } catch (IOException e) {
+                f.completeExceptionally(e);
             }
         });
+        return f;
     }
 
     public <T> T executeSync(String method, List params, Class<T> resultType) throws IOException {
