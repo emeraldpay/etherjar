@@ -8,16 +8,13 @@ import org.ethereumclassic.etherjar.model.HexQuantity;
 import org.ethereumclassic.etherjar.model.Nonce;
 import org.ethereumclassic.etherjar.model.TransactionId;
 import org.ethereumclassic.etherjar.model.Wei;
-import org.ethereumclassic.etherjar.rpc.json.BlockJson;
-import org.ethereumclassic.etherjar.rpc.json.BlockTag;
-import org.ethereumclassic.etherjar.rpc.json.TransactionJson;
-import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson;
-import org.ethereumclassic.etherjar.rpc.json.TransactionCallJson;
+import org.ethereumclassic.etherjar.rpc.json.*;
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 

@@ -1,6 +1,7 @@
 package org.ethereumclassic.etherjar.rpc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,7 @@ public class JacksonRpcConverter implements RpcConverter {
         return objectMapper.writer().writeValueAsString(request);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T fromJson(InputStream content, Class<T> target) throws IOException {
         if (TraceList.class.isAssignableFrom(target)) {
             return (T) fromJsonList(content, TraceItemJson.class);

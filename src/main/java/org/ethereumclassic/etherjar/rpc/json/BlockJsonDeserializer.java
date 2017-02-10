@@ -20,7 +20,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
     private TransactionJsonDeserializer transactionJsonDeserializer = new TransactionJsonDeserializer();
 
-    @Override
+    @Override @SuppressWarnings("unchecked")
     public BlockJson deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         BlockJson blockJson = new BlockJson();
 
