@@ -30,11 +30,11 @@ public class MethodId extends HexData {
         String sign = Objects.requireNonNull(name) +
                 '(' + String.join(",", Objects.requireNonNull(types)) + ')';
 
-        byte[] head = new byte[4];
+        byte[] head = new byte[SIZE_BYTES];
         Keccak.Digest256 digest256 = new Keccak.Digest256();
 
         digest256.update(sign.getBytes());
-        System.arraycopy(digest256.digest(), 0, head, 0, 4);
+        System.arraycopy(digest256.digest(), 0, head, 0, SIZE_BYTES);
 
         return from(head);
     }
@@ -57,6 +57,19 @@ public class MethodId extends HexData {
             throw new IllegalArgumentException("Invalid MethodId length: " + value.length());
 
         return new MethodId(HexData.from(value).getBytes());
+    }
+
+    public static MethodId fromInput(HexData input) {
+        if (input == null) {
+            return null;
+        }
+        byte[] data = input.getBytes();
+        if (data.length < SIZE_BYTES) {
+            return null;
+        }
+        byte[] head = new byte[SIZE_BYTES];
+        System.arraycopy(data, 0, head, 0, SIZE_BYTES);
+        return new MethodId(head);
     }
 
     public MethodId(byte[] value) {
