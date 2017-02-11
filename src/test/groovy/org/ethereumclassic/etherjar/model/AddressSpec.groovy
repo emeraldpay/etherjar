@@ -21,7 +21,22 @@ class AddressSpec extends Specification {
         '0xffffffffffffffffffffffffffffffffffffffff'  | [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] as byte[]
     }
 
+    def "Checksummed Address validation"() {
+        expect:
+        Address.isAddress('0x52908400098527886E0F7030069857D2E4169EE7') == true
+        Address.isAddress('0xde709f2102306220921060314715629080e2fb77') == true
+        Address.isAddress('0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed') == true
+        Address.isAddress('0x5A4EAB120fB44eb6684E5e32785702FF45ea344D') == true
+        // 2nd 'A' changed to 'a'
+        Address.isAddress('0x5a4EAB120fB44eb6684E5e32785702FF45ea344D') == false
+    }
+
     def "Ignore Invalid addr"() {
+        when:
+        Address.from('0xK2908400098527886E0F7030069857D2E4169EE7')
+        then:
+        thrown(IllegalArgumentException)
+
         when:
         Address.from('0x0')
         then:
