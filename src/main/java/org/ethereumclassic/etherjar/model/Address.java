@@ -2,7 +2,7 @@ package org.ethereumclassic.etherjar.model;
 
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.util.encoders.Hex;
-import java.io.UnsupportedEncodingException;
+
 import java.util.regex.Pattern;
 
 /**
@@ -17,9 +17,8 @@ public class Address extends HexData {
 
     public static final Address EMPTY = Address.from("0x0000000000000000000000000000000000000000");
 
-    private static final Pattern ALL_LOW_PATTERN = Pattern.compile("^0x[0-9a-f]{40}$");
-    private static final Pattern ALL_CAP_PATTERN = Pattern.compile("^0x[0-9A-F]{40}$");
-    private static final Pattern INVARIANT_PATTERN = Pattern.compile("^0x[0-9a-fA-F]{40}$");
+    private static final Pattern CASE_INSENSITIVE_PATTERN = Pattern.compile("0x(?i:[0-9a-f]{40})");
+    private static final Pattern CASE_SENSITIVE_PATTERN = Pattern.compile("0x(?:[0-9a-f]{40}|[0-9A-F]{40})");
 
     private Address(byte[] bytes) {
         super(bytes, SIZE_BYTES);
@@ -46,58 +45,41 @@ public class Address extends HexData {
     }
 
     /**
-     * Validate address according to EIP 55
-     * https://github.com/ethereum/EIPs/issues/55
+     * Validate address according to EIP 55.
      *
-     * @param address 0x...
-     * @return true if address correct or false otherwise
+     * @param address a wallet address ('0x...')
+     * @return <code>true</code> if address correct or <code>false</code> otherwise
+     *
+     * @see <a href="https://github.com/ethereum/EIPs/issues/55">EIP 55</a>
      */
-    public static boolean isAddress(String address) {
-        if (!INVARIANT_PATTERN.matcher(address).matches()) {
-            // check if it has the basic requirements of an address
-            return false;
-        } else if (ALL_LOW_PATTERN.matcher(address).matches() ||
-                ALL_CAP_PATTERN.matcher(address).matches()) {
-            // If it's all small caps or all big caps, return true
-            return true;
-        } else {
-            return isChecksumAddress(address);
-        }
+    public static boolean isValidAddress(String address) {
+        return CASE_INSENSITIVE_PATTERN.matcher(address).matches()
+                && (CASE_SENSITIVE_PATTERN.matcher(address).matches() || isValidChecksum(address));
     }
 
     /**
-     * Checks if the given string is a checksummed address
+     * Checks if the given string is an address with checksum (Keccak256).
      *
-     * In other implementation you can find sha3 function call,
-     * but actually it is Keccak256.
-     * See https://medium.com/@ConsenSys/are-you-really-using-sha-3-or-old-code-c5df31ad2b0
-     *
-     * @param address
-     * @return true if address checksummed
+     * @param address a wallet address ('0x...')
+     * @return <code>true</code> if address with checksum
      */
-    static boolean isChecksumAddress(String address) {
-        address = address.replace("0x", "");
-        String addressHash = keccak256(address.toLowerCase());
+    static boolean isValidChecksum(String address) {
+        Keccak.Digest256 digest256 = new Keccak.Digest256();
+
+        digest256.update(
+                address.substring(2).toLowerCase().getBytes());
+
+        String hash = Hex.toHexString(digest256.digest());
 
         for (int i = 0; i < 40; i++) {
-            // the nth letter should be uppercase if the nth digit of casemap is 1
-            char nthChar = address.charAt(i);
-            int nthHashDigit = Character.digit(addressHash.charAt(i), 16);
-            if ((nthHashDigit > 7 && Character.toUpperCase(nthChar) != nthChar) ||
-                    (nthHashDigit <= 7 && Character.toLowerCase(nthChar) != nthChar)) {
-                return false;
-            }
-        }
-        return true;
-    }
+            char ch = address.charAt(i + 2);
+            int dg = Character.digit(hash.charAt(i), 16);
 
-    static String keccak256(String input) {
-        final Keccak.DigestKeccak m = new Keccak.Digest256();
-        try {
-            m.update(input.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            m.update(input.getBytes());
+            if ((dg > 7 && Character.toUpperCase(ch) != ch)
+                    || (dg <= 7 && Character.toLowerCase(ch) != ch))
+                return false;
         }
-        return Hex.toHexString(m.digest());
+
+        return true;
     }
 }
