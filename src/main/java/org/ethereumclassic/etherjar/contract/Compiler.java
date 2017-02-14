@@ -7,9 +7,11 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Igor Artamonov
@@ -101,7 +103,7 @@ public class Compiler {
         if (status != 0) {
             result = new Result(false);
         } else {
-            result = processCompiledResult(tmp);
+            result = processCompiledResult(contractSource);
         }
         result.setStderr(stderrLines);
         result.setStdout(stdoutLines);
@@ -126,14 +128,16 @@ public class Compiler {
         return processBuilder.start();
     }
 
-    public Result processCompiledResult(Path dir) throws IOException {
+    public Result processCompiledResult(Path contractSource) throws IOException {
+        Path dir = contractSource.getParent();
         List<String> errors = new ArrayList<>();
+        int offset = contractSource.getFileName().toString().length() + 1;
         List<CompiledContract> contracts = Files.list(dir).filter((f) ->
             f.getFileName().toString().endsWith(".bin")
         ).map((path -> {
             String name = path.getFileName().toString();
-            return name.substring(0, name.length() - ".bin".length());
-        })).map((name) -> {
+            return name.substring(offset, name.length() - ".bin".length());
+        })).map(name -> {
             Path bin = dir.resolve(name + ".bin");
             HexData binData = null;
             try {
