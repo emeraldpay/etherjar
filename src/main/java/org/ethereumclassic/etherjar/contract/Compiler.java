@@ -136,7 +136,7 @@ public class Compiler {
             f.getFileName().toString().endsWith(".bin")
         ).map((path -> {
             String name = path.getFileName().toString();
-            return name.substring(offset, name.length() - ".bin".length());
+            return name.substring(0, name.length() - ".bin".length());
         })).map(name -> {
             Path bin = dir.resolve(name + ".bin");
             HexData binData = null;
@@ -158,7 +158,7 @@ public class Compiler {
                 errors.add(e.getMessage());
             }
 
-            return new CompiledContract(name, binData, json);
+            return new CompiledContract(name.substring(offset), binData, json);
         }).collect(Collectors.toList());
 
         Result result = new Result(true);
