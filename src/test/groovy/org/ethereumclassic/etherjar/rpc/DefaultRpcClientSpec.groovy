@@ -16,7 +16,7 @@ import org.ethereumclassic.etherjar.rpc.json.TransactionReceiptJson
 import org.ethereumclassic.etherjar.rpc.transport.RpcTransport
 import spock.lang.Specification
 
-import static org.ethereumclassic.etherjar.rpc.ConcurrencyUtils.*
+import java.util.concurrent.CompletableFuture
 
 /**
  *
@@ -36,7 +36,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getBlockNumber().get()
         then:
-        1 * rpcTransport.execute("eth_blockNumber", [], String) >> new CompletedFuture<>("0x1f47d0")
+        1 * rpcTransport.execute("eth_blockNumber", [], String) >> CompletableFuture.completedFuture("0x1f47d0")
         act == 2050000
     }
 
@@ -44,13 +44,13 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getBalance(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST).get()
         then:
-        1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> new CompletedFuture<>("0x0234c8a3397aab58")
+        1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> CompletableFuture.completedFuture("0x0234c8a3397aab58")
         act.toString() == "0.1590 ether"
 
         when:
         act = defaultRpcClient.eth().getBalance(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2050000).get()
         then:
-        1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> new CompletedFuture<>("0x0234c8a3397aab58")
+        1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> CompletableFuture.completedFuture("0x0234c8a3397aab58")
         act.toString() == "0.1590 ether"
     }
 
@@ -61,13 +61,13 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getBlock(2050000, false)
         then:
-        1 * rpcTransport.execute("eth_getBlockByNumber", ['0x1f47d0', false], BlockJson) >> new CompletedFuture<>(json)
+        1 * rpcTransport.execute("eth_getBlockByNumber", ['0x1f47d0', false], BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
 
         when:
         act = defaultRpcClient.eth().getBlock(2050000, true)
         then:
-        1 * rpcTransport.execute("eth_getBlockByNumber", ['0x1f47d0', true], BlockJson) >> new CompletedFuture<>(json)
+        1 * rpcTransport.execute("eth_getBlockByNumber", ['0x1f47d0', true], BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
@@ -78,13 +78,13 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getBlock(BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), false)
         then:
-        1 * rpcTransport.execute("eth_getBlockByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', false], BlockJson) >> new CompletedFuture<>(json)
+        1 * rpcTransport.execute("eth_getBlockByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', false], BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
 
         when:
         act = defaultRpcClient.eth().getBlock(BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'), true)
         then:
-        1 * rpcTransport.execute("eth_getBlockByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', true], BlockJson) >> new CompletedFuture<>(json)
+        1 * rpcTransport.execute("eth_getBlockByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', true], BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
@@ -96,7 +96,7 @@ class DefaultRpcClientSpec extends Specification {
         def act = defaultRpcClient.eth().getTransaction(TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"))
         then:
         1 * rpcTransport.execute("eth_getTransactionByHash",
-                ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionJson) >> new CompletedFuture<>(json)
+                ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
     def "Get tx by block hash and index"() {
@@ -107,7 +107,7 @@ class DefaultRpcClientSpec extends Specification {
         def act = defaultRpcClient.eth().getTransaction(BlockHash.from('0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'), 0)
         then:
         1 * rpcTransport.execute("eth_getTransactionByBlockHashAndIndex",
-                ["0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946", '0x0'], TransactionJson) >> new CompletedFuture<>(json)
+                ["0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946", '0x0'], TransactionJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
     def "Get tx by block number and index"() {
@@ -118,7 +118,7 @@ class DefaultRpcClientSpec extends Specification {
         def act = defaultRpcClient.eth().getTransaction(2007232, 0)
         then:
         1 * rpcTransport.execute("eth_getTransactionByBlockNumberAndIndex",
-                ["0x1ea0c0", '0x0'], TransactionJson) >> new CompletedFuture<>(json)
+                ["0x1ea0c0", '0x0'], TransactionJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
@@ -130,7 +130,7 @@ class DefaultRpcClientSpec extends Specification {
         def act = defaultRpcClient.eth().getTransactionReceipt(TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"))
         then:
         1 * rpcTransport.execute("eth_getTransactionReceipt",
-                ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionReceiptJson) >> new CompletedFuture<>(json)
+                ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionReceiptJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
@@ -138,19 +138,19 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getTransactionCount(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST).get()
         then:
-        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> new CompletedFuture<>("0x0234")
+        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> CompletableFuture.completedFuture("0x0234")
         act == 564L
 
         when:
         act = defaultRpcClient.eth().getTransactionCount(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST).get()
         then:
-        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> new CompletedFuture<>("0x1")
+        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> CompletableFuture.completedFuture("0x1")
         act == 1L
 
         when:
         act = defaultRpcClient.eth().getTransactionCount(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2050000).get()
         then:
-        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> new CompletedFuture<>("0x9")
+        1 * rpcTransport.execute("eth_getTransactionCount", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> CompletableFuture.completedFuture("0x9")
         act == 9L
     }
 
@@ -160,7 +160,7 @@ class DefaultRpcClientSpec extends Specification {
                 BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339')
         ).get()
         then:
-        1 * rpcTransport.execute("eth_getBlockTransactionCountByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'], String) >> new CompletedFuture<>("0x0a")
+        1 * rpcTransport.execute("eth_getBlockTransactionCountByHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'], String) >> CompletableFuture.completedFuture("0x0a")
         act == 10L
 
         when:
@@ -168,7 +168,7 @@ class DefaultRpcClientSpec extends Specification {
                 2050000
         ).get()
         then:
-        1 * rpcTransport.execute("eth_getBlockTransactionCountByNumber", ['0x1f47d0'], String) >> new CompletedFuture<>("0x1")
+        1 * rpcTransport.execute("eth_getBlockTransactionCountByNumber", ['0x1f47d0'], String) >> CompletableFuture.completedFuture("0x1")
         act == 1L
     }
 
@@ -178,7 +178,7 @@ class DefaultRpcClientSpec extends Specification {
                 BlockHash.from('0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339')
         ).get()
         then:
-        1 * rpcTransport.execute("eth_getUncleCountByBlockHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'], String) >> new CompletedFuture<>("0x0a")
+        1 * rpcTransport.execute("eth_getUncleCountByBlockHash", ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339'], String) >> CompletableFuture.completedFuture("0x0a")
         act == 10L
 
         when:
@@ -186,7 +186,7 @@ class DefaultRpcClientSpec extends Specification {
                 2050000
         ).get()
         then:
-        1 * rpcTransport.execute("eth_getUncleCountByBlockNumber", ['0x1f47d0'], String) >> new CompletedFuture<>("0x1")
+        1 * rpcTransport.execute("eth_getUncleCountByBlockNumber", ['0x1f47d0'], String) >> CompletableFuture.completedFuture("0x1")
         act == 1L
     }
 
@@ -198,7 +198,7 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getCode",
                 ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'],
-                String) >> new CompletedFuture<>("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
+                String) >> CompletableFuture.completedFuture("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
         act.toHex() == "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
 
         when:
@@ -208,7 +208,7 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getCode",
                 ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x2'],
-                String) >> new CompletedFuture<>("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
+                String) >> CompletableFuture.completedFuture("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
         act.toHex() == "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
     }
 
@@ -221,7 +221,7 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getUncleByBlockHashAndIndex",
                 ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', '0x0'],
-                BlockJson) >> new CompletedFuture<>(json)
+                BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
 
         when:
@@ -229,7 +229,7 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("eth_getUncleByBlockNumberAndIndex",
                 ['0x1f47d0', '0x0'],
-                BlockJson) >> new CompletedFuture<>(json)
+                BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
@@ -244,7 +244,7 @@ class DefaultRpcClientSpec extends Specification {
         then:
         1 * rpcTransport.execute("trace_transaction",
                 ['0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc'],
-                TraceList) >> new CompletedFuture<>(json)
+                TraceList) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
@@ -256,7 +256,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getWork()
         then:
-        1 * rpcTransport.execute("eth_getWork", [], HexData[]) >> new CompletedFuture<>(data)
+        1 * rpcTransport.execute("eth_getWork", [], HexData[]) >> CompletableFuture.completedFuture(data)
         act.get().size() == data.size()
         act.get() as Set == data as Set
     }
@@ -268,7 +268,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().submitHashrate(hashRate, id);
         then:
-        1 * rpcTransport.execute("eth_submitHashrate", [hashRate.toHex(), id.toHex()], Boolean) >> new CompletedFuture<>(true)
+        1 * rpcTransport.execute("eth_submitHashrate", [hashRate.toHex(), id.toHex()], Boolean) >> CompletableFuture.completedFuture(true)
         act.get() == true
     }
 
@@ -280,7 +280,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().submitWork(nonce, powHash, digest);
         then:
-        1 * rpcTransport.execute("eth_submitWork", [nonce.toHex(), powHash.toHex(), digest.toHex()], Boolean) >> new CompletedFuture<>(true)
+        1 * rpcTransport.execute("eth_submitWork", [nonce.toHex(), powHash.toHex(), digest.toHex()], Boolean) >> CompletableFuture.completedFuture(true)
         act.get() == true
     }
 
@@ -290,7 +290,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getCoinbase()
         then:
-        1 * rpcTransport.execute("eth_coinbase", [], Address) >> new CompletedFuture<>(data)
+        1 * rpcTransport.execute("eth_coinbase", [], Address) >> CompletableFuture.completedFuture(data)
         act.get() == data
     }
 
@@ -300,7 +300,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getHashrate()
         then:
-        1 * rpcTransport.execute("eth_hashrate", [], String) >> new CompletedFuture<>("0x1f47d0")
+        1 * rpcTransport.execute("eth_hashrate", [], String) >> CompletableFuture.completedFuture("0x1f47d0")
         act.get() == 2050000
     }
 
@@ -308,7 +308,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().isMining();
         then:
-        1 * rpcTransport.execute("eth_mining", [], Boolean) >> new CompletedFuture<>(true)
+        1 * rpcTransport.execute("eth_mining", [], Boolean) >> CompletableFuture.completedFuture(true)
         act.get() == true
     }
 
@@ -318,7 +318,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getGasPrice()
         then:
-        1 * rpcTransport.execute("eth_gasPrice", [], String) >> new CompletedFuture<>("0x4A817C800")
+        1 * rpcTransport.execute("eth_gasPrice", [], String) >> CompletableFuture.completedFuture("0x4A817C800")
         act.get() == data
     }
 
@@ -331,7 +331,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getAccounts()
         then:
-        1 * rpcTransport.execute("eth_accounts", [], Address[]) >> new CompletedFuture<>(data)
+        1 * rpcTransport.execute("eth_accounts", [], Address[]) >> CompletableFuture.completedFuture(data)
         act.get().size() == data.size()
         act.get() as Set == data as Set
     }
@@ -342,7 +342,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().getCompilers()
         then:
-        1 * rpcTransport.execute("eth_getCompilers", [], String[]) >> new CompletedFuture<>(data)
+        1 * rpcTransport.execute("eth_getCompilers", [], String[]) >> CompletableFuture.completedFuture(data)
         act.get().size() == data.size()
         act.get() as Set == data as Set
     }
@@ -356,7 +356,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().call(call, BlockTag.LATEST)
         then:
-        1 * rpcTransport.execute("eth_call", [call, 'latest'], String) >> new CompletedFuture<>('0x000000000000000000000000000000000000000000000000000039bc22c57200')
+        1 * rpcTransport.execute("eth_call", [call, 'latest'], String) >> CompletableFuture.completedFuture('0x000000000000000000000000000000000000000000000000000039bc22c57200')
         act.get().toHex() == '0x000000000000000000000000000000000000000000000000000039bc22c57200'
     }
 
@@ -371,7 +371,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().sendTransaction(tx)
         then:
-        1 * rpcTransport.execute("eth_sendTransaction", [tx], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        1 * rpcTransport.execute("eth_sendTransaction", [tx], String) >> CompletableFuture.completedFuture('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
         act.get() == txid
     }
 
@@ -382,7 +382,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().sendTransaction(tx)
         then:
-        1 * rpcTransport.execute("eth_sendRawTransaction", ['0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'], String) >> new CompletedFuture<>('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
+        1 * rpcTransport.execute("eth_sendRawTransaction", ['0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675'], String) >> CompletableFuture.completedFuture('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
         act.get() == txid
     }
 
@@ -393,7 +393,7 @@ class DefaultRpcClientSpec extends Specification {
         when:
         def act = defaultRpcClient.eth().sign(addr, data)
         then:
-        1 * rpcTransport.execute("eth_sign", ['0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab', '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'], String) >> new CompletedFuture<>('0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001')
+        1 * rpcTransport.execute("eth_sign", ['0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab', '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'], String) >> CompletableFuture.completedFuture('0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001')
         act.get().toHex() == '0xbd685c98ec39490f50d15c67ba2a8e9b5b1d6d7601fca80b295e7d717446bd8b7127ea4871e996cdc8cae7690408b4e800f60ddac49d2ad34180e68f1da0aaf001'
     }
 }

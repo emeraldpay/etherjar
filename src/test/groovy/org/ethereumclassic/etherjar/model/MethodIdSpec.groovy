@@ -89,4 +89,35 @@ class MethodIdSpec extends Specification {
         _ | '0xabcdefff'
         _ | '0x12345678'
     }
+
+    def "extract from input - none"() {
+        when:
+        MethodId id = MethodId.fromInput(null)
+        then:
+        id == null
+
+        when:
+        id = MethodId.fromInput(HexData.from('0x'))
+        then:
+        id == null
+    }
+
+    def "extract from input - just method"() {
+        when:
+        def id = MethodId.fromInput(HexData.from('0xab55044d'))
+        then:
+        id.toHex() == '0xab55044d'
+        when:
+        id = MethodId.fromInput(HexData.from('0x00000001'))
+        then:
+        id.toHex() == '0x00000001'
+    }
+
+    def "extract from input - with parameters"() {
+        when:
+        def id = MethodId.fromInput(HexData.from('0xa9059cbb000000000000000000000000ef2de474d07c9db4eb6b8ffeb64f5cbc725c75180000000000000000000000000000000000000000000000000000000000000cba'))
+        then:
+        id.toHex() == '0xa9059cbb'
+    }
+
 }

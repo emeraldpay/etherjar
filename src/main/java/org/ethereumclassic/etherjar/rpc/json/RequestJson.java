@@ -9,10 +9,10 @@ public class RequestJson {
 
     private String jsonrpc = "2.0";
     private String method;
-    private List<Object> params;
+    private List params;
     private int id;
 
-    public RequestJson(String method, List<Object> params, int id) {
+    public RequestJson(String method, List params, int id) {
         this.method = method;
         this.params = params;
         this.id = id;
@@ -26,7 +26,7 @@ public class RequestJson {
         return method;
     }
 
-    public List<Object> getParams() {
+    public List getParams() {
         return params;
     }
 

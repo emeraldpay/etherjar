@@ -3,8 +3,10 @@ package org.ethereumclassic.etherjar.rpc.transport;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.ethereumclassic.etherjar.rpc.JacksonRpcConverter;
 import org.ethereumclassic.etherjar.rpc.RpcConverter;
 import org.ethereumclassic.etherjar.rpc.json.RequestJson;
@@ -13,10 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 /**
@@ -25,6 +24,7 @@ import java.util.logging.Logger;
 public class DefaultRpcTransport implements RpcTransport {
 
     private static final Logger log = Logger.getLogger(DefaultRpcTransport.class.getName());
+    private static final int MAX_CONNECTIONS = 50;
 
     private int callSequence = 1;
 
@@ -38,39 +38,41 @@ public class DefaultRpcTransport implements RpcTransport {
         this.host = host;
         this.rpcConverter = rpcConverter;
         this.executorService = executorService;
-        httpclient = httpClient;
+        this.httpclient = httpClient;
+        if (this.httpclient == null) {
+            this.httpclient = HttpClients.custom()
+                .setConnectionManager(createConnectionManager())
+                .setConnectionManagerShared(true)
+                .build();
+        }
     }
 
     public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService) {
-        this.host = host;
-        this.rpcConverter = rpcConverter;
-        this.executorService = executorService;
-        httpclient = HttpClients.createDefault();
+        this(host, rpcConverter, executorService, null);
     }
 
     public DefaultRpcTransport(URI host) {
-        this.host = host;
-        this.rpcConverter = createRpcConverter();
-        this.executorService = createExecutor();
-        httpclient = HttpClients.createDefault();
+        this(host, new JacksonRpcConverter(), Executors.newCachedThreadPool());
     }
 
-    private RpcConverter createRpcConverter() {
-        return new JacksonRpcConverter();
-    }
-
-    public ExecutorService createExecutor() {
-        return Executors.newFixedThreadPool(2);
+    protected HttpClientConnectionManager createConnectionManager() {
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setMaxTotal(MAX_CONNECTIONS);
+        cm.setDefaultMaxPerRoute(MAX_CONNECTIONS);
+        return cm;
     }
 
     @Override
-    public <T> Future<T> execute(final String method, final List params, final Class<T> resultType) throws IOException {
-        return executorService.submit(new Callable<T>() {
-            @Override
-            public T call() throws Exception {
-                return executeSync(method, params, resultType);
+    public <T> CompletableFuture<T> execute(final String method, final List params, final Class<T> resultType) {
+        CompletableFuture<T> f = new CompletableFuture<T>();
+        executorService.submit(() -> {
+            try {
+                f.complete(executeSync(method, params, resultType));
+            } catch (IOException e) {
+                f.completeExceptionally(e);
             }
         });
+        return f;
     }
 
     public <T> T executeSync(String method, List params, Class<T> resultType) throws IOException {
@@ -87,7 +89,7 @@ public class DefaultRpcTransport implements RpcTransport {
         return rpcConverter.fromJson(content, resultType);
     }
 
-    public RequestJson buildCall(String method, List<Object> params) {
+    public RequestJson buildCall(String method, List params) {
         if (callSequence >= 0x1fffffff) {
             callSequence = 1;
         }

@@ -23,7 +23,7 @@ class JacksonTraceRpcConverterSpec extends Specification {
         setup:
         InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("trace/0x16cb69.json")
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TraceList.class)
         then:
         act.size() == 1
         act[0].type == TraceItemJson.TraceType.CALL
