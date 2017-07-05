@@ -63,6 +63,11 @@ public class DefaultRpcTransport implements RpcTransport {
     }
 
     @Override
+    public void close() throws IOException {
+        executorService.shutdown();
+    }
+
+    @Override
     public <T> CompletableFuture<T> execute(final String method, final List params, final Class<T> resultType) {
         CompletableFuture<T> f = new CompletableFuture<T>();
         executorService.submit(() -> {
@@ -95,5 +100,4 @@ public class DefaultRpcTransport implements RpcTransport {
         }
         return new RequestJson(method, params, callSequence++);
     }
-
 }

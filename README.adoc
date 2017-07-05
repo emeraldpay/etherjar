@@ -83,13 +83,14 @@ public class Main {
     public static void main(String[] args)
             throws URISyntaxException, IOException, ExecutionException, InterruptedException {
 
-        DefaultRpcTransport transport =
-                new DefaultRpcTransport(new URI("http://127.0.0.1:8545"));
+        try (RpcTransport trans =
+                     new DefaultRpcTransport(new URI("http://127.0.0.1:8545"))) {
 
-        Future<String> req =
-                transport.execute("web3_clientVersion", Collections.EMPTY_LIST, String.class);
+            Future<String> req =
+                    trans.execute("web3_clientVersion", Collections.EMPTY_LIST, String.class);
 
-        System.out.println(String.format("Client version: %s", req.get()));
+            System.out.println(String.format("Client version: %s", req.get()));
+        }
     }
 }
 ----
