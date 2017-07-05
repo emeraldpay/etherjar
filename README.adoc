@@ -35,9 +35,9 @@ Java 8 library to Ethereum blockchain nodes, supports both Ethereum Classic (ETC
   <snapshots>
     <enabled>false</enabled>
   </snapshots>
-  <id>bintray-splix-etherjar</id>
+  <id>bintray-infinitape-etherjar</id>
   <name>bintray</name>
-  <url>http://dl.bintray.com/splix/etherjar</url>
+  <url>http://dl.bintray.com/infinitape/etherjar</url>
 </repository>
 
 <dependency>
@@ -52,7 +52,7 @@ Java 8 library to Ethereum blockchain nodes, supports both Ethereum Classic (ETC
 ----
 repositories {
     maven {
-        url  "http://dl.bintray.com/splix/etherjar"
+        url "http://dl.bintray.com/infinitape/etherjar"
     }
 }
 
