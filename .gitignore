@@ -2,11 +2,10 @@
 .gradle
 .idea
 build
+node_modules
 out
 
 *.iml
 *.ipr
 *.iws
 *.log
-
-node_modules/
