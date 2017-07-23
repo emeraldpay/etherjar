@@ -4,20 +4,26 @@
 [![codecov](https://codecov.io/gh/Infinitape/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/Infinitape/etherjar)
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
 
-Modular framework agnostic Java 8 integration library for [Ethereum blockchain](https://www.ethereum.org),
+Framework agnostic modular Java 8 integration library for [Ethereum blockchain](https://www.ethereum.org),
 including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/)
-and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum) (not implemented yet).
-
-## Modules
-
-TBD
+and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum) (_not implemented yet_).
 
 ## Features
 
-* [ ] Smart contracts for Java
-* [x] [Web3 JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) support
-  * [ ] IPC
+* [x] [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
+  * [ ] IPC (_not implemented yet_)
   * [x] HTTP
+* [ ] Smart contracts stubs (_in progress_)
+
+## Modules
+
+* `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
+* `etherjar-domain` - Core domain model, including transactions, smart contracts and event filters
+* `etherjar-gen` - Smart contracts stubs generator
+* `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+* `etherjar-rpc` - Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
+* `etherjar-http` - HTTP transport layer for JSON-RPC API
+* `etherjar-web3` - [Web3.js](https://github.com/ethereum/web3.js) similar high-level API on top of JSON-RPC API
 
 ## Usage
 
