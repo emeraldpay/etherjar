@@ -6,14 +6,15 @@
 
 Framework agnostic modular Java 8 integration library for [Ethereum blockchain](https://www.ethereum.org),
 including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/)
-and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum) (_not implemented yet_).
+and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum).
 
 ## Features
 
-* [x] [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
+* [x] Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
   * [ ] IPC (_not implemented yet_)
   * [x] HTTP
-* [ ] Smart contracts stubs (_in progress_)
+* [ ] High-level [web3.js](https://github.com/ethereum/web3.js) like API (_in progress_)
+* [ ] [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum) support (_not implemented yet_)
 
 ## Modules
 
@@ -21,7 +22,7 @@ and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum) (_not
 * `etherjar-domain` - Core domain model, including transactions, smart contracts and event filters
 * `etherjar-gen` - Smart contracts stubs generator
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
-* `etherjar-rpc` - Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
+* `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-http` - HTTP transport layer for JSON-RPC API
 * `etherjar-web3` - [Web3.js](https://github.com/ethereum/web3.js) similar high-level API on top of JSON-RPC API
 
