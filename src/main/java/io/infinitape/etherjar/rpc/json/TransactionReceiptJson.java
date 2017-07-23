@@ -3,15 +3,10 @@ package io.infinitape.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.model.Address;
 import io.infinitape.etherjar.model.BlockHash;
-import io.infinitape.etherjar.model.HexQuantity;
 import io.infinitape.etherjar.model.TransactionId;
-import io.infinitape.etherjar.model.*;
 
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 @JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
 public class TransactionReceiptJson {
 

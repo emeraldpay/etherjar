@@ -1,8 +1,5 @@
 package io.infinitape.etherjar.model;
 
-/**
- * @author Igor Artamonov
- */
 public class BlockHash extends HexData {
 
     public static final int SIZE_BYTES = 32;

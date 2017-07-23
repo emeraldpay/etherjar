@@ -18,10 +18,6 @@ import spock.lang.Specification
 
 import java.util.concurrent.CompletableFuture
 
-/**
- *
- * @author Igor Artamonov
- */
 class DefaultRpcClientSpec extends Specification {
 
     DefaultRpcClient defaultRpcClient

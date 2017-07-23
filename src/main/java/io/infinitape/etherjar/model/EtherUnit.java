@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * Conversion units
- *
- * @author Igor Artamonov
+ * Conversion units.
  */
 public enum EtherUnit {
 
@@ -19,8 +17,7 @@ public enum EtherUnit {
     ETHER("ether", BigInteger.TEN.pow(18)),
     KETHER("Kether", BigInteger.TEN.pow(21)),
     METHER("Mether", BigInteger.TEN.pow(24)),
-    GETHER("Gether", BigInteger.TEN.pow(27)),
-    TETHER("Tether", BigInteger.TEN.pow(30));
+    GETHER("Gether", BigInteger.TEN.pow(27));
 
     private String name;
     private BigInteger weiCount;

@@ -4,11 +4,6 @@ import io.infinitape.etherjar.rpc.JacksonEthRpcConverterSpec
 import spock.lang.Ignore
 import spock.lang.Specification
 
-/**
- *
- *
- * @author Igor Artamonov
- */
 class CompilerSpec extends Specification {
 
     //

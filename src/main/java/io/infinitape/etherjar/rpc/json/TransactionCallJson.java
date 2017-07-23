@@ -3,12 +3,8 @@ package io.infinitape.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.model.Address;
 import io.infinitape.etherjar.model.HexData;
-import io.infinitape.etherjar.model.HexQuantity;
 import io.infinitape.etherjar.model.Wei;
 
-/**
- * @author Igor Artamonov
- */
 @JsonSerialize(using = TransactionCallJsonSerializer.class)
 public class TransactionCallJson {
 

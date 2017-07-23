@@ -7,8 +7,6 @@ import java.util.regex.Pattern;
 
 /**
  * Ethereum Wallet address
- *
- * @author Igor Artamonov
  */
 public class Address extends HexData {
 
@@ -49,7 +47,6 @@ public class Address extends HexData {
      *
      * @param address a wallet address ('0x...')
      * @return <code>true</code> if address correct or <code>false</code> otherwise
-     *
      * @see <a href="https://github.com/ethereum/EIPs/issues/55">EIP 55</a>
      */
     public static boolean isValidAddress(String address) {

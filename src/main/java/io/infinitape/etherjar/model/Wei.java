@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * Wei Value (amount)
- *
- * @author Igor Artamonov
+ * Wei value (amount).
  */
 public class Wei extends HexQuantity {
+
+    public static Wei from(String value) {
+        return new Wei(HexQuantity.from(value).getValue());
+    }
 
     public Wei(BigInteger value) {
         super(value);
@@ -16,10 +18,6 @@ public class Wei extends HexQuantity {
 
     public Wei(byte[] value) {
         this(new BigInteger(value));
-    }
-
-    public static Wei from(String value) {
-        return new Wei(HexQuantity.from(value).getValue());
     }
 
     /**
@@ -55,8 +53,8 @@ public class Wei extends HexQuantity {
     }
 
     /**
-     * @see #convertTo
      * @return corresponding value in Ether
+     * @see #convertTo
      */
     public BigDecimal toEther() {
         return convertTo(EtherUnit.ETHER);

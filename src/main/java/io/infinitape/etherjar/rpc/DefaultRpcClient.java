@@ -6,20 +6,15 @@ import io.infinitape.etherjar.model.Address;
 import io.infinitape.etherjar.model.BlockHash;
 import io.infinitape.etherjar.model.Hex32;
 import io.infinitape.etherjar.model.HexData;
-import io.infinitape.etherjar.model.HexQuantity;
 import io.infinitape.etherjar.model.Nonce;
 import io.infinitape.etherjar.model.TransactionId;
 import io.infinitape.etherjar.model.Wei;
-import io.infinitape.etherjar.rpc.json.*;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * @author Igor Artamonov
- */
 public class DefaultRpcClient implements RpcClient {
 
     private RpcTransport transport;

@@ -25,7 +25,6 @@ public class AddressType implements SimpleType<Address> {
      * @return a {@link AddressType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
-     *
      * @see #getCanonicalName()
      */
     public static Optional<AddressType> from(String str) {

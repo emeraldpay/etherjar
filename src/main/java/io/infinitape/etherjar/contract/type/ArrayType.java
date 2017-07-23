@@ -27,7 +27,6 @@ public class ArrayType<T> implements StaticType<T[]> {
      * @throws NullPointerException if a {@code str} is <code>null</code>
      * @throws IllegalArgumentException if an {@link ArrayType} has invalid
      * input or not a {@link StaticType} wrapped type
-     *
      * @see #getCanonicalName()
      */
     @SuppressWarnings("unchecked")

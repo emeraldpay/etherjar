@@ -13,7 +13,6 @@ import java.util.Objects;
  * <p>It is the first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash
  * of the signature of the function.
  *
- * @author Igor Artamonov
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector">Function Selector</a>
  * @see ContractMethod
  */

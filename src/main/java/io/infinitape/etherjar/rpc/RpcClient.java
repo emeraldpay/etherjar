@@ -8,9 +8,6 @@ import io.infinitape.etherjar.rpc.json.*;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * @author Igor Artamonov
- */
 public interface RpcClient {
 
     EthCommands eth();

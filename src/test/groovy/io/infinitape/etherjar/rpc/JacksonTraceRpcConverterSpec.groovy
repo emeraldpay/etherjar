@@ -5,10 +5,6 @@ import spock.lang.Specification
 
 import java.text.SimpleDateFormat
 
-/**
- *
- * @author Igor Artamonov
- */
 class JacksonTraceRpcConverterSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
@@ -17,7 +13,6 @@ class JacksonTraceRpcConverterSpec extends Specification {
     def setup() {
         sdf.setTimeZone(TimeZone.getTimeZone('UTC'))
     }
-
 
     def "Transfer"() {
         setup:

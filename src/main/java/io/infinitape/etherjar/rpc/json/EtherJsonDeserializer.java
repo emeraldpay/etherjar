@@ -4,12 +4,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import io.infinitape.etherjar.model.*;
-import io.infinitape.etherjar.model.*;
 
 /**
  * Utility class for Ethereum RPC JSON deserialization
- *
- * @author Igor Artamonov
  */
 public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
 

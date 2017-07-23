@@ -23,7 +23,6 @@ public class FunctionType implements SimpleType<Function> {
      * @return a {@link FunctionType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
-     *
      * @see #getCanonicalName()
      */
     public static Optional<FunctionType> from(String str) {

@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 /**
  * A smart contract methods (either a constructor or a function).
  *
- * @author Igor Artamonov
  * @see Contract
  */
 public class ContractMethod {
@@ -26,9 +25,7 @@ public class ContractMethod {
      * Check contract method ABI signature.
      *
      * @param signature a contract method signature string representation
-     * @return {@code true} if <code>signature</code> is valid, otherwise
-     * {@code false}
-     *
+     * @return {@code true} if <code>signature</code> is valid, otherwise {@code false}
      * @see #ABI_PATTERN
      */
     static boolean isAbiValid(String signature) {
@@ -203,9 +200,7 @@ public class ContractMethod {
     }
 
     /**
-     * @return {@code true} if this method change contract's state,
-     * otherwise {@code false}
-     *
+     * @return {@code true} if this method change contract's state, otherwise {@code false}
      * @see Contract
      */
     public boolean isConstant() {
@@ -231,7 +226,6 @@ public class ContractMethod {
      *
      * @param args parameters of the call
      * @return {@link HexData} encoded call
-     *
      * @see #encodeCall(Collection)
      * @see #decodeResponse(HexData)
      */
@@ -247,10 +241,8 @@ public class ContractMethod {
      *
      * @param args arguments values of the call
      * @return {@link HexData} encoded call
-     *
      * @see #encodeCall(Object...)
      * @see #decodeResponse(HexData)
-     *
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector-and-argument-encoding">Function Selector and Argument Encoding</a>
      * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#examples">Examples</a>
      */
@@ -263,7 +255,6 @@ public class ContractMethod {
      *
      * @param data a hex data
      * @return a list of decoded objects
-     *
      * @see #encodeCall(Object...)
      * @see #encodeCall(Collection)
      */

@@ -2,8 +2,6 @@ package io.infinitape.etherjar.model;
 
 /**
  * CHAIN_ID for Replay Protection (EIP-155)
- *
- * @author Igor Artamonov
  */
 public class ChainId {
 

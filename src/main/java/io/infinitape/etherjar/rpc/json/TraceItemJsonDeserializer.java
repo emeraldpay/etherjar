@@ -9,9 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJson> {
 
     @Override

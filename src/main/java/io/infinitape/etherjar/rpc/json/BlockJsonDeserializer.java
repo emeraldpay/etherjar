@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
     private TransactionJsonDeserializer transactionJsonDeserializer = new TransactionJsonDeserializer();

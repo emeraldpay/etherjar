@@ -31,7 +31,6 @@ public class UFixedType extends DecimalType {
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
      * @throws IllegalArgumentException if a {@link IntType} has invalid input
-     *
      * @see #getCanonicalName()
      */
     public static Optional<UFixedType> from(String str) {

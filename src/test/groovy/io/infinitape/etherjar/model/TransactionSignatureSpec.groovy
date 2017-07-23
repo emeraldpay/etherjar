@@ -2,10 +2,6 @@ package io.infinitape.etherjar.model
 
 import spock.lang.Specification
 
-/**
- *
- * @author Igor Artamonov
- */
 class TransactionSignatureSpec extends Specification {
 
     TransactionSignature signature = new TransactionSignature()

@@ -8,9 +8,6 @@ import io.infinitape.etherjar.model.BlockHash;
 
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 @JsonDeserialize(using = TransactionLogJsonDeserializer.class)
 public class TransactionLogJson {
 

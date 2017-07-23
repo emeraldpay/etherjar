@@ -2,14 +2,10 @@ package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.model.*;
-import io.infinitape.etherjar.model.*;
 
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 @JsonDeserialize(using = BlockJsonDeserializer.class)
 public class BlockJson<T> {
 

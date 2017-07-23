@@ -2,11 +2,6 @@ package io.infinitape.etherjar.model
 
 import spock.lang.Specification
 
-/**
- *
- * @since
- * @author Igor Artamonov
- */
 class WeiSpec extends Specification {
 
     def "Convert wei to Ether"() {

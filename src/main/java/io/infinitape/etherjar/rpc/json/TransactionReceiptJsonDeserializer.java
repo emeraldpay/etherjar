@@ -9,9 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 public class TransactionReceiptJsonDeserializer extends EtherJsonDeserializer<TransactionReceiptJson> {
 
     private TransactionLogJsonDeserializer transactionLogJsonDeserializer = new TransactionLogJsonDeserializer();

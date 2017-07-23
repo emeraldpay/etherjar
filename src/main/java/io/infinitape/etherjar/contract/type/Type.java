@@ -22,7 +22,6 @@ import static java.util.stream.Collectors.toList;
  * <p>Immutable arbitrary-precision types, with provided thread safety guarantees
  *
  * @param <T> a java object type is needed to convert
- *
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI">Ethereum Contract ABI</a>
  */
 public interface Type<T> {
@@ -50,7 +49,6 @@ public interface Type<T> {
          * @param str a {@link Type} string representation (either canonical or not)
          * @return a {@link Type} instance is packed as {@link Optional} value,
          * or {@link Optional#empty()} instead
-         *
          * @see #getTypeParsers()
          */
         @SuppressWarnings("unchecked")
@@ -80,7 +78,6 @@ public interface Type<T> {
          *
          * @param parser a {@link BiFunction} complex type parser
          * @return an extended type repository
-         *
          * @see #append(Function)
          * @see #getTypeParsers()
          */
@@ -95,7 +92,6 @@ public interface Type<T> {
          *
          * @param parser a {@link BiFunction} simple type parser
          * @return an extended type repository
-         *
          * @see #append(BiFunction)
          * @see #getTypeParsers()
          */
@@ -128,7 +124,6 @@ public interface Type<T> {
      * @param str a {@link Type} string representation (either canonical or not)
      * @return a {@link Type} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     *
      * @see Repository#search(String)
      */
     static Optional<Type> search(Repository repo, String str) {
@@ -140,7 +135,6 @@ public interface Type<T> {
      *
      * @param val a length
      * @return a length encoded as {@link Hex32}
-     *
      * @see #encodeLength(BigInteger)
      * @see #decodeLength(Hex32)
      */
@@ -153,7 +147,6 @@ public interface Type<T> {
      *
      * @param val a {@link BigInteger} instance
      * @return a length encoded as {@link Hex32}
-     *
      * @see #encodeLength(long)
      * @see #decodeLength(Hex32)
      */
@@ -166,7 +159,6 @@ public interface Type<T> {
      *
      * @param hex32 a length encoded as {@link Hex32}
      * @return a {@link BigInteger} instance
-     *
      * @see #encodeLength(long)
      * @see #encodeLength(BigInteger)
      */
@@ -178,7 +170,6 @@ public interface Type<T> {
      * Returns {@code true} if, and only if, current type is static (fixed-size type).
      *
      * @return {@code true} if current type is static, otherwise {@code false}
-     *
      * @see #isDynamic()
      */
     default boolean isStatic() {
@@ -187,7 +178,6 @@ public interface Type<T> {
 
     /**
      * @param <V> the type of result object
-     *
      * @see <a href="https://en.wikipedia.org/wiki/Visitor_pattern">Visitor pattern (Wikipedia)</a>
      */
     interface Visitor<V> {
@@ -201,7 +191,6 @@ public interface Type<T> {
      * {@link Visitor} default implementation.
      *
      * @param <V> the type of result object
-     *
      * @see Visitor
      */
     class VisitorImpl<V> implements Type.Visitor<V> {
@@ -232,7 +221,6 @@ public interface Type<T> {
      * <p>Dynamic type has additionally a length as the first {@link Hex32} element.
      *
      * @return {@code true} if current type is dynamic, otherwise {@code false}
-     *
      * @see #isStatic()
      */
     boolean isDynamic();

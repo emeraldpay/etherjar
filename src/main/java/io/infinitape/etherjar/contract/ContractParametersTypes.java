@@ -25,9 +25,7 @@ public class ContractParametersTypes {
      * Check parameters types ABI signature.
      *
      * @param signature a parameters signature string representation
-     * @return {@code true} if <code>signature</code> is valid, otherwise
-     * {@code false}
-     *
+     * @return {@code true} if <code>signature</code> is valid, otherwise {@code false}
      * @see #ABI_PATTERN
      */
     static boolean isAbiValid(String signature) {
@@ -109,7 +107,6 @@ public class ContractParametersTypes {
      *
      * @param params an array of parameters values
      * @return an encoded hex data
-     *
      * @see #encode(Collection)
      */
     public HexData encode(Object... params) {
@@ -121,7 +118,6 @@ public class ContractParametersTypes {
      *
      * @param args a collection of arguments values
      * @return an encoded hex data
-     *
      * @see #encode(Object...)
      */
     @SuppressWarnings("unchecked")
@@ -162,7 +158,6 @@ public class ContractParametersTypes {
      *
      * @param data a hex data
      * @return a list of decoded objects
-     *
      * @see #encode(Object...)
      * @see #encode(Collection)
      */

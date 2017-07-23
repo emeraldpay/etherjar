@@ -35,7 +35,6 @@ public class BytesType implements SimpleType<byte[]> {
      * @return a {@link BytesType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
-     *
      * @see #getCanonicalName()
      */
     public static Optional<BytesType> from(String str) {

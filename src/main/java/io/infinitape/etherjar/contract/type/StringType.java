@@ -25,7 +25,6 @@ public class StringType implements DynamicType<String> {
      * @return a {@link StringType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
-     *
      * @see #getCanonicalName()
      */
     public static Optional<StringType> from(String str) {

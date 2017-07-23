@@ -1,11 +1,7 @@
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.model.HexQuantity;
 import java.util.concurrent.*;
 
-/**
- * @author Igor Artamonov
- */
 public class Extractor {
 
     public CompletableFuture<Long> extractLong(final CompletableFuture<String> result) {

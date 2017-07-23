@@ -10,9 +10,6 @@ import spock.lang.Specification
 
 import java.util.function.Function
 
-/**
- * @author Igor Artamonov
- */
 class ContractMethodSpec extends Specification {
 
     @Shared ContractMethod method

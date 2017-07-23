@@ -13,9 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 public class JacksonRpcConverter implements RpcConverter {
 
     private ObjectMapper objectMapper;

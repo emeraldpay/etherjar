@@ -2,9 +2,6 @@ package io.infinitape.etherjar.rpc.json;
 
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 public class RequestJson {
 
     private String jsonrpc = "2.0";

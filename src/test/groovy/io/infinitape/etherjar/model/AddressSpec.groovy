@@ -2,11 +2,6 @@ package io.infinitape.etherjar.model
 
 import spock.lang.Specification
 
-/**
- *
- * @since
- * @author Igor Artamonov
- */
 class AddressSpec extends Specification {
 
     def "should parse address"() {

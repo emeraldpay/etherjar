@@ -16,10 +16,6 @@ import spock.lang.Specification
 
 import java.util.concurrent.Executors
 
-/**
- *
- * @author Igor Artamonov
- */
 class DefaultRpcTransportSpec extends Specification {
 
     DefaultRpcTransport defaultRpcTransport
@@ -37,7 +33,6 @@ class DefaultRpcTransportSpec extends Specification {
                 httpClientMock
         )
     }
-
 
     def "call to convert trace list"() {
         setup:

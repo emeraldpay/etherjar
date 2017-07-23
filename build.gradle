@@ -10,8 +10,8 @@ apply plugin: 'jacoco'
 apply plugin: 'idea'
 
 group = 'io.infinitape'
-version = '0.5-SNAPSHOT'
-description = 'Lightweight Java client to Ethereum blockchain'
+version = '0.1-SNAPSHOT'
+description = 'Modular framework agnostic Java 8 integration library for Ethereum blockchain, including Ethereum Classic (ETC) and J.P. Morgan Quorum™ (not implemented yet).'
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'

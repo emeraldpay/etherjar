@@ -2,8 +2,6 @@ package io.infinitape.etherjar.model;
 
 /**
  * Transaction Hash value
- *
- * @author Igor Artamonov
  */
 public class TransactionId extends HexData {
 

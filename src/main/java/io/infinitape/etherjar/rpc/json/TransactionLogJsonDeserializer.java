@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 public class TransactionLogJsonDeserializer extends EtherJsonDeserializer<TransactionLogJson> {
 
     @Override

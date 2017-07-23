@@ -13,11 +13,6 @@ import spock.lang.Specification
 
 import java.text.SimpleDateFormat
 
-/**
- *
- * @since
- * @author Igor Artamonov
- */
 class JacksonEthRpcConverterSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()

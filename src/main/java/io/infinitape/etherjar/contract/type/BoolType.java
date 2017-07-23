@@ -19,7 +19,6 @@ public class BoolType extends NumericType {
      * @return a {@link BoolType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
-     *
      * @see #getCanonicalName()
      */
     public static Optional<BoolType> from(String str) {

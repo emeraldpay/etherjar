@@ -32,7 +32,6 @@ public interface SimpleType<T> extends StaticType<T> {
      *
      * @param obj an object
      * @return encoded hex
-     *
      * @see #decodeSimple(Hex32)
      */
     Hex32 encodeSimple(T obj);
@@ -42,7 +41,6 @@ public interface SimpleType<T> extends StaticType<T> {
      *
      * @param hex32 a hex32
      * @return decoded object
-     *
      * @see #encodeSimple(Object)
      */
     T decodeSimple(Hex32 hex32);

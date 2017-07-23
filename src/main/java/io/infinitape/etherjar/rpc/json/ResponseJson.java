@@ -1,8 +1,5 @@
 package io.infinitape.etherjar.rpc.json;
 
-/**
- * @author Igor Artamonov
- */
 public class ResponseJson<X> {
 
     private String jsonrpc = "2.0";

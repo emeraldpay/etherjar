@@ -2,11 +2,7 @@ package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.model.*;
-import io.infinitape.etherjar.model.*;
 
-/**
- * @author Igor Artamonov
- */
 @JsonDeserialize(using = TransactionJsonDeserializer.class)
 public class TransactionJson {
 

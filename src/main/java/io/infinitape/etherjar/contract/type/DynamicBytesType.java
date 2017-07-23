@@ -20,7 +20,6 @@ public class DynamicBytesType implements DynamicType<byte[]> {
      * @return a {@link DynamicBytesType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
      * @throws NullPointerException if a {@code str} is <code>null</code>
-     *
      * @see #getCanonicalName()
      */
     public static Optional<DynamicBytesType> from(String str) {

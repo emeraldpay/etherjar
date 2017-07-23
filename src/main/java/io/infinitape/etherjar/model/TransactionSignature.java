@@ -2,8 +2,6 @@ package io.infinitape.etherjar.model;
 
 /**
  * Transaction signature with support of Replay Protection (EIP-155)
- *
- * @author Igor Artamonov
  */
 public class TransactionSignature {
 

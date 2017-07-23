@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
-/**
- * @author Igor Artamonov
- */
 public class DefaultRpcTransport implements RpcTransport {
 
     private static final Logger log = Logger.getLogger(DefaultRpcTransport.class.getName());

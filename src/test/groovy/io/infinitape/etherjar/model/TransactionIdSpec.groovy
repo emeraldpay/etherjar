@@ -2,11 +2,6 @@ package io.infinitape.etherjar.model
 
 import spock.lang.Specification
 
-/**
- *
- * @since
- * @author Igor Artamonov
- */
 class TransactionIdSpec extends Specification {
 
     def "Parse tx id"() {
