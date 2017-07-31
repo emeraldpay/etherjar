@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ class HexEncodingSpec extends Specification {
     def "should hex encode & decode integer values"() {
         expect:
         HexEncoding.toNakedHex(val) == naked
-        HexEncoding.toFullHex(val) == full
+        HexEncoding.toHexWithPrefix(val) == full
 
         and:
         HexEncoding.fromHex(naked) == val

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package io.infinitape.etherjar.hex;
 import java.math.BigInteger;
 
 /**
- * Hex-encoded {@link String} to and from {@link java.math.BigInteger} mixin interface.
+ * Hex-encoded {@link String} for {@link java.math.BigInteger} instances.
  */
 public interface HexEncoding {
 
@@ -40,15 +40,16 @@ public interface HexEncoding {
     }
 
     /**
-     * @see #toFullHex(BigInteger)
+     * @see #toHexWithPrefix(BigInteger)
      */
     static String toHex(BigInteger num) {
-        return toFullHex(num);
+        return toHexWithPrefix(num);
     }
 
     /**
      * @param num {@link BigInteger} instance
-     * @return Naked (without {@link #HEX_PREFIX}) hex-encoded {@link String}
+     * @return Naked hex-encoded {@link String} without {@link #HEX_PREFIX}
+     * @see #HEX_PREFIX
      */
     static String toNakedHex(BigInteger num) {
         return num.toString(16);
@@ -56,10 +57,10 @@ public interface HexEncoding {
 
     /**
      * @param num {@link BigInteger} instance
-     * @return Full (with {@link #HEX_PREFIX}) hex-encoded {@link String}
+     * @return Full hex-encoded {@link String} with (with {@link #HEX_PREFIX})
      * @see #HEX_PREFIX
      */
-    static String toFullHex(BigInteger num) {
+    static String toHexWithPrefix(BigInteger num) {
         return HEX_PREFIX.concat(num.toString(16));
     }
 }

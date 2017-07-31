@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,15 +42,15 @@ public class Wei {
 
         private String name;
 
-        private BigInteger factor;
+        private int scale;
 
         /**
          * @param name a unit name
-         * @param degreeOfTen a wei base multiplication factor expressed as a degree of power ten
+         * @param scale a wei base multiplication factor expressed as a degree of power ten
          */
-        Unit(String name, int degreeOfTen) {
+        Unit(String name, int scale) {
             this.name = name;
-            this.factor = BigInteger.TEN.pow(degreeOfTen);
+            this.scale = scale;
         }
 
         /**
@@ -61,10 +61,10 @@ public class Wei {
         }
 
         /**
-         * @return a wei base multiplication factor
+         * @return a wei base multiplication factor expressed as a degree of power ten
          */
-        public BigInteger getFactor() {
-            return factor;
+        public int getScale() {
+            return scale;
         }
     }
 
@@ -82,7 +82,7 @@ public class Wei {
      * @return corresponding amount in wei
      */
     public static Wei fromCustom(BigDecimal value, Unit unit) {
-        return new Wei(value.multiply(new BigDecimal(unit.getFactor())).toBigInteger());
+        return new Wei(value.scaleByPowerOfTen(unit.getScale()).toBigInteger());
     }
 
     private BigInteger amount;
@@ -113,7 +113,7 @@ public class Wei {
      * @return corresponding amount in custom denomination {@link Unit}
      */
     public BigDecimal toCustom(Unit unit) {
-        return new BigDecimal(amount).divide(new BigDecimal(unit.factor), BigDecimal.ROUND_HALF_EVEN);
+        return new BigDecimal(amount).scaleByPowerOfTen(-unit.getScale());
     }
 
     @Override
