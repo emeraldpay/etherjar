@@ -1,8 +1,6 @@
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.model.*;
-import io.infinitape.etherjar.rpc.json.*;
-import io.infinitape.etherjar.model.*;
+import io.infinitape.etherjar.core.*;
 import io.infinitape.etherjar.rpc.json.*;
 
 import java.io.IOException;

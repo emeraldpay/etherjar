@@ -2,13 +2,13 @@ package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.rpc.json.*;
 import io.infinitape.etherjar.rpc.transport.RpcTransport;
-import io.infinitape.etherjar.model.Address;
-import io.infinitape.etherjar.model.BlockHash;
-import io.infinitape.etherjar.model.Hex32;
-import io.infinitape.etherjar.model.HexData;
-import io.infinitape.etherjar.model.Nonce;
-import io.infinitape.etherjar.model.TransactionId;
-import io.infinitape.etherjar.model.Wei;
+import io.infinitape.etherjar.core.Address;
+import io.infinitape.etherjar.core.BlockHash;
+import io.infinitape.etherjar.core.Hex32;
+import io.infinitape.etherjar.core.HexData;
+import io.infinitape.etherjar.core.Nonce;
+import io.infinitape.etherjar.core.TransactionId;
+import io.infinitape.etherjar.core.Wei;
 
 import java.io.IOException;
 import java.util.Arrays;

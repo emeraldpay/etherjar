@@ -7,7 +7,7 @@ import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.entity.InputStreamEntity
 import org.apache.http.message.BasicHttpResponse
 import org.apache.http.message.BasicStatusLine
-import io.infinitape.etherjar.model.TransactionId
+import io.infinitape.etherjar.core.TransactionId
 import io.infinitape.etherjar.rpc.JacksonEthRpcConverterSpec
 import io.infinitape.etherjar.rpc.RpcConverter
 import io.infinitape.etherjar.rpc.TraceList

@@ -1,7 +1,7 @@
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.infinitape.etherjar.model.*;
+import io.infinitape.etherjar.core.*;
 
 import java.util.List;
 

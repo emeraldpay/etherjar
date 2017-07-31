@@ -3,7 +3,7 @@ package io.infinitape.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
-import io.infinitape.etherjar.model.*;
+import io.infinitape.etherjar.core.*;
 
 /**
  * Utility class for Ethereum RPC JSON deserialization

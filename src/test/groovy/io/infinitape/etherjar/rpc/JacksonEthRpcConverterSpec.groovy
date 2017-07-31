@@ -1,9 +1,9 @@
 package io.infinitape.etherjar.rpc
 
-import io.infinitape.etherjar.model.Address
-import io.infinitape.etherjar.model.HexData
-import io.infinitape.etherjar.model.TransactionId
-import io.infinitape.etherjar.model.Wei
+import io.infinitape.etherjar.core.Address
+import io.infinitape.etherjar.core.HexData
+import io.infinitape.etherjar.core.TransactionId
+import io.infinitape.etherjar.core.Wei
 import io.infinitape.etherjar.rpc.json.BlockJson
 import io.infinitape.etherjar.rpc.json.RequestJson
 import io.infinitape.etherjar.rpc.json.TransactionJson
