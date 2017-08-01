@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Wei amount.
  */
-public final class Wei {
+public class Wei {
 
     /**
      * Wei denomination units.
@@ -148,18 +148,13 @@ public final class Wei {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(getClass(), Objects.hashCode(amount));
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-
-        if (Objects.isNull(obj)) return false;
-
-        if (!Objects.equals(getClass(), obj.getClass()))
-            return false;
+    public final boolean equals(Object obj) {
+        if (!(obj instanceof Wei)) return false;
 
         Wei other = (Wei) obj;
 
