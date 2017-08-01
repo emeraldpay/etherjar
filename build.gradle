@@ -53,11 +53,11 @@ dependencies {
 
 test {
     jvmArgs '-ea'
-}
 
-testLogging {
-    events "failed"
-    exceptionFormat "short"
+    testLogging {
+        events "failed"
+        exceptionFormat "short"
+    }
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
