@@ -1,21 +1,36 @@
+/*
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import io.infinitape.etherjar.model.HexQuantity;
+import io.infinitape.etherjar.hex.HexEncoding;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
-/**
- * @author Igor Artamonov
- */
 public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCallJson> {
 
     @Override
     public void serialize(TransactionCallJson value, JsonGenerator gen, SerializerProvider serializers)
-        throws IOException, JsonProcessingException {
+        throws IOException, JsonProcessingException
+    {
         if (value == null) {
             gen.writeNull();
             return;
@@ -31,15 +46,15 @@ public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCal
         }
         if (value.getGas() != null) {
             gen.writeFieldName("gas");
-            gen.writeString(HexQuantity.from(value.getGas()).toHex());
+            gen.writeString(HexEncoding.toHex(BigInteger.valueOf(value.getGas())));
         }
         if (value.getGasPrice() != null) {
             gen.writeFieldName("gasPrice");
-            gen.writeString(value.getGasPrice().toHex());
+            gen.writeString(HexEncoding.toHex(value.getGasPrice().getAmount()));
         }
         if (value.getValue() != null) {
             gen.writeFieldName("value");
-            gen.writeString(value.getValue().toHex());
+            gen.writeString(HexEncoding.toHex(value.getValue().getAmount()));
         }
         if (value.getData() != null) {
             gen.writeFieldName("data");
@@ -47,7 +62,7 @@ public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCal
         }
         if (value.getNonce() != null) {
             gen.writeFieldName("nonce");
-            gen.writeString(value.getNonce().toHex());
+            gen.writeString(HexEncoding.toHex(value.getNonce()));
         }
         gen.writeEndObject();
     }

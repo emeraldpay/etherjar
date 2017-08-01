@@ -1,17 +1,29 @@
+/*
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.infinitape.etherjar.model.Address;
-import io.infinitape.etherjar.model.BlockHash;
-import io.infinitape.etherjar.model.HexQuantity;
-import io.infinitape.etherjar.model.TransactionId;
-import io.infinitape.etherjar.model.*;
+import io.infinitape.etherjar.core.Address;
+import io.infinitape.etherjar.core.BlockHash;
+import io.infinitape.etherjar.core.TransactionId;
 
+import java.math.BigInteger;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 @JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
 public class TransactionReceiptJson {
 
@@ -38,12 +50,12 @@ public class TransactionReceiptJson {
     /**
      * total amount of gas used when this transaction was executed in the block.
      */
-    private HexQuantity cumulativeGasUsed;
+    private BigInteger cumulativeGasUsed;
 
     /**
      * amount of gas used by this specific transaction alone.
      */
-    private HexQuantity gasUsed;
+    private BigInteger gasUsed;
 
     /**
      * The contract address created, if the transaction was a contract creation, otherwise null.
@@ -87,19 +99,19 @@ public class TransactionReceiptJson {
         this.blockNumber = blockNumber;
     }
 
-    public HexQuantity getCumulativeGasUsed() {
+    public BigInteger getCumulativeGasUsed() {
         return cumulativeGasUsed;
     }
 
-    public void setCumulativeGasUsed(HexQuantity cumulativeGasUsed) {
+    public void setCumulativeGasUsed(BigInteger cumulativeGasUsed) {
         this.cumulativeGasUsed = cumulativeGasUsed;
     }
 
-    public HexQuantity getGasUsed() {
+    public BigInteger getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(HexQuantity gasUsed) {
+    public void setGasUsed(BigInteger gasUsed) {
         this.gasUsed = gasUsed;
     }
 

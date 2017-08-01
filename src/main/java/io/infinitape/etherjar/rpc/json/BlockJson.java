@@ -1,15 +1,31 @@
+/*
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.infinitape.etherjar.model.*;
-import io.infinitape.etherjar.model.*;
+import io.infinitape.etherjar.core.Address;
+import io.infinitape.etherjar.core.BlockHash;
+import io.infinitape.etherjar.core.HexData;
+import io.infinitape.etherjar.core.TransactionId;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Igor Artamonov
- */
 @JsonDeserialize(using = BlockJsonDeserializer.class)
 public class BlockJson<T> {
 
@@ -63,12 +79,12 @@ public class BlockJson<T> {
     /**
      * the difficulty for this block.
      */
-    private HexQuantity difficulty;
+    private BigInteger difficulty;
 
     /**
      * total difficulty of the chain until this block.
      */
-    private HexQuantity totalDifficulty;
+    private BigInteger totalDifficulty;
 
     /**
      * the "extra data" field of this block.
@@ -83,12 +99,12 @@ public class BlockJson<T> {
     /**
      * the maximum gas allowed in this block.
      */
-    private HexQuantity gasLimit;
+    private BigInteger gasLimit;
 
     /**
      * the total used gas by all transactions in this block.
      */
-    private HexQuantity gasUsed;
+    private BigInteger gasUsed;
 
     /**
      * when the block was collated
@@ -179,19 +195,19 @@ public class BlockJson<T> {
         this.miner = miner;
     }
 
-    public HexQuantity getDifficulty() {
+    public BigInteger getDifficulty() {
         return difficulty;
     }
 
-    public void setDifficulty(HexQuantity difficulty) {
+    public void setDifficulty(BigInteger difficulty) {
         this.difficulty = difficulty;
     }
 
-    public HexQuantity getTotalDifficulty() {
+    public BigInteger getTotalDifficulty() {
         return totalDifficulty;
     }
 
-    public void setTotalDifficulty(HexQuantity totalDifficulty) {
+    public void setTotalDifficulty(BigInteger totalDifficulty) {
         this.totalDifficulty = totalDifficulty;
     }
 
@@ -211,19 +227,19 @@ public class BlockJson<T> {
         this.size = size;
     }
 
-    public HexQuantity getGasLimit() {
+    public BigInteger getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(HexQuantity gasLimit) {
+    public void setGasLimit(BigInteger gasLimit) {
         this.gasLimit = gasLimit;
     }
 
-    public HexQuantity getGasUsed() {
+    public BigInteger getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(HexQuantity gasUsed) {
+    public void setGasUsed(BigInteger gasUsed) {
         this.gasUsed = gasUsed;
     }
 

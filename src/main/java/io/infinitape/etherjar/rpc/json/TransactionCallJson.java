@@ -1,14 +1,28 @@
+/*
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.infinitape.etherjar.model.Address;
-import io.infinitape.etherjar.model.HexData;
-import io.infinitape.etherjar.model.HexQuantity;
-import io.infinitape.etherjar.model.Wei;
+import io.infinitape.etherjar.core.Address;
+import io.infinitape.etherjar.core.HexData;
+import io.infinitape.etherjar.core.Wei;
 
-/**
- * @author Igor Artamonov
- */
+import java.math.BigInteger;
+
 @JsonSerialize(using = TransactionCallJsonSerializer.class)
 public class TransactionCallJson {
 
@@ -18,7 +32,7 @@ public class TransactionCallJson {
     private Wei gasPrice;
     private Wei value;
     private HexData data;
-    private HexQuantity nonce;
+    private BigInteger nonce;
 
     public TransactionCallJson() {
     }
@@ -90,11 +104,11 @@ public class TransactionCallJson {
         this.data = data;
     }
 
-    public HexQuantity getNonce() {
+    public BigInteger getNonce() {
         return nonce;
     }
 
-    public void setNonce(HexQuantity nonce) {
+    public void setNonce(BigInteger nonce) {
         this.nonce = nonce;
     }
 
