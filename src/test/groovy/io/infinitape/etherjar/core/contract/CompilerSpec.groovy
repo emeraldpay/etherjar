@@ -72,8 +72,8 @@ class CompilerSpec extends Specification {
         act.success
         act.count == 3
         act.names.sort() == ["l_SimpleToken", "l_ERC20", "l_StandardToken"].sort()
-        act.getContract("SimpleToken").compiled != null
-        act.getContract("SimpleToken").abi.contains("\"name\":\"transferFrom\"")
+        act.getContract("l_SimpleToken").compiled != null
+        act.getContract("l_SimpleToken").abi.contains("\"name\":\"transferFrom\"")
     }
 
     def "Fail with invalid path to solc"() {
