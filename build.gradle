@@ -55,6 +55,11 @@ test {
     jvmArgs '-ea'
 }
 
+testLogging {
+    events "failed"
+    exceptionFormat "short"
+}
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 compileJava.options.compilerArgs \
