@@ -16,8 +16,8 @@
 
 package io.infinitape.etherjar.core;
 
+import io.infinitape.etherjar.core.contract.ContractMethod;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
-import io.infinitape.etherjar.contract.ContractMethod;
 
 import java.util.Arrays;
 import java.util.Collection;

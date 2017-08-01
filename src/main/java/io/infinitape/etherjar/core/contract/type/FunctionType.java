@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.contract.type;
+package io.infinitape.etherjar.core.contract.type;
 
 import io.infinitape.etherjar.core.Function;
 import io.infinitape.etherjar.core.Hex32;

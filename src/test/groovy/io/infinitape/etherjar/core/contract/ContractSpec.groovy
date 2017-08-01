@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.contract
+package io.infinitape.etherjar.core.contract
 
 import io.infinitape.etherjar.core.Address
 import io.infinitape.etherjar.core.MethodId

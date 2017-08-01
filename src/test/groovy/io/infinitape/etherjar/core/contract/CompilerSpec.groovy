@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.contract
+package io.infinitape.etherjar.core.contract
 
 import io.infinitape.etherjar.rpc.JacksonEthRpcConverterSpec
 import spock.lang.Ignore
@@ -32,11 +32,11 @@ class CompilerSpec extends Specification {
     //
 
     def "Basic compile"() {
-        setup:
         Compiler compiler = Compiler.newBuilder()
                 .withSolc('./node_modules/solc/solcjs')
                 .optimize(false)
                 .build()
+
         String contract = """
         pragma solidity ^0.4.4;
 
@@ -48,8 +48,10 @@ class CompilerSpec extends Specification {
             }
         }
         """
+
         when:
         def act = compiler.compile(contract)
+
         then:
         act.success
         act.count == 1
@@ -59,8 +61,8 @@ class CompilerSpec extends Specification {
     }
 
     def "Multicontract compiler"() {
-        setup:
         InputStream contract = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("contract/SimpleToken.sol")
+
         Compiler compiler = Compiler.newBuilder()
                 .withSolc('./node_modules/solc/solcjs')
                 .build()

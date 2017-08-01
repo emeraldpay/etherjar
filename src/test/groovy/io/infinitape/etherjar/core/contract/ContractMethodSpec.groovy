@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.contract
+package io.infinitape.etherjar.core.contract
 
-import io.infinitape.etherjar.contract.type.Type
 import io.infinitape.etherjar.core.Address
 import io.infinitape.etherjar.core.Hex32
 import io.infinitape.etherjar.core.HexData
 import io.infinitape.etherjar.core.MethodId
+import io.infinitape.etherjar.core.contract.type.Type
 import spock.lang.Shared
 import spock.lang.Specification
 
