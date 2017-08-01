@@ -211,7 +211,7 @@ class JacksonEthRpcConverterSpec extends Specification {
         act.gas == 3000000
         act.gasPrice == new Wei(20000000000)
         act.input.bytes.length == 7153
-        act.value == new Wei()
+        act.value == Wei.ZERO
         act.nonce == 1
     }
 
@@ -249,7 +249,7 @@ class JacksonEthRpcConverterSpec extends Specification {
         act.gas == 250000
         act.gasPrice == new Wei(24085501424)
         act.input.bytes.length == 4
-        act.value == new Wei()
+        act.value == Wei.ZERO
         act.nonce == 15524
         act.signature == null
     }

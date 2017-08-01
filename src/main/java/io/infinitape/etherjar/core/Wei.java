@@ -69,6 +69,8 @@ public class Wei {
         }
     }
 
+    public final static Wei ZERO = Wei.ZERO;
+
     /**
      * @param val amount in {@link Unit#ETHER}
      * @return corresponding amount in wei
