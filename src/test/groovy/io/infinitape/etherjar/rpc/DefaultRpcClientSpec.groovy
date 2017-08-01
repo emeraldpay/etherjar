@@ -16,27 +16,18 @@
 
 package io.infinitape.etherjar.rpc
 
-import io.infinitape.etherjar.core.Address
-import io.infinitape.etherjar.core.BlockHash
-import io.infinitape.etherjar.core.Hex32
-import io.infinitape.etherjar.core.HexData
-import io.infinitape.etherjar.core.Nonce
-import io.infinitape.etherjar.core.TransactionId
-import io.infinitape.etherjar.core.Wei
-import io.infinitape.etherjar.rpc.json.BlockJson
-import io.infinitape.etherjar.rpc.json.BlockTag
-import io.infinitape.etherjar.rpc.json.TraceItemJson
-import io.infinitape.etherjar.rpc.json.TransactionCallJson
-import io.infinitape.etherjar.rpc.json.TransactionJson
-import io.infinitape.etherjar.rpc.json.TransactionReceiptJson
+import io.infinitape.etherjar.core.*
+import io.infinitape.etherjar.rpc.json.*
 import io.infinitape.etherjar.rpc.transport.RpcTransport
 import spock.lang.Specification
 
+import java.math.RoundingMode
 import java.util.concurrent.CompletableFuture
 
 class DefaultRpcClientSpec extends Specification {
 
     DefaultRpcClient defaultRpcClient
+
     RpcTransport rpcTransport
 
     def setup() {
@@ -55,15 +46,17 @@ class DefaultRpcClientSpec extends Specification {
     def "Get balance"() {
         when:
         def act = defaultRpcClient.eth().getBalance(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), BlockTag.LATEST).get()
+
         then:
         1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> CompletableFuture.completedFuture("0x0234c8a3397aab58")
-        act.toString() == "0.1590 ether"
+        act.toEther().setScale(3, RoundingMode.HALF_UP) == 0.159
 
         when:
         act = defaultRpcClient.eth().getBalance(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2050000).get()
+
         then:
         1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> CompletableFuture.completedFuture("0x0234c8a3397aab58")
-        act.toString() == "0.1590 ether"
+        act.toEther().setScale(3, RoundingMode.HALF_UP) == 0.159
     }
 
     def "Get block by number"() {
@@ -111,6 +104,7 @@ class DefaultRpcClientSpec extends Specification {
                 ["0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc"], TransactionJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
+
     def "Get tx by block hash and index"() {
         setup:
         def json = new TransactionJson()
@@ -122,6 +116,7 @@ class DefaultRpcClientSpec extends Specification {
                 ["0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946", '0x0'], TransactionJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
+
     def "Get tx by block number and index"() {
         setup:
         def json = new TransactionJson()

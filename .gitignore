@@ -1,11 +1,10 @@
 .DS_Store
 .gradle
 .idea
+.project
+.settings
 build
 node_modules
 out
-
-*.iml
-*.ipr
-*.iws
+*.i*
 *.log

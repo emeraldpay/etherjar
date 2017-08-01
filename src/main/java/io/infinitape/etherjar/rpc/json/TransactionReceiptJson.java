@@ -21,6 +21,7 @@ import io.infinitape.etherjar.core.Address;
 import io.infinitape.etherjar.core.BlockHash;
 import io.infinitape.etherjar.core.TransactionId;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
@@ -49,12 +50,12 @@ public class TransactionReceiptJson {
     /**
      * total amount of gas used when this transaction was executed in the block.
      */
-    private HexQuantity cumulativeGasUsed;
+    private BigInteger cumulativeGasUsed;
 
     /**
      * amount of gas used by this specific transaction alone.
      */
-    private HexQuantity gasUsed;
+    private BigInteger gasUsed;
 
     /**
      * The contract address created, if the transaction was a contract creation, otherwise null.
@@ -98,19 +99,19 @@ public class TransactionReceiptJson {
         this.blockNumber = blockNumber;
     }
 
-    public HexQuantity getCumulativeGasUsed() {
+    public BigInteger getCumulativeGasUsed() {
         return cumulativeGasUsed;
     }
 
-    public void setCumulativeGasUsed(HexQuantity cumulativeGasUsed) {
+    public void setCumulativeGasUsed(BigInteger cumulativeGasUsed) {
         this.cumulativeGasUsed = cumulativeGasUsed;
     }
 
-    public HexQuantity getGasUsed() {
+    public BigInteger getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(HexQuantity gasUsed) {
+    public void setGasUsed(BigInteger gasUsed) {
         this.gasUsed = gasUsed;
     }
 

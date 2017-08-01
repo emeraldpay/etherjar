@@ -16,45 +16,45 @@
 
 package io.infinitape.etherjar.core
 
+import nl.jqno.equalsverifier.EqualsVerifier
 import spock.lang.Specification
 
 class WeiSpec extends Specification {
 
-    def "Convert wei to Ether"() {
+    def "should process small number of wei"() {
+        when:
+        def wei = new Wei(0x0b3266)
+
+        then:
+        wei.getAmount() == 733798L
+        wei.toEther() == 7.33798E-13
+        wei.toString() == '733798 wei'
+    }
+
+    def "should process large number of wei"() {
+        when:
+        def wei = new Wei(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+
+        then:
+        wei.toEther() == 115792089237316195423570985008687907853269984665640564039457.584007913129639935
+        wei.toString() == '115792089237316195423570985008687907853269984665640564039457584007913129639935 wei'
+    }
+
+    def "should convert wei to Ether"() {
         expect:
-        Wei.from(hex).toEther() == ether
+        new Wei(num).toEther() == ether
+
         where:
-        hex                     | ether
-        '0x0'                   |  0.0
-        '0x1692343a32d9000'     |  0.101651
-        '0x11527914c23af80'     |  0.078012
-        '0x3f794375d8dc4c00'    |  4.573761
-        '0xa9964ef1b825f600'    | 12.220041
-        '0x1b1ae4d6e2ef500000'  | 500
-        '0x32d26ce13c9584e4800' | 14999.999126
-        '0x54b40aedd840a8e4800' | 24999.999126
+        num                     | ether
+        0                       | 0.0
+        123456000000000000      | 0.123456
+        12345678901234567890    | 12.34567890123456789
+        500000000000000000000   | 500
+        14999999126000000000123 | 14999.999126000000000123
     }
 
-    def "Process large number of wei"() {
-        setup:
-        String hex = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        when:
-        def wei = Wei.from(hex)
-        then:
-        wei.value.toString() == '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-        wei.value.toString(16) == 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-        wei.toEther() == new BigDecimal('115792089237316195423570985008687907853269984665640564039457.584008')
-        wei.getBytes().length == 33
-        wei.getBytes().toList().tail().every { b -> b == (byte)-1 } //tail because first element is 0
-        wei.toString() == '115792089237316195423570985008687907853269984665640564039457.5840 ether'
-    }
-
-    def "Process small number of wei"() {
-        when:
-        def wei = Wei.from('0x0b3266')
-        then:
-        wei.getValue().toLong() == 733798L
-        wei.toEther() == 0.0
-        wei.toString() == '0.0000 ether'
+    def "should meet equals and hashCode contract"() {
+        expect:
+        EqualsVerifier.forClass(Wei.class).verify()
     }
 }

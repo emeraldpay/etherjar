@@ -21,6 +21,8 @@ import io.infinitape.etherjar.core.Address;
 import io.infinitape.etherjar.core.HexData;
 import io.infinitape.etherjar.core.Wei;
 
+import java.math.BigInteger;
+
 @JsonSerialize(using = TransactionCallJsonSerializer.class)
 public class TransactionCallJson {
 
@@ -30,7 +32,7 @@ public class TransactionCallJson {
     private Wei gasPrice;
     private Wei value;
     private HexData data;
-    private HexQuantity nonce;
+    private BigInteger nonce;
 
     public TransactionCallJson() {
     }
@@ -102,11 +104,11 @@ public class TransactionCallJson {
         this.data = data;
     }
 
-    public HexQuantity getNonce() {
+    public BigInteger getNonce() {
         return nonce;
     }
 
-    public void setNonce(HexQuantity nonce) {
+    public void setNonce(BigInteger nonce) {
         this.nonce = nonce;
     }
 

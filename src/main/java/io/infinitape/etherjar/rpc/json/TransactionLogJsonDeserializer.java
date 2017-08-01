@@ -39,16 +39,16 @@ public class TransactionLogJsonDeserializer extends EtherJsonDeserializer<Transa
 
         log.setAddress(getAddress(node, "address"));
         log.setBlockHash(getBlockHash(node, "blockHash"));
-        log.setBlockNumber(getQuantity(node, "blockNumber").getValue().longValue());
+        log.setBlockNumber(getQuantity(node, "blockNumber").longValue());
         log.setData(getData(node, "data"));
-        log.setLogIndex(getQuantity(node, "logIndex").getValue().longValue());
+        log.setLogIndex(getQuantity(node, "logIndex").longValue());
         List<HexData> topics = new ArrayList<>();
         for (JsonNode topic: node.get("topics")) {
             topics.add(HexData.from(topic.textValue()));
         }
         log.setTopics(topics);
         log.setTransactionHash(getTxHash(node, "transactionHash"));
-        log.setTransactionIndex(getQuantity(node, "transactionIndex").getValue().longValue());
+        log.setTransactionIndex(getQuantity(node, "transactionIndex").longValue());
 
         return log;
     }

@@ -40,27 +40,44 @@ public interface HexEncoding {
     }
 
     /**
-     * @see #toHexWithPrefix(BigInteger)
+     * @param val a long value
+     * @return Hex-encoded {@link String} with {@link #HEX_PREFIX}
+     * and padded with zero to an even number of digits
+     * @see #HEX_PREFIX
+     */
+    static String toHex(long val) {
+        String str = toNakedHex(val);
+
+        return HEX_PREFIX.concat(str.length() % 2 == 0 ? "" : "0").concat(str);
+    }
+
+    /**
+     * @param num {@link BigInteger} instance
+     * @return Hex-encoded {@link String} with {@link #HEX_PREFIX}
+     * and padded with zero to an even number of digits
+     * @see #HEX_PREFIX
      */
     static String toHex(BigInteger num) {
-        return toHexWithPrefix(num);
+        String str = toNakedHex(num);
+
+        return HEX_PREFIX.concat(str.length() % 2 == 0 ? "" : "0").concat(str);
+    }
+
+    /**
+     * @param val a long value
+     * @return Naked hex-encoded {@link String} without {@link #HEX_PREFIX}
+     * @see #toHex(long)
+     */
+    static String toNakedHex(long val) {
+        return Long.toHexString(val);
     }
 
     /**
      * @param num {@link BigInteger} instance
      * @return Naked hex-encoded {@link String} without {@link #HEX_PREFIX}
-     * @see #HEX_PREFIX
+     * @see #toHex(BigInteger)
      */
     static String toNakedHex(BigInteger num) {
         return num.toString(16);
-    }
-
-    /**
-     * @param num {@link BigInteger} instance
-     * @return Full hex-encoded {@link String} with (with {@link #HEX_PREFIX})
-     * @see #HEX_PREFIX
-     */
-    static String toHexWithPrefix(BigInteger num) {
-        return HEX_PREFIX.concat(num.toString(16));
     }
 }

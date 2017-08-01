@@ -20,14 +20,17 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import io.infinitape.etherjar.hex.HexEncoding;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCallJson> {
 
     @Override
     public void serialize(TransactionCallJson value, JsonGenerator gen, SerializerProvider serializers)
-        throws IOException, JsonProcessingException {
+        throws IOException, JsonProcessingException
+    {
         if (value == null) {
             gen.writeNull();
             return;
@@ -43,15 +46,15 @@ public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCal
         }
         if (value.getGas() != null) {
             gen.writeFieldName("gas");
-            gen.writeString(HexQuantity.from(value.getGas()).toHex());
+            gen.writeString(HexEncoding.toHex(BigInteger.valueOf(value.getGas())));
         }
         if (value.getGasPrice() != null) {
             gen.writeFieldName("gasPrice");
-            gen.writeString(value.getGasPrice().toHex());
+            gen.writeString(HexEncoding.toHex(value.getGasPrice().getAmount()));
         }
         if (value.getValue() != null) {
             gen.writeFieldName("value");
-            gen.writeString(value.getValue().toHex());
+            gen.writeString(HexEncoding.toHex(value.getValue().getAmount()));
         }
         if (value.getData() != null) {
             gen.writeFieldName("data");
@@ -59,7 +62,7 @@ public class TransactionCallJsonSerializer extends JsonSerializer<TransactionCal
         }
         if (value.getNonce() != null) {
             gen.writeFieldName("nonce");
-            gen.writeString(value.getNonce().toHex());
+            gen.writeString(HexEncoding.toHex(value.getNonce()));
         }
         gen.writeEndObject();
     }

@@ -19,6 +19,8 @@ package io.infinitape.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.core.*;
 
+import java.math.BigInteger;
+
 @JsonDeserialize(using = TransactionJsonDeserializer.class)
 public class TransactionJson {
 
@@ -70,7 +72,7 @@ public class TransactionJson {
     /**
      * gas provided by the sender.
      */
-    private HexQuantity gas;
+    private BigInteger gas;
 
     /**
      * the data send along with the transaction.
@@ -151,11 +153,11 @@ public class TransactionJson {
         this.gasPrice = gasPrice;
     }
 
-    public HexQuantity getGas() {
+    public BigInteger getGas() {
         return gas;
     }
 
-    public void setGas(HexQuantity gas) {
+    public void setGas(BigInteger gas) {
         this.gas = gas;
     }
 

@@ -20,9 +20,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.infinitape.etherjar.core.BlockHash;
 import io.infinitape.etherjar.core.HexData;
 import io.infinitape.etherjar.core.TransactionId;
-import io.infinitape.etherjar.core.BlockHash;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,9 +38,9 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         BlockJson blockJson = new BlockJson();
 
         JsonNode node = jp.readValueAsTree();
-        blockJson.setNumber(getQuantity(node, "number").getValue().longValue());
+        blockJson.setNumber(getQuantity(node, "number").longValue());
         blockJson.setHash(getBlockHash(node, "hash"));
-        blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").getValue().longValue() * 1000L));
+        blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").longValue() * 1000L));
 
         List txes = new ArrayList();
         for (JsonNode tx: node.get("transactions")) {

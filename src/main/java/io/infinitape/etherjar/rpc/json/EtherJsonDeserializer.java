@@ -20,6 +20,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import io.infinitape.etherjar.core.*;
+import io.infinitape.etherjar.hex.HexEncoding;
+
+import java.math.BigInteger;
 
 /**
  * Utility class for Ethereum RPC JSON deserialization
@@ -36,6 +39,7 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         }
         return value;
     }
+
     protected String getHexString(JsonNode node, String name) {
         return getHexString(node.get(name));
     }
@@ -46,27 +50,29 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         return HexData.from(value);
     }
 
-    protected HexQuantity getQuantity(JsonNode node, String name) {
+    protected BigInteger getQuantity(JsonNode node, String name) {
         return getQuantity(node.get(name));
     }
-    protected HexQuantity getQuantity(JsonNode node) {
+
+    protected BigInteger getQuantity(JsonNode node) {
         if (node instanceof NumericNode) {
-            return HexQuantity.from(node.longValue());
+            return BigInteger.valueOf(node.longValue());
         }
         String value = getHexString(node);
         if (value == null) return null;
-        return HexQuantity.from(value);
+        return HexEncoding.fromHex(value);
     }
 
     protected Long getLong(JsonNode node, String name) {
-        HexQuantity quantity = getQuantity(node, name);
+        BigInteger quantity = getQuantity(node, name);
         if (quantity == null) return null;
-        return quantity.getValue().longValue();
+        return quantity.longValue();
     }
+
     protected Long getLong(JsonNode node) {
-        HexQuantity quantity = getQuantity(node);
+        BigInteger quantity = getQuantity(node);
         if (quantity == null) return null;
-        return quantity.getValue().longValue();
+        return quantity.longValue();
     }
 
     protected Address getAddress(JsonNode node, String name) {
@@ -84,7 +90,7 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
     protected Wei getWei(JsonNode node, String name) {
         String value = getHexString(node, name);
         if (value == null) return null;
-        return Wei.from(value);
+        return new Wei(HexEncoding.fromHex(value));
     }
 
     protected BlockHash getBlockHash(JsonNode node, String name) {

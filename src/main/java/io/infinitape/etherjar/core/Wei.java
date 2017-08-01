@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Wei amount.
  */
-public class Wei {
+public final class Wei {
 
     /**
      * Wei denomination units.
@@ -45,7 +45,7 @@ public class Wei {
         private int scale;
 
         /**
-         * @param name a unit name
+         * @param name  a unit name
          * @param scale a wei base multiplication factor expressed as a degree of power ten
          */
         Unit(String name, int scale) {
@@ -69,29 +69,60 @@ public class Wei {
     }
 
     /**
-     * @param value amount in {@link Unit#ETHER}
+     * @param val amount in {@link Unit#ETHER}
+     * @return corresponding amount in wei
+     * @see #fromCustom(double, Unit)
+     */
+    public static Wei fromEther(double val) {
+        return fromCustom(val, Unit.ETHER);
+    }
+
+    /**
+     * @param num amount in {@link Unit#ETHER}
      * @return corresponding amount in wei
      * @see #fromCustom(BigDecimal, Unit)
      */
-    public static Wei fromEther(BigDecimal value) {
-        return fromCustom(value, Unit.ETHER);
+    public static Wei fromEther(BigDecimal num) {
+        return fromCustom(num, Unit.ETHER);
     }
 
     /**
-     * @param value amount in some custom denomination {@link Unit}
+     * @param val amount in some custom denomination {@link Unit}
      * @return corresponding amount in wei
      */
-    public static Wei fromCustom(BigDecimal value, Unit unit) {
-        return new Wei(value.scaleByPowerOfTen(unit.getScale()).toBigInteger());
+    public static Wei fromCustom(double val, Unit unit) {
+        return fromCustom(BigDecimal.valueOf(val), unit);
     }
 
-    private BigInteger amount;
+    /**
+     * @param num amount in some custom denomination {@link Unit}
+     * @return corresponding amount in wei
+     */
+    public static Wei fromCustom(BigDecimal num, Unit unit) {
+        return new Wei(num.scaleByPowerOfTen(unit.getScale()).toBigInteger());
+    }
+
+    private final BigInteger amount;
 
     /**
-     * @param value an amount in wei
+     * Create zero wei amount.
      */
-    public Wei(BigInteger value) {
-        this.amount = Objects.requireNonNull(value);
+    public Wei() {
+        this(BigInteger.ZERO);
+    }
+
+    /**
+     * @param val an amount in wei
+     */
+    public Wei(long val) {
+        this(BigInteger.valueOf(val));
+    }
+
+    /**
+     * @param num an amount in wei
+     */
+    public Wei(BigInteger num) {
+        this.amount = Objects.requireNonNull(num);
     }
 
     /**
@@ -118,7 +149,7 @@ public class Wei {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getClass(), amount.hashCode());
+        return Objects.hash(getClass(), Objects.hashCode(amount));
     }
 
     @Override
@@ -132,7 +163,7 @@ public class Wei {
 
         Wei other = (Wei) obj;
 
-        return amount.equals(other.amount);
+        return Objects.equals(amount, other.amount);
     }
 
     @Override

@@ -24,6 +24,7 @@ import io.infinitape.etherjar.core.ChainId;
 import io.infinitape.etherjar.core.TransactionSignature;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 public class TransactionJsonDeserializer extends EtherJsonDeserializer<TransactionJson> {
 
@@ -36,15 +37,15 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
     public TransactionJson deserialize(JsonNode node) {
         TransactionJson tx = new TransactionJson();
         tx.setHash(getTxHash(node, "hash"));
-        tx.setNonce(getQuantity(node, "nonce").getValue().longValue());
+        tx.setNonce(getQuantity(node, "nonce").longValue());
         tx.setBlockHash(getBlockHash(node, "blockHash"));
-        HexQuantity blockNumber = getQuantity(node, "blockNumber");
+        BigInteger blockNumber = getQuantity(node, "blockNumber");
         if (blockNumber != null)  {
-            tx.setBlockNumber(blockNumber.getValue().longValue());
+            tx.setBlockNumber(blockNumber.longValue());
         }
-        HexQuantity txIndex = getQuantity(node, "transactionIndex");
+        BigInteger txIndex = getQuantity(node, "transactionIndex");
         if (txIndex != null) {
-            tx.setTransactionIndex(txIndex.getValue().longValue());
+            tx.setTransactionIndex(txIndex.longValue());
         }
         tx.setFrom(getAddress(node, "from"));
         tx.setTo(getAddress(node, "to"));

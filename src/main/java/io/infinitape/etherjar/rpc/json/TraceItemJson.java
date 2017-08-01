@@ -19,6 +19,7 @@ package io.infinitape.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.core.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @JsonDeserialize(using = TraceItemJsonDeserializer.class)
@@ -119,7 +120,7 @@ public class TraceItemJson {
 
         private CallType callType;
         private Address from;
-        private HexQuantity gas;
+        private BigInteger gas;
         private HexData init;
         private HexData input;
         private Address to;
@@ -144,11 +145,11 @@ public class TraceItemJson {
             this.from = from;
         }
 
-        public HexQuantity getGas() {
+        public BigInteger getGas() {
             return gas;
         }
 
-        public void setGas(HexQuantity gas) {
+        public void setGas(BigInteger gas) {
             this.gas = gas;
         }
 
@@ -218,16 +219,16 @@ public class TraceItemJson {
     }
 
     public static class Result {
-        private HexQuantity gasUsed;
+        private BigInteger gasUsed;
         private HexData output;
         private Address address;
         private HexData code;
 
-        public HexQuantity getGasUsed() {
+        public BigInteger getGasUsed() {
             return gasUsed;
         }
 
-        public void setGasUsed(HexQuantity gasUsed) {
+        public void setGasUsed(BigInteger gasUsed) {
             this.gasUsed = gasUsed;
         }
 

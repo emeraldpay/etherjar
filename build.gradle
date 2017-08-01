@@ -48,6 +48,7 @@ dependencies {
     testCompile "org.objenesis:objenesis:$objenesisVersion"
     testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
     testCompile "org.spockframework:spock-core:$spockVersion"
+    testCompile "nl.jqno.equalsverifier:equalsverifier:$equalsverifier"
 }
 
 test {

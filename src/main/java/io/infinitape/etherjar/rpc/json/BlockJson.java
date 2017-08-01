@@ -17,7 +17,10 @@
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.infinitape.etherjar.core.*;
+import io.infinitape.etherjar.core.Address;
+import io.infinitape.etherjar.core.BlockHash;
+import io.infinitape.etherjar.core.HexData;
+import io.infinitape.etherjar.core.TransactionId;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -96,12 +99,12 @@ public class BlockJson<T> {
     /**
      * the maximum gas allowed in this block.
      */
-    private HexQuantity gasLimit;
+    private BigInteger gasLimit;
 
     /**
      * the total used gas by all transactions in this block.
      */
-    private HexQuantity gasUsed;
+    private BigInteger gasUsed;
 
     /**
      * when the block was collated
@@ -192,19 +195,19 @@ public class BlockJson<T> {
         this.miner = miner;
     }
 
-    public HexQuantity getDifficulty() {
+    public BigInteger getDifficulty() {
         return difficulty;
     }
 
-    public void setDifficulty(HexQuantity difficulty) {
+    public void setDifficulty(BigInteger difficulty) {
         this.difficulty = difficulty;
     }
 
-    public HexQuantity getTotalDifficulty() {
+    public BigInteger getTotalDifficulty() {
         return totalDifficulty;
     }
 
-    public void setTotalDifficulty(HexQuantity totalDifficulty) {
+    public void setTotalDifficulty(BigInteger totalDifficulty) {
         this.totalDifficulty = totalDifficulty;
     }
 
@@ -224,19 +227,19 @@ public class BlockJson<T> {
         this.size = size;
     }
 
-    public HexQuantity getGasLimit() {
+    public BigInteger getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(HexQuantity gasLimit) {
+    public void setGasLimit(BigInteger gasLimit) {
         this.gasLimit = gasLimit;
     }
 
-    public HexQuantity getGasUsed() {
+    public BigInteger getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(HexQuantity gasUsed) {
+    public void setGasUsed(BigInteger gasUsed) {
         this.gasUsed = gasUsed;
     }
 

@@ -22,19 +22,23 @@ class HexEncodingSpec extends Specification {
 
     def "should hex encode & decode integer values"() {
         expect:
+        HexEncoding.toHex(val) == hex
         HexEncoding.toNakedHex(val) == naked
-        HexEncoding.toHexWithPrefix(val) == full
 
         and:
-        HexEncoding.fromHex(naked) == val
-        HexEncoding.fromHex(full) == val
+        HexEncoding.toHex(val as BigInteger) == hex
+        HexEncoding.toNakedHex(val as BigInteger) == naked
+
+        and:
+        HexEncoding.fromHex(hex) == val as BigInteger
+        HexEncoding.fromHex(naked) == val as BigInteger
 
         where:
-        val                 | naked             | full
-        0G                  | '0'               | '0x00'
-        4180G               | '1054'            | '0x1054'
-        1659284G            | '195194'          | '0x195194'
-        81985529216486895G  | '123456789abcdef' | '0x0123456789abcdef'
+        val                 | hex                   | naked
+        0L                  | '0x00'                | '0'
+        4180L               | '0x1054'              | '1054'
+        1659284L            | '0x195194'            | '195194'
+        81985529216486895L  | '0x0123456789abcdef'  | '123456789abcdef'
     }
 
     def "should detect wrong hex-encoding strings"() {

@@ -16,14 +16,16 @@
 
 package io.infinitape.etherjar.rpc;
 
-import java.util.concurrent.*;
+import io.infinitape.etherjar.hex.HexEncoding;
+
+import java.math.BigInteger;
+import java.util.concurrent.CompletableFuture;
 
 public class Extractor {
 
     public CompletableFuture<Long> extractLong(final CompletableFuture<String> result) {
-        return result.thenApply(HexQuantity::from)
-            .thenApply(HexQuantity::getValue)
-            .thenApply((q) -> q != null ? q.longValue() : null);
+        return result
+            .thenApply(HexEncoding::fromHex)
+            .thenApply(BigInteger::longValue);
     }
-
 }
