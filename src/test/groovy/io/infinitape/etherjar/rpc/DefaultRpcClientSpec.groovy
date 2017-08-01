@@ -61,7 +61,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get block by number"() {
-        setup:
         def json = new BlockJson()
         json.number = 2050000
 
@@ -81,7 +80,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get block by hash"() {
-        setup:
         def json = new BlockJson()
         json.number = 2050000
 
@@ -101,7 +99,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get tx by hash"() {
-        setup:
         def json = new TransactionJson()
         json.hash = TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc")
 
@@ -115,7 +112,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get tx by block hash and index"() {
-        setup:
         def json = new TransactionJson()
         json.hash = TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc")
 
@@ -124,12 +120,13 @@ class DefaultRpcClientSpec extends Specification {
 
         then:
         1 * rpcTransport.execute("eth_getTransactionByBlockHashAndIndex",
-                ["0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946", '0x0'], TransactionJson) >> CompletableFuture.completedFuture(json)
+                ["0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946", '0x00'], TransactionJson) >> CompletableFuture.completedFuture(json)
+
+        0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946
         act.get() == json
     }
 
     def "Get tx by block number and index"() {
-        setup:
         def json = new TransactionJson()
         json.hash = TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc")
 
@@ -138,12 +135,11 @@ class DefaultRpcClientSpec extends Specification {
 
         then:
         1 * rpcTransport.execute("eth_getTransactionByBlockNumberAndIndex",
-                ["0x1ea0c0", '0x0'], TransactionJson) >> CompletableFuture.completedFuture(json)
+                ["0x1ea0c0", '0x00'], TransactionJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
     def "Get tx receipt"() {
-        setup:
         def json = new TransactionReceiptJson()
         json.transactionHash = TransactionId.from("0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc")
 
@@ -238,13 +234,12 @@ class DefaultRpcClientSpec extends Specification {
 
         then:
         1 * rpcTransport.execute("eth_getCode",
-                ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x2'],
+                ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x02'],
                 String) >> CompletableFuture.completedFuture("0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056")
         act.toHex() == "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
     }
 
     def "Get uncle"() {
-        setup:
         def json = new BlockJson()
         json.number = 2050000
 
@@ -253,7 +248,7 @@ class DefaultRpcClientSpec extends Specification {
 
         then:
         1 * rpcTransport.execute("eth_getUncleByBlockHashAndIndex",
-                ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', '0x0'],
+                ['0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339', '0x00'],
                 BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
 
@@ -262,13 +257,12 @@ class DefaultRpcClientSpec extends Specification {
 
         then:
         1 * rpcTransport.execute("eth_getUncleByBlockNumberAndIndex",
-                ['0x1f47d0', '0x0'],
+                ['0x1f47d0', '0x00'],
                 BlockJson) >> CompletableFuture.completedFuture(json)
         act.get() == json
     }
 
     def "Get trace"() {
-        setup:
         def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
         def json = [
                 new TraceItemJson()
@@ -285,7 +279,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get work"() {
-        setup:
         def data = [    '0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02',
                         '0x002440e15267eebdf06fa7fe5aee5ccff445967925a90ecce6429aef7f8feb1f',
                         '0x000000000029891796c0001e696bca79de31c4640e112f147dc80e77263ffa1a']
@@ -299,7 +292,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Submit Hashrate"() {
-        setup:
         def hashRate = Hex32.from("0x0000000000000000000000000000000000000000000000000000000000500000");
         def id = Hex32.from("0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c");
 
@@ -312,7 +304,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Submit Work"() {
-        setup:
         def nonce = Nonce.from("0x0000000000000001");
         def powHash = Hex32.from("0x0234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
         def digest = Hex32.from("0x01fe5700000000000000000000000000d1fe5700000000000000000000000000");
@@ -326,7 +317,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Coinbase"() {
-        setup:
         def data = '0x7aecf7e21cd03501010454105ccd4b688939684505a01457cef338a33924ad02'
 
         when:
@@ -338,7 +328,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get Hashrate"() {
-        setup:
         def data = 947330l
 
         when:
@@ -359,7 +348,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Gas price"() {
-        setup:
         def data = 20000000000L
 
         when:
@@ -371,7 +359,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Accounts"() {
-        setup:
         def data = [    Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
                         Address.from('0x1e45c30168ba23a0dac51911079d0fcff1a9e4ad'),
                         Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
@@ -387,7 +374,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Get Compilers"() {
-        setup:
         def data = ["solidity", "lll", "serpent"]
 
         when:
@@ -400,7 +386,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Call"() {
-        setup:
         def call = new TransactionCallJson(
                 Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
                 HexData.from('0x18160ddd')
@@ -415,7 +400,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Send Transaction"() {
-        setup:
         def tx = new TransactionCallJson(
                 Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
                 Address.from('0x1e45c30168ba23a0dac51911079d0fcff1a9e4ad'),
@@ -432,7 +416,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Send Raw Transaction"() {
-        setup:
         def tx = HexData.from('0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675')
         def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
 
@@ -445,7 +428,6 @@ class DefaultRpcClientSpec extends Specification {
     }
 
     def "Sign"() {
-        setup:
         def addr = Address.from('0x8a3106a3e50576d4b6794a0e74d3bb5f8c9acaab')
         def data = HexData.from('0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470')
 

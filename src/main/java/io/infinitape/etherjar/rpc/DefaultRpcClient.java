@@ -29,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 public class DefaultRpcClient implements RpcClient {
 
     private RpcTransport transport;
+
     private Extractor extractor;
 
     public DefaultRpcClient(RpcTransport transport) {
