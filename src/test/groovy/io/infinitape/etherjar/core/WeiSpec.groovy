@@ -21,14 +21,28 @@ import spock.lang.Specification
 
 class WeiSpec extends Specification {
 
+    def "should keep custom unit numbers"() {
+        expect:
+        Wei.fromCustom(val, unit).toCustom(unit) == val
+
+        where:
+        val                     | unit
+        0.0                     | Wei.Unit.WEI
+        1.234567890             | Wei.Unit.GWEI
+        1234567890.0987654321   | Wei.Unit.METHER
+    }
+
     def "should process small number of wei"() {
         when:
         def wei = new Wei(0x0b3266)
 
         then:
         wei.getAmount() == 733798L
-        wei.toEther() == 7.33798E-13
         wei.toString() == '733798 wei'
+
+        and:
+        wei.toEther(6) == 0
+        wei.toEther() == 7.33798E-13
     }
 
     def "should process large number of wei"() {
@@ -36,8 +50,12 @@ class WeiSpec extends Specification {
         def wei = new Wei(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
 
         then:
-        wei.toEther() == 115792089237316195423570985008687907853269984665640564039457.584007913129639935
+        wei.getAmount() == 115792089237316195423570985008687907853269984665640564039457584007913129639935
         wei.toString() == '115792089237316195423570985008687907853269984665640564039457584007913129639935 wei'
+
+        and:
+        wei.toEther(5) == 115792089237316195423570985008687907853269984665640564039457.58401
+        wei.toEther() == 115792089237316195423570985008687907853269984665640564039457.584007913129639935
     }
 
     def "should convert wei to Ether"() {

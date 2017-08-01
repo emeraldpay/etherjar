@@ -18,6 +18,7 @@ package io.infinitape.etherjar.core;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
@@ -133,6 +134,15 @@ public class Wei {
     }
 
     /**
+     * @param scale scale of the {@code BigDecimal} value to be returned
+     * @return corresponding amount in {@link Unit#ETHER}
+     * @see #toCustom(Unit, int)
+     */
+    public BigDecimal toEther(int scale) {
+        return toCustom(Unit.ETHER, scale);
+    }
+
+    /**
      * @return corresponding amount in {@link Unit#ETHER}
      * @see #toCustom(Unit)
      */
@@ -141,7 +151,17 @@ public class Wei {
     }
 
     /**
+     * @param scale scale of the {@code BigDecimal} value to be returned
      * @return corresponding amount in custom denomination {@link Unit}
+     * @see #toCustom(Unit, int)
+     */
+    public BigDecimal toCustom(Unit unit, int scale) {
+        return toCustom(unit).setScale(scale, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * @return corresponding amount in custom denomination {@link Unit}
+     * @see #toCustom(Unit)
      */
     public BigDecimal toCustom(Unit unit) {
         return new BigDecimal(amount).scaleByPowerOfTen(-unit.getScale());
