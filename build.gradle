@@ -54,10 +54,8 @@ dependencies {
 test {
     jvmArgs '-ea'
 
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = 'full'
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
