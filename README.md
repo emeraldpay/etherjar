@@ -5,8 +5,7 @@
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
 
 Framework agnostic modular Java 8 integration library for [Ethereum blockchain](https://www.ethereum.org),
-including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/)
-and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum).
+including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 
 ## Features
 
@@ -14,17 +13,22 @@ and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum).
   * [ ] IPC (_not implemented yet_)
   * [x] HTTP
 * [ ] High-level [web3.js](https://github.com/ethereum/web3.js) like Java 8 API (_in progress_)
-* [ ] [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum) support (_not implemented yet_)
 
 ## Modules
 
-* `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-* `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
-* `etherjar-gen` - Smart contracts stubs generator
-* `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
-* `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
-* `etherjar-http` - HTTP transport layer for JSON-RPC API
+Structure of dependencies between modules:
+
 * `etherjar-web3` - [Web3.js](https://github.com/ethereum/web3.js) like Java 8 API on top of JSON-RPC API
+  * `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
+    * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+  * `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
+  * `etherjar-http` - HTTP transport layer for JSON-RPC API
+    * `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
+      * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+* `etherjar-gen` - Smart contracts stubs generator
+  * `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
+    * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+  * `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
 
 ## Usage
 
@@ -33,7 +37,7 @@ and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum).
 ```xml
 <dependency>
   <groupId>io.infinitape</groupId>
-  <artifactId>etherjar</artifactId>
+  <artifactId>etherjar-web3</artifactId>
   <version>0.1.0</version>
 </dependency>
 ```
@@ -41,12 +45,12 @@ and [J.P. Morgan Quorum™](https://www.jpmorgan.com/country/US/EN/Quorum).
 ### Gradle
 
 ```groovy
-compile 'io.infinitape:etherjar:0.1.0'
+compile 'io.infinitape:etherjar-web3:0.1.0'
 ```
 
 ## Examples
 
-How to call `web3_clientVersion` JSON-RPC method:
+How to call `web3_clientVersion` JSON-RPC API method:
 
 ```java
 package example;
