@@ -222,7 +222,8 @@ class ContractMethodSpec extends Specification {
 
         where:
         first   | second
-        method  | new ContractMethod.Builder().withName('bar').withInputTypes(method.inputTypes).build()
+        method  | new ContractMethod.Builder().withName('bar')
+                        .withInputTypes(method.inputTypes).build()
     }
 
     def "should be equal"() {
@@ -232,7 +233,8 @@ class ContractMethodSpec extends Specification {
         where:
         first   | second
         method  | method
-        method  | new ContractMethod.Builder().withName('bar').withInputTypes(method.inputTypes).build()
+        method  | new ContractMethod.Builder().withName('bar')
+                        .withInputTypes(method.inputTypes).build()
     }
 
     def "should not be equal"() {

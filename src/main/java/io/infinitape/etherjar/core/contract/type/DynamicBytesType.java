@@ -35,7 +35,7 @@ public class DynamicBytesType implements DynamicType<byte[]> {
      * @param str a string
      * @return a {@link DynamicBytesType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @see #getCanonicalName()
      */
     public static Optional<DynamicBytesType> from(String str) {

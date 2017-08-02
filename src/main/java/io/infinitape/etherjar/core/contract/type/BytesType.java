@@ -50,7 +50,7 @@ public class BytesType implements SimpleType<byte[]> {
      * @param str a string
      * @return a {@link BytesType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @see #getCanonicalName()
      */
     public static Optional<BytesType> from(String str) {

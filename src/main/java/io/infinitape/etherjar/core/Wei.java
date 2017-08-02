@@ -171,7 +171,7 @@ public class Wei {
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getClass(), Objects.hashCode(amount));
+        return Objects.hash(getClass(), amount);
     }
 
     @Override

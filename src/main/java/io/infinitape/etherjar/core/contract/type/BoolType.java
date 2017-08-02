@@ -34,7 +34,7 @@ public class BoolType extends NumericType {
      * @param str a string
      * @return a {@link BoolType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @see #getCanonicalName()
      */
     public static Optional<BoolType> from(String str) {

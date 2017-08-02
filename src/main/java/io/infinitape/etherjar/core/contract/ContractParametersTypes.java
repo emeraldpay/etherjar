@@ -41,7 +41,7 @@ public class ContractParametersTypes {
      * Check parameters types ABI signature.
      *
      * @param signature a parameters signature string representation
-     * @return {@code true} if <code>signature</code> is valid, otherwise {@code false}
+     * @return {@code true} if {@code signature} is valid, otherwise {@code false}
      * @see #ABI_PATTERN
      */
     static boolean isAbiValid(String signature) {
@@ -49,7 +49,7 @@ public class ContractParametersTypes {
     }
 
     /**
-     * Create an instance from signature like <tt>'address,uint256'</tt>.
+     * Create an instance from signature like {@code 'address,uint256'}.
      *
      * <p>The signature is defined as a string expression of a list of either canonical
      * or not parameter types, are split by a single comma - no spaces are used.
