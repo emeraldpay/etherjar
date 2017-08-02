@@ -18,17 +18,29 @@ including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 
 Structure of dependencies between modules:
 
-* `etherjar-web3` - [Web3.js](https://github.com/ethereum/web3.js) like Java 8 API on top of JSON-RPC API
-  * `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-    * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
-  * `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
-  * `etherjar-http` - HTTP transport layer for JSON-RPC API
-    * `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
-      * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+* `etherjar-web3`
+  * `etherjar-abi`
+    * `etherjar-hex`
+  * `etherjar-core`
+  * `etherjar-rpc`
+    * `etherjar-hex`
+  * `etherjar-trans`
+    * `etherjar-http`
+* `etherjar-gen`
+  * `etherjar-abi`
+    * `etherjar-hex`
+  * `etherjar-core`
+
+where
+
+* `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
+* `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
 * `etherjar-gen` - Smart contracts stubs generator
-  * `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-    * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
-  * `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
+* `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+* `etherjar-http` - HTTP transport layer for JSON-RPC API
+* `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
+* `etherjar-trans` -Abstract transport layer for JSON-RPC API
+* `etherjar-web3` - [Web3.js](https://github.com/ethereum/web3.js) like Java 8 API on top of JSON-RPC API
 
 ## Usage
 
