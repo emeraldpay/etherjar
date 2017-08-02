@@ -7,12 +7,13 @@
 Framework agnostic modular Java 8 integration library for [Ethereum blockchain](https://www.ethereum.org),
 including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 
-## Features
+## Architecture
 
+* [ ] High-level [web3.js](https://github.com/ethereum/web3.js) like Java 8 API (_in progress_)
 * [x] Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
+* [x] Transport data-level 
   * [ ] IPC (_not implemented yet_)
   * [x] HTTP
-* [ ] High-level [web3.js](https://github.com/ethereum/web3.js) like Java 8 API (_in progress_)
 
 ## Modules
 
@@ -22,10 +23,12 @@ Structure of dependencies between modules:
   * `etherjar-abi`
     * `etherjar-hex`
   * `etherjar-core`
+  * `etherjar-hex`
   * `etherjar-rpc`
     * `etherjar-hex`
-  * `etherjar-trans`
-    * `etherjar-http`
+    * `etherjar-trans`
+  * `etherjar-http`
+    * `etherjar-trans`
 * `etherjar-gen`
   * `etherjar-abi`
     * `etherjar-hex`
