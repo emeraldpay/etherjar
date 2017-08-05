@@ -11,7 +11,7 @@ including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 
 * [ ] High-level [web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API (_in progress_)
 * [x] Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
-* [x] Transport data-level 
+* [x] Transport data-layer 
   * [ ] IPC (_not implemented yet_)
   * [x] HTTP
 
@@ -20,30 +20,22 @@ including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 Structure of dependencies between modules:
 
 * `etherjar-web3`
-  * `etherjar-contract`
-    * `etherjar-abi`
-      * `etherjar-hex`
-    * `etherjar-tx`
+  * `etherjar-abi`
+    * `etherjar-hex`
   * `etherjar-hex`
   * `etherjar-rpc-http`
     * `etherjar-rpc`
       * `etherjar-hex`
   * `etherjar-tx`
-* `etherjar-contract-gen`
-  * `etherjar-contract`
-    * `etherjar-abi`
-      * `etherjar-hex`
-    * `etherjar-tx`
+    * `etherjar-crypto`
 
 where
 
-* `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-* `etherjar-contract` - Smart contracts and event filters domain model
-* `etherjar-contract-gen` - Smart contracts stubs generator
+* `etherjar-abi` - Smart contract [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI), including event filters support
 * `etherjar-crypto` - General cryptographic utils (KECCAK-256 hash, ECDSA signatures)
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
 * `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
-* `etherjar-rpc-http` - HTTP transport implementation of JSON-RPC API data-layer
+* `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
 * `etherjar-tx` - Creating and signing transactions, contains also common domain model
 * `etherjar-web3` - [Web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API on top of JSON-RPC API
 
@@ -98,7 +90,7 @@ public class Main {
 }
 ```
 
-# Documentation
+## Documentation
 
 [Reference Guide](./docs/index.md)
 
