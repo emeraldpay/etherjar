@@ -24,16 +24,19 @@ Structure of dependencies between modules:
     * `etherjar-abi`
       * `etherjar-hex`
     * `etherjar-tx`
+      * `etherjar-crypto`
   * `etherjar-hex`
   * `etherjar-rpc-http`
     * `etherjar-rpc`
       * `etherjar-hex`
   * `etherjar-tx`
+    * `etherjar-crypto`
 * `etherjar-contract-gen`
   * `etherjar-contract`
     * `etherjar-abi`
       * `etherjar-hex`
     * `etherjar-tx`
+      * `etherjar-crypto`
 
 where
 
@@ -98,7 +101,7 @@ public class Main {
 }
 ```
 
-# Documentation
+## Documentation
 
 [Reference Guide](./docs/index.md)
 
