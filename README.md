@@ -19,7 +19,6 @@ including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 
 Structure of dependencies between modules:
 
-* `etherjar-solidity`
 * `etherjar-web3`
   * `etherjar-abi`
     * `etherjar-hex`
@@ -27,6 +26,7 @@ Structure of dependencies between modules:
   * `etherjar-rpc-http`
     * `etherjar-rpc`
       * `etherjar-hex`
+  * `etherjar-solidity`
   * `etherjar-tx`
     * `etherjar-crypto`
 
