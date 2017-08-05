@@ -89,8 +89,8 @@ public interface Type<T> {
          *                  .append(complexParser1).append(complexParser2);
          * }</pre>
          *
-         * <p>In this example <code>complexParser1</code> don't know anything about
-         * <code>complexParse2</code>, but it's not right visa versa.
+         * <p>In this example {@code complexParser1} don't know anything about
+         * {@code complexParse2}, but it's not right visa versa.
          *
          * @param parser a {@link BiFunction} complex type parser
          * @return an extended type repository
@@ -124,7 +124,7 @@ public interface Type<T> {
         /**
          * Get {@link Type} string parsers in order to build an appropriate {@link Type} instances.
          *
-         * <p>Parser can throw {@link NullPointerException} if a {@code str} is <code>null</code>.
+         * <p>Parser can throw {@link NullPointerException} if a {@code str} is {@code null}.
          *
          * <p>Parser can throw {@link IllegalArgumentException} if a {@link Type} has invalid input.
          *

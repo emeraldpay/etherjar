@@ -40,7 +40,7 @@ public class AddressType implements SimpleType<Address> {
      * @param str a string
      * @return a {@link AddressType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @see #getCanonicalName()
      */
     public static Optional<AddressType> from(String str) {

@@ -24,12 +24,15 @@ import java.math.BigInteger;
 public interface HexEncoding {
 
     /**
-     * The prefix used for a full hex encoding format.
+     * The prefix used for non naked hex encoding format.
+     *
+     * @see #toHex(long)
+     * @see #toHex(BigInteger)
      */
     String HEX_PREFIX = "0x";
 
     /**
-     * @param hex hex-encoded {@link String} with optional {@link #HEX_PREFIX}
+     * @param hex hex-encoded {@link String} with optional {@value #HEX_PREFIX}
      * @return {@link BigInteger} instance
      * @see #HEX_PREFIX
      */
@@ -41,7 +44,7 @@ public interface HexEncoding {
 
     /**
      * @param val a long value
-     * @return Hex-encoded {@link String} with {@link #HEX_PREFIX}
+     * @return Hex-encoded {@link String} with {@value #HEX_PREFIX}
      * and padded with zero to an even number of digits
      * @see #HEX_PREFIX
      */
@@ -53,7 +56,7 @@ public interface HexEncoding {
 
     /**
      * @param num {@link BigInteger} instance
-     * @return Hex-encoded {@link String} with {@link #HEX_PREFIX}
+     * @return Hex-encoded {@link String} with {@value #HEX_PREFIX}
      * and padded with zero to an even number of digits
      * @see #HEX_PREFIX
      */
@@ -65,7 +68,7 @@ public interface HexEncoding {
 
     /**
      * @param val a long value
-     * @return Naked hex-encoded {@link String} without {@link #HEX_PREFIX}
+     * @return Naked hex-encoded {@link String} without {@value #HEX_PREFIX}
      * @see #toHex(long)
      */
     static String toNakedHex(long val) {
@@ -74,7 +77,7 @@ public interface HexEncoding {
 
     /**
      * @param num {@link BigInteger} instance
-     * @return Naked hex-encoded {@link String} without {@link #HEX_PREFIX}
+     * @return Naked hex-encoded {@link String} without {@value #HEX_PREFIX}
      * @see #toHex(BigInteger)
      */
     static String toNakedHex(BigInteger num) {

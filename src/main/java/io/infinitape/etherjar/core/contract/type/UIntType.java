@@ -44,7 +44,7 @@ public class UIntType extends NumericType {
      * @param str a string
      * @return a {@link UIntType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @throws IllegalArgumentException if a {@link UIntType} has invalid input
      * @see #getCanonicalName()
      */

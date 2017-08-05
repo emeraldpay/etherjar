@@ -40,7 +40,7 @@ public class StringType implements DynamicType<String> {
      * @param str a string
      * @return a {@link StringType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @see #getCanonicalName()
      */
     public static Optional<StringType> from(String str) {

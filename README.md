@@ -4,12 +4,12 @@
 [![codecov](https://codecov.io/gh/Infinitape/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/Infinitape/etherjar)
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
 
-Framework agnostic modular Java 8 integration library for [Ethereum blockchain](https://www.ethereum.org),
+Framework agnostic modular Java 8+ integration library for [Ethereum blockchain](https://www.ethereum.org),
 including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 
 ## Architecture
 
-* [ ] High-level [web3.js](https://github.com/ethereum/web3.js) like Java 8 API (_in progress_)
+* [ ] High-level [web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API (_in progress_)
 * [x] Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
 * [x] Transport data-level 
   * [ ] IPC (_not implemented yet_)
@@ -20,30 +20,32 @@ including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
 Structure of dependencies between modules:
 
 * `etherjar-web3`
-  * `etherjar-abi`
-    * `etherjar-hex`
-  * `etherjar-core`
+  * `etherjar-contract`
+    * `etherjar-abi`
+      * `etherjar-hex`
+    * `etherjar-tx`
   * `etherjar-hex`
-  * `etherjar-rpc`
-    * `etherjar-hex`
-    * `etherjar-trans`
-  * `etherjar-http`
-    * `etherjar-trans`
-* `etherjar-gen`
-  * `etherjar-abi`
-    * `etherjar-hex`
-  * `etherjar-core`
+  * `etherjar-rpc-http`
+    * `etherjar-rpc`
+      * `etherjar-hex`
+  * `etherjar-tx`
+* `etherjar-contract-gen`
+  * `etherjar-contract`
+    * `etherjar-abi`
+      * `etherjar-hex`
+    * `etherjar-tx`
 
 where
 
 * `etherjar-abi` - [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-* `etherjar-core` - Core domain model, including transactions, smart contracts and event filters
-* `etherjar-gen` - Smart contracts stubs generator
+* `etherjar-contract` - Smart contracts and event filters domain model
+* `etherjar-contract-gen` - Smart contracts stubs generator
+* `etherjar-crypto` - General cryptographic utils (KECCAK-256 hash, ECDSA signatures)
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
-* `etherjar-http` - HTTP transport layer for JSON-RPC API
 * `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
-* `etherjar-trans` -Abstract transport layer for JSON-RPC API
-* `etherjar-web3` - [Web3.js](https://github.com/ethereum/web3.js) like Java 8 API on top of JSON-RPC API
+* `etherjar-rpc-http` - HTTP transport implementation of JSON-RPC API data-layer
+* `etherjar-tx` - Creating and signing transactions, contains also common domain model
+* `etherjar-web3` - [Web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API on top of JSON-RPC API
 
 ## Usage
 
@@ -95,6 +97,10 @@ public class Main {
     }
 }
 ```
+
+# Documentation
+
+[Reference Guide](./docs/index.md)
 
 ## Licence
 

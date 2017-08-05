@@ -45,7 +45,7 @@ public class UFixedType extends DecimalType {
      * @param str a string
      * @return a {@link UFixedType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @throws IllegalArgumentException if a {@link IntType} has invalid input
      * @see #getCanonicalName()
      */

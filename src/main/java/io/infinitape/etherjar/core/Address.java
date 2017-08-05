@@ -62,7 +62,7 @@ public class Address extends HexData {
      * Validate address according to EIP 55.
      *
      * @param address a wallet address ('0x...')
-     * @return <code>true</code> if address correct or <code>false</code> otherwise
+     * @return {@code true} if address correct or {@code false} otherwise
      * @see <a href="https://github.com/ethereum/EIPs/issues/55">EIP 55</a>
      */
     public static boolean isValidAddress(String address) {
@@ -74,7 +74,7 @@ public class Address extends HexData {
      * Checks if the given string is an address with checksum (Keccak256).
      *
      * @param address a wallet address ('0x...')
-     * @return <code>true</code> if address with checksum
+     * @return {@code true} if address with checksum
      */
     static boolean isValidChecksum(String address) {
         Keccak.Digest256 digest256 = new Keccak.Digest256();

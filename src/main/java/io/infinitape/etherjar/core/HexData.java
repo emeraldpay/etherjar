@@ -63,7 +63,7 @@ public class HexData {
     }
 
     /**
-     * Parse hex representation for a number, should start with <tt>0x</tt>.
+     * Parse hex representation for a number, should start with {@code 0x}.
      *
      * @param value hex value
      */
@@ -142,7 +142,7 @@ public class HexData {
     }
 
     /**
-     * Extract a {@link HexData} instance by required <tt>size</tt> bytes from start.
+     * Extract a {@link HexData} instance by required {@code size} bytes from start.
      *
      * @param size a size in bytes
      * @return an extracted {@link HexData} instance
@@ -153,7 +153,7 @@ public class HexData {
     }
 
     /**
-     * Extract a new object by required <tt>size</tt> bytes from start.
+     * Extract a new object by required {@code size} bytes from start.
      *
      * @param size a size in bytes
      * @param conv a converter from hex data into required object type
@@ -167,8 +167,8 @@ public class HexData {
     }
 
     /**
-     * Extract a {@link HexData} instance by required <tt>size</tt> bytes
-     * and with <tt>offset</tt>.
+     * Extract a {@link HexData} instance by required {@code size} bytes
+     * and with {@code offset}.
      *
      * @param size a size in bytes
      * @param offset an offset in bytes
@@ -180,8 +180,8 @@ public class HexData {
     }
 
     /**
-     * Extract a new object by required <tt>size</tt> bytes
-     * and from <tt>offset</tt>.
+     * Extract a new object by required {@code size} bytes
+     * and from {@code offset}.
      *
      * @param size a size in bytes
      * @param offset an offset in bytes
@@ -207,13 +207,13 @@ public class HexData {
     }
 
     /**
-     * Returns an array of {@link HexData} were split by required <tt>size</tt>
+     * Returns an array of {@link HexData} were split by required {@code size}
      * bytes from start.
      *
      * @param size a size in bytes to split by
      * @return an array of split hex data
      * @throws IllegalArgumentException if the hex data length
-     * is not a multiple of given <tt>size</tt>
+     * is not a multiple of given {@code size}
      * @see #split(int, int)
      */
     public HexData[] split(int size) {
@@ -221,7 +221,7 @@ public class HexData {
     }
 
     /**
-     * Returns an array of the elements were split by required <tt>size</tt>
+     * Returns an array of the elements were split by required {@code size}
      * bytes from start.
      *
      * @param size a size in bytes to split by
@@ -231,7 +231,7 @@ public class HexData {
      * @param <T> the element type of the resulting array
      * @return an array of split type instances
      * @throws IllegalArgumentException if the hex data length
-     * is not a multiple of given <tt>size</tt>
+     * is not a multiple of given {@code size}
      * @see #split(int, int, IntFunction, Function)
      */
     public <T> T[] split(int size, IntFunction<T[]> gen, Function<? super HexData, T> conv) {
@@ -239,14 +239,14 @@ public class HexData {
     }
 
     /**
-     * Returns an array of {@link HexData} were split by required <tt>size</tt>
-     * bytes and from <tt>offset</tt>.
+     * Returns an array of {@link HexData} were split by required {@code size}
+     * bytes and from {@code offset}.
      *
      * @param size a size in bytes to split by
      * @param offset an offset in bytes to split from
      * @return an array of split hex data
      * @throws IllegalArgumentException if the summary length to split
-     * is not a multiple of given <tt>size</tt>
+     * is not a multiple of given {@code size}
      * @see #split(int)
      */
     public HexData[] split(int size, int offset) {
@@ -254,8 +254,8 @@ public class HexData {
     }
 
     /**
-     * Returns an array of the elements were split by required <tt>size</tt>
-     * bytes and from <tt>offset</tt>, using the provided {@code conv}
+     * Returns an array of the elements were split by required {@code size}
+     * bytes and from {@code offset}, using the provided {@code conv}
      * function to convert {@link HexData} into required object type.
      *
      * <pre>{@code
@@ -270,7 +270,7 @@ public class HexData {
      * @param <T> the element type of the resulting array
      * @return an array of split type instances
      * @throws IllegalArgumentException if the summary length to split
-     * is not a multiple of given <tt>size</tt>
+     * is not a multiple of given {@code size}
      * @see #split(int, IntFunction, Function)
      */
     public <T> T[] split(int size, int offset, IntFunction<T[]> gen, Function<? super HexData, T> conv) {

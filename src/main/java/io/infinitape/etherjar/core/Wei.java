@@ -74,34 +74,34 @@ public class Wei {
     /**
      * @param val amount in {@link Unit#ETHER}
      * @return corresponding amount in wei
-     * @see #fromCustom(double, Unit)
+     * @see #fromUnit(double, Unit)
      */
     public static Wei fromEther(double val) {
-        return fromCustom(val, Unit.ETHER);
+        return fromUnit(val, Unit.ETHER);
     }
 
     /**
      * @param num amount in {@link Unit#ETHER}
      * @return corresponding amount in wei
-     * @see #fromCustom(BigDecimal, Unit)
+     * @see #fromUnit(BigDecimal, Unit)
      */
     public static Wei fromEther(BigDecimal num) {
-        return fromCustom(num, Unit.ETHER);
+        return fromUnit(num, Unit.ETHER);
     }
 
     /**
      * @param val amount in some custom denomination {@link Unit}
      * @return corresponding amount in wei
      */
-    public static Wei fromCustom(double val, Unit unit) {
-        return fromCustom(BigDecimal.valueOf(val), unit);
+    public static Wei fromUnit(double val, Unit unit) {
+        return fromUnit(BigDecimal.valueOf(val), unit);
     }
 
     /**
      * @param num amount in some custom denomination {@link Unit}
      * @return corresponding amount in wei
      */
-    public static Wei fromCustom(BigDecimal num, Unit unit) {
+    public static Wei fromUnit(BigDecimal num, Unit unit) {
         return new Wei(num.scaleByPowerOfTen(unit.getScale()).toBigInteger());
     }
 
@@ -136,42 +136,42 @@ public class Wei {
     }
 
     /**
-     * @param scale scale of the {@code BigDecimal} value to be returned
+     * @param decimalPlaces scale of the {@code BigDecimal} value to be returned
      * @return corresponding amount in {@link Unit#ETHER}
-     * @see #toCustom(Unit, int)
+     * @see #toUnit(Unit, int)
      */
-    public BigDecimal toEther(int scale) {
-        return toCustom(Unit.ETHER, scale);
+    public BigDecimal toEther(int decimalPlaces) {
+        return toUnit(Unit.ETHER, decimalPlaces);
     }
 
     /**
      * @return corresponding amount in {@link Unit#ETHER}
-     * @see #toCustom(Unit)
+     * @see #toUnit(Unit)
      */
     public BigDecimal toEther() {
-        return toCustom(Unit.ETHER);
+        return toUnit(Unit.ETHER);
     }
 
     /**
-     * @param scale scale of the {@code BigDecimal} value to be returned
+     * @param decimalPlaces scale of the {@code BigDecimal} value to be returned
      * @return corresponding amount in custom denomination {@link Unit}
-     * @see #toCustom(Unit, int)
+     * @see #toUnit(Unit, int)
      */
-    public BigDecimal toCustom(Unit unit, int scale) {
-        return toCustom(unit).setScale(scale, RoundingMode.HALF_UP);
+    public BigDecimal toUnit(Unit unit, int decimalPlaces) {
+        return toUnit(unit).setScale(decimalPlaces, RoundingMode.HALF_UP);
     }
 
     /**
      * @return corresponding amount in custom denomination {@link Unit}
-     * @see #toCustom(Unit)
+     * @see #toUnit(Unit)
      */
-    public BigDecimal toCustom(Unit unit) {
+    public BigDecimal toUnit(Unit unit) {
         return new BigDecimal(amount).scaleByPowerOfTen(-unit.getScale());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(getClass(), Objects.hashCode(amount));
+        return Objects.hash(getClass(), amount);
     }
 
     @Override

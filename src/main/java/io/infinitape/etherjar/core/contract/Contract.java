@@ -118,17 +118,13 @@ public class Contract {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(getClass(), address);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-
-        if (Objects.isNull(obj)) return false;
-
-        if (!Objects.equals(getClass(), obj.getClass()))
+    public final boolean equals(Object obj) {
+        if (!(obj instanceof Contract))
             return false;
 
         Contract other = (Contract) obj;

@@ -23,7 +23,7 @@ class WeiSpec extends Specification {
 
     def "should keep custom unit numbers"() {
         expect:
-        Wei.fromCustom(val, unit).toCustom(unit) == val
+        Wei.fromUnit(val, unit).toUnit(unit) == val
 
         where:
         val                     | unit

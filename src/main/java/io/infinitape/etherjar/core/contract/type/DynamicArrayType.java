@@ -39,7 +39,7 @@ public class DynamicArrayType<T> implements DynamicType<T[]> {
      * @param str a string
      * @return an {@link DynamicArrayType} instance is packed as {@link Optional} value,
      * or {@link Optional#empty()} instead
-     * @throws NullPointerException if a {@code str} is <code>null</code>
+     * @throws NullPointerException if a {@code str} is {@code null}
      * @throws IllegalArgumentException if an {@link DynamicArrayType} has invalid
      * input or not a {@link StaticType} wrapped type
      * @see #getCanonicalName()
