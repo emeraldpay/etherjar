@@ -26,6 +26,7 @@ Structure of dependencies between modules:
   * `etherjar-rpc-http`
     * `etherjar-rpc`
       * `etherjar-hex`
+  * `etherjar-solidity`
   * `etherjar-tx`
     * `etherjar-crypto`
 
@@ -36,6 +37,7 @@ where
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
 * `etherjar-rpc` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
+* `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)
 * `etherjar-tx` - Creating and signing transactions, contains also common domain model
 * `etherjar-web3` - [Web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API on top of JSON-RPC API
 
