@@ -146,7 +146,7 @@ public class ContractMethod {
 
     /**
      * Create a {@link Builder} instance from methods signature like
-     * {@code name(datatype1,datatype2)}, or {@code transfer(address,uint256)}.
+     * {@code name(datatype1,datatype2)} or {@code transfer(address,uint256)}.
      *
      * <p>The signature is defined as the canonical expression of the basic prototype,
      * i.e. the function name with the parenthesised list of parameter types.
