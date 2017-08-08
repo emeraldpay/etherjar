@@ -26,7 +26,7 @@ apply plugin: 'jacoco'
 apply plugin: 'idea'
 
 group = 'io.infinitape'
-description = 'Framework agnostic modular Java 8 integration library for Ethereum blockchain, including Ethereum Classic (ETC) and J.P. Morgan Quorum™ (not implemented yet).'
+description = 'Framework agnostic modular Java 8 integration library for Ethereum blockchain, including Ethereum Classic (ETC).'
 
 targetCompatibility = '1.8'
 sourceCompatibility = '1.8'
