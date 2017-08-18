@@ -1,3 +1,14 @@
+# Contributing to Etherjar
+
+If you would like to contribute code you can do so through GitHub by forking the repository and sending pull requests.
+
+## License
+
+By contributing your code, you agree to license your contribution under the terms of the APLv2: http://www.apache.org/licenses/LICENSE-2.0
+
+If you are adding a new file it should have a header like this:
+
+```
 /*
  * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
  *
@@ -13,16 +24,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-rootProject.name = 'etherjar'
-
-include \
-    "etherjar-abi",
-    "etherjar-core",
-    "etherjar-crypto",
-    "etherjar-hex",
-    "etherjar-rpc-api",
-    "etherjar-rpc-http",
-    "etherjar-solidity",
-    "etherjar-tx",
-    "etherjar-web3"
+ ```

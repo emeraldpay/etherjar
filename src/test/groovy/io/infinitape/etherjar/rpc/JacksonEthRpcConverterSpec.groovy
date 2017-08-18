@@ -230,7 +230,7 @@ class JacksonEthRpcConverterSpec extends Specification {
         act.gas == 4712388
         act.gasPrice == new Wei(27000000000)
         act.input.bytes.length == 4
-        act.value.toEther(4) == 102.5666
+        act.value.toEthers(4) == 102.5666
         act.nonce == 259
     }
 
@@ -355,8 +355,8 @@ class JacksonEthRpcConverterSpec extends Specification {
                 to: Address.from('0x57d90b64a1a57749b0f932f1a3395792e12e7055'),
                 data: HexData.from('0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2'),
                 gas: 100000,
-                gasPrice: Wei.fromEther(0.002),
-                value: Wei.fromEther(1.5)
+                gasPrice: Wei.ofEthers(0.002),
+                value: Wei.ofEthers(1.5)
         )
         def req = new RequestJson(
                 "eth_call",

@@ -23,7 +23,7 @@ class WeiSpec extends Specification {
 
     def "should keep custom unit numbers"() {
         expect:
-        Wei.fromUnit(val, unit).toUnit(unit) == val
+        Wei.ofUnits(val, unit).toUnits(unit) == val
 
         where:
         val                     | unit
@@ -41,8 +41,8 @@ class WeiSpec extends Specification {
         wei.toString() == '733798 wei'
 
         and:
-        wei.toEther(6) == 0
-        wei.toEther() == 7.33798E-13
+        wei.toEthers(6) == 0
+        wei.toEthers() == 7.33798E-13
     }
 
     def "should process large number of wei"() {
@@ -54,13 +54,13 @@ class WeiSpec extends Specification {
         wei.toString() == '115792089237316195423570985008687907853269984665640564039457584007913129639935 wei'
 
         and:
-        wei.toEther(5) == 115792089237316195423570985008687907853269984665640564039457.58401
-        wei.toEther() == 115792089237316195423570985008687907853269984665640564039457.584007913129639935
+        wei.toEthers(5) == 115792089237316195423570985008687907853269984665640564039457.58401
+        wei.toEthers() == 115792089237316195423570985008687907853269984665640564039457.584007913129639935
     }
 
     def "should convert wei to Ether"() {
         expect:
-        new Wei(num).toEther() == ether
+        new Wei(num).toEthers() == ether
 
         where:
         num                     | ether

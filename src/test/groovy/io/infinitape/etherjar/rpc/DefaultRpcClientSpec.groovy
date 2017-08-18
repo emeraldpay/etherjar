@@ -50,14 +50,14 @@ class DefaultRpcClientSpec extends Specification {
 
         then:
         1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest'], String) >> CompletableFuture.completedFuture("0x0234c8a3397aab58")
-        act.toEther().setScale(3, RoundingMode.HALF_UP) == 0.159
+        act.toEthers().setScale(3, RoundingMode.HALF_UP) == 0.159
 
         when:
         act = defaultRpcClient.eth().getBalance(Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'), 2050000).get()
 
         then:
         1 * rpcTransport.execute("eth_getBalance", ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1f47d0'], String) >> CompletableFuture.completedFuture("0x0234c8a3397aab58")
-        act.toEther().setScale(3, RoundingMode.HALF_UP) == 0.159
+        act.toEthers().setScale(3, RoundingMode.HALF_UP) == 0.159
     }
 
     def "Get block by number"() {
@@ -403,7 +403,7 @@ class DefaultRpcClientSpec extends Specification {
         def tx = new TransactionCallJson(
                 Address.from('0xf45c301e123a068badac079d0cff1a9e4ad51911'),
                 Address.from('0x1e45c30168ba23a0dac51911079d0fcff1a9e4ad'),
-                Wei.fromEther(12.345)
+                Wei.ofEthers(12.345)
         )
         def txid = TransactionId.from('0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc')
 

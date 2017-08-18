@@ -45,7 +45,7 @@ class JacksonTraceRpcConverterSpec extends Specification {
         act[0].action.gas == 69000
         act[0].action.input == null
         act[0].action.to?.toHex() == '0x506c79b086e7c0e1d654b92e806d7a177fcbbd6e'
-        act[0].action.value?.toEther(4) == 0.2547
+        act[0].action.value?.toEthers(4) == 0.2547
         act[0].action.callType == TraceItemJson.CallType.CALL
         act[0].blockHash.toHex() == '0x6d4ba9516a1e92b95ebbd8e7d024c6277b8607c1bc94abc1a53c5c5f65c7bf7c'
         act[0].blockNumber.intValue() == 2279999

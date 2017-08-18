@@ -18,12 +18,10 @@ plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
-apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
-apply plugin: 'jacoco'
-apply plugin: 'idea'
 
 group = 'io.infinitape'
 description = 'Framework agnostic modular Java 8 integration library for Ethereum blockchain, including Ethereum Classic (ETC).'
@@ -45,10 +43,14 @@ dependencies {
     compile "org.bouncycastle:bcprov-jdk15on:$bcprovVersion"
 
     testCompile "org.objenesis:objenesis:$objenesisVersion"
-    testCompile "org.codehaus.groovy:groovy-all:$groovyVersion"
     testCompile "org.spockframework:spock-core:$spockVersion"
     testCompile "nl.jqno.equalsverifier:equalsverifier:$equalsverifier"
 }
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+compileJava.options.compilerArgs \
+        << "-Xlint:unchecked" << "-Xlint:deprecation"
 
 test {
     jvmArgs '-ea'
@@ -57,10 +59,36 @@ test {
     testLogging.exceptionFormat = 'full'
 }
 
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
 
-compileJava.options.compilerArgs \
-        << "-Xlint:unchecked" << "-Xlint:deprecation"
+test.finalizedBy jacocoTestReport
+
+bintray {
+    user = project.hasProperty('bintrayUser') ?
+        project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+
+    key = project.hasProperty('bintrayApiKey') ?
+        project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+
+    publications = ['EtherJarPublication']
+
+    pkg {
+        repo = 'etherjar'
+        name = 'etherjar'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/infinitape/etherjar.git'
+        labels = ['etherjar', 'etc', 'ethereum', 'blockchain']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            description = project.description
+        }
+    }
+}
 
 publishing {
     publications {
@@ -82,31 +110,3 @@ task sourceJar(type: Jar) {
 task wrapper(type: Wrapper) {
     gradleVersion = '3.5.1'
 }
-
-bintray {
-    user = project.hasProperty('bintrayUser') ?
-            project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ?
-            project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-    publications = ['EtherJarPublication']
-    pkg {
-        repo = 'etherjar'
-        name = 'etherjar'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/infinitape/etherjar.git'
-        labels = ['etherjar', 'etc', 'ethereum', 'blockchain']
-        publicDownloadNumbers = true
-        version {
-            name = project.version
-            description = project.description
-        }
-    }
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
-
-test.finalizedBy(jacocoTestReport)
