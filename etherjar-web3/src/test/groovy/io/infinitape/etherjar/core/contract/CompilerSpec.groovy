@@ -31,6 +31,7 @@ class CompilerSpec extends Specification {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //
 
+    @Ignore
     def "Basic compile"() {
         Compiler compiler = Compiler.newBuilder()
                 .withSolc('./node_modules/solc/solcjs')
@@ -60,6 +61,7 @@ class CompilerSpec extends Specification {
         act.contracts[0].abi.contains("\"name\":\"doit\"")
     }
 
+    @Ignore
     def "Multicontract compiler"() {
         InputStream contract = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("contract/SimpleToken.sol")
 
