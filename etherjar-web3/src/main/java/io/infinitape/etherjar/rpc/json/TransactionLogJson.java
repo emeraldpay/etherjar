@@ -18,9 +18,9 @@ package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.core.Address;
+import io.infinitape.etherjar.core.BlockHash;
 import io.infinitape.etherjar.core.HexData;
 import io.infinitape.etherjar.core.TransactionId;
-import io.infinitape.etherjar.core.BlockHash;
 
 import java.util.List;
 

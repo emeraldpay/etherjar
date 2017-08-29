@@ -17,6 +17,8 @@
 package io.infinitape.etherjar.rpc.transport;
 
 import io.infinitape.etherjar.rpc.JacksonRpcConverter;
+import io.infinitape.etherjar.rpc.RpcConverter;
+import io.infinitape.etherjar.rpc.json.RequestJson;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.RequestBuilder;
@@ -24,14 +26,14 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import io.infinitape.etherjar.rpc.RpcConverter;
-import io.infinitape.etherjar.rpc.json.RequestJson;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class DefaultRpcTransport implements RpcTransport {

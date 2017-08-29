@@ -21,9 +21,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.infinitape.etherjar.rpc.json.TraceItemJson;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
+import io.infinitape.etherjar.rpc.json.TraceItemJson;
 
 import java.io.IOException;
 import java.io.InputStream;

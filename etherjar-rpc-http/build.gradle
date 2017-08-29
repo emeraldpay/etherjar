@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-rootProject.name = 'etherjar'
+dependencies {
+    compile project(':etherjar-rpc-api')
 
-include \
-    "etherjar-abi",
-    "etherjar-crypto",
-    "etherjar-domain",
-    "etherjar-hex",
-    "etherjar-rpc-api",
-    "etherjar-rpc-http",
-    "etherjar-solidity",
-    "etherjar-tx",
-    "etherjar-web3"
+    compile 'org.apache.httpcomponents:httpmime:4.5.+'
+    compile 'org.apache.httpcomponents:httpclient:4.5.+'
+}

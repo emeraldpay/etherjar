@@ -14,58 +14,66 @@
  * limitations under the License.
  */
 
+import java.nio.charset.Charset
+
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
-apply plugin: 'groovy'
-apply plugin: 'jacoco'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
+def jvmEncoding = Charset.defaultCharset().name()
 
-group = 'io.infinitape'
-description = 'Framework agnostic modular Java 8 integration library for Ethereum blockchain, including Ethereum Classic (ETC).'
-
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
-
-repositories {
-    jcenter()
-    mavenLocal()
-    mavenCentral()
+if (jvmEncoding != "UTF-8") {
+    throw new IllegalStateException("Build environment must be UTF-8 (it is: $jvmEncoding)" +
+        "- add '-Dfile.encoding=UTF-8' to the GRADLE_OPTS environment variable ")
 }
 
-dependencies {
-    compile "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-    compile "org.apache.httpcomponents:httpmime:$httpClientVersion"
-    compile "org.apache.httpcomponents:httpclient:$httpClientVersion"
-    compile "org.bouncycastle:bcprov-jdk15on:$bcprovVersion"
-
-    testCompile "org.objenesis:objenesis:$objenesisVersion"
-    testCompile "org.spockframework:spock-core:$spockVersion"
-    testCompile "nl.jqno.equalsverifier:equalsverifier:$equalsverifier"
+if (!JavaVersion.current().java8Compatible) {
+    throw new IllegalStateException('Must be built with Java 8 or higher')
 }
 
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+allprojects {
+    group = 'io.infinitape'
+    version = "1.0.0-SNAPSHOT"
 
-compileJava.options.compilerArgs \
-        << "-Xlint:unchecked" << "-Xlint:deprecation"
-
-test {
-    jvmArgs '-ea'
-
-    testLogging.showStandardStreams = true
-    testLogging.exceptionFormat = 'full'
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
+    repositories {
+        jcenter()
+        maven { url 'https://oss.jfrog.org/artifactory/repo' }
     }
 }
 
-test.finalizedBy jacocoTestReport
+subprojects {
+    apply plugin: 'groovy'
+    apply plugin: 'jacoco'
+
+    targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+    compileJava.options.compilerArgs \
+        << '-Xlint:unchecked' << '-Xlint:deprecation'
+
+    dependencies {
+        testCompile 'org.objenesis:objenesis:2.+'
+        testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+        testCompile 'nl.jqno.equalsverifier:equalsverifier:2.3.+'
+    }
+
+    test {
+        jvmArgs '-ea'
+
+        testLogging.showStandardStreams = true
+        testLogging.exceptionFormat = 'full'
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    test.finalizedBy jacocoTestReport
+}
 
 bintray {
     user = project.hasProperty('bintrayUser') ?
@@ -83,28 +91,12 @@ bintray {
         vcsUrl = 'https://github.com/infinitape/etherjar.git'
         labels = ['etherjar', 'etc', 'ethereum', 'blockchain']
         publicDownloadNumbers = true
+
         version {
             name = project.version
             description = project.description
         }
     }
-}
-
-publishing {
-    publications {
-        EtherJarPublication(MavenPublication) {
-            from components.java
-            artifact sourceJar
-            pom.withXml {
-                asNode().appendNode('description', description)
-            }
-        }
-    }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-    classifier "sources"
 }
 
 task wrapper(type: Wrapper) {

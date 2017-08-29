@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchain](https://www.ethereum.org),
-including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
+including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/) support.
 
 ## Architecture
 
@@ -24,21 +24,21 @@ Structure of dependencies between modules:
 * `etherjar-web3`
   * `etherjar-abi`
     * `etherjar-hex`
-  * `etherjar-core`
+  * `etherjar-domain`
   * `etherjar-hex`
   * `etherjar-rpc-http`
     * `etherjar-rpc-api`
       * `etherjar-hex`
   * `etherjar-solidity`
   * `etherjar-tx`
-    * `etherjar-core`
     * `etherjar-crypto`
+    * `etherjar-domain`
 
 where
 
 * `etherjar-abi` - Smart contract [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-* `etherjar-core` - Core module contains pure domain logic (`Address`, `Block`, `Transaction`, `Wei` and so on)
 * `etherjar-crypto` - General cryptographic utils (KECCAK-256 hash, ECDSA signatures)
+* `etherjar-domain` - Core module contains pure domain logic (`Address`, `Block`, `Transaction`, `Wei` and so on)
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
