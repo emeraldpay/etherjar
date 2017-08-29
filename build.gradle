@@ -89,7 +89,7 @@ bintray {
         name = 'etherjar'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/infinitape/etherjar.git'
-        labels = ['etherjar', 'etc', 'ethereum', 'blockchain']
+        labels = ['ethereum', 'ethereum-classic', 'blockchain', 'smart-contracts', 'java-8']
         publicDownloadNumbers = true
 
         version {

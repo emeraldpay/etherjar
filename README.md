@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchain](https://www.ethereum.org),
-including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/) support.
+including [Ethereum Classic](https://ethereumclassic.github.io/) support.
 
 ## Architecture
 
@@ -103,7 +103,7 @@ public class Main {
 
 ## Bugs and Feedback
 
-For bugs, questions and discussions please use the [GitHub Issues](https://github.com/io.infinitape/etherjar/issues).
+For bugs, questions and discussions please use the [GitHub Issues](https://github.com/Infinitape/etherjar/issues).
 
 ## Thanks to
 
