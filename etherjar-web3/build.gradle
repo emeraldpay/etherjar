@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-rootProject.name = 'etherjar'
-
-include \
-    "etherjar-abi",
-    "etherjar-crypto",
-    "etherjar-domain",
-    "etherjar-hex",
-    "etherjar-rpc-api",
-    "etherjar-rpc-http",
-    "etherjar-solidity",
-    "etherjar-tx",
-    "etherjar-web3"
+dependencies {
+    compile project(':etherjar-abi')
+    compile project(':etherjar-domain')
+    compile project(':etherjar-hex')
+    compile project(':etherjar-rpc-http')
+    compile project(':etherjar-solidity')
+    compile project(':etherjar-tx')
+}
