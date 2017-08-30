@@ -115,4 +115,5 @@ For bugs, questions and discussions please use the [GitHub Issues](https://githu
 
 ## Licence
 
-Apache 2.0
+[Apache 2.0](LICENSE)
+
