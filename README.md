@@ -75,7 +75,8 @@ How to call `web3_clientVersion` low-level JSON-RPC API method:
 ```java
 package example;
 
-import DefaultRpcTransport;
+import io.infinitape.etherjar.rpc.transport.DefaultRpcTransport;
+import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
 import java.net.URI;
