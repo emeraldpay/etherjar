@@ -14,4 +14,7 @@
  * limitations under the License.
  */
 
-dependencies { }
+dependencies {
+    compile project(':etherjar-abi')
+    compile project(':etherjar-domain')
+}

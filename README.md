@@ -28,8 +28,12 @@ Structure of dependencies between modules:
   * `etherjar-hex`
   * `etherjar-rpc-http`
     * `etherjar-rpc-api`
+      * `etherjar-domain`
       * `etherjar-hex`
+      * `etherjar-tx`
   * `etherjar-solidity`
+    * `etherjar-abi`
+    * `etherjar-domain`
   * `etherjar-tx`
     * `etherjar-crypto`
     * `etherjar-domain`
@@ -54,19 +58,19 @@ where
 <dependency>
   <groupId>io.infinitape</groupId>
   <artifactId>etherjar-web3</artifactId>
-  <version>0.1.0</version>
+  <version>1.0.0.M1</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-compile 'io.infinitape:etherjar-web3:0.1.0'
+compile 'io.infinitape:etherjar-web3:1.0.0.M1'
 ```
 
 ## Examples
 
-How to call `web3_clientVersion` JSON-RPC API method:
+How to call `web3_clientVersion` low-level JSON-RPC API method:
 
 ```java
 package example;

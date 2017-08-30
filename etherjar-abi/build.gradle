@@ -15,5 +15,6 @@
  */
 
 dependencies {
+    compile project(':etherjar-domain')
     compile project(':etherjar-hex')
 }
