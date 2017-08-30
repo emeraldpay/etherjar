@@ -1,7 +1,7 @@
 # EtherJar Reference Guide
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchain](https://www.ethereum.org),
-including [Ethereum Classic (ETC)](https://ethereumclassic.github.io/).
+including [Ethereum Classic](https://ethereumclassic.github.io/) support.
 
 Table of Contents:
 
