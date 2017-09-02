@@ -25,12 +25,9 @@ Structure of dependencies between modules:
   * `etherjar-abi`
     * `etherjar-hex`
   * `etherjar-domain`
-  * `etherjar-hex`
   * `etherjar-rpc-http`
     * `etherjar-rpc-api`
       * `etherjar-domain`
-      * `etherjar-hex`
-      * `etherjar-tx`
   * `etherjar-solidity`
     * `etherjar-abi`
     * `etherjar-domain`
@@ -112,9 +109,9 @@ For bugs, questions and discussions please use the [GitHub Issues](https://githu
 
 ## Thanks to
 
-* [JetBrains](https://www.jetbrains.com) for [IntelliJ IDEA](https://www.jetbrains.com/idea/) free open-source license 
+* [JetBrains](https://www.jetbrains.com) for [IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/) free open-source license.
+* [![Logo of YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com) for [full-featured YourKit Java Profiler](https://www.yourkit.com/java/profiler/) free open-source license.
 
 ## Licence
 
 [Apache 2.0](LICENSE)
-
