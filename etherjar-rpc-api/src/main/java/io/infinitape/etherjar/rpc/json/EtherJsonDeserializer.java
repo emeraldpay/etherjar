@@ -21,10 +21,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NumericNode;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
-import io.infinitape.etherjar.domain.HexData;
+import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.domain.Wei;
+import io.infinitape.etherjar.hex.HexData;
 import io.infinitape.etherjar.hex.HexEncoding;
-import io.infinitape.etherjar.tx.TransactionId;
 
 import java.math.BigInteger;
 

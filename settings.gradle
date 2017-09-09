@@ -21,8 +21,8 @@ include \
     "etherjar-crypto",
     "etherjar-domain",
     "etherjar-hex",
+    "etherjar-keystore",
     "etherjar-rpc-api",
     "etherjar-rpc-http",
     "etherjar-solidity",
-    "etherjar-tx",
     "etherjar-web3"

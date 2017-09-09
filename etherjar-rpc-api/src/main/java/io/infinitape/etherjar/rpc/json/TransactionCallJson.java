@@ -18,8 +18,8 @@ package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.domain.Address;
-import io.infinitape.etherjar.domain.HexData;
 import io.infinitape.etherjar.domain.Wei;
+import io.infinitape.etherjar.hex.HexData;
 
 import java.math.BigInteger;
 

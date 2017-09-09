@@ -20,8 +20,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.infinitape.etherjar.tx.ChainId;
-import io.infinitape.etherjar.tx.TransactionSignature;
+import io.infinitape.etherjar.domain.ChainId;
+import io.infinitape.etherjar.domain.TransactionSignature;
 
 import java.io.IOException;
 import java.math.BigInteger;

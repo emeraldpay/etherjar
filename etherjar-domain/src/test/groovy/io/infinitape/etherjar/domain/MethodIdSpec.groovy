@@ -16,6 +16,7 @@
 
 package io.infinitape.etherjar.domain
 
+import io.infinitape.etherjar.hex.HexData
 import spock.lang.Specification
 
 class MethodIdSpec extends Specification {
@@ -135,5 +136,4 @@ class MethodIdSpec extends Specification {
         then:
         id.toHex() == '0xa9059cbb'
     }
-
 }

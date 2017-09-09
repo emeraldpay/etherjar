@@ -19,7 +19,7 @@ package io.infinitape.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
-import io.infinitape.etherjar.tx.TransactionId;
+import io.infinitape.etherjar.domain.TransactionId;
 
 import java.math.BigInteger;
 import java.util.List;

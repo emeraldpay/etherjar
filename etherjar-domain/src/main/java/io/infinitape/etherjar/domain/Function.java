@@ -16,6 +16,8 @@
 
 package io.infinitape.etherjar.domain;
 
+import io.infinitape.etherjar.hex.HexData;
+
 /**
  * An address, followed by a function selector.
  */

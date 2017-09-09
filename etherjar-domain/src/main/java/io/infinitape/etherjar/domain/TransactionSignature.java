@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.tx;
+package io.infinitape.etherjar.domain;
 
-import io.infinitape.etherjar.domain.HexData;
+import io.infinitape.etherjar.hex.HexData;
 
 /**
  * Transaction signature with support of Replay Protection (EIP-155)

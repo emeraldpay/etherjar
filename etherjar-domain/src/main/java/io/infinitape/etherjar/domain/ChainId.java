@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.tx;
+package io.infinitape.etherjar.domain;
 
 /**
  * CHAIN_ID for Replay Protection (EIP-155)

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.infinitape.etherjar.domain.BlockHash;
-import io.infinitape.etherjar.domain.HexData;
-import io.infinitape.etherjar.tx.TransactionId;
+import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.hex.HexData;
 
 import java.io.IOException;
 import java.util.ArrayList;

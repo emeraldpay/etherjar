@@ -17,10 +17,11 @@
 package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.domain.*;
+import io.infinitape.etherjar.hex.Hex32;
+import io.infinitape.etherjar.hex.HexData;
 import io.infinitape.etherjar.hex.HexEncoding;
 import io.infinitape.etherjar.rpc.json.*;
 import io.infinitape.etherjar.rpc.transport.RpcTransport;
-import io.infinitape.etherjar.tx.TransactionId;
 
 import java.io.IOException;
 import java.util.Arrays;

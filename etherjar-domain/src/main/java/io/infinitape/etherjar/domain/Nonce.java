@@ -17,6 +17,8 @@
 package io.infinitape.etherjar.domain;
 
 
+import io.infinitape.etherjar.hex.HexData;
+
 public class Nonce extends HexData {
 
     public static final int SIZE_BYTES = 8;

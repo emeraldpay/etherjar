@@ -16,8 +16,8 @@
 
 package io.infinitape.etherjar.abi;
 
-import io.infinitape.etherjar.domain.Hex32;
-import io.infinitape.etherjar.domain.HexData;
+import io.infinitape.etherjar.hex.Hex32;
+import io.infinitape.etherjar.hex.HexData;
 
 /**
  * Fixed-size elementary type (32 bytes length only).

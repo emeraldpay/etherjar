@@ -16,8 +16,8 @@
 
 package io.infinitape.etherjar.abi
 
-import io.infinitape.etherjar.domain.Hex32
-import io.infinitape.etherjar.domain.HexData
+import io.infinitape.etherjar.hex.Hex32
+import io.infinitape.etherjar.hex.HexData
 import spock.lang.Specification
 
 class StringTypeSpec extends Specification {
