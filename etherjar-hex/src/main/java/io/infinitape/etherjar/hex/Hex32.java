@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.domain;
+package io.infinitape.etherjar.hex;
 
 /**
  * Fixed-size 32-bytes hex value.

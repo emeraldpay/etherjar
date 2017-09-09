@@ -16,6 +16,7 @@
 
 package io.infinitape.etherjar.domain;
 
+import io.infinitape.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ import java.util.Objects;
 /**
  * The first four bytes of the call data for a function call specifies the function to be called.
  *
- * <p>It is the first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash
+ * <p>It is the first (left, high-order in big-endian) four bytes of the Keccak256 (SHA-3) hash
  * of the signature of the function.
  *
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector">Function Selector</a>
@@ -39,7 +40,6 @@ public class MethodId extends HexData {
         return fromSignature(name, Arrays.asList(types));
     }
 
-    // FIXME: Extract to `etherjar-crypto` submodule
     public static MethodId fromSignature(String name, Collection<String> types) {
         String sign = Objects.requireNonNull(name) +
                 '(' + String.join(",", Objects.requireNonNull(types)) + ')';

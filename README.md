@@ -23,16 +23,19 @@ Structure of dependencies between modules:
 
 * `etherjar-web3`
   * `etherjar-abi`
+    * `etherjar-domain`
     * `etherjar-hex`
   * `etherjar-domain`
+    * `etherjar-crypto`
+  * `etherjar-keystore`
+    * `etherjar-domain`
+    * `etherjar-hex`
   * `etherjar-rpc-http`
     * `etherjar-rpc-api`
       * `etherjar-domain`
+      * `etherjar-hex`
   * `etherjar-solidity`
     * `etherjar-abi`
-    * `etherjar-domain`
-  * `etherjar-tx`
-    * `etherjar-crypto`
     * `etherjar-domain`
 
 where
@@ -41,10 +44,10 @@ where
 * `etherjar-crypto` - General cryptographic utils (KECCAK-256 hash, ECDSA signatures)
 * `etherjar-domain` - Core module contains pure domain logic (`Address`, `Block`, `Transaction`, `Wei` and so on)
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
+* `etherjar-keystore` - Keystore files (UTC / JSON) encrypted with a passphrase
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
 * `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)  
-* `etherjar-tx` - Creating and signing transactions, including [EIP-155 replay attack protection](https://github.com/ethereum/eips/issues/155)
 * `etherjar-web3` - [Web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API on top of JSON-RPC API
 
 ## Usage

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.domain;
+package io.infinitape.etherjar.hex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

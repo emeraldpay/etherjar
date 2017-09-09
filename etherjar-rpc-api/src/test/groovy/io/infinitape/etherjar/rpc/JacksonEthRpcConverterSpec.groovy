@@ -17,10 +17,10 @@
 package io.infinitape.etherjar.rpc
 
 import io.infinitape.etherjar.domain.Address
-import io.infinitape.etherjar.domain.HexData
+import io.infinitape.etherjar.domain.TransactionId
 import io.infinitape.etherjar.domain.Wei
+import io.infinitape.etherjar.hex.HexData
 import io.infinitape.etherjar.rpc.json.*
-import io.infinitape.etherjar.tx.TransactionId
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat

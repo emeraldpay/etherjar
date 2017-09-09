@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.infinitape.etherjar.domain
+package io.infinitape.etherjar.hex
 
 import spock.lang.Specification
 
@@ -22,9 +22,9 @@ class HexDataSpec extends Specification {
 
     def "should combine hex data"() {
         def x = [
-                HexData.from('0x0123'),
-                HexData.from('0x456789ab'),
-                HexData.from('0xcdef')
+            HexData.from('0x0123'),
+            HexData.from('0x456789ab'),
+            HexData.from('0xcdef')
         ]
 
         when:
@@ -104,9 +104,9 @@ class HexDataSpec extends Specification {
         def x = HexData.from '0x0123456789abcdef'
 
         def c = [
-                HexData.from('0x0123'),
-                HexData.from('0x456789ab'),
-                HexData.from('0xcdef')
+            HexData.from('0x0123'),
+            HexData.from('0x456789ab'),
+            HexData.from('0xcdef')
         ]
 
         when:
@@ -137,14 +137,14 @@ class HexDataSpec extends Specification {
         x == res
 
         where:
-        hex                                 | size  | offset    | res
-        HexData.from('0x1234')              | 1     | 0         | HexData.from('0x12')
-        HexData.from('0x1234')              | 1     | 1         | HexData.from('0x34')
-        HexData.from('0x1234')              | 2     | 0         | HexData.from('0x1234')
-        HexData.from('0x0123456789abcdef')  | 8     | 0         | HexData.from('0x0123456789abcdef')
-        HexData.from('0x0123456789abcdef')  | 4     | 4         | HexData.from('0x89abcdef')
-        HexData.from('0x0123456789abcdef')  | 2     | 3         | HexData.from('0x6789')
-        HexData.from('0x0123456789abcdef')  | 1     | 2         | HexData.from('0x45')
+        hex                                | size | offset | res
+        HexData.from('0x1234')             | 1    | 0      | HexData.from('0x12')
+        HexData.from('0x1234')             | 1    | 1      | HexData.from('0x34')
+        HexData.from('0x1234')             | 2    | 0      | HexData.from('0x1234')
+        HexData.from('0x0123456789abcdef') | 8    | 0      | HexData.from('0x0123456789abcdef')
+        HexData.from('0x0123456789abcdef') | 4    | 4      | HexData.from('0x89abcdef')
+        HexData.from('0x0123456789abcdef') | 2    | 3      | HexData.from('0x6789')
+        HexData.from('0x0123456789abcdef') | 1    | 2      | HexData.from('0x45')
     }
 
     def "should extract custom instances"() {
@@ -172,11 +172,11 @@ class HexDataSpec extends Specification {
         thrown IllegalArgumentException
 
         where:
-        hex                     | size    | offset
-        HexData.EMPTY           | -1      | 0
-        HexData.EMPTY           | 0       | -1
-        HexData.from('0x1234')  | 3       | 0
-        HexData.from('0x1234')  | 1       | 2
+        hex                    | size | offset
+        HexData.EMPTY          | -1   | 0
+        HexData.EMPTY          | 0    | -1
+        HexData.from('0x1234') | 3    | 0
+        HexData.from('0x1234') | 1    | 2
     }
 
     def "should catch null extracted converter"() {
@@ -200,15 +200,15 @@ class HexDataSpec extends Specification {
         Arrays.equals(x, res as HexData[])
 
         where:
-        hex                                 | size  | offset    | res
-        HexData.from('0x1234')              | 1     | 0         | [HexData.from('0x12'), HexData.from('0x34')]
-        HexData.from('0x1234')              | 1     | 1         | [HexData.from('0x34')]
-        HexData.from('0x1234')              | 2     | 0         | [HexData.from('0x1234')]
-        HexData.from('0x0123456789abcdef')  | 1     | 4         | [HexData.from('0x89'), HexData.from('0xab'), HexData.from('0xcd'), HexData.from('0xef')]
-        HexData.from('0x0123456789abcdef')  | 2     | 4         | [HexData.from('0x89ab'), HexData.from('0xcdef')]
-        HexData.from('0x0123456789abcdef')  | 3     | 2         | [HexData.from('0x456789'), HexData.from('0xabcdef')]
-        HexData.from('0x0123456789abcdef')  | 8     | 0         | [HexData.from('0x0123456789abcdef')]
-        HexData.from('0x0123456789abcdef')  | 8     | 8         | []
+        hex                                | size | offset | res
+        HexData.from('0x1234')             | 1    | 0      | [HexData.from('0x12'), HexData.from('0x34')]
+        HexData.from('0x1234')             | 1    | 1      | [HexData.from('0x34')]
+        HexData.from('0x1234')             | 2    | 0      | [HexData.from('0x1234')]
+        HexData.from('0x0123456789abcdef') | 1    | 4      | [HexData.from('0x89'), HexData.from('0xab'), HexData.from('0xcd'), HexData.from('0xef')]
+        HexData.from('0x0123456789abcdef') | 2    | 4      | [HexData.from('0x89ab'), HexData.from('0xcdef')]
+        HexData.from('0x0123456789abcdef') | 3    | 2      | [HexData.from('0x456789'), HexData.from('0xabcdef')]
+        HexData.from('0x0123456789abcdef') | 8    | 0      | [HexData.from('0x0123456789abcdef')]
+        HexData.from('0x0123456789abcdef') | 8    | 8      | []
     }
 
     def "should split custom instances"() {
@@ -236,13 +236,13 @@ class HexDataSpec extends Specification {
         thrown IllegalArgumentException
 
         where:
-        hex                                 | size  | offset
-        HexData.EMPTY                       | -1    | 0
-        HexData.EMPTY                       | 0     | -1
-        HexData.from('0x1234')              | 2     | 1
-        HexData.from('0x0123456789abcdef')  | 3     | 0
-        HexData.from('0x0123456789abcdef')  | 4     | 2
-        HexData.from('0x0123456789abcdef')  | 2     | 3
+        hex                                | size | offset
+        HexData.EMPTY                      | -1   | 0
+        HexData.EMPTY                      | 0    | -1
+        HexData.from('0x1234')             | 2    | 1
+        HexData.from('0x0123456789abcdef') | 3    | 0
+        HexData.from('0x0123456789abcdef') | 4    | 2
+        HexData.from('0x0123456789abcdef') | 2    | 3
     }
 
     def "should catch null split array generator"() {
@@ -306,7 +306,7 @@ class HexDataSpec extends Specification {
 
     def "Equal is symmetric"() {
         def x = HexData.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
-        def y = BlockHash.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def y = Hex32.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
 
         expect:
         x == y
@@ -316,7 +316,7 @@ class HexDataSpec extends Specification {
     def "Equal is transitive"() {
         def x = HexData.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
         def y = Hex32.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
-        def z = BlockHash.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def z = Hex32.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
 
         expect:
         x == y

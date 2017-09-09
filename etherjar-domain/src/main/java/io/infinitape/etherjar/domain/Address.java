@@ -16,6 +16,7 @@
 
 package io.infinitape.etherjar.domain;
 
+import io.infinitape.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -76,7 +77,6 @@ public class Address extends HexData {
      * @param address a wallet address ('0x...')
      * @return {@code true} if address with checksum
      */
-    // FIXME: Extract to `etherjar-crypto` submodule
     static boolean isValidChecksum(String address) {
         Keccak.Digest256 digest256 = new Keccak.Digest256();
 

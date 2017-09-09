@@ -16,6 +16,8 @@
 
 package io.infinitape.etherjar.domain;
 
+import io.infinitape.etherjar.hex.HexData;
+
 public class BlockHash extends HexData {
 
     public static final int SIZE_BYTES = 32;

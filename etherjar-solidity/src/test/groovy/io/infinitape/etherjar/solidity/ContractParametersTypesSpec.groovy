@@ -17,8 +17,8 @@
 package io.infinitape.etherjar.solidity
 
 import io.infinitape.etherjar.abi.Type
-import io.infinitape.etherjar.domain.Hex32
-import io.infinitape.etherjar.domain.HexData
+import io.infinitape.etherjar.hex.Hex32
+import io.infinitape.etherjar.hex.HexData
 import spock.lang.Shared
 import spock.lang.Specification
 

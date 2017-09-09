@@ -17,8 +17,8 @@
 package io.infinitape.etherjar.solidity;
 
 import io.infinitape.etherjar.abi.Type;
-import io.infinitape.etherjar.domain.HexData;
 import io.infinitape.etherjar.domain.MethodId;
+import io.infinitape.etherjar.hex.HexData;
 
 import java.util.Arrays;
 import java.util.Collection;

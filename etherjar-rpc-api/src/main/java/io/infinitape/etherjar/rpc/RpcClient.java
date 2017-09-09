@@ -17,8 +17,9 @@
 package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.domain.*;
+import io.infinitape.etherjar.hex.Hex32;
+import io.infinitape.etherjar.hex.HexData;
 import io.infinitape.etherjar.rpc.json.*;
-import io.infinitape.etherjar.tx.TransactionId;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -75,7 +76,7 @@ public interface RpcClient {
 
         /**
          *
-         * @param hash tx hash
+         * @param hash keystore hash
          * @return information about a transaction
          * @throws IOException
          */
@@ -84,7 +85,7 @@ public interface RpcClient {
         /**
          *
          * @param block block hash
-         * @param index tx index in the block
+         * @param index keystore index in the block
          * @return information about a transaction
          * @throws IOException
          */
@@ -93,7 +94,7 @@ public interface RpcClient {
         /**
          *
          * @param block block number
-         * @param index tx index in the block
+         * @param index keystore index in the block
          * @return information about a transaction
          * @throws IOException
          */

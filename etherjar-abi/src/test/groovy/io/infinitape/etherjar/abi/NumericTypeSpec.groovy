@@ -16,7 +16,7 @@
 
 package io.infinitape.etherjar.abi
 
-import io.infinitape.etherjar.domain.Hex32
+import io.infinitape.etherjar.hex.Hex32
 import spock.lang.Specification
 
 class NumericTypeSpec extends Specification {

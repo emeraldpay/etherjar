@@ -16,7 +16,7 @@
 
 package io.infinitape.etherjar.solidity;
 
-import io.infinitape.etherjar.domain.HexData;
+import io.infinitape.etherjar.hex.HexData;
 
 import java.io.*;
 import java.nio.file.FileVisitOption;
