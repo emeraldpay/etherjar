@@ -54,20 +54,25 @@ public class JacksonRpcConverter implements RpcConverter {
         return objectMapper.writer().writeValueAsString(request);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T fromJson(InputStream content, Class<T> target) throws IOException {
+        return fromJson(content, target, Integer.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T, X> T fromJson(InputStream content, Class<T> target, Class<X> idtype) throws IOException {
         if (TraceList.class.isAssignableFrom(target)) {
             return (T) fromJsonList(content, TraceItemJson.class);
         }
-        JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, target);
-        ResponseJson<T> responseJson = objectMapper.readerFor(type1).readValue(content);
+        JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, target, idtype);
+        ResponseJson<T, X> responseJson = objectMapper.readerFor(type1).readValue(content);
         return responseJson.getResult();
     }
 
     public <T> List<T> fromJsonList(InputStream content, Class<T> target) throws IOException {
-        JavaType type1 = objectMapper.getTypeFactory().constructParametricType(List.class, target);
-        JavaType type2 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, type1);
-        ResponseJson<List<T>> responseJson = objectMapper.readerFor(type2).readValue(content);
+        JavaType dataType = objectMapper.getTypeFactory().constructParametricType(List.class, target);
+        JavaType idType = objectMapper.getTypeFactory().constructType(Integer.class);
+        JavaType type2 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, dataType, idType);
+        ResponseJson<List<T>, Object> responseJson = objectMapper.readerFor(type2).readValue(content);
         return responseJson.getResult();
     }
 
