@@ -16,16 +16,20 @@
 
 package io.infinitape.etherjar.rpc.json;
 
+
 import java.util.List;
 
-public class RequestJson {
+public class RequestJson<T> {
 
     private String jsonrpc = "2.0";
     private String method;
     private List params;
-    private int id;
+    private T id;
 
-    public RequestJson(String method, List params, int id) {
+    public RequestJson(String method, List params, T id) {
+        if (!(Integer.class.isAssignableFrom(id.getClass()) || String.class.isAssignableFrom(id.getClass()))) {
+            throw new IllegalArgumentException("ID must be String or Integer");
+        }
         this.method = method;
         this.params = params;
         this.id = id;
@@ -43,7 +47,7 @@ public class RequestJson {
         return params;
     }
 
-    public int getId() {
+    public T getId() {
         return id;
     }
 }

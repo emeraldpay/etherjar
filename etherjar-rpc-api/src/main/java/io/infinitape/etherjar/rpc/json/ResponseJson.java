@@ -16,10 +16,10 @@
 
 package io.infinitape.etherjar.rpc.json;
 
-public class ResponseJson<X> {
+public class ResponseJson<X,T> {
 
     private String jsonrpc = "2.0";
-    private int id;
+    private T id;
     private X result;
 
     public String getJsonrpc() {
@@ -30,11 +30,14 @@ public class ResponseJson<X> {
         this.jsonrpc = jsonrpc;
     }
 
-    public int getId() {
+    public T getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(T id) {
+        if (!(Integer.class.isAssignableFrom(id.getClass()) || String.class.isAssignableFrom(id.getClass()))) {
+            throw new IllegalArgumentException("ID must be String or Integer");
+        }
         this.id = id;
     }
 

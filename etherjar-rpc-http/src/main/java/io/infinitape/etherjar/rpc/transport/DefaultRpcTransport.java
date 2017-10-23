@@ -109,10 +109,10 @@ public class DefaultRpcTransport implements RpcTransport {
         return rpcConverter.fromJson(content, resultType);
     }
 
-    public RequestJson buildCall(String method, List params) {
+    public RequestJson<Integer> buildCall(String method, List params) {
         if (callSequence >= 0x1fffffff) {
             callSequence = 1;
         }
-        return new RequestJson(method, params, callSequence++);
+        return new RequestJson<Integer>(method, params, callSequence++);
     }
 }
