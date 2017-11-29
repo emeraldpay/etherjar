@@ -16,6 +16,8 @@
 
 package io.infinitape.etherjar.domain;
 
+import io.infinitape.etherjar.hex.HexData;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -103,6 +105,17 @@ public class Wei {
      */
     public static Wei ofUnits(BigDecimal num, Unit unit) {
         return new Wei(num.scaleByPowerOfTen(unit.getScale()).toBigInteger());
+    }
+
+    public static Wei from(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Null Address");
+        }
+        if (!value.startsWith("0x") || value.length() <= 2) {
+            throw new IllegalArgumentException("Invalid hex format: " + value);
+        }
+        value = value.substring(2);
+        return new Wei(new BigInteger(value, 16));
     }
 
     private final BigInteger amount;
