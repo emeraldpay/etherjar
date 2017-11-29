@@ -16,10 +16,13 @@
 
 package io.infinitape.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ResponseJson<X> {
 
     private String jsonrpc = "2.0";
     private int id;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private X result;
 
     public String getJsonrpc() {

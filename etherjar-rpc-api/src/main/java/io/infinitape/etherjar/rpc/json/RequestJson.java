@@ -16,13 +16,17 @@
 
 package io.infinitape.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 public class RequestJson {
 
     private String jsonrpc = "2.0";
     private String method;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List params;
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private int id;
 
     public RequestJson(String method, List params, int id) {
