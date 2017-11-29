@@ -377,4 +377,17 @@ class JacksonEthRpcConverterSpec extends Specification {
                  '"data":"0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2"}' +
                 ',"latest"],"id":1}'
     }
+
+    def "Can parse response with string id"() {
+        setup:
+        String json = "{" +
+                "\"jsonrpc\": \"2.0\"," +
+                "\"result\": \"0x0000000000000000000000000000000000000000000000000000000000000000\"," +
+                "\"id\": \"c96fb505261cff21040d5939393b21c1\"" +
+                "}"
+        when:
+        def act = jacksonRpcConverter.fromJson(new ByteArrayInputStream(json.getBytes()), String, String)
+        then:
+        act == "0x0000000000000000000000000000000000000000000000000000000000000000"
+    }
 }
