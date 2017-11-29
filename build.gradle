@@ -44,6 +44,7 @@ allprojects {
 subprojects {
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
+    apply plugin: 'maven'
 
     targetCompatibility = '1.8'
     sourceCompatibility = '1.8'
