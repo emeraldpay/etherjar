@@ -187,4 +187,8 @@ public class Wei {
     public String toString() {
         return String.format("%s wei", amount.toString());
     }
+
+    public String toHex() {
+        return "0x" + amount.toString(16);
+    }
 }
