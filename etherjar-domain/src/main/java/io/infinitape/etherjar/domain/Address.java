@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
  */
 public class Address extends HexData {
 
+    private final static byte[] HEX_BYTES = "0123456789abcdef".getBytes();
+
     public static final int SIZE_BYTES = 20;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
@@ -69,6 +71,40 @@ public class Address extends HexData {
     public static boolean isValidAddress(String address) {
         return CASE_INSENSITIVE_PATTERN.matcher(address).matches()
                 && (CASE_SENSITIVE_PATTERN.matcher(address).matches() || isValidChecksum(address));
+    }
+
+    public String toChecksumString() {
+        Keccak.Digest256 digest256 = new Keccak.Digest256();
+
+        byte[] hex = new byte[value.length * 2];
+        for(int i = 0, j = 0; i < value.length; i++){
+            hex[j++] = HEX_BYTES[(0xF0 & value[i]) >>> 4];
+            hex[j++] = HEX_BYTES[0x0F & value[i]];
+        }
+        digest256.update(hex);
+        String hash = Hex.toHexString(digest256.digest());
+
+        char[] plain = toHex().toCharArray();
+        char[] str = new char[hex.length + 2];
+        if (plain.length != str.length) {
+            throw new IllegalStateException("Hex representation has invalid length: " + plain.length + " != " + str.length);
+        }
+        str[0] = '0';
+        str[1] = 'x';
+        for (int i = 0; i < 40; i++) {
+            int dg = Character.digit(hash.charAt(i), 16);
+            if (dg > 7) {
+                str[i + 2] = Character.toUpperCase(plain[i + 2]);
+            } else {
+                str[i + 2] = plain[i + 2];
+            }
+        }
+        return new String(str);
+    }
+
+    @Override
+    public String toString() {
+        return toChecksumString();
     }
 
     /**

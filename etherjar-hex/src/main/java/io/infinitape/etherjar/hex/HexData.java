@@ -34,7 +34,7 @@ public class HexData {
 
     public final static HexData EMPTY = new HexData(new byte[0]);
 
-    final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
+    private final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
 
     /**
      * Combine an array of hex data into single instance.
@@ -94,7 +94,7 @@ public class HexData {
         return new HexData(buf);
     }
 
-    private final byte[] value;
+    protected final byte[] value;
 
     public HexData(byte[] value) {
         this(value, value.length);

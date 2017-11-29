@@ -22,7 +22,7 @@ class AddressSpec extends Specification {
 
     def "should parse address"() {
         expect:
-        Address.from(addr).toString() == addr
+        Address.from(addr).toHex() == addr
         Address.from(addr).bytes == bytes
 
         where:
@@ -84,5 +84,24 @@ class AddressSpec extends Specification {
         Address.from '0x0000000000015b23c7e20b0ea5ebd84c39dcbe6070'
         then:
         thrown(IllegalArgumentException)
+    }
+
+    def "toString makes valid checksum"() {
+        expect:
+        Address.from(source).toString() == checksumed
+        println Address.from(source).toString()
+
+        where:
+        source                                          | checksumed
+        '0x52908400098527886E0F7030069857D2E4169EE7'    | '0x52908400098527886E0F7030069857D2E4169EE7'
+        '0x52908400098527886e0f7030069857d2e4169ee7'    | '0x52908400098527886E0F7030069857D2E4169EE7'
+        '0xde709f2102306220921060314715629080e2fb77'    | '0xde709f2102306220921060314715629080e2fb77'
+        '0x5aaeb6053f3e94c9b9a09f33669435e7ef1beaed'    | '0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed'
+        '0x5a4eab120fb44eb6684e5e32785702ff45ea344d'    | '0x5A4EAB120fB44eb6684E5e32785702FF45ea344D'
+        '0x78fd860124d3b95fee2be3438c102c4fcbd32d88'    | '0x78fD860124D3B95fEe2Be3438C102C4fcBd32D88'
+        '0x24d3b95fee2be3438c102c4fcb78fd8601d32d86'    | '0x24d3B95FEE2bE3438c102c4fCB78Fd8601d32d86'
+        '0x24d3b95fee2be3438c102c4fcb78fd8601d32d87'    | '0x24d3b95fee2BE3438c102c4FcB78FD8601D32d87'
+        '0x24d3b95fee2be3438c102c4fcb78fd8601d32d88'    | '0x24D3B95fEe2Be3438C102c4fcB78Fd8601D32d88'
+        '0x24d3b95fee2be3438c102c4fcb78fd8601d32d89'    | '0x24d3B95fee2BE3438c102c4FcB78FD8601d32D89'
     }
 }
