@@ -16,11 +16,13 @@
 
 package io.infinitape.etherjar.rpc;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import io.infinitape.etherjar.rpc.json.FullResponseJson;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
 import io.infinitape.etherjar.rpc.json.TraceItemJson;
@@ -63,17 +65,27 @@ public class JacksonRpcConverter implements RpcConverter {
         if (TraceList.class.isAssignableFrom(target)) {
             return (T) fromJsonList(content, TraceItemJson.class);
         }
-        JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, target, idtype);
-        ResponseJson<T, X> responseJson = objectMapper.readerFor(type1).readValue(content);
+        JavaType type1 = objectMapper.getTypeFactory().constructParametricType(FullResponseJson.class, target, idtype);
+        FullResponseJson<T, X> responseJson = objectMapper.readerFor(type1).readValue(content);
+        if (responseJson.hasError()) {
+            RpcResponseError error = responseJson.getError();
+            throw new RpcException(error.getCode(), error.getMessage(), error.getData());
+        }
         return responseJson.getResult();
     }
 
     public <T> List<T> fromJsonList(InputStream content, Class<T> target) throws IOException {
         JavaType dataType = objectMapper.getTypeFactory().constructParametricType(List.class, target);
         JavaType idType = objectMapper.getTypeFactory().constructType(Integer.class);
-        JavaType type2 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, dataType, idType);
-        ResponseJson<List<T>, Object> responseJson = objectMapper.readerFor(type2).readValue(content);
+        JavaType type2 = objectMapper.getTypeFactory().constructParametricType(FullResponseJson.class, dataType, idType);
+        FullResponseJson<List<T>, Object> responseJson = objectMapper.readerFor(type2).readValue(content);
+        if (responseJson.hasError()) {
+            RpcResponseError error = responseJson.getError();
+            throw new RpcException(error.getCode(), error.getMessage(), error.getData());
+        }
         return responseJson.getResult();
     }
+
+
 
 }
