@@ -42,15 +42,17 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         blockJson.setHash(getBlockHash(node, "hash"));
         blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").longValue() * 1000L));
 
-        List txes = new ArrayList();
-        for (JsonNode tx: node.get("transactions")) {
-            if (tx.isObject()) {
-                txes.add(transactionJsonDeserializer.deserialize(tx));
-            } else {
-                txes.add(TransactionId.from(tx.textValue()));
+        if (node.has("transactions")) {
+            List txes = new ArrayList();
+            for (JsonNode tx: node.get("transactions")) {
+                if (tx.isObject()) {
+                    txes.add(transactionJsonDeserializer.deserialize(tx));
+                } else {
+                    txes.add(TransactionId.from(tx.textValue()));
+                }
             }
+            blockJson.setTransactions(txes);
         }
-        blockJson.setTransactions(txes);
 
         blockJson.setParentHash(getBlockHash(node, "parentHash"));
         blockJson.setSha3Uncles(getData(node, "sha3Uncles"));

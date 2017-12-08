@@ -390,4 +390,16 @@ class JacksonEthRpcConverterSpec extends Specification {
         then:
         act == "0x0000000000000000000000000000000000000000000000000000000000000000"
     }
+
+    def "Parse uncle"() {
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/uncle-e7b70b42.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.hash.toHex() == '0xa0437cab40119e21bc92d1ce5be52c89c64fa3b914489d51b4fe209a33ed31a5'
+        act.transactions == null
+    }
 }
