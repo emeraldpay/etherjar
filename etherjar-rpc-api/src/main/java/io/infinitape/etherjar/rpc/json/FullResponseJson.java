@@ -41,7 +41,7 @@ public class FullResponseJson<X, ID> {
     }
 
     public boolean hasError() {
-        return error != null || result == null;
+        return error != null;
     }
 
     public ResponseJson<X, ID> getResponseOnly() {
