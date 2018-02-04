@@ -66,7 +66,12 @@ public class JacksonRpcConverter implements RpcConverter {
             return (T) fromJsonList(content, TraceItemJson.class);
         }
         JavaType type1 = objectMapper.getTypeFactory().constructParametricType(FullResponseJson.class, target, idtype);
-        FullResponseJson<T, X> responseJson = objectMapper.readerFor(type1).readValue(content);
+        FullResponseJson<T, X> responseJson;
+        try {
+            responseJson = objectMapper.readerFor(type1).readValue(content);
+        } catch (IOException e) {
+            throw new RpcResponseException("Invalid response from RPC endpoint", e);
+        }
         if (responseJson.hasError()) {
             RpcResponseError error = responseJson.getError();
             throw new RpcException(error.getCode(), error.getMessage(), error.getData());
