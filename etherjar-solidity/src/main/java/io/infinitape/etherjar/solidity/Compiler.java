@@ -144,7 +144,6 @@ public class Compiler {
     public Result processCompiledResult(Path contractSource) throws IOException {
         Path dir = contractSource.getParent();
         List<String> errors = new ArrayList<>();
-        int offset = contractSource.getFileName().toString().length() + 1;
         List<CompiledContract> contracts = Files.list(dir).filter((f) ->
             f.getFileName().toString().endsWith(".bin")
         ).map((path -> {
@@ -171,7 +170,8 @@ public class Compiler {
                 errors.add(e.getMessage());
             }
 
-            return new CompiledContract(name.substring(offset), binData, json);
+            int filenameOffset = contractSource.getFileName().toString().lastIndexOf("/") + 1;
+            return new CompiledContract(name.substring(filenameOffset), binData, json);
         }).collect(Collectors.toList());
 
         Result result = new Result(true);
