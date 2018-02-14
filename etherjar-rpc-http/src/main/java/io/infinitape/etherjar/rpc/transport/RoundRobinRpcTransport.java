@@ -96,13 +96,13 @@ public class RoundRobinRpcTransport implements RpcTransport {
     public void revalidate() {
         validationLock.lock();
         try {
+            List<RpcTransport> transports = new ArrayList<>(knownHosts.size());
             for (URI uri: knownHosts) {
-                List<RpcTransport> transports = new ArrayList<>(knownHosts.size());
                 if (upstreamValidator.validate(uri)) {
                     transports.add(new DefaultRpcTransport(uri, rpcConverter, executorService));
                 }
-                active.set(transports);
             }
+            active.set(transports);
         } finally {
             validationLock.unlock();
         }
@@ -138,6 +138,7 @@ public class RoundRobinRpcTransport implements RpcTransport {
         private ExecutorService executorService;
         private List<URI> hosts;
         private Long validateSeconds;
+        private int minPeers = 3;
 
         public Builder hosts(List<String> knownHosts) throws URISyntaxException {
             List<URI> hosts = new ArrayList<>(knownHosts.size());
