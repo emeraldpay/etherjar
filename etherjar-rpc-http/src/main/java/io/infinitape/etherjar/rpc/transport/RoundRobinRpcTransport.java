@@ -162,11 +162,22 @@ public class RoundRobinRpcTransport implements RpcTransport {
             return this;
         }
 
+        public Builder minPeers(int minPeers) {
+            if (minPeers < 0) {
+                throw new IllegalArgumentException("minPeers can't be less than 0. Provided: " + minPeers);
+            }
+            this.minPeers = minPeers;
+            return this;
+        }
+
         public RoundRobinRpcTransport build() {
             if (executorService == null) {
                 executorService = Executors.newCachedThreadPool();
             }
             RoundRobinRpcTransport transport = new RoundRobinRpcTransport(hosts, executorService);
+            BasicUpstreamValidator upstreamValidator = new BasicUpstreamValidator();
+            upstreamValidator.setMinPeers(minPeers);
+            transport.setUpstreamValidator(upstreamValidator);
             if (validateSeconds != null) {
                 transport.startAutoValidation(validateSeconds, TimeUnit.SECONDS);
             }
