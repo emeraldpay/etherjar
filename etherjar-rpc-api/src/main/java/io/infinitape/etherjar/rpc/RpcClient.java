@@ -36,7 +36,7 @@ public interface RpcClient {
          * @return number of most recent block.
          * @throws IOException
          */
-        public CompletableFuture<Long> getBlockNumber() throws IOException;
+        public CompletableFuture<Long> getBlockNumber();
 
         /**
          *
@@ -45,7 +45,7 @@ public interface RpcClient {
          * @return balance of the account of given address.
          * @throws IOException
          */
-        public CompletableFuture<Wei> getBalance(Address address, BlockTag block) throws IOException;
+        public CompletableFuture<Wei> getBalance(Address address, BlockTag block);
 
         /**
          *
@@ -54,7 +54,7 @@ public interface RpcClient {
          * @return balance of the account of given address.
          * @throws IOException
          */
-        public CompletableFuture<Wei> getBalance(Address address, long block) throws IOException;
+        public CompletableFuture<Wei> getBalance(Address address, long block);
 
         /**
          *
@@ -63,7 +63,7 @@ public interface RpcClient {
          * @return information about a block
          * @throws IOException
          */
-        public CompletableFuture<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException;
+        public CompletableFuture<BlockJson> getBlock(long blockNumber, boolean includeTransactions);
 
         /**
          *
@@ -72,7 +72,7 @@ public interface RpcClient {
          * @return information about a block
          * @throws IOException
          */
-        public CompletableFuture<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) throws IOException;
+        public CompletableFuture<BlockJson> getBlock(BlockHash hash, boolean includeTransactions);
 
         /**
          *
@@ -80,7 +80,7 @@ public interface RpcClient {
          * @return information about a transaction
          * @throws IOException
          */
-        public CompletableFuture<TransactionJson> getTransaction(TransactionId hash) throws IOException;
+        public CompletableFuture<TransactionJson> getTransaction(TransactionId hash);
 
         /**
          *
@@ -89,7 +89,7 @@ public interface RpcClient {
          * @return information about a transaction
          * @throws IOException
          */
-        public CompletableFuture<TransactionJson> getTransaction(BlockHash block, long index) throws IOException;;
+        public CompletableFuture<TransactionJson> getTransaction(BlockHash block, long index);;
 
         /**
          *
@@ -99,7 +99,7 @@ public interface RpcClient {
          * @throws IOException
          */
 
-        public CompletableFuture<TransactionJson> getTransaction(long block, long index) throws IOException;;
+        public CompletableFuture<TransactionJson> getTransaction(long block, long index);;
 
         /**
          *
@@ -107,7 +107,7 @@ public interface RpcClient {
          * @return receipt of a transaction
          * @throws IOException
          */
-        public CompletableFuture<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException;
+        public CompletableFuture<TransactionReceiptJson> getTransactionReceipt(TransactionId hash);
 
         /**
          * Returns the number of transactions sent from an address.
@@ -116,7 +116,7 @@ public interface RpcClient {
          * @return
          * @throws IOException
          */
-        public CompletableFuture<Long> getTransactionCount(Address address, BlockTag block) throws IOException;
+        public CompletableFuture<Long> getTransactionCount(Address address, BlockTag block);
 
         /**
          * Returns the number of transactions sent from an address.
@@ -125,7 +125,7 @@ public interface RpcClient {
          * @return
          * @throws IOException
          */
-        public CompletableFuture<Long> getTransactionCount(Address address, long block) throws IOException;
+        public CompletableFuture<Long> getTransactionCount(Address address, long block);
 
         /**
          *
@@ -133,7 +133,7 @@ public interface RpcClient {
          * @return number of transactions in a block from a block matching the given block
          * @throws IOException
          */
-        public CompletableFuture<Long> getBlockTransactionCount(BlockHash block) throws IOException;
+        public CompletableFuture<Long> getBlockTransactionCount(BlockHash block);
 
         /**
          *
@@ -141,7 +141,7 @@ public interface RpcClient {
          * @return number of transactions in a block from a block matching the given block
          * @throws IOException
          */
-        public CompletableFuture<Long> getBlockTransactionCount(long block) throws IOException;
+        public CompletableFuture<Long> getBlockTransactionCount(long block);
 
         /**
          *
@@ -149,7 +149,7 @@ public interface RpcClient {
          * @return number of uncles in a block from a block matching the given block hash.
          * @throws IOException
          */
-        public CompletableFuture<Long> getUncleCount(BlockHash block) throws IOException;
+        public CompletableFuture<Long> getUncleCount(BlockHash block);
 
         /**
          *
@@ -157,7 +157,7 @@ public interface RpcClient {
          * @return number of uncles in a block from a block matching the given block number.
          * @throws IOException
          */
-        public CompletableFuture<Long> getUncleCount(long block) throws IOException;
+        public CompletableFuture<Long> getUncleCount(long block);
 
         /**
          *
@@ -166,7 +166,7 @@ public interface RpcClient {
          * @return uncle block
          * @throws IOException
          */
-        public CompletableFuture<BlockJson> getUncle(BlockHash block, long index) throws IOException;
+        public CompletableFuture<BlockJson> getUncle(BlockHash block, long index);
 
         /**
          *
@@ -175,7 +175,7 @@ public interface RpcClient {
          * @return uncle block
          * @throws IOException
          */
-        public CompletableFuture<BlockJson> getUncle(long block, long index) throws IOException;
+        public CompletableFuture<BlockJson> getUncle(long block, long index);
 
         /**
          *
@@ -184,7 +184,7 @@ public interface RpcClient {
          * @return code at a given address
          * @throws IOException
          */
-        public CompletableFuture<HexData> getCode(Address address, long block) throws IOException;
+        public CompletableFuture<HexData> getCode(Address address, long block);
 
         /**
          *
@@ -193,14 +193,14 @@ public interface RpcClient {
          * @return code at a given address
          * @throws IOException
          */
-        public CompletableFuture<HexData> getCode(Address address, BlockTag block) throws IOException;
+        public CompletableFuture<HexData> getCode(Address address, BlockTag block);
 
         /**
          *
          * @return the hash of the current block, the seedHash, and the boundary condition to be met ("target").
          * @throws IOException
          */
-        public CompletableFuture<HexData[]> getWork() throws IOException;
+        public CompletableFuture<HexData[]> getWork();
 
         /**
          * Used for submitting a proof-of-work solution.
@@ -210,7 +210,7 @@ public interface RpcClient {
          * @return true if the provided solution is valid, otherwise false.
          * @throws IOException
          */
-        public CompletableFuture<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException;
+        public CompletableFuture<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest);
 
         /**
          * Used for submitting mining hashrate.
@@ -219,44 +219,44 @@ public interface RpcClient {
          * @return true if submitting went through succesfully and false otherwise.
          * @throws IOException
          */
-        public CompletableFuture<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException;
+        public CompletableFuture<Boolean> submitHashrate(Hex32 hashrate, Hex32 id);
 
         /**
          * Returns the client getCoinbase address.
          * @return getCoinbase address
          * @throws IOException
          */
-        public CompletableFuture<Address> getCoinbase() throws IOException;
+        public CompletableFuture<Address> getCoinbase();
 
         /**
          * @return the number of hashes per second that the node is mining with.
          * @throws IOException
          */
-        public CompletableFuture<Long> getHashrate() throws IOException;
+        public CompletableFuture<Long> getHashrate();
 
         /**
          * @return true if client is actively mining new blocks.
          * @throws IOException
          */
-        public CompletableFuture<Boolean> isMining() throws IOException;
+        public CompletableFuture<Boolean> isMining();
 
         /**
          * @return the current price per gas in wei.
          * @throws IOException
          */
-        public CompletableFuture<Long> getGasPrice() throws IOException;
+        public CompletableFuture<Long> getGasPrice();
 
         /**
          * @return a list of addresses owned by client.
          * @throws IOException
          */
-        public CompletableFuture<Address[]> getAccounts() throws IOException;
+        public CompletableFuture<Address[]> getAccounts();
 
         /**
          * @return a list of available compilers in the client.
          * @throws IOException
          */
-        public CompletableFuture<String[]> getCompilers() throws IOException;
+        public CompletableFuture<String[]> getCompilers();
 
         /**
          * Executes a new message call immediately without creating a transaction on the block chain.
@@ -266,7 +266,7 @@ public interface RpcClient {
          * @return return value of executed contract
          * @throws IOException
          */
-        public CompletableFuture<HexData> call(TransactionCallJson call, BlockTag block) throws IOException;
+        public CompletableFuture<HexData> call(TransactionCallJson call, BlockTag block);
 
         /**
          * Creates new message call transaction or a contract creation, if the data.data field contains code.
@@ -275,7 +275,7 @@ public interface RpcClient {
          * @return transaction id
          * @throws IOException
          */
-        public CompletableFuture<TransactionId> sendTransaction(TransactionCallJson data) throws IOException;
+        public CompletableFuture<TransactionId> sendTransaction(TransactionCallJson data);
 
         /**
          * Creates new message call transaction or a contract creation for signed transactions
@@ -284,7 +284,7 @@ public interface RpcClient {
          * @return transaction id
          * @throws IOException
          */
-        public CompletableFuture<TransactionId> sendTransaction(HexData raw) throws IOException;
+        public CompletableFuture<TransactionId> sendTransaction(HexData raw);
 
         /**
          * Signs data with a given address.
@@ -295,12 +295,12 @@ public interface RpcClient {
          * @return signature
          * @throws IOException
          */
-        public CompletableFuture<HexData> sign(Address signer, HexData hash) throws IOException;
+        public CompletableFuture<HexData> sign(Address signer, HexData hash);
     }
 
     interface TraceCommands {
 
-        CompletableFuture<TraceList> getTransaction(TransactionId hash) throws IOException;
+        CompletableFuture<TraceList> getTransaction(TransactionId hash);
 
     }
 }

@@ -63,13 +63,13 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getBlockNumber() throws IOException {
+        public CompletableFuture<Long> getBlockNumber() {
             CompletableFuture<String> resp = transport.execute("eth_blockNumber", Collections.emptyList(), String.class);
             return extractor.extractLong(resp);
         }
 
         @Override
-        public CompletableFuture<Wei> getBalance(Address address, BlockTag block) throws IOException {
+        public CompletableFuture<Wei> getBalance(Address address, BlockTag block) {
             CompletableFuture<String> resp = transport.execute("eth_getBalance",
                 Arrays.asList(address.toHex(), block.getCode()),
                 String.class);
@@ -77,7 +77,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Wei> getBalance(Address address, long block) throws IOException {
+        public CompletableFuture<Wei> getBalance(Address address, long block) {
             CompletableFuture<String> resp = transport.execute("eth_getBalance",
                 Arrays.asList(address.toHex(), HexEncoding.toHex(block)),
                 String.class);
@@ -85,7 +85,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<BlockJson> getBlock(long blockNumber, boolean includeTransactions) throws IOException {
+        public CompletableFuture<BlockJson> getBlock(long blockNumber, boolean includeTransactions) {
             CompletableFuture<BlockJson> resp = transport.execute("eth_getBlockByNumber",
                 Arrays.asList(HexEncoding.toHex(blockNumber), includeTransactions),
                 BlockJson.class);
@@ -93,7 +93,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) throws IOException {
+        public CompletableFuture<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) {
             CompletableFuture<BlockJson> resp = transport.execute("eth_getBlockByHash",
                 Arrays.asList(hash.toHex(), includeTransactions),
                 BlockJson.class);
@@ -101,7 +101,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TransactionJson> getTransaction(TransactionId hash) throws IOException {
+        public CompletableFuture<TransactionJson> getTransaction(TransactionId hash) {
             CompletableFuture<TransactionJson> resp = transport.execute("eth_getTransactionByHash",
                 Collections.singletonList(hash.toHex()),
                 TransactionJson.class);
@@ -109,7 +109,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TransactionJson> getTransaction(BlockHash block, long index) throws IOException {
+        public CompletableFuture<TransactionJson> getTransaction(BlockHash block, long index) {
             CompletableFuture<TransactionJson> resp = transport.execute("eth_getTransactionByBlockHashAndIndex",
                 Arrays.asList(block.toHex(), HexEncoding.toHex(index)),
                 TransactionJson.class);
@@ -117,7 +117,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TransactionJson> getTransaction(long block, long index) throws IOException {
+        public CompletableFuture<TransactionJson> getTransaction(long block, long index) {
             CompletableFuture<TransactionJson> resp = transport.execute("eth_getTransactionByBlockNumberAndIndex",
                 Arrays.asList(HexEncoding.toHex(block), HexEncoding.toHex(index)),
                 TransactionJson.class);
@@ -125,7 +125,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) throws IOException {
+        public CompletableFuture<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) {
             CompletableFuture<TransactionReceiptJson> resp = transport.execute("eth_getTransactionReceipt",
                 Collections.singletonList(hash.toHex()),
                 TransactionReceiptJson.class);
@@ -133,7 +133,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getTransactionCount(Address address, BlockTag block) throws IOException {
+        public CompletableFuture<Long> getTransactionCount(Address address, BlockTag block) {
             CompletableFuture<String> resp = transport.execute("eth_getTransactionCount",
                 Arrays.asList(address.toHex(), block.getCode()),
                 String.class);
@@ -141,7 +141,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getTransactionCount(Address address, long block) throws IOException {
+        public CompletableFuture<Long> getTransactionCount(Address address, long block) {
             CompletableFuture<String> resp = transport.execute("eth_getTransactionCount",
                 Arrays.asList(address.toHex(), HexEncoding.toHex(block)),
                 String.class);
@@ -149,7 +149,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getBlockTransactionCount(BlockHash block) throws IOException {
+        public CompletableFuture<Long> getBlockTransactionCount(BlockHash block) {
             CompletableFuture<String> resp = transport.execute("eth_getBlockTransactionCountByHash",
                 Collections.singletonList(block.toHex()),
                 String.class);
@@ -157,7 +157,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getBlockTransactionCount(long block) throws IOException {
+        public CompletableFuture<Long> getBlockTransactionCount(long block) {
             CompletableFuture<String> resp = transport.execute("eth_getBlockTransactionCountByNumber",
                 Collections.singletonList(HexEncoding.toHex(block)),
                 String.class);
@@ -165,7 +165,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getUncleCount(BlockHash block) throws IOException {
+        public CompletableFuture<Long> getUncleCount(BlockHash block) {
             CompletableFuture<String> resp = transport.execute("eth_getUncleCountByBlockHash",
                 Collections.singletonList(block.toHex()),
                 String.class);
@@ -173,7 +173,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getUncleCount(long block) throws IOException {
+        public CompletableFuture<Long> getUncleCount(long block) {
             CompletableFuture<String> resp = transport.execute("eth_getUncleCountByBlockNumber",
                 Collections.singletonList(HexEncoding.toHex(block)),
                 String.class);
@@ -181,7 +181,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<BlockJson> getUncle(BlockHash block, long index) throws IOException {
+        public CompletableFuture<BlockJson> getUncle(BlockHash block, long index) {
             CompletableFuture<BlockJson> resp = transport.execute("eth_getUncleByBlockHashAndIndex",
                 Arrays.asList(block.toHex(), HexEncoding.toHex(index)),
                 BlockJson.class);
@@ -189,7 +189,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<BlockJson> getUncle(long block, long index) throws IOException {
+        public CompletableFuture<BlockJson> getUncle(long block, long index) {
             CompletableFuture<BlockJson> resp = transport.execute("eth_getUncleByBlockNumberAndIndex",
                 Arrays.asList(HexEncoding.toHex(block), HexEncoding.toHex(index)),
                 BlockJson.class);
@@ -197,7 +197,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<HexData> getCode(Address address, long block) throws IOException {
+        public CompletableFuture<HexData> getCode(Address address, long block) {
             CompletableFuture<String> resp = transport.execute("eth_getCode",
                 Arrays.asList(address.toHex(), HexEncoding.toHex(block)),
                 String.class);
@@ -205,7 +205,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<HexData> getCode(Address address, BlockTag block) throws IOException {
+        public CompletableFuture<HexData> getCode(Address address, BlockTag block) {
             CompletableFuture<String> resp = transport.execute("eth_getCode",
                 Arrays.asList(address.toHex(), block.getCode()),
                 String.class);
@@ -213,7 +213,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<HexData[]> getWork() throws IOException {
+        public CompletableFuture<HexData[]> getWork() {
             CompletableFuture<HexData[]> resp = transport.execute("eth_getWork",
                     Collections.emptyList(),
                     HexData[].class);
@@ -221,7 +221,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) throws IOException {
+        public CompletableFuture<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) {
             CompletableFuture<Boolean> resp = transport.execute("eth_submitWork",
                     Arrays.asList(nonce.toHex(), powHash.toHex(), digest.toHex()),
                     Boolean.class);
@@ -229,7 +229,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) throws IOException {
+        public CompletableFuture<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) {
             CompletableFuture<Boolean> resp = transport.execute("eth_submitHashrate",
                     Arrays.asList(hashrate.toHex(), id.toHex()),
                     Boolean.class);
@@ -237,7 +237,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Address> getCoinbase() throws IOException {
+        public CompletableFuture<Address> getCoinbase() {
             CompletableFuture<Address> resp = transport.execute("eth_coinbase",
                     Collections.emptyList(),
                     Address.class);
@@ -245,7 +245,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getHashrate() throws IOException {
+        public CompletableFuture<Long> getHashrate() {
             CompletableFuture<String> resp = transport.execute("eth_hashrate",
                     Collections.emptyList(),
                     String.class);
@@ -253,7 +253,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Boolean> isMining() throws IOException {
+        public CompletableFuture<Boolean> isMining() {
             CompletableFuture<Boolean> resp = transport.execute("eth_mining",
                     Collections.emptyList(),
                     Boolean.class);
@@ -261,7 +261,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Long> getGasPrice() throws IOException {
+        public CompletableFuture<Long> getGasPrice() {
             CompletableFuture<String> resp = transport.execute("eth_gasPrice",
                     Collections.emptyList(),
                     String.class);
@@ -269,7 +269,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<Address[]> getAccounts() throws IOException {
+        public CompletableFuture<Address[]> getAccounts() {
             CompletableFuture<Address[]> resp = transport.execute("eth_accounts",
                     Collections.emptyList(),
                     Address[].class);
@@ -277,7 +277,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<String[]> getCompilers() throws IOException {
+        public CompletableFuture<String[]> getCompilers() {
             CompletableFuture<String[]> resp = transport.execute("eth_getCompilers",
                     Collections.emptyList(),
                     String[].class);
@@ -285,7 +285,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<HexData> call(TransactionCallJson call, BlockTag block) throws IOException {
+        public CompletableFuture<HexData> call(TransactionCallJson call, BlockTag block) {
             CompletableFuture<String> resp = transport.execute("eth_call",
                 Arrays.asList(call, block.getCode()),
                 String.class);
@@ -293,7 +293,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TransactionId> sendTransaction(TransactionCallJson data) throws IOException {
+        public CompletableFuture<TransactionId> sendTransaction(TransactionCallJson data) {
             CompletableFuture<String> resp = transport.execute("eth_sendTransaction",
                 Collections.singletonList(data),
                 String.class);
@@ -301,7 +301,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TransactionId> sendTransaction(HexData raw) throws IOException {
+        public CompletableFuture<TransactionId> sendTransaction(HexData raw) {
             CompletableFuture<String> resp = transport.execute("eth_sendRawTransaction",
                 Collections.singletonList(raw.toHex()),
                 String.class);
@@ -309,7 +309,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<HexData> sign(Address signer, HexData hash) throws IOException {
+        public CompletableFuture<HexData> sign(Address signer, HexData hash) {
             CompletableFuture<String> resp = transport.execute("eth_sign",
                 Arrays.asList(signer.toHex(), hash.toHex()),
                 String.class);
@@ -328,7 +328,7 @@ public class DefaultRpcClient implements RpcClient {
         }
 
         @Override
-        public CompletableFuture<TraceList> getTransaction(TransactionId hash) throws IOException {
+        public CompletableFuture<TraceList> getTransaction(TransactionId hash) {
             CompletableFuture<TraceList> resp = transport.execute("trace_transaction",
                 Collections.singletonList(hash.toHex()),
                 TraceList.class);
