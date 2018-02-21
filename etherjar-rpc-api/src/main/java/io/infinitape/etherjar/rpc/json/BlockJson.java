@@ -59,7 +59,7 @@ public class BlockJson<T> {
     /**
      * the root of the transaction trie of the block.
      */
-    private TransactionId transactionsRoot;
+    private HexData transactionsRoot;
 
     /**
      * the root of the final state trie of the block.
@@ -163,11 +163,11 @@ public class BlockJson<T> {
         this.logsBloom = logsBloom;
     }
 
-    public TransactionId getTransactionsRoot() {
+    public HexData getTransactionsRoot() {
         return transactionsRoot;
     }
 
-    public void setTransactionsRoot(TransactionId transactionsRoot) {
+    public void setTransactionsRoot(HexData transactionsRoot) {
         this.transactionsRoot = transactionsRoot;
     }
 
