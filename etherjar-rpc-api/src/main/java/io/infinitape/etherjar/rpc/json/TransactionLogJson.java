@@ -22,10 +22,11 @@ import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.hex.HexData;
 
+import java.io.Serializable;
 import java.util.List;
 
 @JsonDeserialize(using = TransactionLogJsonDeserializer.class)
-public class TransactionLogJson {
+public class TransactionLogJson implements Serializable {
 
     /**
      * true when the log was removed, due to a chain reorganization. false if its a valid log.
@@ -145,5 +146,33 @@ public class TransactionLogJson {
 
     public void setTopics(List<HexData> topics) {
         this.topics = topics;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TransactionLogJson)) return false;
+
+        TransactionLogJson that = (TransactionLogJson) o;
+
+        if (removed != null ? !removed.equals(that.removed) : that.removed != null) return false;
+        if (logIndex != null ? !logIndex.equals(that.logIndex) : that.logIndex != null) return false;
+        if (transactionIndex != null ? !transactionIndex.equals(that.transactionIndex) : that.transactionIndex != null)
+            return false;
+        if (transactionHash != null ? !transactionHash.equals(that.transactionHash) : that.transactionHash != null)
+            return false;
+        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
+        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
+        if (address != null ? !address.equals(that.address) : that.address != null) return false;
+        if (data != null ? !data.equals(that.data) : that.data != null) return false;
+        return topics != null ? topics.equals(that.topics) : that.topics == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = logIndex != null ? logIndex.hashCode() : 0;
+        result = 31 * result + (transactionHash != null ? transactionHash.hashCode() : 0);
+        result = 31 * result + (blockHash != null ? blockHash.hashCode() : 0);
+        return result;
     }
 }

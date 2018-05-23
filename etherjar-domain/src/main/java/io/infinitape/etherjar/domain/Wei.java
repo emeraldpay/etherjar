@@ -18,6 +18,7 @@ package io.infinitape.etherjar.domain;
 
 import io.infinitape.etherjar.hex.HexData;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -26,7 +27,7 @@ import java.util.Objects;
 /**
  * Wei amount.
  */
-public class Wei {
+public class Wei implements Serializable {
 
     /**
      * Wei denomination units.

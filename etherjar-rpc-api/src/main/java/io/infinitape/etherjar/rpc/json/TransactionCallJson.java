@@ -21,10 +21,11 @@ import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.Wei;
 import io.infinitape.etherjar.hex.HexData;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 @JsonSerialize(using = TransactionCallJsonSerializer.class)
-public class TransactionCallJson {
+public class TransactionCallJson implements Serializable {
 
     private Address from;
     private Address to;

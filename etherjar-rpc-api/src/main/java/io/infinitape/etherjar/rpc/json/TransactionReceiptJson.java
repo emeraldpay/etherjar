@@ -21,11 +21,12 @@ import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
 @JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
-public class TransactionReceiptJson {
+public class TransactionReceiptJson implements Serializable {
 
     /**
      * hash of the transaction
@@ -129,5 +130,33 @@ public class TransactionReceiptJson {
 
     public void setLogs(List<TransactionLogJson> logs) {
         this.logs = logs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TransactionReceiptJson)) return false;
+
+        TransactionReceiptJson that = (TransactionReceiptJson) o;
+
+        if (transactionHash != null ? !transactionHash.equals(that.transactionHash) : that.transactionHash != null)
+            return false;
+        if (transactionIndex != null ? !transactionIndex.equals(that.transactionIndex) : that.transactionIndex != null)
+            return false;
+        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
+        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
+        if (cumulativeGasUsed != null ? !cumulativeGasUsed.equals(that.cumulativeGasUsed) : that.cumulativeGasUsed != null)
+            return false;
+        if (gasUsed != null ? !gasUsed.equals(that.gasUsed) : that.gasUsed != null) return false;
+        if (contractAddress != null ? !contractAddress.equals(that.contractAddress) : that.contractAddress != null)
+            return false;
+        return logs != null ? logs.equals(that.logs) : that.logs == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = transactionHash != null ? transactionHash.hashCode() : 0;
+        result = 31 * result + (blockHash != null ? blockHash.hashCode() : 0);
+        return result;
     }
 }

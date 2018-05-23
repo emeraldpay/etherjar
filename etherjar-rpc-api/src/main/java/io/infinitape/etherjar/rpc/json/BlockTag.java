@@ -16,7 +16,9 @@
 
 package io.infinitape.etherjar.rpc.json;
 
-public enum BlockTag {
+import java.io.Serializable;
+
+public enum BlockTag implements Serializable {
 
     LATEST("latest"), EARLIEST("earliest"), PENDING("pending");
 

@@ -23,11 +23,12 @@ import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.domain.Wei;
 import io.infinitape.etherjar.hex.HexData;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
 
 @JsonDeserialize(using = TraceItemJsonDeserializer.class)
-public class TraceItemJson {
+public class TraceItemJson implements Serializable {
 
     private TraceType type;
     private Action action;
@@ -120,7 +121,35 @@ public class TraceItemJson {
         this.transactionPosition = transactionPosition;
     }
 
-    public static class Action {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TraceItemJson)) return false;
+
+        TraceItemJson that = (TraceItemJson) o;
+
+        if (type != that.type) return false;
+        if (action != null ? !action.equals(that.action) : that.action != null) return false;
+        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
+        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
+        if (result != null ? !result.equals(that.result) : that.result != null) return false;
+        if (error != null ? !error.equals(that.error) : that.error != null) return false;
+        if (subtraces != null ? !subtraces.equals(that.subtraces) : that.subtraces != null) return false;
+        if (traceAddress != null ? !traceAddress.equals(that.traceAddress) : that.traceAddress != null) return false;
+        if (transactionHash != null ? !transactionHash.equals(that.transactionHash) : that.transactionHash != null)
+            return false;
+        return transactionPosition != null ? transactionPosition.equals(that.transactionPosition) : that.transactionPosition == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (blockHash != null ? blockHash.hashCode() : 0);
+        result = 31 * result + (transactionHash != null ? transactionHash.hashCode() : 0);
+        return result;
+    }
+
+    public static class Action implements Serializable {
 
         private CallType callType;
         private Address from;
@@ -212,6 +241,40 @@ public class TraceItemJson {
         public void setRefundAddress(Address refundAddress) {
             this.refundAddress = refundAddress;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Action)) return false;
+
+            Action action = (Action) o;
+
+            if (callType != action.callType) return false;
+            if (from != null ? !from.equals(action.from) : action.from != null) return false;
+            if (gas != null ? !gas.equals(action.gas) : action.gas != null) return false;
+            if (init != null ? !init.equals(action.init) : action.init != null) return false;
+            if (input != null ? !input.equals(action.input) : action.input != null) return false;
+            if (to != null ? !to.equals(action.to) : action.to != null) return false;
+            if (value != null ? !value.equals(action.value) : action.value != null) return false;
+            if (address != null ? !address.equals(action.address) : action.address != null) return false;
+            if (balance != null ? !balance.equals(action.balance) : action.balance != null) return false;
+            return refundAddress != null ? refundAddress.equals(action.refundAddress) : action.refundAddress == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = callType != null ? callType.hashCode() : 0;
+            result = 31 * result + (from != null ? from.hashCode() : 0);
+            result = 31 * result + (gas != null ? gas.hashCode() : 0);
+            result = 31 * result + (init != null ? init.hashCode() : 0);
+            result = 31 * result + (input != null ? input.hashCode() : 0);
+            result = 31 * result + (to != null ? to.hashCode() : 0);
+            result = 31 * result + (value != null ? value.hashCode() : 0);
+            result = 31 * result + (address != null ? address.hashCode() : 0);
+            result = 31 * result + (balance != null ? balance.hashCode() : 0);
+            result = 31 * result + (refundAddress != null ? refundAddress.hashCode() : 0);
+            return result;
+        }
     }
 
     public static enum CallType {
@@ -222,7 +285,7 @@ public class TraceItemJson {
         CREATE, CALL, SUICIDE;
     }
 
-    public static class Result {
+    public static class Result implements Serializable {
         private BigInteger gasUsed;
         private HexData output;
         private Address address;
@@ -258,6 +321,28 @@ public class TraceItemJson {
 
         public void setCode(HexData code) {
             this.code = code;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Result)) return false;
+
+            Result result = (Result) o;
+
+            if (gasUsed != null ? !gasUsed.equals(result.gasUsed) : result.gasUsed != null) return false;
+            if (output != null ? !output.equals(result.output) : result.output != null) return false;
+            if (address != null ? !address.equals(result.address) : result.address != null) return false;
+            return code != null ? code.equals(result.code) : result.code == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = gasUsed != null ? gasUsed.hashCode() : 0;
+            result = 31 * result + (output != null ? output.hashCode() : 0);
+            result = 31 * result + (address != null ? address.hashCode() : 0);
+            result = 31 * result + (code != null ? code.hashCode() : 0);
+            return result;
         }
     }
 

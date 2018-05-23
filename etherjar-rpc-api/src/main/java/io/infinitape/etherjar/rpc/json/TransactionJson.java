@@ -20,10 +20,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.domain.*;
 import io.infinitape.etherjar.hex.HexData;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 @JsonDeserialize(using = TransactionJsonDeserializer.class)
-public class TransactionJson {
+public class TransactionJson implements Serializable {
 
     /**
      * hash of the transaction
@@ -176,5 +177,34 @@ public class TransactionJson {
 
     public void setSignature(TransactionSignature signature) {
         this.signature = signature;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TransactionJson)) return false;
+
+        TransactionJson that = (TransactionJson) o;
+
+        if (hash != null ? !hash.equals(that.hash) : that.hash != null) return false;
+        if (nonce != null ? !nonce.equals(that.nonce) : that.nonce != null) return false;
+        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
+        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
+        if (transactionIndex != null ? !transactionIndex.equals(that.transactionIndex) : that.transactionIndex != null)
+            return false;
+        if (from != null ? !from.equals(that.from) : that.from != null) return false;
+        if (to != null ? !to.equals(that.to) : that.to != null) return false;
+        if (value != null ? !value.equals(that.value) : that.value != null) return false;
+        if (gasPrice != null ? !gasPrice.equals(that.gasPrice) : that.gasPrice != null) return false;
+        if (gas != null ? !gas.equals(that.gas) : that.gas != null) return false;
+        if (input != null ? !input.equals(that.input) : that.input != null) return false;
+        return signature != null ? signature.equals(that.signature) : that.signature == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = hash != null ? hash.hashCode() : 0;
+        result = 31 * result + (blockHash != null ? blockHash.hashCode() : 0);
+        return result;
     }
 }

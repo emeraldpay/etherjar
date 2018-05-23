@@ -22,12 +22,13 @@ import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.hex.HexData;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
 @JsonDeserialize(using = BlockJsonDeserializer.class)
-public class BlockJson<T> {
+public class BlockJson<T> implements Serializable {
 
     //TODO nonce or sealFields
 
@@ -265,5 +266,43 @@ public class BlockJson<T> {
 
     public void setUncles(List<BlockHash> uncles) {
         this.uncles = uncles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BlockJson)) return false;
+
+        BlockJson<?> blockJson = (BlockJson<?>) o;
+
+        if (number != null ? !number.equals(blockJson.number) : blockJson.number != null) return false;
+        if (hash != null ? !hash.equals(blockJson.hash) : blockJson.hash != null) return false;
+        if (parentHash != null ? !parentHash.equals(blockJson.parentHash) : blockJson.parentHash != null) return false;
+        if (sha3Uncles != null ? !sha3Uncles.equals(blockJson.sha3Uncles) : blockJson.sha3Uncles != null) return false;
+        if (logsBloom != null ? !logsBloom.equals(blockJson.logsBloom) : blockJson.logsBloom != null) return false;
+        if (transactionsRoot != null ? !transactionsRoot.equals(blockJson.transactionsRoot) : blockJson.transactionsRoot != null)
+            return false;
+        if (stateRoot != null ? !stateRoot.equals(blockJson.stateRoot) : blockJson.stateRoot != null) return false;
+        if (receiptsRoot != null ? !receiptsRoot.equals(blockJson.receiptsRoot) : blockJson.receiptsRoot != null)
+            return false;
+        if (miner != null ? !miner.equals(blockJson.miner) : blockJson.miner != null) return false;
+        if (difficulty != null ? !difficulty.equals(blockJson.difficulty) : blockJson.difficulty != null) return false;
+        if (totalDifficulty != null ? !totalDifficulty.equals(blockJson.totalDifficulty) : blockJson.totalDifficulty != null)
+            return false;
+        if (extraData != null ? !extraData.equals(blockJson.extraData) : blockJson.extraData != null) return false;
+        if (size != null ? !size.equals(blockJson.size) : blockJson.size != null) return false;
+        if (gasLimit != null ? !gasLimit.equals(blockJson.gasLimit) : blockJson.gasLimit != null) return false;
+        if (gasUsed != null ? !gasUsed.equals(blockJson.gasUsed) : blockJson.gasUsed != null) return false;
+        if (timestamp != null ? !timestamp.equals(blockJson.timestamp) : blockJson.timestamp != null) return false;
+        if (transactions != null ? !transactions.equals(blockJson.transactions) : blockJson.transactions != null)
+            return false;
+        return uncles != null ? uncles.equals(blockJson.uncles) : blockJson.uncles == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = number != null ? number.hashCode() : 0;
+        result = 31 * result + (hash != null ? hash.hashCode() : 0);
+        return result;
     }
 }

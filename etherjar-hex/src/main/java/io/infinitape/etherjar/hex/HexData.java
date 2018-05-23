@@ -18,6 +18,7 @@ package io.infinitape.etherjar.hex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,7 +31,7 @@ import java.util.stream.Stream;
 /**
  * Fixed size value, such as Wallet Address, represented in Hex.
  */
-public class HexData {
+public class HexData implements Serializable {
 
     public final static HexData EMPTY = new HexData(new byte[0]);
 
