@@ -22,6 +22,7 @@ import io.infinitape.etherjar.rpc.RpcConverter;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Basic upstream validator that verifies that upstream host is available (answer RPC requests) and is not in
@@ -103,10 +105,14 @@ public class BasicUpstreamValidator implements UpstreamValidator {
         boolean validSync = false;
         boolean validPeers = false;
 
+        RequestConfig config = RequestConfig.copy(RequestConfig.DEFAULT)
+                .setConnectTimeout((int) TimeUnit.SECONDS.toMillis(3)).build();
+
         RequestBuilder requestBuilder = RequestBuilder.create("POST")
             .setUri(uri)
             .addHeader("Content-Type", "application/json")
-            .setEntity(new ByteArrayEntity(CHECK_JSON));
+            .setEntity(new ByteArrayEntity(CHECK_JSON))
+            .setConfig(config);
 
         HttpResponse rcpResponse;
         try {
