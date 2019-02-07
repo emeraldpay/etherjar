@@ -35,9 +35,12 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
     @Override @SuppressWarnings("unchecked")
     public BlockJson deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        BlockJson blockJson = new BlockJson();
-
         JsonNode node = jp.readValueAsTree();
+        return deserialize(node);
+    }
+
+    public BlockJson deserialize(JsonNode node) {
+        BlockJson blockJson = new BlockJson();
         blockJson.setNumber(getQuantity(node, "number").longValue());
         blockJson.setHash(getBlockHash(node, "hash"));
         blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").longValue() * 1000L));
