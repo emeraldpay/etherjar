@@ -76,38 +76,60 @@ public class RoundRobinRpcTransport implements RpcTransport {
         this.upstreamValidator = upstreamValidator;
     }
 
+    public void setScheduler(ScheduledExecutorService scheduler) {
+        this.scheduler = scheduler;
+    }
+
     /**
      * Start automatic validation of upstream endpoints
      *
      * @param period the period between successive executions
      * @param unit the time unit of the initialDelay and period parameters
      */
-    public void startAutoValidation(long period, TimeUnit unit) {
+    public Future<Boolean> startAutoValidation(long period, TimeUnit unit) {
         if (scheduler == null) {
-            scheduler = Executors.newScheduledThreadPool(1);
+            scheduler = SchedulerInstance.getInstance();
         }
-        revalidate();
+
+        Future<Boolean> firstValidation = scheduler.submit(this::revalidate);
         scheduler.scheduleAtFixedRate(this::revalidate, period, period, unit);
+        return firstValidation;
     }
 
     /**
      * Revalidates all known endpoints
      */
-    public void revalidate() {
+    public boolean revalidate() {
         validationLock.lock();
         try {
             List<RpcTransport> transports = new ArrayList<>(knownHosts.size());
+            List<Future<URI>> validations = new ArrayList<>(knownHosts.size());
             for (URI uri: knownHosts) {
-                if (upstreamValidator.validate(uri)) {
+                Future<URI> f = executorService.submit(
+                        () -> upstreamValidator.validate(uri) ? uri : null
+                );
+                validations.add(f);
+            }
+            for (Future<URI> uriValidator: validations) {
+                URI uri = null;
+                try {
+                    uri = uriValidator.get();
+                } catch (Exception e) { }
+                if (uri != null) {
                     transports.add(new DefaultRpcTransport(uri, rpcConverter, executorService));
                 }
             }
             active.set(transports);
+            return transports.size() > 0;
         } finally {
             validationLock.unlock();
         }
     }
 
+    public boolean hasUpstreams() {
+        List<RpcTransport> transports = active.get();
+        return !transports.isEmpty();
+    }
 
     public RpcTransport next() {
         List<RpcTransport> transports = active.get();
@@ -136,6 +158,7 @@ public class RoundRobinRpcTransport implements RpcTransport {
 
     static class Builder {
         private ExecutorService executorService;
+        private ScheduledExecutorService scheduler;
         private List<URI> hosts;
         private Long validateSeconds;
         private int minPeers = 3;
@@ -151,6 +174,11 @@ public class RoundRobinRpcTransport implements RpcTransport {
 
         public Builder executor(ExecutorService executorService) {
             this.executorService = executorService;
+            return this;
+        }
+
+        public Builder scheduler(ScheduledExecutorService scheduler) {
+            this.scheduler = scheduler;
             return this;
         }
 
@@ -178,11 +206,23 @@ public class RoundRobinRpcTransport implements RpcTransport {
             BasicUpstreamValidator upstreamValidator = new BasicUpstreamValidator();
             upstreamValidator.setMinPeers(minPeers);
             transport.setUpstreamValidator(upstreamValidator);
+            transport.setScheduler(scheduler);
             if (validateSeconds != null) {
                 transport.startAutoValidation(validateSeconds, TimeUnit.SECONDS);
             }
             return transport;
         }
 
+    }
+
+    private static class SchedulerInstance {
+        private static ScheduledExecutorService instance;
+
+        public static synchronized ScheduledExecutorService getInstance() {
+            if (instance == null) {
+                instance = Executors.newScheduledThreadPool(1);
+            }
+            return instance;
+        }
     }
 }
