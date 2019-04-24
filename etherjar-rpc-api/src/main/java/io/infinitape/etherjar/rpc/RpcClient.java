@@ -63,7 +63,7 @@ public interface RpcClient {
          * @return information about a block
          * @throws IOException
          */
-        public CompletableFuture<BlockJson> getBlock(long blockNumber, boolean includeTransactions);
+        public <X> CompletableFuture<BlockJson<X>> getBlock(long blockNumber, boolean includeTransactions);
 
         /**
          *
@@ -72,7 +72,7 @@ public interface RpcClient {
          * @return information about a block
          * @throws IOException
          */
-        public CompletableFuture<BlockJson> getBlock(BlockHash hash, boolean includeTransactions);
+        public <X> CompletableFuture<BlockJson<X>> getBlock(BlockHash hash, boolean includeTransactions);
 
         /**
          *
