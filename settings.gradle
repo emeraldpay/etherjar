@@ -16,8 +16,7 @@
 
 rootProject.name = 'etherjar'
 
-include(
-    "etherjar-abi",
+include "etherjar-abi",
     "etherjar-crypto",
     "etherjar-domain",
     "etherjar-hex",
@@ -26,4 +25,4 @@ include(
     "etherjar-rpc-http",
     "etherjar-solidity",
     "etherjar-web3"
-)
+
