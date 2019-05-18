@@ -56,6 +56,10 @@ public class JacksonRpcConverter implements RpcConverter {
         return objectMapper;
     }
 
+    public String toJson(ResponseJson response) throws JsonProcessingException {
+        return objectMapper.writer().writeValueAsString(response);
+    }
+
     public String toJson(RequestJson request) throws JsonProcessingException {
         return objectMapper.writer().writeValueAsString(request);
     }

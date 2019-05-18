@@ -17,6 +17,7 @@
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
@@ -28,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 @JsonDeserialize(using = BlockJsonDeserializer.class)
+@JsonSerialize(using = BlockJsonSerializer.class)
 public class BlockJson<T> implements Serializable {
 
     //TODO nonce or sealFields

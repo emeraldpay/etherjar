@@ -17,6 +17,7 @@
 package io.infinitape.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.domain.*;
 import io.infinitape.etherjar.hex.HexData;
 
@@ -24,6 +25,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 @JsonDeserialize(using = TransactionJsonDeserializer.class)
+@JsonSerialize(using = TransactionJsonSerializer.class)
 public class TransactionJson implements Serializable {
 
     /**
@@ -60,6 +62,11 @@ public class TransactionJson implements Serializable {
      * address of the receiver. null when its a contract creation transaction.
      */
     private Address to;
+
+    /**
+     * Address of a contract created from that transaction
+     */
+    private Address creates;
 
     /**
      * value transferred in Wei.
@@ -179,6 +186,14 @@ public class TransactionJson implements Serializable {
         this.signature = signature;
     }
 
+    public Address getCreates() {
+        return creates;
+    }
+
+    public void setCreates(Address creates) {
+        this.creates = creates;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -198,6 +213,7 @@ public class TransactionJson implements Serializable {
         if (gasPrice != null ? !gasPrice.equals(that.gasPrice) : that.gasPrice != null) return false;
         if (gas != null ? !gas.equals(that.gas) : that.gas != null) return false;
         if (input != null ? !input.equals(that.input) : that.input != null) return false;
+        if (creates != null ? !creates.equals(that.creates) : that.creates != null) return false;
         return signature != null ? signature.equals(that.signature) : that.signature == null;
     }
 
