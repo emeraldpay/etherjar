@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.infinitape.etherjar.rlp;
 
-rootProject.name = 'etherjar'
+public enum RlpType {
 
-include "etherjar-abi",
-    "etherjar-crypto",
-    "etherjar-domain",
-    "etherjar-hex",
-    "etherjar-keystore",
-    "etherjar-rlp",
-    "etherjar-rpc-api",
-    "etherjar-rpc-http",
-    "etherjar-solidity",
-    "etherjar-web3"
+    BYTES,
+    LIST,
+    INVALID,
+    NONE;
 
+}
