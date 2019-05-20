@@ -15,6 +15,7 @@
  */
 package io.infinitape.etherjar.rlp
 
+import io.infinitape.etherjar.domain.Address
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
@@ -206,6 +207,55 @@ class RlpReaderSpec extends Specification {
         !list32.hasNext()
         !list3.hasNext()
         !list.hasNext()
+    }
+
+    def "read transaction 0x19442f"() {
+        setup:
+        def tx = Hex.decodeHex("f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b")
+        when:
+        def rdr = new RlpReader(tx)
+
+        then:
+        rdr.hasNext()
+        rdr.type == RlpType.LIST
+
+        when:
+        rdr = rdr.nextList()
+
+        then:
+        //nonce
+        rdr.type == RlpType.BYTES
+        rdr.nextLong() == 15524
+        //gasprice
+        rdr.type == RlpType.BYTES
+        rdr.nextBigInt().toString(16) == "59b9b95f0"
+        //gas
+        rdr.nextLong() == 0x03d090
+        rdr.type == RlpType.BYTES
+        //to
+        rdr.type == RlpType.BYTES
+        Address.from(rdr.next()).toHex() == "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac"
+        //value
+        rdr.type == RlpType.BYTES
+        rdr.nextBigInt().toString() == "0"
+        //data
+        rdr.type == RlpType.BYTES
+        rdr.nextBigInt().toString(16) == "667a2f58"
+        //v
+        rdr.hasNext()
+        rdr.type == RlpType.BYTES
+        rdr.nextInt() == 28
+        //r
+        rdr.hasNext()
+        rdr.type == RlpType.BYTES
+        rdr.nextBigInt().toString(16) == "d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64"
+        //s
+        rdr.hasNext()
+        rdr.type == RlpType.BYTES
+        rdr.nextBigInt().toString(16) == "39837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b"
+
+        !rdr.hasNext()
+        rdr.consumed
     }
 
 }
