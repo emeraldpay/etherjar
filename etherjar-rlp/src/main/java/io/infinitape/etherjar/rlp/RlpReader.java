@@ -15,6 +15,7 @@
  */
 package io.infinitape.etherjar.rlp;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 /**
@@ -211,7 +212,7 @@ public class RlpReader {
     public long nextLong() {
         byte[] decoded = next();
         if (decoded.length == 0) {
-            throw new IllegalStateException("Empty element");
+            return 0;
         }
         if (decoded.length > 8) {
             throw new IllegalArgumentException("Input is too long. Has " + decoded.length + " bytes. Max accepted is 8 bytes");
@@ -231,7 +232,7 @@ public class RlpReader {
     public int nextInt() {
         byte[] decoded = next();
         if (decoded.length == 0) {
-            throw new IllegalStateException("Empty element");
+            return 0;
         }
         if (decoded.length > 4) {
             throw new IllegalArgumentException("Input is too long. Has " + decoded.length + " bytes. Max accepted is 4 bytes");
@@ -239,6 +240,21 @@ public class RlpReader {
         byte[] buf = new byte[4];
         System.arraycopy(decoded, 0, buf, 4 - decoded.length, decoded.length);
         return ByteBuffer.wrap(buf).getInt();
+    }
+
+    /**
+     * Read next element as a BigInteger. Please not that it always thread input as an unsigned value, i.e. it's
+     * always positing
+     *
+     * @return next element as a BigInteger
+     * @throws IllegalStateException if RLP element is empty
+     */
+    public BigInteger nextBigInt() {
+        byte[] decoded = next();
+        if (decoded.length == 0) {
+            return BigInteger.ZERO;
+        }
+        return new BigInteger(1, decoded);
     }
 
     /**
