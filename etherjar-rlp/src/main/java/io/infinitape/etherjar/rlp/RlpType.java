@@ -15,11 +15,29 @@
  */
 package io.infinitape.etherjar.rlp;
 
+/**
+ * Type of an element
+ */
 public enum RlpType {
 
+    /**
+     * Standard bytes. Can be converted into a String, number, etc.
+     */
     BYTES,
+
+    /**
+     * List of elements, binary representation parsed as RLP input
+     */
     LIST,
+
+    /**
+     * Invalid element, cannot be parsed correctly
+     */
     INVALID,
+
+    /**
+     * No element
+     */
     NONE;
 
 }

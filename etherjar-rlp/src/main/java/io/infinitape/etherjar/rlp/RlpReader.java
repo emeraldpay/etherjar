@@ -18,6 +18,8 @@ package io.infinitape.etherjar.rlp;
 import java.nio.ByteBuffer;
 
 /**
+ * RLP (Recursive Length Prefix) encoding reader
+ *
  * @link https://github.com/ethereum/wiki/wiki/RLP#rlp-decoding
  */
 public class RlpReader {
@@ -28,11 +30,23 @@ public class RlpReader {
     private int position = 0;
     private int limit;
 
+    /**
+     * Read from provided input
+     *
+     * @param input RLP encoded data
+     */
     public RlpReader(byte[] input) {
         this.input = input;
         this.limit = input.length;
     }
 
+    /**
+     * Read from provided input
+     *
+     * @param input RLP encoded data
+     * @param position position to start parsing
+     * @param length total length of RLP encoded data in provided input
+     */
     public RlpReader(byte[] input, int position, int length) {
         this.input = input;
         this.position = position;
@@ -99,7 +113,7 @@ public class RlpReader {
             throw new IllegalStateException("Incorrect RLP. Must be: " + (position + length) + " bytes long. Has " + input.length + " bytes");
         }
         if (buf.length < bufPosition + length) {
-            throw new IllegalArgumentException("Buffer is too small. Required to real " + length + " bytes (after " + bufPosition + "), has " + buf.length + " bytes buffer");
+            throw new IllegalArgumentException("Buffer is too small. Required to read " + length + " bytes (after " + bufPosition + "), has " + buf.length + " bytes buffer");
         }
         System.arraycopy(input, position, buf, bufPosition, length);
         position += length;
@@ -119,6 +133,10 @@ public class RlpReader {
         return value;
     }
 
+    /**
+     *
+     * @return true if input is read fulluy
+     */
     public boolean isConsumed() {
         return position >= limit;
     }
@@ -129,11 +147,21 @@ public class RlpReader {
         }
     }
 
+    /**
+     *
+     * @return true if RLP input has more data to read
+     */
     public boolean hasNext() {
         tryRead();
         return current != null && current.type != RlpType.NONE;
     }
 
+    /**
+     * Read next element as bytes
+     *
+     * @return byte[] data for the next element
+     * @throws IllegalStateException if fully read
+     */
     public byte[] next() {
         tryRead();
         if (current == null) {
@@ -144,6 +172,10 @@ public class RlpReader {
         return data;
     }
 
+    /**
+     *
+     * @return type of the next element
+     */
     public RlpType getType() {
         tryRead();
         if (current != null) {
@@ -152,28 +184,48 @@ public class RlpReader {
         return RlpType.NONE;
     }
 
+    /**
+     * Skip next element
+     */
     public void skip() {
         tryRead();
         current = null;
     }
 
+    /**
+     * Read next element as String
+     *
+     * @return next element converted to String
+     */
     public String nextString() {
         return new String(next());
     }
 
+    /**
+     * Read next element as a number.
+     *
+     * @return next element as a number
+     * @throws IllegalArgumentException if element size is larger that 8 bytes, i.e. cannot fit into a long
+     * @throws IllegalStateException if RLP element is empty
+     */
     public long nextNumber() {
         byte[] decoded = next();
         if (decoded.length == 0) {
-            return 0;
+            throw new IllegalStateException("Empty element");
         }
         if (decoded.length > 8) {
-            throw new IllegalArgumentException("Input is too long. Has " + decoded.length + " bytes. Max accepted 8 bytes");
+            throw new IllegalArgumentException("Input is too long. Has " + decoded.length + " bytes. Max accepted is 8 bytes");
         }
         byte[] buf = new byte[8];
         System.arraycopy(decoded, 0, buf, 8 - decoded.length, decoded.length);
         return ByteBuffer.wrap(buf).getLong();
     }
 
+    /**
+     * Read next element as a list
+     *
+     * @return new RlpReader for the list
+     */
     public RlpReader nextList() {
         tryRead();
         if (current == null) {
