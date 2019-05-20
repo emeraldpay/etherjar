@@ -202,13 +202,13 @@ public class RlpReader {
     }
 
     /**
-     * Read next element as a number.
+     * Read next element as a long number.
      *
-     * @return next element as a number
+     * @return next element as a long
      * @throws IllegalArgumentException if element size is larger that 8 bytes, i.e. cannot fit into a long
      * @throws IllegalStateException if RLP element is empty
      */
-    public long nextNumber() {
+    public long nextLong() {
         byte[] decoded = next();
         if (decoded.length == 0) {
             throw new IllegalStateException("Empty element");
@@ -219,6 +219,26 @@ public class RlpReader {
         byte[] buf = new byte[8];
         System.arraycopy(decoded, 0, buf, 8 - decoded.length, decoded.length);
         return ByteBuffer.wrap(buf).getLong();
+    }
+
+    /**
+     * Read next element as a int number.
+     *
+     * @return next element as an int
+     * @throws IllegalArgumentException if element size is larger that 4 bytes, i.e. cannot fit into an int
+     * @throws IllegalStateException if RLP element is empty
+     */
+    public int nextInt() {
+        byte[] decoded = next();
+        if (decoded.length == 0) {
+            throw new IllegalStateException("Empty element");
+        }
+        if (decoded.length > 4) {
+            throw new IllegalArgumentException("Input is too long. Has " + decoded.length + " bytes. Max accepted is 4 bytes");
+        }
+        byte[] buf = new byte[4];
+        System.arraycopy(decoded, 0, buf, 4 - decoded.length, decoded.length);
+        return ByteBuffer.wrap(buf).getInt();
     }
 
     /**

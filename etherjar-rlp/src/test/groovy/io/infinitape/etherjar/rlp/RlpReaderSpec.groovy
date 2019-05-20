@@ -67,7 +67,26 @@ class RlpReaderSpec extends Specification {
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
-        act.nextNumber() == 0
+        act.nextLong() == 0
+        !act.hasNext()
+        act.consumed
+
+        when:
+        act = new RlpReader(Hex.decodeHex("00"))
+        then:
+        act.hasNext()
+        act.getType() == RlpType.BYTES
+        act.nextInt() == 0
+        !act.hasNext()
+        act.consumed
+
+
+        when:
+        act = new RlpReader(Hex.decodeHex("0f"))
+        then:
+        act.hasNext()
+        act.getType() == RlpType.BYTES
+        act.nextLong() == 15
         !act.hasNext()
         act.consumed
 
@@ -76,7 +95,7 @@ class RlpReaderSpec extends Specification {
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
-        act.nextNumber() == 15
+        act.nextInt() == 15
         !act.hasNext()
         act.consumed
 
@@ -85,7 +104,16 @@ class RlpReaderSpec extends Specification {
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
-        act.nextNumber() == 1024
+        act.nextLong() == 1024
+        !act.hasNext()
+        act.consumed
+
+        when:
+        act = new RlpReader(Hex.decodeHex("820400"))
+        then:
+        act.hasNext()
+        act.getType() == RlpType.BYTES
+        act.nextInt() == 1024
         !act.hasNext()
         act.consumed
 
