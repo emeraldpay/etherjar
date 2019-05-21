@@ -33,7 +33,7 @@ class RlpWriterSpec extends Specification {
         Hex.encodeHexString(act)  == "83646f67"
     }
 
-    def "Official examples - bytes - [ \"cat\", \"dog\" ]"() {
+    def "Official examples - list - cat, dog"() {
         when:
         def wrt = new RlpWriter()
         def act = wrt.startList()

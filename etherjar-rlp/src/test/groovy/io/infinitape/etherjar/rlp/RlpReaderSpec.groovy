@@ -23,8 +23,7 @@ import java.nio.ByteBuffer
 
 class RlpReaderSpec extends Specification {
 
-    // https://github.com/ethereum/wiki/wiki/RLP#rlp-decoding
-    def "Official examples - bytes"() {
+    def "Official examples - bytes - dog"() {
         when:
         // [0x83, 'd', 'o', 'g']
         def act = new RlpReader(Hex.decodeHex("83646f67"))
@@ -44,9 +43,11 @@ class RlpReaderSpec extends Specification {
         act.nextString() == 'dog'
         !act.hasNext()
         act.consumed
+    }
 
+    def "Official examples - bytes - empty string"() {
         when:
-        act = new RlpReader(Hex.decodeHex("80"))
+        def act = new RlpReader(Hex.decodeHex("80"))
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
@@ -62,9 +63,11 @@ class RlpReaderSpec extends Specification {
         act.nextString() == ''
         !act.hasNext()
         act.consumed
+    }
 
+    def "Official examples - bytes - integer 0"() {
         when:
-        act = new RlpReader(Hex.decodeHex("00"))
+        def act = new RlpReader(Hex.decodeHex("00"))
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
@@ -80,10 +83,11 @@ class RlpReaderSpec extends Specification {
         act.nextInt() == 0
         !act.hasNext()
         act.consumed
+    }
 
-
+    def "Official examples - bytes - integer 15"() {
         when:
-        act = new RlpReader(Hex.decodeHex("0f"))
+        def act = new RlpReader(Hex.decodeHex("0f"))
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
@@ -99,9 +103,11 @@ class RlpReaderSpec extends Specification {
         act.nextInt() == 15
         !act.hasNext()
         act.consumed
+    }
 
+    def "Official examples - bytes - integer 1024"() {
         when:
-        act = new RlpReader(Hex.decodeHex("820400"))
+        def act = new RlpReader(Hex.decodeHex("820400"))
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
@@ -117,17 +123,37 @@ class RlpReaderSpec extends Specification {
         act.nextInt() == 1024
         !act.hasNext()
         act.consumed
+    }
 
+    def "Official examples - bytes - lorem ipsum"() {
         when:
         byte[] str = "Lorem ipsum dolor sit amet, consectetur adipisicing elit".getBytes()
         def buf = ByteBuffer.allocate(2 + str.length).put(Hex.decodeHex("b838")).put(str)
-        act = new RlpReader(buf.array())
+        def act = new RlpReader(buf.array())
         then:
         act.hasNext()
         act.getType() == RlpType.BYTES
         act.nextString() == "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
         !act.hasNext()
         act.consumed
+    }
+
+    def "Official examples - list - cat, dog"() {
+        when:
+        def act = new RlpReader(Hex.decodeHex("c88363617483646f67"))
+        then:
+        act.hasNext()
+        act.type == RlpType.LIST
+
+        when:
+        act = act.nextList()
+
+        then:
+        act.hasNext()
+        act.nextString() == "cat"
+        act.hasNext()
+        act.nextString() == "dog"
+        !act.hasNext()
     }
 
     def "Official examples - list"() {
@@ -209,7 +235,7 @@ class RlpReaderSpec extends Specification {
         !list.hasNext()
     }
 
-    def "read transaction 0x19442f"() {
+    def "Read transaction 0x19442f"() {
         setup:
         def tx = Hex.decodeHex("f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b")
         when:
