@@ -2,20 +2,18 @@
 
 [![Build Status](https://travis-ci.org/Infinitape/etherjar.svg?branch=master)](https://travis-ci.org/Infinitape/etherjar)
 [![codecov](https://codecov.io/gh/Infinitape/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/Infinitape/etherjar)
-[![Maven Central](https://img.shields.io/maven-central/v/io.infinitape/etherjar.svg)](https://mvnrepository.com/artifact/io.infinitape/etherjar)
-[![Javadocs](https://www.javadoc.io/badge/io.infinitape/etherjar.svg)](https://www.javadoc.io/doc/io.infinitape/etherjar)
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
 
-Framework agnostic modular Java 8+ integration library for [Ethereum blockchain](https://www.ethereum.org),
-including [Ethereum Classic](https://ethereumclassic.github.io/) support.
+Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
 ## Architecture
 
-* [ ] High-level [web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API (_in progress_)
+* [ ] High-level [web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API)-like Java 8 API (_in progress_)
 * [x] Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
 * [x] Transport data-layer 
-  * [ ] IPC (_not implemented yet_)
+  * [ ] IPC (_not implemented yet_)  
   * [x] HTTP
+  * [ ] WebSockets (_in progress_)
 
 ## Modules
 
@@ -30,6 +28,7 @@ Structure of dependencies between modules:
   * `etherjar-keystore`
     * `etherjar-domain`
     * `etherjar-hex`
+  * `etherjar-rlp`  
   * `etherjar-rpc-http`
     * `etherjar-rpc-api`
       * `etherjar-domain`
@@ -45,6 +44,7 @@ where
 * `etherjar-domain` - Core module contains pure domain logic (`Address`, `Block`, `Transaction`, `Wei` and so on)
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
 * `etherjar-keystore` - Keystore files (UTC / JSON) encrypted with a passphrase
+* `etherjar-rlp` - Reading and writing RLP (Recursive Length Prefix) encoded data 
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
 * `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)  
@@ -57,15 +57,15 @@ where
 ```xml
 <dependency>
   <groupId>io.infinitape</groupId>
-  <artifactId>etherjar-web3</artifactId>
-  <version>1.0.0.M1</version>
+  <artifactId>etherjar-rpc-http</artifactId>
+  <version>0.5.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-compile 'io.infinitape:etherjar-web3:1.0.0.M1'
+compile 'io.infinitape:etherjar-rpc-http:0.5.0'
 ```
 
 ## Examples
@@ -109,11 +109,6 @@ public class Main {
 ## Bugs and Feedback
 
 For bugs, questions and discussions please use the [GitHub Issues](https://github.com/Infinitape/etherjar/issues).
-
-## Thanks to
-
-* [JetBrains](https://www.jetbrains.com) for [IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/) free open-source license.
-* [![Logo of YourKit](https://www.yourkit.com/images/yklogo.png)](https://www.yourkit.com) for [full-featured YourKit Java Profiler](https://www.yourkit.com/java/profiler/) free open-source license.
 
 ## Licence
 
