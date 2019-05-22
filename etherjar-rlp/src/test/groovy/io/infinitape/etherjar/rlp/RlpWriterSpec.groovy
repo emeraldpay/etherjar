@@ -154,4 +154,24 @@ class RlpWriterSpec extends Specification {
         then:
         Hex.encodeHexString(act) == "f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b"
     }
+
+    def "Write transaction 0x19442f - not chained call"() {
+        when:
+        def wrt = new RlpWriter()
+        wrt.startList()
+        wrt.write(15524) //nonce
+        wrt.write(new BigInteger("59b9b95f0", 16)) //gas price
+        wrt.write(0x03d090) // gas
+        wrt.write(Address.from("0x8b3b3b624c3c0397d3da8fd861512393d51dcbac").bytes) // to
+        wrt.write(0) // value
+        wrt.write(HexData.from("0x667a2f58").bytes) //data
+        wrt.write(28) // v
+        wrt.write(new BigInteger("d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64", 16)) //r
+        wrt.write(new BigInteger("39837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b", 16)) //s
+        wrt.closeList()
+        def act = wrt.toByteArray()
+
+        then:
+        Hex.encodeHexString(act) == "f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b"
+    }
 }

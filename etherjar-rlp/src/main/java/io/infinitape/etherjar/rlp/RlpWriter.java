@@ -36,11 +36,6 @@ public class RlpWriter {
         buffer = new ByteArrayOutputStream();
     }
 
-    private RlpWriter(LinkedList<ByteArrayOutputStream> parent) {
-        levels = parent;
-        buffer = new ByteArrayOutputStream();
-    }
-
     /**
      * Start a new list, must be closed after all data is written.
      *
@@ -49,7 +44,8 @@ public class RlpWriter {
      */
     public RlpWriter startList() {
         levels.push(buffer);
-        return new RlpWriter(this.levels);
+        buffer = new ByteArrayOutputStream();
+        return this;
     }
 
     /**
