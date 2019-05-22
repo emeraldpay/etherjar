@@ -75,6 +75,13 @@ class RlpWriterSpec extends Specification {
         act = wrt.toByteArray()
         then:
         Hex.encodeHexString(act)  == "80"
+
+        when:
+        wrt = new RlpWriter()
+        wrt.write(BigInteger.ZERO)
+        act = wrt.toByteArray()
+        then:
+        Hex.encodeHexString(act)  == "80"
     }
 
     def "Official examples - bytes - integer 15"() {
@@ -91,6 +98,13 @@ class RlpWriterSpec extends Specification {
         act = wrt.toByteArray()
         then:
         Hex.encodeHexString(act)  == "0f"
+
+        when:
+        wrt = new RlpWriter()
+        wrt.write(BigInteger.valueOf(15))
+        act = wrt.toByteArray()
+        then:
+        Hex.encodeHexString(act)  == "0f"
     }
 
     def "Official examples - bytes - integer 1024"() {
@@ -104,6 +118,13 @@ class RlpWriterSpec extends Specification {
         when:
         wrt = new RlpWriter()
         wrt.write(1024L)
+        act = wrt.toByteArray()
+        then:
+        Hex.encodeHexString(act)  == "820400"
+
+        when:
+        wrt = new RlpWriter()
+        wrt.write(BigInteger.valueOf(1024))
         act = wrt.toByteArray()
         then:
         Hex.encodeHexString(act)  == "820400"

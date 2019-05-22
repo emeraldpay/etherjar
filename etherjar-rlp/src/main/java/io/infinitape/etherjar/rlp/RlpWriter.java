@@ -197,7 +197,7 @@ public class RlpWriter {
      */
     protected byte[] shorten(byte[] value) {
         int pos = 0;
-        while (value[pos] == 0) pos++;
+        while (pos < value.length && value[pos] == 0) pos++;
         if (pos == 0) {
             return value;
         }
