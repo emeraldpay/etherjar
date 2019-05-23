@@ -96,11 +96,14 @@ public class Signature {
     /**
      * Recovers address that signed the message. Requires signature (v,R,S) and message to be set
      *
-     * @return Address which signed the message
+     * @return Address which signed the message, or null if address cannot be extracted
      */
     public Address recoverAddress() {
         try {
             byte[] pubkey = ecrecover();
+            if (pubkey == null) {
+                return null;
+            }
             Keccak.Digest256 digest = new Keccak.Digest256();
             digest.update(pubkey);
             byte[] hash = digest.digest();
