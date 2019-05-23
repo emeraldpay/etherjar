@@ -17,6 +17,7 @@ out
 
 bin
 node_modules
+scripts
 
 .gradle
 build
