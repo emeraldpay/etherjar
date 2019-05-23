@@ -25,5 +25,6 @@ include "etherjar-abi",
     "etherjar-rpc-api",
     "etherjar-rpc-http",
     "etherjar-solidity",
+    "etherjar-tx",
     "etherjar-web3"
 
