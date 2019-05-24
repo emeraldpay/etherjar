@@ -19,36 +19,36 @@ Framework agnostic modular Java 8+ integration library for [Ethereum blockchains
 
 Structure of dependencies between modules:
 
-* `etherjar-web3`
-  * `etherjar-abi`
-    * `etherjar-domain`
-    * `etherjar-hex`
+* `etherjar-abi`
   * `etherjar-domain`
-    * `etherjar-crypto`
-  * `etherjar-keystore`
-    * `etherjar-domain`
-    * `etherjar-hex`
-  * `etherjar-rlp`  
-  * `etherjar-rpc-http`
-    * `etherjar-rpc-api`
-      * `etherjar-domain`
-      * `etherjar-hex`
-  * `etherjar-solidity`
-    * `etherjar-abi`
-    * `etherjar-domain`
+  * `etherjar-hex`
+* `etherjar-domain`
+* `etherjar-hex`  
+* `etherjar-rlp`
+* `etherjar-rpc-api`  
+  * `etherjar-domain`
+  * `etherjar-hex`  
+* `etherjar-rpc-http`
+  * `etherjar-rpc-api`
+  * `etherjar-domain`
+  * `etherjar-hex`
+* `etherjar-solidity`
+  * `etherjar-abi`
+  * `etherjar-domain`
+* `etherjar-tx`
+  * `etherjar-rlp`
+  * `etherjar-domain`
 
 where
 
 * `etherjar-abi` - Smart contract [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
-* `etherjar-crypto` - General cryptographic utils (KECCAK-256 hash, ECDSA signatures)
 * `etherjar-domain` - Core module contains pure domain logic (`Address`, `Block`, `Transaction`, `Wei` and so on)
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
-* `etherjar-keystore` - Keystore files (UTC / JSON) encrypted with a passphrase
 * `etherjar-rlp` - Reading and writing RLP (Recursive Length Prefix) encoded data 
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
-* `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)  
-* `etherjar-web3` - [Web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API) like Java 8 API on top of JSON-RPC API
+* `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)
+* `etherjar-tx` - Read, verify and manipulate Transactions   
 
 ## Usage
 

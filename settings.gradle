@@ -17,14 +17,11 @@
 rootProject.name = 'etherjar'
 
 include "etherjar-abi",
-    "etherjar-crypto",
     "etherjar-domain",
     "etherjar-hex",
-    "etherjar-keystore",
     "etherjar-rlp",
     "etherjar-rpc-api",
     "etherjar-rpc-http",
     "etherjar-solidity",
-    "etherjar-tx",
-    "etherjar-web3"
+    "etherjar-tx"
 
