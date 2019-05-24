@@ -117,6 +117,10 @@ public class Signature {
         return null;
     }
 
+    protected int getRecId() {
+        return v - 27;
+    }
+
     /**
      *
      * @return public key derived from current v,R,S and message
@@ -124,7 +128,7 @@ public class Signature {
     // implementation is based on BitcoinJ ECKey code
     // see https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/ECKey.java
     public byte[] ecrecover() {
-        int recId = v - 27;
+        int recId = getRecId();
         SecP256K1Curve curve = (SecP256K1Curve)ecParams.getCurve();
         BigInteger n = ecParams.getN();
 
