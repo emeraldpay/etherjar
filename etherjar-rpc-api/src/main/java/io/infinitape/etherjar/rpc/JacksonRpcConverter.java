@@ -22,10 +22,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.infinitape.etherjar.rpc.json.FullResponseJson;
-import io.infinitape.etherjar.rpc.json.RequestJson;
-import io.infinitape.etherjar.rpc.json.ResponseJson;
-import io.infinitape.etherjar.rpc.json.TraceItemJson;
+import io.infinitape.etherjar.domain.Wei;
+import io.infinitape.etherjar.hex.HexData;
+import io.infinitape.etherjar.rpc.json.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +44,8 @@ public class JacksonRpcConverter implements RpcConverter {
 
     public ObjectMapper createJsonMapper() {
         SimpleModule module = new SimpleModule("EtherJar");
+        module.addSerializer(HexData.class, new HexDataSerializer());
+        module.addSerializer(Wei.class, new WeiSerializer());
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(module);
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);

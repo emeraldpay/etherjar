@@ -15,6 +15,8 @@
  */
 package io.infinitape.etherjar.rpc;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * @author Igor Artamonov
  */
@@ -42,6 +44,7 @@ public class RpcResponseError {
      * This may be omitted.
      * The value of this member is defined by the Server (e.g. detailed error information, nested errors etc.).
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object data;
 
     public int getCode() {

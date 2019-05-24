@@ -16,14 +16,16 @@
 
 package io.infinitape.etherjar.rpc.json;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.infinitape.etherjar.rpc.RpcResponseError;
 
+@JsonSerialize(using = ResponseJsonSerializer.class)
 public class ResponseJson<X,T> {
 
     private String jsonrpc = "2.0";
     private T id;
-    @JsonInclude(JsonInclude.Include.ALWAYS)
     private X result;
+    private RpcResponseError error;
 
     public String getJsonrpc() {
         return jsonrpc;
@@ -50,5 +52,13 @@ public class ResponseJson<X,T> {
 
     public void setResult(X result) {
         this.result = result;
+    }
+
+    public RpcResponseError getError() {
+        return error;
+    }
+
+    public void setError(RpcResponseError error) {
+        this.error = error;
     }
 }
