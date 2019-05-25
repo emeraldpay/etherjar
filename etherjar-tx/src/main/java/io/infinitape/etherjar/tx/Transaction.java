@@ -95,9 +95,16 @@ public class Transaction {
         }
 
         if (rdr.hasNext()) {
-            Signature signature = new Signature();
+            Signature signature;
             if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-                signature.setV(rdr.nextInt());
+                int v = rdr.nextInt();
+                if (v == 27 || v == 28) {
+                    signature = new Signature();
+                } else {
+                    int chainId = SignatureEip155.extractChainId(v);
+                    signature = new SignatureEip155(chainId);
+                }
+                signature.setV(v);
             } else {
                 throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: V");
             }
@@ -220,6 +227,10 @@ public class Transaction {
             wrt.write(signature.getV())
                     .write(signature.getR())
                     .write(signature.getS());
+        } else if (signature instanceof SignatureEip155) {
+            wrt.write(((SignatureEip155) signature).getChainId())
+                    .write(0)
+                    .write(0);
         }
         wrt.closeList();
         byte[] rlp = wrt.toByteArray();

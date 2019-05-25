@@ -18,7 +18,7 @@ package io.infinitape.etherjar.tx
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
-class SingatureEip155Spec extends Specification {
+class SignatureEip155Spec extends Specification {
 
     def "valid recId for ETC"() {
         SignatureEip155 signature = new SignatureEip155(61)
