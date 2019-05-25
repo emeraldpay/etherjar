@@ -58,4 +58,18 @@ public class RpcResponseError {
     public Object getData() {
         return data;
     }
+
+    public RpcResponseError() {
+    }
+
+    public RpcResponseError(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public RpcResponseError(int code, String message, Object data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+    }
 }

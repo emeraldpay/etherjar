@@ -33,6 +33,10 @@ public class RpcException extends IOException {
         this.details = details;
     }
 
+    public RpcException(int code, String rpcMessage) {
+        this(code, rpcMessage, null);
+    }
+
     public int getCode() {
         return code;
     }
@@ -43,5 +47,9 @@ public class RpcException extends IOException {
 
     public Object getDetails() {
         return details;
+    }
+
+    public RpcResponseError getError() {
+        return new RpcResponseError(code, rpcMessage, details);
     }
 }
