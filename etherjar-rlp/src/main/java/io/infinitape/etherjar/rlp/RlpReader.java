@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 /**
  * RLP (Recursive Length Prefix) encoding reader
  *
- * @link https://github.com/ethereum/wiki/wiki/RLP#rlp-decoding
+ * See RLP Spec at https://github.com/ethereum/wiki/wiki/RLP
  */
 public class RlpReader {
 

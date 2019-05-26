@@ -24,7 +24,7 @@ import java.util.LinkedList;
 /**
  * RLP (Recursive Length Prefix) encoding writer
  *
- * @link https://github.com/ethereum/wiki/wiki/RLP
+ * See RLP Spec at https://github.com/ethereum/wiki/wiki/RLP
  */
 public class RlpWriter {
 
@@ -129,6 +129,7 @@ public class RlpWriter {
     /**
      *
      * @param value bytes to encode into RLP list
+     * @param type type of data to write
      * @return writer for the list
      */
     protected RlpWriter write(byte[] value, RlpType type) {

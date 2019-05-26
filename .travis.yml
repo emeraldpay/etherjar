@@ -13,6 +13,8 @@ before_install:
  - chmod +x gradlew
 install:
   - npm install solc
-script: ./gradlew check
+script:
+  - ./gradlew check
+  - ./gradlew javadoc
 after_success:
   - bash <(curl -s https://codecov.io/bash)

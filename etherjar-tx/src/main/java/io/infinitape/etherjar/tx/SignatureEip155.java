@@ -23,7 +23,7 @@ import java.math.BigInteger;
  * v = CHAIN_ID * 2 + 35
  * v = CHAIN_ID * 2 + 36
  *
- * @link https://github.com/ethereum/eips/issues/155
+ * See spec at https://github.com/ethereum/eips/issues/155
  */
 public class SignatureEip155 extends Signature {
 

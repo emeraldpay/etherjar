@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Signed & unsigned integer type.
+ * Signed &amp; unsigned integer type.
  */
 public abstract class NumericType implements SimpleType<BigInteger> {
 

@@ -48,11 +48,12 @@ public class Signature {
     }
 
     /**
+     * Creates existing signature
      *
      * @param message a signed message, usually a Keccak256 of some data
-     * @param v
-     * @param r
-     * @param s
+     * @param v v part of signature
+     * @param r R part of signature
+     * @param s S part of signature
      */
     public Signature(byte[] message, int v, BigInteger r, BigInteger s) {
         this.message = message;

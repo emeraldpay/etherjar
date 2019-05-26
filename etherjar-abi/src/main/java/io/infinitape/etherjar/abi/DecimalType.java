@@ -24,7 +24,7 @@ import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
- * Signed & unsigned fixed-point number.
+ * Signed &amp; unsigned fixed-point number.
  */
 public abstract class DecimalType implements SimpleType<BigDecimal> {
 
