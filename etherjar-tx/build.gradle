@@ -1,7 +1,7 @@
 dependencies {
-    compile project(':etherjar-domain')
-    compile project(':etherjar-rlp')
-    compile 'org.bouncycastle:bcprov-jdk15on:1.61'
+    api project(':etherjar-domain')
+    api project(':etherjar-rlp')
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 
     testCompile 'commons-codec:commons-codec:1.12'
 }

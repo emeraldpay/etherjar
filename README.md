@@ -6,6 +6,8 @@
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
+Latest Version: 0.6.0
+
 ## Architecture
 
 * [ ] High-level [web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API)-like Java 8 API (_in progress_)
@@ -65,7 +67,15 @@ where
 ### Gradle
 
 ```groovy
-compile 'io.infinitape:etherjar-rpc-http:0.5.0'
+repositories {
+    maven {
+        url  "https://dl.bintray.com/infinitape/etherjar" 
+    }
+}
+
+dependencies {
+    compile 'io.infinitape:etherjar-rpc-http:0.6.0'
+}
 ```
 
 ## Examples

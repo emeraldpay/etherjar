@@ -15,9 +15,9 @@
  */
 
 dependencies {
-    compile project(':etherjar-hex')
-    compile project(':etherjar-domain')
+    api project(':etherjar-hex')
+    api project(':etherjar-domain')
 
-    compile "com.fasterxml.jackson.core:jackson-core:2.9.8"
-    compile "com.fasterxml.jackson.core:jackson-databind:2.9.8"
+    api "com.fasterxml.jackson.core:jackson-core:2.9.8"
+    api "com.fasterxml.jackson.core:jackson-databind:2.9.8"
 }

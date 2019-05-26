@@ -1,10 +1,10 @@
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 allprojects {
     group = 'io.infinitape'
-    version = "0.6.0-SNAPSHOT"
+    version = "0.6.0"
 
     repositories {
         jcenter()
@@ -12,10 +12,37 @@ allprojects {
     }
 }
 
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "splix"
+            name "Igor Artamonov"
+            email "igor@artamonov.ru"
+        }
+    }
+
+    scm {
+        connection "scm:git:git://github.com/infinitape/etherjar.git"
+        developerConnection "scm:git:git://github.com/infinitape/etherjar.git"
+        url "https://github.com/infinitape/etherjar"
+    }
+}
+
 subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
     apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.jfrog.bintray'
 
     targetCompatibility = '1.8'
     sourceCompatibility = '1.8'
@@ -46,28 +73,75 @@ subprojects {
     }
 
     test.finalizedBy jacocoTestReport
-}
 
-bintray {
-    user = project.hasProperty('bintrayUser') ?
-        project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
 
-    key = project.hasProperty('bintrayApiKey') ?
-        project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
 
-    publications = ['EtherJarPublication']
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
 
-    pkg {
-        repo = 'etherjar'
-        name = 'etherjar'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/infinitape/etherjar.git'
-        labels = ['ethereum', 'ethereum-classic', 'blockchain', 'smart-contracts', 'java-8']
-        publicDownloadNumbers = true
 
-        version {
-            name = project.version
-            description = project.description
+    publishing {
+        publications {
+            EtherJarPublication(MavenPublication) {
+                from components.java
+                artifact sourcesJar {
+                    classifier "sources"
+                }
+                artifact javadocJar {
+                    classifier "javadoc"
+                }
+
+                groupId project.group
+                artifactId project.name
+                version project.version
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('name', 'EtherJar - Java Library to Build Application on Ethereum')
+                    root.children().last() + pomConfig
+                }
+            }
+        }
+    }
+
+    bintray {
+        user = System.getProperty('bintrayUser') ? System.getProperty('bintrayUser') : System.getenv('BINTRAY_USER')
+        key = System.getProperty('bintrayApiKey') ? System.getProperty('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+
+        publications = ['EtherJarPublication']
+
+        dryRun=false
+        publish=true
+        override=true
+
+        pkg {
+            repo = 'etherjar'
+            userOrg = 'infinitape'
+            name = project.name
+            licenses = ['Apache-2.0']
+            vcsUrl = 'https://github.com/infinitape/etherjar.git'
+            labels = ['ethereum', 'ethereum-classic', 'blockchain', 'smart-contracts', 'java-8']
+            publicDownloadNumbers = true
+
+            version {
+                name = project.version
+                description = 'EtherJar ' + project.version + ' Beta'
+                released  = new Date()
+                vcsTag = project.version
+
+                gpg {
+                    sign = true
+                }
+            }
         }
     }
 }

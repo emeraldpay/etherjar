@@ -15,6 +15,6 @@
  */
 
 dependencies {
-    compile project(':etherjar-domain')
-    compile project(':etherjar-hex')
+    api project(':etherjar-domain')
+    api project(':etherjar-hex')
 }

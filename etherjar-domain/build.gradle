@@ -15,7 +15,7 @@
  */
 
 dependencies {
-    compile project(':etherjar-hex')
+    api project(':etherjar-hex')
 
-    compile 'org.bouncycastle:bcprov-jdk15on:1.61'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 }
