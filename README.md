@@ -57,10 +57,17 @@ where
 ### Maven
 
 ```xml
+<repositories>
+    <repository>
+      <id>etherjar</id>
+      <url>https://dl.bintray.com/infinitape/etherjar</url>
+    </repository>
+</repositories>
+
 <dependency>
   <groupId>io.infinitape</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
-  <version>0.5.0</version>
+  <version>0.6.0</version>
 </dependency>
 ```
 
