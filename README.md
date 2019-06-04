@@ -1,5 +1,6 @@
 # EtherJar
 
+[![Bintray](https://img.shields.io/bintray/v/infinitape/etherjar/etherjar-domain.svg)](https://bintray.com/infinitape/etherjar)
 [![Build Status](https://travis-ci.org/Infinitape/etherjar.svg?branch=master)](https://travis-ci.org/Infinitape/etherjar)
 [![codecov](https://codecov.io/gh/Infinitape/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/Infinitape/etherjar)
 [![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
