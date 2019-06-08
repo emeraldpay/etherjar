@@ -309,6 +309,10 @@ public class HexData implements Serializable {
         return new String(hex);
     }
 
+    public HexQuantity asQuantity() {
+        return new HexQuantity(new BigInteger(1, value));
+    }
+
     public String toString() {
         return toHex();
     }

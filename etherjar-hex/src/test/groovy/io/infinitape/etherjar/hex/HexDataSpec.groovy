@@ -323,4 +323,22 @@ class HexDataSpec extends Specification {
         y == x
         x == z
     }
+
+    def "Converts to quantity"() {
+        def x = HexData.from '0x1234'
+
+        expect:
+        x.asQuantity() != null
+        x.asQuantity().value == 4660
+    }
+
+    def "hash code is consistent"() {
+        def x = HexData.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def y = Hex32.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+        def z = Hex32.from '0x604f7bef716ded3aeea97946652940c0c075bcbb2e6745af042ab1c1ad988946'
+
+        expect:
+        x.hashCode() == y.hashCode()
+        y.hashCode() == z.hashCode()
+    }
 }
