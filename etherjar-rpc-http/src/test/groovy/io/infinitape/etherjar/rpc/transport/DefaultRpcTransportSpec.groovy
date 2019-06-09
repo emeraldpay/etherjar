@@ -16,29 +16,66 @@
 
 package io.infinitape.etherjar.rpc.transport
 
+import io.infinitape.etherjar.rpc.Batch
+import io.infinitape.etherjar.rpc.JacksonRpcConverter
+import io.infinitape.etherjar.rpc.RpcCall
 import io.infinitape.etherjar.rpc.RpcConverter
+import io.infinitape.etherjar.rpc.json.RequestJson
+import org.apache.http.ProtocolVersion
 import org.apache.http.client.HttpClient
+import org.apache.http.message.BasicStatusLine
 import spock.lang.Specification
 
+import java.net.http.HttpResponse
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 
 class DefaultRpcTransportSpec extends Specification {
 
     DefaultRpcTransport defaultRpcTransport
 
-    RpcConverter rpcConverterMock
     HttpClient httpClientMock
 
     def setup() {
-        rpcConverterMock = Mock(RpcConverter)
         httpClientMock = Mock(HttpClient)
         defaultRpcTransport = new DefaultRpcTransport(
                 new URI('http://localhost:8545'),
-                rpcConverterMock,
+                new JacksonRpcConverter(),
                 Executors.newFixedThreadPool(1),
                 httpClientMock
         )
     }
+
+    def "Fail batch items on batch exception"() {
+        setup:
+        def batch = new Batch()
+        when:
+        def callF = batch.add(RpcCall.create("test"))
+        def f = defaultRpcTransport.execute(batch.items)
+        f.get()
+        then:
+        thrown(ExecutionException)
+        1 * httpClientMock.execute(_) >> { throw new IOException("Test error") }
+        callF.isCompletedExceptionally()
+        f.isCompletedExceptionally()
+    }
+
+    def "Fail batch items on non-OK response"() {
+        setup:
+        def batch = new Batch()
+        def respMock = Mock(org.apache.http.HttpResponse)
+        when:
+        def callF = batch.add(RpcCall.create("test"))
+        def f = defaultRpcTransport.execute(batch.items)
+        f.get()
+        then:
+        thrown(ExecutionException)
+        1 * httpClientMock.execute(_) >> respMock
+        1 * respMock.getStatusLine() >> new BasicStatusLine(new ProtocolVersion("HTTP", 1, 0), 503, "Test")
+        callF.isCompletedExceptionally()
+        f.isCompletedExceptionally()
+    }
+
 /*
     def "call to convert trace list"() {
         setup:

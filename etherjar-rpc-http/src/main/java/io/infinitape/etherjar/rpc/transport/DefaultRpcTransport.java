@@ -113,19 +113,44 @@ public class DefaultRpcTransport implements RpcTransport {
                         .addHeader("Content-Type", "application/json")
                         .setEntity(new ByteArrayEntity(json.getBytes(StandardCharsets.UTF_8)));
                 HttpResponse rcpResponse = httpclient.execute(requestBuilder.build());
-                if (rcpResponse.getStatusLine().getStatusCode() != 200) {
-                    throw new IOException("Server returned error response: " + rcpResponse.getStatusLine().getStatusCode());
+                int statusCode = rcpResponse.getStatusLine().getStatusCode();
+                if (statusCode != 200) {
+                    throw new IOException("Server returned error response: " + statusCode);
                 }
                 InputStream content = rcpResponse.getEntity().getContent();
                 BatchStatus status = processResult(content, items, resultMapper, jsonTypes);
                 f.complete(status);
-            } catch (IOException e) {
+            } catch (Throwable e) {
+                processError(e, items);
                 f.completeExceptionally(e);
             }
         });
         return f;
     }
 
+    /**
+     * Called when batch call failed
+     *
+     * @param t Exception caused to fail execution
+     * @param batch batch items
+     */
+    public void processError(Throwable t, List<Batch.BatchItem<?, ?>> batch) {
+        batch.forEach((item) -> {
+            item.onError(t);
+        });
+    }
+
+    /**
+     * Called when batch succeeded to execute
+     *
+     * @param content output from upstream
+     * @param batch batch items
+     * @param resultMapper mapping from response ids to original ids
+     * @param jsonTypes data types for batch items
+     *
+     * @return status of batch execution
+     * @throws IOException when failed to read from input stream
+     */
     public BatchStatus processResult(InputStream content,
                                      List<Batch.BatchItem<?, ?>> batch,
                                      Map<Integer, Batch.BatchItem> resultMapper,
