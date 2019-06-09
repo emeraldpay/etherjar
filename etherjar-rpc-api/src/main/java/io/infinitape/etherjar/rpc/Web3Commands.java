@@ -15,33 +15,27 @@
  */
 package io.infinitape.etherjar.rpc;
 
+import io.infinitape.etherjar.hex.Hex32;
+import io.infinitape.etherjar.hex.HexData;
+
 /**
- * Common RPC commands
+ * Web3 commands
  */
-public class Commands {
+public class Web3Commands {
 
     /**
      *
-     * @return standard RPC commands with eth_ prefix
+     * @return the current client version.
      */
-    public static EthCommands eth() {
-        return new EthCommands();
+    public RpcCall<String, String> clientVersion() {
+        return RpcCall.create("web3_clientVersion");
     }
 
     /**
      *
-     * @return standard RPC commands with web3_ prefix
+     * @return Keccak-256 of the given data
      */
-    public static Web3Commands web3() {
-        return new Web3Commands();
+    public RpcCall<String, Hex32> sha3(HexData data) {
+        return RpcCall.create("web3_sha3", data.toHex()).converted(Hex32.class, Hex32::from);
     }
-
-    /**
-     *
-     * @return commands specific for Parity Ethereum client
-     */
-    public static ParityCommands parity() {
-        return new ParityCommands();
-    }
-
 }

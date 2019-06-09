@@ -91,6 +91,23 @@ dependencies {
 How to call `web3_clientVersion` low-level JSON-RPC API method:
 
 ```java
+public class GetClientVersion {
+    public static void main(String[] args)
+            throws URISyntaxException, IOException, ExecutionException, InterruptedException {
+
+        try (RpcTransport trans = new DefaultRpcTransport(new URI("http://127.0.0.1:8545"))) {
+            RpcClient client = new DefaultRpcClient(trans);
+            Future<String> req = client.execute(Commands.web3().clientVersion());
+
+            System.out.println(String.format("Client version: %s", req.get()));
+        }
+    }
+}
+```
+
+How to call `eth_gasPrice` low-level JSON-RPC API method:
+
+```java
 public class GetGasPrice {
 
     public static void main(String[] args)
