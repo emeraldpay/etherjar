@@ -1,0 +1,6 @@
+dependencies {
+    api project(':etherjar-rpc-api')
+
+    implementation "io.netty:netty-transport:4.1.36.Final"
+    implementation "io.netty:netty-codec-http:4.1.36.Final"
+}

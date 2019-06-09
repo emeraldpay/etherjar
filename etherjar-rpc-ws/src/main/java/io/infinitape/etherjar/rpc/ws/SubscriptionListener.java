@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.infinitape.etherjar.rpc.ws;
 
-rootProject.name = 'etherjar'
+/**
+ * Listener for new data coming through WS subscription
+ *
+ * @author Igor Artamonov
+ */
+public interface SubscriptionListener<T> {
 
-include "etherjar-abi",
-    "etherjar-domain",
-    "etherjar-hex",
-    "etherjar-rlp",
-    "etherjar-rpc-api",
-    "etherjar-rpc-http",
-    "etherjar-rpc-ws",
-    "etherjar-solidity",
-    "etherjar-tx"
+    /**
+     * Called each time WS subscription pushed new data
+     *
+     * @param data data
+     */
+    void onData(T data);
 
+}

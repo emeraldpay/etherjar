@@ -35,6 +35,8 @@ Structure of dependencies between modules:
   * `etherjar-rpc-api`
   * `etherjar-domain`
   * `etherjar-hex`
+* `etherjar-rpc-ws`  
+  * `etherjar-rpc-api`
 * `etherjar-solidity`
   * `etherjar-abi`
   * `etherjar-domain`
@@ -50,6 +52,7 @@ where
 * `etherjar-rlp` - Reading and writing RLP (Recursive Length Prefix) encoded data 
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
+* `etherjar-rpc-ws` - WebSocket transport to subscribe to new blocks
 * `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)
 * `etherjar-tx` - Read, verify and manipulate Transactions   
 
