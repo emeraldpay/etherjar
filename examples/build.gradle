@@ -1,0 +1,16 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+
+    compile "io.infinitape:etherjar-domain:0.7.0-SNAPSHOT"
+    compile "io.infinitape:etherjar-rpc-api:0.7.0-SNAPSHOT"
+    compile "io.infinitape:etherjar-rpc-http:0.7.0-SNAPSHOT"
+    compile "io.infinitape:etherjar-rlp:0.7.0-SNAPSHOT"
+
+}
