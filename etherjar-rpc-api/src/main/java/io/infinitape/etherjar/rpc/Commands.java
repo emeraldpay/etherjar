@@ -20,12 +20,16 @@ package io.infinitape.etherjar.rpc;
  */
 public class Commands {
 
+    private static final EthCommands eth = new EthCommands();
+    private static final Web3Commands web3 = new Web3Commands();
+    private static final ParityCommands parity = new ParityCommands();
+
     /**
      *
      * @return standard RPC commands with eth_ prefix
      */
     public static EthCommands eth() {
-        return new EthCommands();
+        return eth;
     }
 
     /**
@@ -33,7 +37,7 @@ public class Commands {
      * @return standard RPC commands with web3_ prefix
      */
     public static Web3Commands web3() {
-        return new Web3Commands();
+        return web3;
     }
 
     /**
@@ -41,7 +45,7 @@ public class Commands {
      * @return commands specific for Parity Ethereum client
      */
     public static ParityCommands parity() {
-        return new ParityCommands();
+        return parity;
     }
 
 }
