@@ -95,7 +95,7 @@ public class Batch {
          * @param err error details
          * @see RpcException
          */
-        public void onError(Throwable err) {
+        public void onError(RpcException err) {
             result.completeExceptionally(err);
         }
 

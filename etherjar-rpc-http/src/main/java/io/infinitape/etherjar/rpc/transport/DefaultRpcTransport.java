@@ -19,6 +19,7 @@ package io.infinitape.etherjar.rpc.transport;
 import io.infinitape.etherjar.rpc.Batch;
 import io.infinitape.etherjar.rpc.JacksonRpcConverter;
 import io.infinitape.etherjar.rpc.RpcConverter;
+import io.infinitape.etherjar.rpc.RpcException;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
 import org.apache.http.HttpResponse;
@@ -121,8 +122,14 @@ public class DefaultRpcTransport implements RpcTransport {
                 BatchStatus status = processResult(content, items, resultMapper, jsonTypes);
                 f.complete(status);
             } catch (Throwable e) {
-                processError(e, items);
-                f.completeExceptionally(e);
+                RpcException rpcError;
+                if (e instanceof RpcException) {
+                    rpcError = (RpcException) e;
+                } else {
+                    rpcError = new RpcException(-32603, e.getMessage(), null, e);
+                }
+                processError(rpcError, items);
+                f.completeExceptionally(rpcError);
             }
         });
         return f;
@@ -134,7 +141,7 @@ public class DefaultRpcTransport implements RpcTransport {
      * @param t Exception caused to fail execution
      * @param batch batch items
      */
-    public void processError(Throwable t, List<Batch.BatchItem<?, ?>> batch) {
+    public void processError(RpcException t, List<Batch.BatchItem<?, ?>> batch) {
         batch.forEach((item) -> {
             item.onError(t);
         });

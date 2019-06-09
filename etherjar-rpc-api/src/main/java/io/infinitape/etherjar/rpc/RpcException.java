@@ -26,11 +26,15 @@ public class RpcException extends IOException {
     private String rpcMessage;
     private Object details;
 
-    public RpcException(int code, String rpcMessage, Object details) {
-        super("RPC Error " + code + ": " + rpcMessage);
+    public RpcException(int code, String rpcMessage, Object details, Throwable cause) {
+        super("RPC Error " + code + ": " + rpcMessage, cause);
         this.code = code;
         this.rpcMessage = rpcMessage;
         this.details = details;
+    }
+
+    public RpcException(int code, String rpcMessage, Object details) {
+        this(code, rpcMessage, details, null);
     }
 
     public RpcException(int code, String rpcMessage) {
