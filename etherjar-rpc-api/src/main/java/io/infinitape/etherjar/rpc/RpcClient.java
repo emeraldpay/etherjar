@@ -20,21 +20,31 @@ import io.infinitape.etherjar.domain.*;
 import io.infinitape.etherjar.hex.Hex32;
 import io.infinitape.etherjar.hex.HexData;
 import io.infinitape.etherjar.rpc.json.*;
+import io.infinitape.etherjar.rpc.transport.BatchStatus;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public interface RpcClient {
 
+    CompletableFuture<BatchStatus> execute(Batch batch);
+
+    <RES> CompletableFuture<RES> execute(RpcCall<?, RES> call);
+
+    ExecutableBatch batch();
+
+    @Deprecated
     EthCommands eth();
+    @Deprecated
     TraceCommands trace();
 
+    @Deprecated
     public interface EthCommands {
 
         /**
          *
          * @return number of most recent block.
          */
+        @Deprecated
         public CompletableFuture<Long> getBlockNumber();
 
         /**
@@ -43,6 +53,7 @@ public interface RpcClient {
          * @param block block to check
          * @return balance of the account of given address.
          */
+        @Deprecated
         public CompletableFuture<Wei> getBalance(Address address, BlockTag block);
 
         /**
@@ -51,6 +62,7 @@ public interface RpcClient {
          * @param block block to check
          * @return balance of the account of given address.
          */
+        @Deprecated
         public CompletableFuture<Wei> getBalance(Address address, long block);
 
         /**
@@ -59,6 +71,7 @@ public interface RpcClient {
          * @param includeTransactions includes TransactionJson if true, or hashes as HexData only
          * @return information about a block
          */
+        @Deprecated
         public <X> CompletableFuture<BlockJson<X>> getBlock(long blockNumber, boolean includeTransactions);
 
         /**
@@ -67,6 +80,7 @@ public interface RpcClient {
          * @param includeTransactions includes TransactionJson if true, or hashes as HexData only
          * @return information about a block
          */
+        @Deprecated
         public <X> CompletableFuture<BlockJson<X>> getBlock(BlockHash hash, boolean includeTransactions);
 
         /**
@@ -74,6 +88,7 @@ public interface RpcClient {
          * @param hash keystore hash
          * @return information about a transaction
          */
+        @Deprecated
         public CompletableFuture<TransactionJson> getTransaction(TransactionId hash);
 
         /**
@@ -82,6 +97,7 @@ public interface RpcClient {
          * @param index keystore index in the block
          * @return information about a transaction
          */
+        @Deprecated
         public CompletableFuture<TransactionJson> getTransaction(BlockHash block, long index);;
 
         /**
@@ -90,7 +106,7 @@ public interface RpcClient {
          * @param index keystore index in the block
          * @return information about a transaction
          */
-
+        @Deprecated
         public CompletableFuture<TransactionJson> getTransaction(long block, long index);;
 
         /**
@@ -98,6 +114,7 @@ public interface RpcClient {
          * @param hash transaction hash
          * @return receipt of a transaction
          */
+        @Deprecated
         public CompletableFuture<TransactionReceiptJson> getTransactionReceipt(TransactionId hash);
 
         /**
@@ -106,6 +123,7 @@ public interface RpcClient {
          * @param block block to check
          * @return nonce value
          */
+        @Deprecated
         public CompletableFuture<Long> getTransactionCount(Address address, BlockTag block);
 
         /**
@@ -114,6 +132,7 @@ public interface RpcClient {
          * @param block block to check
          * @return nonce value
          */
+        @Deprecated
         public CompletableFuture<Long> getTransactionCount(Address address, long block);
 
         /**
@@ -121,6 +140,7 @@ public interface RpcClient {
          * @param block block hash
          * @return number of transactions in a block from a block matching the given block
          */
+        @Deprecated
         public CompletableFuture<Long> getBlockTransactionCount(BlockHash block);
 
         /**
@@ -128,6 +148,7 @@ public interface RpcClient {
          * @param block block height
          * @return number of transactions in a block from a block matching the given block
          */
+        @Deprecated
         public CompletableFuture<Long> getBlockTransactionCount(long block);
 
         /**
@@ -135,6 +156,7 @@ public interface RpcClient {
          * @param block block hash
          * @return number of uncles in a block from a block matching the given block hash.
          */
+        @Deprecated
         public CompletableFuture<Long> getUncleCount(BlockHash block);
 
         /**
@@ -142,6 +164,7 @@ public interface RpcClient {
          * @param block
          * @return number of uncles in a block from a block matching the given block number.
          */
+        @Deprecated
         public CompletableFuture<Long> getUncleCount(long block);
 
         /**
@@ -150,6 +173,7 @@ public interface RpcClient {
          * @param index uncle index
          * @return uncle block
          */
+        @Deprecated
         public CompletableFuture<BlockJson> getUncle(BlockHash block, long index);
 
         /**
@@ -158,6 +182,7 @@ public interface RpcClient {
          * @param index uncle index
          * @return uncle block
          */
+        @Deprecated
         public CompletableFuture<BlockJson> getUncle(long block, long index);
 
         /**
@@ -166,6 +191,7 @@ public interface RpcClient {
          * @param block block number
          * @return code at a given address
          */
+        @Deprecated
         public CompletableFuture<HexData> getCode(Address address, long block);
 
         /**
@@ -174,12 +200,14 @@ public interface RpcClient {
          * @param block block tag
          * @return code at a given address
          */
+        @Deprecated
         public CompletableFuture<HexData> getCode(Address address, BlockTag block);
 
         /**
          *
          * @return the hash of the current block, the seedHash, and the boundary condition to be met ("target").
          */
+        @Deprecated
         public CompletableFuture<HexData[]> getWork();
 
         /**
@@ -189,6 +217,7 @@ public interface RpcClient {
          * @param digest 32 Bytes - The mix digest (256 bits)
          * @return true if the provided solution is valid, otherwise false.
          */
+        @Deprecated
         public CompletableFuture<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest);
 
         /**
@@ -197,37 +226,44 @@ public interface RpcClient {
          * @param id  A random hexadecimal(32 bytes) ID identifying the client
          * @return true if submitting went through succesfully and false otherwise.
          */
+        @Deprecated
         public CompletableFuture<Boolean> submitHashrate(Hex32 hashrate, Hex32 id);
 
         /**
          * Returns the client getCoinbase address.
          * @return getCoinbase address
          */
+        @Deprecated
         public CompletableFuture<Address> getCoinbase();
 
         /**
          * @return the number of hashes per second that the node is mining with.
          */
+        @Deprecated
         public CompletableFuture<Long> getHashrate();
 
         /**
          * @return true if client is actively mining new blocks.
          */
+        @Deprecated
         public CompletableFuture<Boolean> isMining();
 
         /**
          * @return the current price per gas in wei.
          */
-        public CompletableFuture<Long> getGasPrice();
+        @Deprecated
+        public CompletableFuture<Wei> getGasPrice();
 
         /**
          * @return a list of addresses owned by client.
          */
+        @Deprecated
         public CompletableFuture<Address[]> getAccounts();
 
         /**
          * @return a list of available compilers in the client.
          */
+        @Deprecated
         public CompletableFuture<String[]> getCompilers();
 
         /**
@@ -237,6 +273,7 @@ public interface RpcClient {
          * @param block target block
          * @return return value of executed contract
          */
+        @Deprecated
         public CompletableFuture<HexData> call(TransactionCallJson call, BlockTag block);
 
         /**
@@ -245,6 +282,7 @@ public interface RpcClient {
          * @param data transaction object
          * @return transaction id
          */
+        @Deprecated
         public CompletableFuture<TransactionId> sendTransaction(TransactionCallJson data);
 
         /**
@@ -253,6 +291,7 @@ public interface RpcClient {
          * @param raw signed transaction data
          * @return transaction id
          */
+        @Deprecated
         public CompletableFuture<TransactionId> sendTransaction(HexData raw);
 
         /**
@@ -263,12 +302,16 @@ public interface RpcClient {
          * @param hash sha3 hash of data to sign
          * @return signature
          */
+        @Deprecated
         public CompletableFuture<HexData> sign(Address signer, HexData hash);
     }
 
+    @Deprecated
     interface TraceCommands {
 
+        @Deprecated
         CompletableFuture<TraceList> getTransaction(TransactionId hash);
 
     }
+
 }

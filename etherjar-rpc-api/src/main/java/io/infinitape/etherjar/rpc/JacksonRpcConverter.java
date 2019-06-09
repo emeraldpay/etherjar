@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.infinitape.etherjar.domain.Wei;
@@ -28,7 +29,10 @@ import io.infinitape.etherjar.rpc.json.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class JacksonRpcConverter implements RpcConverter {
 
@@ -65,6 +69,11 @@ public class JacksonRpcConverter implements RpcConverter {
         return objectMapper.writer().writeValueAsString(request);
     }
 
+    @Override
+    public String toJson(List<RequestJson<Integer>> batch) throws IOException {
+        return objectMapper.writer().writeValueAsString(batch);
+    }
+
     public <T> T fromJson(InputStream content, Class<T> target) throws IOException {
         return fromJson(content, target, Integer.class);
     }
@@ -86,6 +95,30 @@ public class JacksonRpcConverter implements RpcConverter {
             throw new RpcException(error.getCode(), error.getMessage(), error.getData());
         }
         return responseJson.getResult();
+    }
+
+    public List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws IOException {
+        JsonNode nodes = objectMapper.reader().readTree(content);
+        if (!nodes.isArray()) {
+            throw new IOException("Not array");
+        }
+        Iterator<JsonNode> elements = nodes.elements();
+        List<ResponseJson<?,Integer>> parsedBatch = new ArrayList<>();
+        while (elements.hasNext()) {
+            JsonNode resp = elements.next();
+            if (!resp.isObject()) {
+                continue;
+            }
+            Integer id = resp.get("id").asInt();
+            if (!targets.containsKey(id)) {
+                continue;
+            }
+            Class[] inner = new Class[] { targets.get(id), Integer.class };
+            JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, inner);
+            ResponseJson parsedItem = objectMapper.reader().forType(type1).readValue(resp);
+            parsedBatch.add(parsedItem);
+        }
+        return parsedBatch;
     }
 
     public <T> List<T> fromJsonList(InputStream content, Class<T> target) throws IOException {

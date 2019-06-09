@@ -15,6 +15,7 @@
  */
 package io.infinitape.etherjar.rpc.transport;
 
+import io.infinitape.etherjar.rpc.Batch;
 import io.infinitape.etherjar.rpc.JacksonRpcConverter;
 import io.infinitape.etherjar.rpc.RpcConverter;
 
@@ -141,19 +142,19 @@ public class RoundRobinRpcTransport implements RpcTransport {
     }
 
     @Override
-    public <T> CompletableFuture<T> execute(String method, List params, Class<T> resultType) {
-        RpcTransport next = next();
-        if (next == null) {
-            CompletableFuture<T> error = new CompletableFuture<>();
-            error.completeExceptionally(new IllegalStateException("No valid upstreams available"));
-            return error;
-        }
-        return next.execute(method, params, resultType);
+    public void close() throws IOException {
+        executorService.shutdown();
     }
 
     @Override
-    public void close() throws IOException {
-        executorService.shutdown();
+    public CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
+        RpcTransport next = next();
+        if (next == null) {
+            CompletableFuture<BatchStatus> error = new CompletableFuture<>();
+            error.completeExceptionally(new IllegalStateException("No valid upstreams available"));
+            return error;
+        }
+        return next.execute(items);
     }
 
     static class Builder {

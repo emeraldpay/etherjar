@@ -17,14 +17,21 @@
 package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.rpc.json.RequestJson;
+import io.infinitape.etherjar.rpc.json.ResponseJson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 public interface RpcConverter {
 
     <T> T fromJson(InputStream content, Class<T> clazz) throws IOException;
 
+    List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws IOException;
+
     String toJson(RequestJson request) throws IOException;
+
+    String toJson(List<RequestJson<Integer>> batch) throws IOException;
 
 }

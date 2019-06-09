@@ -16,9 +16,11 @@
 
 package io.infinitape.etherjar.rpc.transport;
 
+import io.infinitape.etherjar.rpc.Batch;
 import io.infinitape.etherjar.rpc.JacksonRpcConverter;
 import io.infinitape.etherjar.rpc.RpcConverter;
 import io.infinitape.etherjar.rpc.json.RequestJson;
+import io.infinitape.etherjar.rpc.json.ResponseJson;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.RequestBuilder;
@@ -30,11 +32,16 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class DefaultRpcTransport implements RpcTransport {
 
@@ -83,11 +90,35 @@ public class DefaultRpcTransport implements RpcTransport {
     }
 
     @Override
-    public <T> CompletableFuture<T> execute(final String method, final List params, final Class<T> resultType) {
-        CompletableFuture<T> f = new CompletableFuture<T>();
+    public CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
+        if (callSequence >= 0x1fffffff) {
+            callSequence = 1;
+        }
+        Map<Integer, Batch.BatchItem> resultMapper = new HashMap<>();
+        Map<Integer, Class> jsonTypes = new HashMap<>();
+        List<RequestJson<Integer>> rpcRequests = items.stream()
+                .map(item -> {
+                    int current = callSequence++;
+                    resultMapper.put(current, item);
+                    jsonTypes.put(current, item.getCall().getJsonType());
+                    return item.getCall().toJson(current);
+                })
+                .collect(Collectors.toList());
+        CompletableFuture<BatchStatus> f = new CompletableFuture<>();
         executorService.submit(() -> {
             try {
-                f.complete(executeSync(method, params, resultType));
+                String json = rpcConverter.toJson(rpcRequests);
+                RequestBuilder requestBuilder = RequestBuilder.create("POST")
+                        .setUri(host)
+                        .addHeader("Content-Type", "application/json")
+                        .setEntity(new ByteArrayEntity(json.getBytes(StandardCharsets.UTF_8)));
+                HttpResponse rcpResponse = httpclient.execute(requestBuilder.build());
+                if (rcpResponse.getStatusLine().getStatusCode() != 200) {
+                    throw new IOException("Server returned error response: " + rcpResponse.getStatusLine().getStatusCode());
+                }
+                InputStream content = rcpResponse.getEntity().getContent();
+                BatchStatus status = processResult(content, items, resultMapper, jsonTypes);
+                f.complete(status);
             } catch (IOException e) {
                 f.completeExceptionally(e);
             }
@@ -95,24 +126,30 @@ public class DefaultRpcTransport implements RpcTransport {
         return f;
     }
 
-    public <T> T executeSync(String method, List params, Class<T> resultType) throws IOException {
-        String json = rpcConverter.toJson(buildCall(method, params));
-        RequestBuilder requestBuilder = RequestBuilder.create("POST")
-            .setUri(host)
-            .addHeader("Content-Type", "application/json")
-            .setEntity(new ByteArrayEntity(json.getBytes("UTF-8")));
-        HttpResponse rcpResponse = httpclient.execute(requestBuilder.build());
-        if (rcpResponse.getStatusLine().getStatusCode() != 200) {
-            throw new IOException("Server returned error response: " + rcpResponse.getStatusLine().getStatusCode());
-        }
-        InputStream content = rcpResponse.getEntity().getContent();
-        return rpcConverter.fromJson(content, resultType);
-    }
-
-    public RequestJson<Integer> buildCall(String method, List params) {
-        if (callSequence >= 0x1fffffff) {
-            callSequence = 1;
-        }
-        return new RequestJson<Integer>(method, params, callSequence++);
+    public BatchStatus processResult(InputStream content,
+                                     List<Batch.BatchItem<?, ?>> batch,
+                                     Map<Integer, Batch.BatchItem> resultMapper,
+                                     Map<Integer, Class> jsonTypes) throws IOException {
+        List<ResponseJson<?, Integer>> response = rpcConverter.parseBatch(content, jsonTypes);
+        AtomicInteger failed = new AtomicInteger();
+        AtomicInteger succeed = new AtomicInteger();
+        response.forEach(item -> {
+            Batch.BatchItem bi = resultMapper.get(item.getId());
+            if (bi == null) {
+                return;
+            }
+            if (item.getError() != null) {
+                failed.getAndIncrement();
+                bi.onError(item.getError().asException());
+            } else {
+                succeed.getAndIncrement();
+                bi.onComplete(item.getResult());
+            }
+        });
+        return BatchStatus.newBuilder()
+                .withTotal(batch.size())
+                .withSucceed(succeed.get())
+                .withFailed(failed.get())
+                .build();
     }
 }

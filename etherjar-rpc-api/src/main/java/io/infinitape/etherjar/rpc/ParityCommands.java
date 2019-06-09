@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.hex.HexEncoding;
+import io.infinitape.etherjar.domain.TransactionId;
 
-import java.math.BigInteger;
-import java.util.concurrent.CompletableFuture;
+/**
+ * Commands specific for Parity Ethereum
+ */
+public class ParityCommands {
 
-public class Extractor {
-
-    public CompletableFuture<Long> extractLong(final CompletableFuture<String> result) {
-        return result
-            .thenApply(HexEncoding::fromHex)
-            .thenApply(BigInteger::longValue);
+    RpcCall<TraceList, TraceList> traceTransaction(TransactionId hash) {
+        return RpcCall.create("trace_transaction", TraceList.class, hash.toHex());
     }
 }

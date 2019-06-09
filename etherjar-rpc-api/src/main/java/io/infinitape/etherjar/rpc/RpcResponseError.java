@@ -72,4 +72,14 @@ public class RpcResponseError {
         this.message = message;
         this.data = data;
     }
+
+    /**
+     * Convert it ot RpcException
+     *
+     * @return same error as exception
+     * @see RpcException
+     */
+    public RpcException asException() {
+        return new RpcException(code, message, data);
+    }
 }

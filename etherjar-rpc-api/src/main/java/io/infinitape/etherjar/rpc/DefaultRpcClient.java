@@ -19,320 +19,238 @@ package io.infinitape.etherjar.rpc;
 import io.infinitape.etherjar.domain.*;
 import io.infinitape.etherjar.hex.Hex32;
 import io.infinitape.etherjar.hex.HexData;
-import io.infinitape.etherjar.hex.HexEncoding;
 import io.infinitape.etherjar.rpc.json.*;
+import io.infinitape.etherjar.rpc.transport.BatchStatus;
 import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 public class DefaultRpcClient implements RpcClient {
 
     private RpcTransport transport;
 
-    private Extractor extractor;
-
     public DefaultRpcClient(RpcTransport transport) {
-        this(transport, new Extractor());
-    }
-
-    public DefaultRpcClient(RpcTransport transport, Extractor extractor) {
         this.transport = transport;
-        this.extractor = extractor;
+    }
+
+    public ExecutableBatch batch() {
+        return new ExecutableBatch(this);
     }
 
     @Override
+    public CompletableFuture<BatchStatus> execute(Batch batch) {
+        return transport.execute(batch.getItems());
+    }
+
+    @Override
+    public <RES> CompletableFuture<RES> execute(RpcCall<?, RES> call) {
+        ExecutableBatch batch = this.batch();
+        CompletableFuture<RES> result = batch.add(call);
+        batch.execute();
+        return result;
+    }
+
+    // DEPRECATED
+
+    @Override
+    @Deprecated
     public EthCommands eth() {
-        return new EthCommandsImpl(transport, extractor);
+        return new EthCommandsImpl(this);
     }
     @Override
+    @Deprecated
     public TraceCommands trace() {
-        return new TraceCommandsImpl(transport, extractor);
+        return new TraceCommandsImpl(this);
     }
 
+    @Deprecated
     public static class EthCommandsImpl implements EthCommands {
 
-        private final RpcTransport transport;
-        private Extractor extractor;
+        private final DefaultRpcClient client;
 
-        public EthCommandsImpl(RpcTransport transport, Extractor extractor) {
-            this.transport = transport;
-            this.extractor = extractor;
+        public EthCommandsImpl(DefaultRpcClient client) {
+            this.client = client;
         }
 
         @Override
         public CompletableFuture<Long> getBlockNumber() {
-            CompletableFuture<String> resp = transport.execute("eth_blockNumber", Collections.emptyList(), String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getBlockNumber());
         }
 
         @Override
         public CompletableFuture<Wei> getBalance(Address address, BlockTag block) {
-            CompletableFuture<String> resp = transport.execute("eth_getBalance",
-                Arrays.asList(address.toHex(), block.getCode()),
-                String.class);
-            return resp.thenApply(HexEncoding::fromHex).thenApply(Wei::new);
+            return client.execute(Commands.eth().getBalance(address, block));
         }
 
         @Override
         public CompletableFuture<Wei> getBalance(Address address, long block) {
-            CompletableFuture<String> resp = transport.execute("eth_getBalance",
-                Arrays.asList(address.toHex(), HexEncoding.toHex(block)),
-                String.class);
-            return resp.thenApply(HexEncoding::fromHex).thenApply(Wei::new);
+            return client.execute(Commands.eth().getBalance(address, block));
         }
 
         @Override
         public CompletableFuture<BlockJson> getBlock(long blockNumber, boolean includeTransactions) {
-            CompletableFuture<BlockJson> resp = transport.execute("eth_getBlockByNumber",
-                Arrays.asList(HexEncoding.toHex(blockNumber), includeTransactions),
-                BlockJson.class);
-            return resp;
+            if (includeTransactions) {
+                return client.execute(Commands.eth().getBlockWithTransactions(blockNumber)).thenApply((b) -> b);
+            }
+            return client.execute(Commands.eth().getBlock(blockNumber)).thenApply((b) -> b);
         }
 
         @Override
         public CompletableFuture<BlockJson> getBlock(BlockHash hash, boolean includeTransactions) {
-            CompletableFuture<BlockJson> resp = transport.execute("eth_getBlockByHash",
-                Arrays.asList(hash.toHex(), includeTransactions),
-                BlockJson.class);
-            return resp;
+            if (includeTransactions) {
+                return client.execute(Commands.eth().getBlockWithTransactions(hash)).thenApply((b) -> b);
+            }
+            return client.execute(Commands.eth().getBlock(hash)).thenApply((b) -> b);
         }
 
         @Override
         public CompletableFuture<TransactionJson> getTransaction(TransactionId hash) {
-            CompletableFuture<TransactionJson> resp = transport.execute("eth_getTransactionByHash",
-                Collections.singletonList(hash.toHex()),
-                TransactionJson.class);
-            return resp;
+            return client.execute(Commands.eth().getTransaction(hash));
         }
 
         @Override
         public CompletableFuture<TransactionJson> getTransaction(BlockHash block, long index) {
-            CompletableFuture<TransactionJson> resp = transport.execute("eth_getTransactionByBlockHashAndIndex",
-                Arrays.asList(block.toHex(), HexEncoding.toHex(index)),
-                TransactionJson.class);
-            return resp;
+            return client.execute(Commands.eth().getTransaction(block, index));
         }
 
         @Override
         public CompletableFuture<TransactionJson> getTransaction(long block, long index) {
-            CompletableFuture<TransactionJson> resp = transport.execute("eth_getTransactionByBlockNumberAndIndex",
-                Arrays.asList(HexEncoding.toHex(block), HexEncoding.toHex(index)),
-                TransactionJson.class);
-            return resp;
+            return client.execute(Commands.eth().getTransaction(block, index));
         }
 
         @Override
         public CompletableFuture<TransactionReceiptJson> getTransactionReceipt(TransactionId hash) {
-            CompletableFuture<TransactionReceiptJson> resp = transport.execute("eth_getTransactionReceipt",
-                Collections.singletonList(hash.toHex()),
-                TransactionReceiptJson.class);
-            return resp;
+            return client.execute(Commands.eth().getTransactionReceipt(hash));
         }
 
         @Override
         public CompletableFuture<Long> getTransactionCount(Address address, BlockTag block) {
-            CompletableFuture<String> resp = transport.execute("eth_getTransactionCount",
-                Arrays.asList(address.toHex(), block.getCode()),
-                String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getTransactionCount(address, block));
         }
 
         @Override
         public CompletableFuture<Long> getTransactionCount(Address address, long block) {
-            CompletableFuture<String> resp = transport.execute("eth_getTransactionCount",
-                Arrays.asList(address.toHex(), HexEncoding.toHex(block)),
-                String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getTransactionCount(address, block));
         }
 
         @Override
         public CompletableFuture<Long> getBlockTransactionCount(BlockHash block) {
-            CompletableFuture<String> resp = transport.execute("eth_getBlockTransactionCountByHash",
-                Collections.singletonList(block.toHex()),
-                String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getBlockTransactionCount(block));
         }
 
         @Override
         public CompletableFuture<Long> getBlockTransactionCount(long block) {
-            CompletableFuture<String> resp = transport.execute("eth_getBlockTransactionCountByNumber",
-                Collections.singletonList(HexEncoding.toHex(block)),
-                String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getBlockTransactionCount(block));
         }
 
         @Override
         public CompletableFuture<Long> getUncleCount(BlockHash block) {
-            CompletableFuture<String> resp = transport.execute("eth_getUncleCountByBlockHash",
-                Collections.singletonList(block.toHex()),
-                String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getUncleCount(block));
         }
 
         @Override
         public CompletableFuture<Long> getUncleCount(long block) {
-            CompletableFuture<String> resp = transport.execute("eth_getUncleCountByBlockNumber",
-                Collections.singletonList(HexEncoding.toHex(block)),
-                String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getUncleCount(block));
         }
 
         @Override
         public CompletableFuture<BlockJson> getUncle(BlockHash block, long index) {
-            CompletableFuture<BlockJson> resp = transport.execute("eth_getUncleByBlockHashAndIndex",
-                Arrays.asList(block.toHex(), HexEncoding.toHex(index)),
-                BlockJson.class);
-            return resp;
+            return client.execute(Commands.eth().getUncle(block, index));
         }
 
         @Override
         public CompletableFuture<BlockJson> getUncle(long block, long index) {
-            CompletableFuture<BlockJson> resp = transport.execute("eth_getUncleByBlockNumberAndIndex",
-                Arrays.asList(HexEncoding.toHex(block), HexEncoding.toHex(index)),
-                BlockJson.class);
-            return resp;
+            return client.execute(Commands.eth().getUncle(block, index));
         }
 
         @Override
         public CompletableFuture<HexData> getCode(Address address, long block) {
-            CompletableFuture<String> resp = transport.execute("eth_getCode",
-                Arrays.asList(address.toHex(), HexEncoding.toHex(block)),
-                String.class);
-            return resp.thenApply(HexData::from);
+            return client.execute(Commands.eth().getCode(address, block));
         }
 
         @Override
         public CompletableFuture<HexData> getCode(Address address, BlockTag block) {
-            CompletableFuture<String> resp = transport.execute("eth_getCode",
-                Arrays.asList(address.toHex(), block.getCode()),
-                String.class);
-            return resp.thenApply(HexData::from);
+            return client.execute(Commands.eth().getCode(address, block));
         }
 
         @Override
         public CompletableFuture<HexData[]> getWork() {
-            CompletableFuture<HexData[]> resp = transport.execute("eth_getWork",
-                    Collections.emptyList(),
-                    HexData[].class);
-            return resp;
+            return client.execute(Commands.eth().getWork());
         }
 
         @Override
         public CompletableFuture<Boolean> submitWork(Nonce nonce, Hex32 powHash, Hex32 digest) {
-            CompletableFuture<Boolean> resp = transport.execute("eth_submitWork",
-                    Arrays.asList(nonce.toHex(), powHash.toHex(), digest.toHex()),
-                    Boolean.class);
-            return resp;
+            return client.execute(Commands.eth().submitWork(nonce, powHash, digest));
         }
 
         @Override
         public CompletableFuture<Boolean> submitHashrate(Hex32 hashrate, Hex32 id) {
-            CompletableFuture<Boolean> resp = transport.execute("eth_submitHashrate",
-                    Arrays.asList(hashrate.toHex(), id.toHex()),
-                    Boolean.class);
-            return resp;
+            return client.execute(Commands.eth().submitHashrate(hashrate, id));
         }
 
         @Override
         public CompletableFuture<Address> getCoinbase() {
-            CompletableFuture<Address> resp = transport.execute("eth_coinbase",
-                    Collections.emptyList(),
-                    Address.class);
-            return resp;
+            return client.execute(Commands.eth().getCoinbase());
         }
 
         @Override
         public CompletableFuture<Long> getHashrate() {
-            CompletableFuture<String> resp = transport.execute("eth_hashrate",
-                    Collections.emptyList(),
-                    String.class);
-            return extractor.extractLong(resp);
+            return client.execute(Commands.eth().getHashrate());
         }
 
         @Override
         public CompletableFuture<Boolean> isMining() {
-            CompletableFuture<Boolean> resp = transport.execute("eth_mining",
-                    Collections.emptyList(),
-                    Boolean.class);
-            return resp;
+            return client.execute(Commands.eth().isMining());
         }
 
         @Override
-        public CompletableFuture<Long> getGasPrice() {
-            CompletableFuture<String> resp = transport.execute("eth_gasPrice",
-                    Collections.emptyList(),
-                    String.class);
-            return extractor.extractLong(resp);
+        public CompletableFuture<Wei> getGasPrice() {
+            return client.execute(Commands.eth().getGasPrice());
         }
 
         @Override
         public CompletableFuture<Address[]> getAccounts() {
-            CompletableFuture<Address[]> resp = transport.execute("eth_accounts",
-                    Collections.emptyList(),
-                    Address[].class);
-            return resp;
+            return client.execute(Commands.eth().getAccounts());
         }
 
         @Override
         public CompletableFuture<String[]> getCompilers() {
-            CompletableFuture<String[]> resp = transport.execute("eth_getCompilers",
-                    Collections.emptyList(),
-                    String[].class);
-            return resp;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public CompletableFuture<HexData> call(TransactionCallJson call, BlockTag block) {
-            CompletableFuture<String> resp = transport.execute("eth_call",
-                Arrays.asList(call, block.getCode()),
-                String.class);
-            return resp.thenApply(HexData::from);
+            return client.execute(Commands.eth().call(call, block));
         }
 
         @Override
         public CompletableFuture<TransactionId> sendTransaction(TransactionCallJson data) {
-            CompletableFuture<String> resp = transport.execute("eth_sendTransaction",
-                Collections.singletonList(data),
-                String.class);
-            return resp.thenApply(TransactionId::from);
+            return client.execute(Commands.eth().sendTransaction(data));
         }
 
         @Override
         public CompletableFuture<TransactionId> sendTransaction(HexData raw) {
-            CompletableFuture<String> resp = transport.execute("eth_sendRawTransaction",
-                Collections.singletonList(raw.toHex()),
-                String.class);
-            return resp.thenApply(TransactionId::from);
+            return client.execute(Commands.eth().sendTransaction(raw));
         }
 
         @Override
         public CompletableFuture<HexData> sign(Address signer, HexData hash) {
-            CompletableFuture<String> resp = transport.execute("eth_sign",
-                Arrays.asList(signer.toHex(), hash.toHex()),
-                String.class);
-            return resp.thenApply(HexData::from);
+            return client.execute(Commands.eth().sign(signer, hash));
         }
     }
 
+    @Deprecated
     public static class TraceCommandsImpl implements TraceCommands {
 
-        private final RpcTransport transport;
-        private Extractor extractor;
+        private final DefaultRpcClient client;
 
-        public TraceCommandsImpl(RpcTransport transport, Extractor extractor) {
-            this.transport = transport;
-            this.extractor = extractor;
+        public TraceCommandsImpl(DefaultRpcClient client) {
+            this.client = client;
         }
 
         @Override
         public CompletableFuture<TraceList> getTransaction(TransactionId hash) {
-            CompletableFuture<TraceList> resp = transport.execute("trace_transaction",
-                Collections.singletonList(hash.toHex()),
-                TraceList.class);
-            return resp;
+            return client.execute(Commands.parity().traceTransaction(hash));
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.infinitape.etherjar.rpc;
 
-package io.infinitape.etherjar.rpc.transport;
+/**
+ * Common RPC commands
+ */
+public class Commands {
 
-import io.infinitape.etherjar.rpc.Batch;
+    /**
+     *
+     * @return standard RPC commands
+     */
+    public static EthCommands eth() {
+        return new EthCommands();
+    }
 
-import java.io.Closeable;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+    /**
+     *
+     * @return commands specific for Parity Ethereum client
+     */
+    public static ParityCommands parity() {
+        return new ParityCommands();
+    }
 
-public interface RpcTransport extends Closeable {
-
-    CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items);
 }
