@@ -25,6 +25,7 @@ import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.hex.HexData;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,9 +42,15 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
     public BlockJson deserialize(JsonNode node) {
         BlockJson blockJson = new BlockJson();
-        blockJson.setNumber(getQuantity(node, "number").longValue());
+        BigInteger number = getQuantity(node, "number");
+        if (number != null) {
+            blockJson.setNumber(number.longValue());
+        }
         blockJson.setHash(getBlockHash(node, "hash"));
-        blockJson.setTimestamp(new Date(getQuantity(node, "timestamp").longValue() * 1000L));
+        BigInteger timestamp = getQuantity(node, "timestamp");
+        if (timestamp != null && timestamp.signum() > 0) {
+            blockJson.setTimestamp(new Date(timestamp.longValue() * 1000L));
+        }
 
         if (node.has("transactions")) {
             List txes = new ArrayList();
@@ -62,14 +69,20 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         blockJson.setMiner(getAddress(node, "miner"));
         blockJson.setDifficulty(getQuantity(node, "difficulty"));
         blockJson.setTotalDifficulty(getQuantity(node, "totalDifficulty"));
-        blockJson.setSize(node.get("size").longValue());
+        BigInteger size = getQuantity(node, "size");
+        if (size != null) {
+            blockJson.setSize(size.longValue());
+        }
         blockJson.setGasLimit(getQuantity(node, "gasLimit"));
         blockJson.setGasUsed(getQuantity(node, "gasUsed"));
         blockJson.setExtraData(getData(node, "extraData"));
 
         List<HexData> uncles = new ArrayList<>();
-        for (JsonNode tx: node.get("uncles")) {
-            uncles.add(BlockHash.from(tx.textValue()));
+        JsonNode unclesNode = node.get("uncles");
+        if (unclesNode != null && unclesNode.isArray()) {
+            for (JsonNode tx: unclesNode) {
+                uncles.add(BlockHash.from(tx.textValue()));
+            }
         }
         blockJson.setUncles(uncles);
 

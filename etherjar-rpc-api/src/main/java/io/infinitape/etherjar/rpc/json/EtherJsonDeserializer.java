@@ -64,6 +64,9 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         }
         String value = getHexString(node);
         if (value == null) return null;
+        if (!value.startsWith("0x")) {
+            return new BigInteger(value, 10);
+        }
         return HexEncoding.fromHex(value);
     }
 
