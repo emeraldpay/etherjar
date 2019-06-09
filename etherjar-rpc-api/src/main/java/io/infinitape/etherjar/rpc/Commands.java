@@ -23,6 +23,7 @@ public class Commands {
     private static final EthCommands eth = new EthCommands();
     private static final Web3Commands web3 = new Web3Commands();
     private static final ParityCommands parity = new ParityCommands();
+    private static final NetCommands net = new NetCommands();
 
     /**
      *
@@ -38,6 +39,14 @@ public class Commands {
      */
     public static Web3Commands web3() {
         return web3;
+    }
+
+    /**
+     *
+     * @return standard RPC commands with net_ prefix
+     */
+    public static NetCommands net() {
+        return net;
     }
 
     /**
