@@ -19,14 +19,12 @@ package io.infinitape.etherjar.rpc.transport
 import io.infinitape.etherjar.rpc.Batch
 import io.infinitape.etherjar.rpc.JacksonRpcConverter
 import io.infinitape.etherjar.rpc.RpcCall
-import io.infinitape.etherjar.rpc.RpcConverter
-import io.infinitape.etherjar.rpc.json.RequestJson
+import org.apache.http.HttpResponse
 import org.apache.http.ProtocolVersion
 import org.apache.http.client.HttpClient
 import org.apache.http.message.BasicStatusLine
 import spock.lang.Specification
 
-import java.net.http.HttpResponse
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 
@@ -63,7 +61,7 @@ class DefaultRpcTransportSpec extends Specification {
     def "Fail batch items on non-OK response"() {
         setup:
         def batch = new Batch()
-        def respMock = Mock(org.apache.http.HttpResponse)
+        def respMock = Mock(HttpResponse)
         when:
         def callF = batch.add(RpcCall.create("test"))
         def f = defaultRpcTransport.execute(batch.items)
