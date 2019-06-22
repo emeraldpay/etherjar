@@ -24,6 +24,7 @@ import io.infinitape.etherjar.hex.Hex32
 import io.infinitape.etherjar.hex.HexData
 import io.infinitape.etherjar.rpc.json.BlockJson
 import io.infinitape.etherjar.rpc.json.BlockTag
+import io.infinitape.etherjar.rpc.json.SyncingJson
 import io.infinitape.etherjar.rpc.json.TransactionCallJson
 import io.infinitape.etherjar.rpc.json.TransactionJson
 import io.infinitape.etherjar.rpc.json.TransactionReceiptJson
@@ -395,5 +396,16 @@ class EthCommandsSpec extends Specification {
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1234']
         call.jsonType == String
         call.resultType == HexData
+    }
+
+    def syncing() {
+        when:
+        def call = Commands.eth().syncing()
+
+        then:
+        call.method == "eth_syncing"
+        call.params == []
+        call.jsonType == SyncingJson
+        call.resultType == SyncingJson
     }
 }

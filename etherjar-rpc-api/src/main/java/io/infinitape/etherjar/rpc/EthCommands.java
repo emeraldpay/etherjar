@@ -359,4 +359,13 @@ public class EthCommands {
         return RpcCall.create("eth_sign", signer.toHex(), hash.toHex()).converted(HexData.class, HexData::from);
     }
 
+    /**
+     * Checks the syncing status of the node
+     *
+     * @return syncing status (false or information about current progress if true)
+     */
+    public RpcCall<SyncingJson, SyncingJson> syncing() {
+        return RpcCall.create("eth_syncing", SyncingJson.class);
+    }
+
 }
