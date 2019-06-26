@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     group = 'io.infinitape'
-    version = "0.7.0-SNAPSHOT"
+    version = "0.7.0"
 
     repositories {
         jcenter()
@@ -142,6 +142,22 @@ subprojects {
                     sign = true
                 }
             }
+        }
+    }
+}
+
+// Skip Bintray for the root module
+bintray {
+    dryRun=true
+    publish=false
+    override=true
+    publications = []
+    configurations = []
+    pkg {
+        repo = 'none'
+        name = 'none'
+        version {
+            name = 'none'
         }
     }
 }

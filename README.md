@@ -7,7 +7,7 @@
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-Latest Version: 0.6.0
+Latest Version: 0.7.0
 
 ## Architecture
 
@@ -16,7 +16,7 @@ Latest Version: 0.6.0
 * [x] Transport data-layer 
   * [ ] IPC (_not implemented yet_)  
   * [x] HTTP
-  * [ ] WebSockets (_in progress_)
+  * [x] WebSockets
 
 ## Modules
 
@@ -71,7 +71,7 @@ where
 <dependency>
   <groupId>io.infinitape</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
-  <version>0.6.0</version>
+  <version>0.7.0</version>
 </dependency>
 ```
 
@@ -85,11 +85,11 @@ repositories {
 }
 
 dependencies {
-    compile 'io.infinitape:etherjar-rpc-http:0.6.0'
+    compile 'io.infinitape:etherjar-rpc-http:0.7.0'
 }
 ```
 
-## Examples (version 0.7.0-SNAPSHOT)
+## Examples
 
 How to call `web3_clientVersion` low-level JSON-RPC API method:
 
