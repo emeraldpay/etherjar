@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.kordamp.gradle:jacoco-gradle-plugin:0.25.0'
+    }
+}
+
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
