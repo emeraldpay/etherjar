@@ -74,6 +74,19 @@ class DefaultRpcTransportSpec extends Specification {
         f.isCompletedExceptionally()
     }
 
+    def "Empty batch"() {
+        setup:
+        def batch = new Batch()
+        when:
+        def f = defaultRpcTransport.execute(batch.items)
+        def act = f.get()
+        then:
+        act.succeed == 0
+        act.total == 0
+        act.failed == 0
+        0 * httpClientMock.execute(_)
+    }
+
 /*
     def "call to convert trace list"() {
         setup:

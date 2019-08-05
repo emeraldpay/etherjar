@@ -92,6 +92,15 @@ public class DefaultRpcTransport implements RpcTransport {
 
     @Override
     public CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
+        if (items.isEmpty()) {
+            return CompletableFuture.completedFuture(
+                BatchStatus.newBuilder()
+                    .withFailed(0)
+                    .withSucceed(0)
+                    .withTotal(0)
+                    .build()
+            );
+        }
         if (callSequence >= 0x1fffffff) {
             callSequence = 1;
         }
