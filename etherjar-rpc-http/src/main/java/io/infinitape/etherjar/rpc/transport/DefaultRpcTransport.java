@@ -22,11 +22,20 @@ import io.infinitape.etherjar.rpc.RpcConverter;
 import io.infinitape.etherjar.rpc.RpcException;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
@@ -56,6 +65,7 @@ public class DefaultRpcTransport implements RpcTransport {
     private RpcConverter rpcConverter;
 
     private HttpClient httpclient;
+    private HttpClientContext context;
 
     public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService, HttpClient httpClient) {
         this.host = host;
@@ -67,7 +77,23 @@ public class DefaultRpcTransport implements RpcTransport {
                 .setConnectionManager(createConnectionManager())
                 .setConnectionManagerShared(true)
                 .build();
+            this.context = null;
         }
+    }
+
+    public void setBasicAuth(String username, String password) {
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+        AuthCache cache = new BasicAuthCache();
+        cache.put(
+            new HttpHost(host.getHost(), host.getPort(), host.getScheme()),
+            new BasicScheme()
+        );
+
+        HttpClientContext context = HttpClientContext.create();
+        context.setCredentialsProvider(provider);
+        context.setAuthCache(cache);
+        this.context = context;
     }
 
     public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService) {
@@ -122,7 +148,7 @@ public class DefaultRpcTransport implements RpcTransport {
                         .setUri(host)
                         .addHeader("Content-Type", "application/json")
                         .setEntity(new ByteArrayEntity(json.getBytes(StandardCharsets.UTF_8)));
-                HttpResponse rcpResponse = httpclient.execute(requestBuilder.build());
+                HttpResponse rcpResponse = httpclient.execute(requestBuilder.build(), context);
                 int statusCode = rcpResponse.getStatusLine().getStatusCode();
                 if (statusCode != 200) {
                     throw new IOException("Server returned error response: " + statusCode);
