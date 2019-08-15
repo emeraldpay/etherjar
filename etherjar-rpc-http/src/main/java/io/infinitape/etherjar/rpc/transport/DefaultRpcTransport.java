@@ -31,18 +31,29 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.ssl.*;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 
+import javax.net.ssl.SSLContext;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,23 +75,52 @@ public class DefaultRpcTransport implements RpcTransport {
     private ExecutorService executorService;
     private RpcConverter rpcConverter;
 
+    private boolean clientProvided;
     private HttpClient httpclient;
     private HttpClientContext context;
+    private SSLContext sslContext;
 
     public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService, HttpClient httpClient) {
         this.host = host;
         this.rpcConverter = rpcConverter;
         this.executorService = executorService;
         this.httpclient = httpClient;
+        this.clientProvided = httpClient != null;
+        this.context = null;
         if (this.httpclient == null) {
-            this.httpclient = HttpClients.custom()
-                .setConnectionManager(createConnectionManager())
-                .setConnectionManagerShared(true)
-                .build();
-            this.context = null;
+            buildHttpClient();
         }
     }
 
+    public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService) {
+        this(host, rpcConverter, executorService, null);
+    }
+
+    public DefaultRpcTransport(URI host) {
+        this(host, new JacksonRpcConverter(), Executors.newCachedThreadPool());
+    }
+
+    protected void buildHttpClient() {
+        this.httpclient = HttpClients.custom()
+            .setMaxConnTotal(MAX_CONNECTIONS)
+            .setConnectionManagerShared(true)
+            .setSSLContext(sslContext)
+            .setDefaultSocketConfig(
+                SocketConfig.custom()
+                    .setSoTimeout(1000)
+                    .setSoReuseAddress(true)
+                    .setSoKeepAlive(true)
+                    .build()
+            )
+            .build();
+    }
+
+    /**
+     * Setup Basic Auth for RPC calls
+     *
+     * @param username username
+     * @param password password
+     */
     public void setBasicAuth(String username, String password) {
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
@@ -96,19 +136,28 @@ public class DefaultRpcTransport implements RpcTransport {
         this.context = context;
     }
 
-    public DefaultRpcTransport(URI host, RpcConverter rpcConverter, ExecutorService executorService) {
-        this(host, rpcConverter, executorService, null);
-    }
+    /**
+     * Provide a trusted x509 certificate expected from RPC server
+     *
+     * @param certificate input stream to certificate in DER format (binary or base64)
+     * @throws GeneralSecurityException if there is a problem with the certificate
+     * @throws IOException if unable to read certificate
+     */
+    public void setTrustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
+        if (clientProvided) {
+            throw new IllegalArgumentException("Transport is using a provided HttpClient");
+        }
 
-    public DefaultRpcTransport(URI host) {
-        this(host, new JacksonRpcConverter(), Executors.newCachedThreadPool());
-    }
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509Certificate cert = (X509Certificate) cf.generateCertificate(certificate);
 
-    protected HttpClientConnectionManager createConnectionManager() {
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setMaxTotal(MAX_CONNECTIONS);
-        cm.setDefaultMaxPerRoute(MAX_CONNECTIONS);
-        return cm;
+        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        ks.load(null, "".toCharArray());
+        ks.setCertificateEntry("server", cert);
+        this.sslContext = SSLContexts.custom()
+            .loadTrustMaterial(ks, (TrustStrategy) (chain, authType) -> Arrays.asList(chain).contains(cert))
+            .build();
+        buildHttpClient();
     }
 
     @Override
