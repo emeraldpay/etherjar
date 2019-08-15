@@ -53,7 +53,7 @@ class DefaultRpcTransportSpec extends Specification {
         f.get()
         then:
         thrown(ExecutionException)
-        1 * httpClientMock.execute(_) >> { throw new IOException("Test error") }
+        1 * httpClientMock.execute(_, _) >> { throw new IOException("Test error") }
         callF.isCompletedExceptionally()
         f.isCompletedExceptionally()
     }
@@ -68,7 +68,7 @@ class DefaultRpcTransportSpec extends Specification {
         f.get()
         then:
         thrown(ExecutionException)
-        1 * httpClientMock.execute(_) >> respMock
+        1 * httpClientMock.execute(_, _) >> respMock
         1 * respMock.getStatusLine() >> new BasicStatusLine(new ProtocolVersion("HTTP", 1, 0), 503, "Test")
         callF.isCompletedExceptionally()
         f.isCompletedExceptionally()
@@ -84,7 +84,7 @@ class DefaultRpcTransportSpec extends Specification {
         act.succeed == 0
         act.total == 0
         act.failed == 0
-        0 * httpClientMock.execute(_)
+        0 * httpClientMock.execute(_, _)
     }
 
 /*
