@@ -56,7 +56,7 @@ public class SubscriptionJson {
     }
 
     public String getStringResult() {
-        return result.asText();
+        return result == null ? null : result.asText();
     }
 
     public Integer getId() {

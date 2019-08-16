@@ -80,7 +80,7 @@ public abstract class Subscription<T> {
     public static class Block extends Subscription<BlockJson<TransactionId>> {
 
         private static final List PARAMS = Arrays.asList(
-            "newBlocks",
+            "newHeads",
             Collections.unmodifiableMap(new HashMap<String, Boolean>() {{
                 put("includeTransactions", true);
                 put("transactionDetails", false);
