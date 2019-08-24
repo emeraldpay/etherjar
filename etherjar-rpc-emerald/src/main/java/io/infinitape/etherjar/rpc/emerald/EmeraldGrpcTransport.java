@@ -42,16 +42,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * RPC Transport over gRPC for Emerald API compatible servers (such as Emerald Dshackle)
- * <br/>
+ * <br>
+ *
  * Example usage:
- * <code><pre>
+ * <pre><code>
  * RpcTransport transport = EmeraldGrpcTransport.newBuilder()
  *                 .forAddress("dshackle-server:9001")
  *                 .setThreadsCount(8)
  *                 .setChain(Chain.ETHEREUM)
  *                 .build();
  * RpcClient client = new DefaultRpcClient(transport);
- * </pre></code>
+ * </code></pre>
  */
 public class EmeraldGrpcTransport implements RpcTransport {
 
@@ -99,10 +100,10 @@ public class EmeraldGrpcTransport implements RpcTransport {
 
     /**
      * Reuse same transport and channel for a new client that will select a particular nodes
-     * to execute.<br/>
+     * to execute.<br>
      *
      * Example:
-     * <code><pre>
+     * <pre><code>
      * BlockchainOuterClass.Selector selector = BlockchainOuterClass.Selector.newBuilder().setAndSelector(
      *         BlockchainOuterClass.AndSelector.newBuilder()
      *                 .addSelectors(
@@ -125,7 +126,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
      * ).build()
      *
      * RpcClient archiveClient = new DefaultRpcClient(transport.copyWithSelector(selector));
-     * </pre></code>
+     * </code></pre>
      *
      * @param selector node selector (may be null, to copy without selector)
      *
@@ -235,8 +236,8 @@ public class EmeraldGrpcTransport implements RpcTransport {
 
         /**
          *
-         * @param host
-         * @param port
+         * @param host host
+         * @param port port
          * @return builder
          */
         public Builder forAddress(String host, int port) {
@@ -244,6 +245,11 @@ public class EmeraldGrpcTransport implements RpcTransport {
             return this;
         }
 
+        /**
+         *
+         * @param uri uri (only host:port are used, could be anything like grpc://dshakle-server:9001)
+         * @return builder
+         */
         public Builder forUri(URI uri) {
             String host = uri.getHost();
             int port = uri.getPort();
