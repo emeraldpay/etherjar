@@ -24,6 +24,7 @@ import io.infinitape.etherjar.rpc.RpcResponseError;
  */
 public class FullResponseJson<X, ID> {
 
+    private String jsonrpc = "2.0";
     private ID id;
     private X result;
     private RpcResponseError error;
@@ -38,6 +39,10 @@ public class FullResponseJson<X, ID> {
 
     public RpcResponseError getError() {
         return error;
+    }
+
+    public void setJsonrpc(String jsonrpc) {
+        this.jsonrpc = jsonrpc;
     }
 
     public boolean hasError() {

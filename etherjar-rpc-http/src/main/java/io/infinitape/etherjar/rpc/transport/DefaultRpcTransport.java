@@ -16,10 +16,7 @@
 
 package io.infinitape.etherjar.rpc.transport;
 
-import io.infinitape.etherjar.rpc.Batch;
-import io.infinitape.etherjar.rpc.JacksonRpcConverter;
-import io.infinitape.etherjar.rpc.RpcConverter;
-import io.infinitape.etherjar.rpc.RpcException;
+import io.infinitape.etherjar.rpc.*;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
 import org.apache.http.HttpHost;
@@ -169,11 +166,7 @@ public class DefaultRpcTransport implements RpcTransport {
     public CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
         if (items.isEmpty()) {
             return CompletableFuture.completedFuture(
-                BatchStatus.newBuilder()
-                    .withFailed(0)
-                    .withSucceed(0)
-                    .withTotal(0)
-                    .build()
+                BatchStatus.empty()
             );
         }
         if (callSequence >= 0x1fffffff) {
@@ -210,7 +203,7 @@ public class DefaultRpcTransport implements RpcTransport {
                 if (e instanceof RpcException) {
                     rpcError = (RpcException) e;
                 } else {
-                    rpcError = new RpcException(-32603, e.getMessage(), null, e);
+                    rpcError = new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, e.getMessage(), null, e);
                 }
                 processError(rpcError, items);
                 f.completeExceptionally(rpcError);

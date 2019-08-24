@@ -8,6 +8,22 @@ public class BatchStatus {
     private int failed;
     private int total;
 
+    public static BatchStatus empty() {
+        return BatchStatus.newBuilder()
+            .withSucceed(0)
+            .withFailed(0)
+            .withTotal(0)
+            .build();
+    }
+
+    public static BatchStatus single() {
+        return BatchStatus.newBuilder()
+            .withSucceed(1)
+            .withFailed(0)
+            .withTotal(1)
+            .build();
+    }
+
     private BatchStatus(int total) {
         this.total = total;
     }

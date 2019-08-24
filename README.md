@@ -7,16 +7,18 @@
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-Latest Version: 0.7.0
+- Latest Stable Version: 0.7.0
+- Latest Snapshot Version: 0.8.0-SNAPSHOT
 
 ## Architecture
 
-* [ ] High-level [web3.js](https://github.com/ethereum/wiki/wiki/JavaScript-API)-like Java 8 API (_in progress_)
 * [x] Low-level [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC)
 * [x] Transport data-layer 
   * [ ] IPC (_not implemented yet_)  
   * [x] HTTP
   * [x] WebSockets
+  * [x] gRPC
+* [ ] High-level Java 8 API (_in progress_)
 
 ## Modules
 
@@ -30,7 +32,9 @@ Structure of dependencies between modules:
 * `etherjar-rlp`
 * `etherjar-rpc-api`  
   * `etherjar-domain`
-  * `etherjar-hex`  
+  * `etherjar-hex`
+* `etherjar-rpc-emerald`
+  * `etherjar-rpc-api`
 * `etherjar-rpc-http`
   * `etherjar-rpc-api`
   * `etherjar-domain`
@@ -51,6 +55,7 @@ where
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
 * `etherjar-rlp` - Reading and writing RLP (Recursive Length Prefix) encoded data 
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation
+* `etherjar-rpc-emerald` - gRPC transport, see [Emerald Dshackle](https://github.com/emeraldpay/dshackle)
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
 * `etherjar-rpc-ws` - WebSocket transport to subscribe to new blocks
 * `etherjar-solidity` - Thin wrapper around [`solc` Solidity compiler](https://github.com/ethereum/solidity)

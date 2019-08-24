@@ -21,7 +21,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Igor Artamonov
  */
 public class RpcResponseError {
-    
+
+    public static int CODE_INVALID_JSON = -32700;
+    public static int CODE_INVALID_REQUEST = -32600;
+    public static int CODE_METHOD_NOT_EXIST = -32601;
+    public static int CODE_INVALID_METHOD_PARAMS = -32602;
+    public static int CODE_INTERNAL_ERROR = -32603;
+    public static int CODE_RESERVED_0 = -32000;
+    public static int CODE_RESERVED_99 = -32099;
+
     /**
      * -32700 - Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.
      * -32600 - The JSON sent is not a valid Request object.

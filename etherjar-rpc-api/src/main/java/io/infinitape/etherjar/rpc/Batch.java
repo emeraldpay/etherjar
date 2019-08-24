@@ -103,6 +103,14 @@ public class Batch {
             return call;
         }
 
+        public int getPos() {
+            return pos;
+        }
+
+        public CompletableFuture<T> getResult() {
+            return result;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;

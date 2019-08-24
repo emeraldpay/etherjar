@@ -1,0 +1,5 @@
+dependencies {
+    api project(':etherjar-rpc-api')
+    api "io.emeraldpay:emerald-grpc:0.6-SNAPSHOT"
+    api 'io.grpc:grpc-netty:1.20.0'
+}
