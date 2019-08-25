@@ -1,3 +1,9 @@
+repositories {
+    maven {
+        url  "https://dl.bintray.com/emerald/emerald-grpc"
+    }
+}
+
 dependencies {
     api project(':etherjar-rpc-api')
     api "io.emeraldpay:emerald-grpc:0.6.0-0.2"
