@@ -46,6 +46,7 @@ public class SubscriptionJsonDeserializer extends JsonDeserializer<SubscriptionJ
             SubscriptionJson resp = new SubscriptionJson();
             resp.setId(id);
             resp.setResult(node.get("result"));
+            resp.setError(node.get("error"));
             return resp;
         } else {
             throw new IOException("Unsupported message: " + node.toString());

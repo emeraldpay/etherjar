@@ -97,6 +97,10 @@ public class SocketApiHandler extends SimpleChannelInboundHandler<Object> {
                     Subscription s = initializing.remove(json.getId());
                     if (s != null) {
                         s.setId(json.getStringResult());
+                        if (json.getError() != null) {
+                            subscriptions.remove(s);
+                            s.onClose(json.extractError());
+                        }
                     } else {
                         System.err.println("Cannot find subscriber " + json.getId());
                     }

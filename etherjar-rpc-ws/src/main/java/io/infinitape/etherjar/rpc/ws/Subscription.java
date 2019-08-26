@@ -18,6 +18,7 @@ package io.infinitape.etherjar.rpc.ws;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.rpc.RpcResponseError;
 import io.infinitape.etherjar.rpc.json.BlockJson;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.netty.channel.Channel;
@@ -77,14 +78,21 @@ public abstract class Subscription<T> {
         }
     }
 
+    /**
+     * Called on socket close
+     *
+     * @param error error if closed as a result of error
+     */
+    public void onClose(RpcResponseError error) {
+        if (error != null) {
+            System.err.println("Socket closed with " + error.getMessage());
+        }
+    }
+
     public static class Block extends Subscription<BlockJson<TransactionId>> {
 
         private static final List PARAMS = Arrays.asList(
-            "newHeads",
-            Collections.unmodifiableMap(new HashMap<String, Boolean>() {{
-                put("includeTransactions", true);
-                put("transactionDetails", false);
-            }})
+            "newHeads"
         );
 
         protected Block() {

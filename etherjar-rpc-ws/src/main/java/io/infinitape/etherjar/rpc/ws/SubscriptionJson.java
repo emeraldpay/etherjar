@@ -18,6 +18,7 @@ package io.infinitape.etherjar.rpc.ws;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.rpc.RpcResponseError;
 import io.infinitape.etherjar.rpc.json.BlockJson;
 import io.infinitape.etherjar.rpc.json.BlockJsonDeserializer;
 
@@ -34,6 +35,7 @@ public class SubscriptionJson {
     private String subscription;
     private JsonNode result;
     private Integer id;
+    private JsonNode error;
 
     public String getSubscription() {
         return subscription;
@@ -65,5 +67,22 @@ public class SubscriptionJson {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public JsonNode getError() {
+        return error;
+    }
+
+    public void setError(JsonNode error) {
+        this.error = error;
+    }
+
+    public RpcResponseError extractError() {
+        if (this.error == null) {
+            return null;
+        }
+        return new RpcResponseError(this.error.get("code").asInt(),
+            this.error.get("message").asText(), this.error.get("data").asText()
+        );
     }
 }
