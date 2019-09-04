@@ -210,6 +210,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
 
         private NettyChannelBuilder channelBuilder;
         private SslContextBuilder sslContextBuilder;
+        private Channel channel;
 
         private ObjectMapper objectMapper;
         private RpcConverter rpcConverter;
@@ -218,8 +219,22 @@ public class EmeraldGrpcTransport implements RpcTransport {
         private Chain chain;
 
         /**
+         * Setup for an existing channel
+         *
+         * @param channel existing channel
+         * @return builder
+         */
+        public Builder forChannel(Channel channel) {
+            this.channel = channel;
+            channelBuilder = null;
+            sslContextBuilder = null;
+            return this;
+        }
+
+        /**
          * Setup for address formatted as host:port
-         * @param hostPort
+         *
+         * @param hostPort address in host:port format
          * @return builder
          */
         public Builder forAddress(String hostPort) {
@@ -239,6 +254,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
          */
         public Builder forAddress(String host, int port) {
             channelBuilder = NettyChannelBuilder.forAddress(host, port).usePlaintext();
+            channel = null;
             return this;
         }
 
@@ -377,9 +393,12 @@ public class EmeraldGrpcTransport implements RpcTransport {
          * @throws SSLException if problem with TLS certificates
          */
         public EmeraldGrpcTransport build() throws SSLException {
-            if (sslContextBuilder != null) {
-                channelBuilder.useTransportSecurity()
-                    .sslContext(sslContextBuilder.build());
+            if (channel == null) {
+                if (sslContextBuilder != null) {
+                    channelBuilder.useTransportSecurity()
+                        .sslContext(sslContextBuilder.build());
+                }
+                channel = channelBuilder.build();
             }
             if (executorService == null) {
                 setThreadsCount(2);
@@ -394,7 +413,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
                 chain = Chain.UNSPECIFIED;
             }
             Common.ChainRef chainRef = Common.ChainRef.forNumber(chain.getId());
-            return new EmeraldGrpcTransport(channelBuilder.build(), objectMapper, rpcConverter, executorService, chainRef);
+            return new EmeraldGrpcTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
         }
     }
 }
