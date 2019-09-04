@@ -22,7 +22,7 @@ import io.emeraldpay.api.proto.BlockchainGrpc;
 import io.emeraldpay.api.proto.BlockchainOuterClass;
 import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.grpc.Chain;
-import io.grpc.ManagedChannel;
+import io.grpc.Channel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.infinitape.etherjar.rpc.*;
@@ -56,7 +56,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class EmeraldGrpcTransport implements RpcTransport {
 
-    private final ManagedChannel channel;
+    private final Channel channel;
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
 
     private ObjectMapper objectMapper;
@@ -65,7 +65,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
     private Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
-    public EmeraldGrpcTransport(ManagedChannel channel,
+    public EmeraldGrpcTransport(Channel channel,
                                 ObjectMapper objectMapper,
                                 RpcConverter rpcConverter,
                                 ExecutorService executorService,
@@ -109,7 +109,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
      *                 .addSelectors(
      *                         BlockchainOuterClass.Selector.newBuilder().setLabelSelector(
      *                                 BlockchainOuterClass.LabelSelector.newBuilder()
-     *                                         .setName("trace")
+     *                                         .setName("archive")
      *                                         .addValue("true")
      *                                         .build()
      *                         )
@@ -204,9 +204,6 @@ public class EmeraldGrpcTransport implements RpcTransport {
 
     @Override
     public void close() throws IOException {
-        try {
-            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) { }
     }
 
     public static class Builder {
