@@ -22,7 +22,13 @@ import io.infinitape.etherjar.domain.TransactionId;
  */
 public class ParityCommands {
 
-    RpcCall<TraceList, TraceList> traceTransaction(TransactionId hash) {
+    /**
+     * Call for trace_transaction
+     *
+     * @param hash hash of the transaction
+     * @return trace list
+     */
+    public RpcCall<TraceList, TraceList> traceTransaction(TransactionId hash) {
         return RpcCall.create("trace_transaction", TraceList.class, hash.toHex());
     }
 }
