@@ -7,8 +7,8 @@
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.7.0
-- Latest Snapshot Version: 0.8.0-SNAPSHOT
+- Latest Stable Version: 0.8.0
+- Latest Snapshot Version: 0.9.0-SNAPSHOT
 
 ## Architecture
 
@@ -76,7 +76,7 @@ where
 <dependency>
   <groupId>io.infinitape</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
-  <version>0.7.0</version>
+  <version>0.8.0</version>
 </dependency>
 ```
 
@@ -90,7 +90,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.infinitape:etherjar-rpc-http:0.7.0'
+    compile 'io.infinitape:etherjar-rpc-http:0.8.0'
 }
 ```
 
