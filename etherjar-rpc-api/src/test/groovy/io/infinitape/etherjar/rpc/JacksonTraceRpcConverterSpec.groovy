@@ -17,6 +17,7 @@
 package io.infinitape.etherjar.rpc
 
 import io.infinitape.etherjar.domain.Wei
+import io.infinitape.etherjar.hex.HexData
 import io.infinitape.etherjar.rpc.json.TraceItemJson
 import spock.lang.Specification
 
@@ -192,5 +193,34 @@ class JacksonTraceRpcConverterSpec extends Specification {
         act.every { it.blockHash.toHex() == '0xcccca35475a616036977373053068d32e9f1b7dd111b66cb1791ceb845307dd8' }
         act.every { it.blockNumber == 2423047L}
         act.every { it.transactionHash.toHex() == '0x02e5080477b605c6b83acbd93548f4fdb9205353bc6bad4a7172d951300de4cb'}
+    }
+
+    def "Static Call"() {
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("trace/0x0cbb36.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TraceList.class)
+
+        then:
+        act.size() == 3
+        with(act[0]) {
+            action.callType == TraceItemJson.CallType.CALL
+            subtraces == 2
+            traceAddress == []
+            error == "Reverted"
+        }
+        with(act[1]) {
+            action.callType == TraceItemJson.CallType.STATICCALL
+            subtraces == 0
+            traceAddress == [0L]
+            result.gasUsed == 0x2ae
+            result.output == HexData.from("0x0000000000000000000000000000000000000000000000000000000000000000")
+        }
+        with(act[2]) {
+            action.callType == TraceItemJson.CallType.DELEGATECALL
+            subtraces == 0
+            traceAddress == [1L]
+            error == "Reverted"
+        }
     }
 }

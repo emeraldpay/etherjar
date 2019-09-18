@@ -278,7 +278,7 @@ public class TraceItemJson implements Serializable {
     }
 
     public static enum CallType {
-        NONE, CALL, CALLCODE, DELEGATECALL;
+        NONE, CALL, CALLCODE, DELEGATECALL, STATICCALL;
     }
 
     public static enum TraceType {
