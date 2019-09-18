@@ -1,0 +1,67 @@
+{
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "action": {
+                "callType": "call",
+                "from": "0x393b2103ee8016f763efe4e1a681ccd4a6e3393b",
+                "gas": "0x43ce72",
+                "input": "0xb59589d1",
+                "to": "0x907b61e2af5a0b0b133921cc6aee27f69eafcd32",
+                "value": "0x0"
+            },
+            "blockHash": "0xdd0b4c2add01462b4a0173d0566c0c3938707209ab9cac37fbb88886948de0e0",
+            "blockNumber": 8795817,
+            "error": "Reverted",
+            "subtraces": 2,
+            "traceAddress": [],
+            "transactionHash": "0x0cbb36ed9631acbc81cb5cf9f69ed41948e2e9d899d6ba944526195838243ead",
+            "transactionPosition": 10,
+            "type": "call"
+        },
+        {
+            "action": {
+                "callType": "staticcall",
+                "from": "0x907b61e2af5a0b0b133921cc6aee27f69eafcd32",
+                "gas": "0x42b7a0",
+                "input": "0xcb81cd8e",
+                "to": "0x8d46ebd9653a14b2d3e51b518096845cd3f5ce2e",
+                "value": "0x0"
+            },
+            "blockHash": "0xdd0b4c2add01462b4a0173d0566c0c3938707209ab9cac37fbb88886948de0e0",
+            "blockNumber": 8795817,
+            "result": {
+                "gasUsed": "0x2ae",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "subtraces": 0,
+            "traceAddress": [
+                0
+            ],
+            "transactionHash": "0x0cbb36ed9631acbc81cb5cf9f69ed41948e2e9d899d6ba944526195838243ead",
+            "transactionPosition": 10,
+            "type": "call"
+        },
+        {
+            "action": {
+                "callType": "delegatecall",
+                "from": "0x907b61e2af5a0b0b133921cc6aee27f69eafcd32",
+                "gas": "0x42ad83",
+                "input": "0x526396a10000000000000000000000000000000000000000000000000000000000000000",
+                "to": "0xffbd35a75b45c58ccaf7250c8680c4133bbad311",
+                "value": "0x0"
+            },
+            "blockHash": "0xdd0b4c2add01462b4a0173d0566c0c3938707209ab9cac37fbb88886948de0e0",
+            "blockNumber": 8795817,
+            "error": "Reverted",
+            "subtraces": 0,
+            "traceAddress": [
+                1
+            ],
+            "transactionHash": "0x0cbb36ed9631acbc81cb5cf9f69ed41948e2e9d899d6ba944526195838243ead",
+            "transactionPosition": 10,
+            "type": "call"
+        }
+    ],
+    "id": 1
+}
