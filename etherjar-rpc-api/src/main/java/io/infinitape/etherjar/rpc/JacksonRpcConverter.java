@@ -38,6 +38,9 @@ public class JacksonRpcConverter implements RpcConverter {
     private ObjectMapper objectMapper;
 
     public JacksonRpcConverter(ObjectMapper objectMapper) {
+        if (objectMapper == null) {
+            throw new IllegalArgumentException("objectMapper must be set");
+        }
         this.objectMapper = objectMapper;
     }
 

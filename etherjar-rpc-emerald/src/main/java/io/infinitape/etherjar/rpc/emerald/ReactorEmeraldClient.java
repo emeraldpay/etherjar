@@ -340,6 +340,9 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
                 }
                 channel = channelBuilder.build();
             }
+            if (objectMapper == null) {
+                objectMapper = new ObjectMapper();
+            }
             if (rpcConverter == null) {
                 rpcConverter = new JacksonRpcConverter(objectMapper);
             }
