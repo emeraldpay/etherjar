@@ -55,7 +55,7 @@ class StaticTypeSpec extends Specification {
         def visitor = new Type.VisitorImpl<Boolean>() {
 
             @Override
-            <T> Boolean visit(StaticType<T> type) { true }
+            Boolean visit(StaticType<Boolean> type) { true }
         }
 
         expect:

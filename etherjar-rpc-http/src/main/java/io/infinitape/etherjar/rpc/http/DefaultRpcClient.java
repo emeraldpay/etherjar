@@ -21,6 +21,8 @@ import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DefaultRpcClient extends AbstractFuturesRcpClient implements FuturesRcpClient {
@@ -45,25 +47,44 @@ public class DefaultRpcClient extends AbstractFuturesRcpClient implements Future
         }
         BatchCallContext<DefaultBatch.FutureBatchItem> context = new BatchCallContext<>();
         List<RpcTransport.RpcRequest> rpcRequests = items.stream()
-            .map(item -> {
-                int current = context.add(item);
-                return convert(item.getCall(), current);
-            })
+            .map(new BatchTransformer<Object, Object>(context))
             .collect(Collectors.toList());
 
         return rpcTransport.execute(rpcRequests).thenApply((resp) -> {
             List<DefaultBatch.FutureBatchItem> result = batch.getItems();
-            resp.forEach((it) -> {
-                DefaultBatch.FutureBatchItem batchItem = context.getResultMapper().get(it.getRequest().getPayload().getId());
-                batchItem.read(it);
-            });
+            resp.forEach(new ResponseReader<Object>(context));
             return result;
         });
     }
 
-    protected <T> RpcTransport.RpcRequest<T> convert(RpcCall<T, ?> call, int id) {
-        Class<T> jsonType = call.getJsonType();
-        return new RpcTransport.RpcRequest<T>(jsonType, call.getMethod(), call.toJson(id));
+    public static class BatchTransformer<JS, T> implements Function<DefaultBatch.FutureBatchItem, RpcTransport.RpcRequest<JS>> {
+        private final BatchCallContext<DefaultBatch.FutureBatchItem> context;
+
+        BatchTransformer(BatchCallContext<DefaultBatch.FutureBatchItem> context) {
+            this.context = context;
+        }
+
+        @Override
+        public RpcTransport.RpcRequest<JS> apply(DefaultBatch.FutureBatchItem item) {
+            int id = context.add(item);
+            RpcCall<JS, T> call = item.getCall();
+            Class<JS> jsonType = call.getJsonType();
+            return new RpcTransport.RpcRequest<>(jsonType, call.getMethod(), call.toJson(id));
+        }
     }
 
+    public static class ResponseReader<JS> implements Consumer<RpcTransport.RpcResponse> {
+        private final BatchCallContext<DefaultBatch.FutureBatchItem> context;
+
+        ResponseReader(BatchCallContext<DefaultBatch.FutureBatchItem> context) {
+            this.context = context;
+        }
+
+        @Override
+        public void accept(RpcTransport.RpcResponse value) {
+            DefaultBatch.FutureBatchItem<JS, ?> batchItem = context.getResultMapper().get(value.getRequest().getPayload().getId());
+            batchItem.read(value);
+        }
+
+    }
 }
