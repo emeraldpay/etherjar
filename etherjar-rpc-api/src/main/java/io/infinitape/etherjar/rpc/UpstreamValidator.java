@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2018 Infinitape Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.rpc.json.RequestJson;
-import io.infinitape.etherjar.rpc.json.ResponseJson;
+import io.infinitape.etherjar.rpc.FuturesRcpClient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+/**
+ *  Validates an upstream URI to conform requirements of the current app
+ *
+ * @author Igor Artamonov
+ */
+public interface UpstreamValidator {
 
-public interface RpcConverter {
-
-    <T> T fromJson(InputStream content, Class<T> clazz) throws RpcException;
-
-    List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException;
-
-    String toJson(RequestJson request);
-
-    String toJson(List<RequestJson<Integer>> batch);
+    /**
+     * Validates an upstream URI to conform requirements of the current app
+     *
+     * @param uri upstream JSON RPC host:port
+     * @return true if valid
+     */
+    boolean validate(FuturesRcpClient uri);
 
 }

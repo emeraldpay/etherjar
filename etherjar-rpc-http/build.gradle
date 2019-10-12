@@ -19,4 +19,10 @@ dependencies {
 
     implementation 'org.apache.httpcomponents:httpmime:4.5.8'
     implementation 'org.apache.httpcomponents:httpclient:4.5.8'
+
+    implementation "io.projectreactor:reactor-core:3.2.12.RELEASE"
+    implementation "io.projectreactor.netty:reactor-netty:0.8.11.RELEASE"
+
+    testCompile "com.sparkjava:spark-core:2.8.0"
+    testCompile "io.projectreactor:reactor-test:3.2.12.RELEASE"
 }

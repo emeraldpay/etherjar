@@ -25,12 +25,18 @@ public class RpcException extends IOException {
     private int code;
     private String rpcMessage;
     private Object details;
+    private RpcCall<?, ?> source;
 
-    public RpcException(int code, String rpcMessage, Object details, Throwable cause) {
+    public RpcException(RpcCall<?, ?> source, int code, String rpcMessage, Object details, Throwable cause) {
         super("RPC Error " + code + ": " + rpcMessage, cause);
+        this.source = source;
         this.code = code;
         this.rpcMessage = rpcMessage;
         this.details = details;
+    }
+
+    public RpcException(int code, String rpcMessage, Object details, Throwable cause) {
+        this(null, code, rpcMessage, details, cause);
     }
 
     public RpcException(int code, String rpcMessage, Object details) {
@@ -56,4 +62,9 @@ public class RpcException extends IOException {
     public RpcResponseError getError() {
         return new RpcResponseError(code, rpcMessage, details);
     }
+
+    public RpcCall<?, ?> getSource() {
+        return source;
+    }
+
 }

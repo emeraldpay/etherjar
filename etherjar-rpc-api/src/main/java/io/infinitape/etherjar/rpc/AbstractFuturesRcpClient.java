@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2019 Igor Artamonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.rpc.json.RequestJson;
-import io.infinitape.etherjar.rpc.json.ResponseJson;
+import java.util.concurrent.CompletableFuture;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+public abstract class AbstractFuturesRcpClient implements FuturesRcpClient {
 
-public interface RpcConverter {
-
-    <T> T fromJson(InputStream content, Class<T> clazz) throws RpcException;
-
-    List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException;
-
-    String toJson(RequestJson request);
-
-    String toJson(List<RequestJson<Integer>> batch);
+    public <JS, RES> CompletableFuture<RES> execute(RpcCall<JS, RES> call) {
+        DefaultBatch batch = new DefaultBatch();
+        DefaultBatch.FutureBatchItem<JS, RES> result = batch.add(call);
+        this.execute(batch);
+        return result.getResult();
+    }
 
 }

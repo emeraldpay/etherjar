@@ -16,16 +16,8 @@
 
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.rpc.transport.BatchStatus;
+public interface RpcClient<RESP, BI extends BatchItem, REQ extends Batch<BI>> {
 
-import java.util.concurrent.CompletableFuture;
-
-public interface RpcClient {
-
-    CompletableFuture<BatchStatus> execute(Batch batch);
-
-    <RES> CompletableFuture<RES> execute(RpcCall<?, RES> call);
-
-    ExecutableBatch batch();
+    RESP execute(REQ batch);
 
 }

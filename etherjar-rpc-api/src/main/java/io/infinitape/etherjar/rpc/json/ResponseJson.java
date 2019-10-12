@@ -20,11 +20,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.rpc.RpcResponseError;
 
 @JsonSerialize(using = ResponseJsonSerializer.class)
-public class ResponseJson<X,T> {
+public class ResponseJson<DATA, ID> {
 
     private String jsonrpc = "2.0";
-    private T id;
-    private X result;
+    private ID id;
+    private DATA result;
     private RpcResponseError error;
 
     public String getJsonrpc() {
@@ -35,22 +35,22 @@ public class ResponseJson<X,T> {
         this.jsonrpc = jsonrpc;
     }
 
-    public T getId() {
+    public ID getId() {
         return id;
     }
 
-    public void setId(T id) {
+    public void setId(ID id) {
         if (!(Integer.class.isAssignableFrom(id.getClass()) || String.class.isAssignableFrom(id.getClass()))) {
             throw new IllegalArgumentException("ID must be String or Integer");
         }
         this.id = id;
     }
 
-    public X getResult() {
+    public DATA getResult() {
         return result;
     }
 
-    public void setResult(X result) {
+    public void setResult(DATA result) {
         this.result = result;
     }
 

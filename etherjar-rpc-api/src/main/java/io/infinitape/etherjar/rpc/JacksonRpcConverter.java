@@ -16,7 +16,6 @@
 
 package io.infinitape.etherjar.rpc;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -65,21 +64,31 @@ public class JacksonRpcConverter implements RpcConverter {
         return objectMapper.writer().writeValueAsString(response);
     }
 
-    public String toJson(RequestJson request) throws JsonProcessingException {
-        return objectMapper.writer().writeValueAsString(request);
+    @Override
+    public String toJson(RequestJson request) {
+        try {
+            return objectMapper.writer().writeValueAsString(request);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Unable to serialize to JSON", e);
+        }
     }
 
     @Override
-    public String toJson(List<RequestJson<Integer>> batch) throws IOException {
-        return objectMapper.writer().writeValueAsString(batch);
+    public String toJson(List<RequestJson<Integer>> batch) {
+        try {
+            return objectMapper.writer().writeValueAsString(batch);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Unable to serialize to JSON", e);
+        }
     }
 
-    public <T> T fromJson(InputStream content, Class<T> target) throws IOException {
+    @Override
+    public <T> T fromJson(InputStream content, Class<T> target) throws RpcException {
         return fromJson(content, target, Integer.class);
     }
 
     @SuppressWarnings("unchecked")
-    public <T, X> T fromJson(InputStream content, Class<T> target, Class<X> idtype) throws IOException {
+    public <T, X> T fromJson(InputStream content, Class<T> target, Class<X> idtype) throws RpcException {
         if (TraceList.class.isAssignableFrom(target)) {
             return (T) fromJsonList(content, TraceItemJson.class);
         }
@@ -88,7 +97,7 @@ public class JacksonRpcConverter implements RpcConverter {
         try {
             responseJson = objectMapper.readerFor(type1).readValue(content);
         } catch (IOException e) {
-            throw new RpcResponseException("Invalid response from RPC endpoint", e);
+            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Invalid response from RPC endpoint");
         }
         if (responseJson.hasError()) {
             RpcResponseError error = responseJson.getError();
@@ -97,35 +106,45 @@ public class JacksonRpcConverter implements RpcConverter {
         return responseJson.getResult();
     }
 
-    public List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws IOException {
-        JsonNode nodes = objectMapper.reader().readTree(content);
-        if (!nodes.isArray()) {
-            throw new IOException("Not array");
-        }
-        Iterator<JsonNode> elements = nodes.elements();
-        List<ResponseJson<?,Integer>> parsedBatch = new ArrayList<>();
-        while (elements.hasNext()) {
-            JsonNode resp = elements.next();
-            if (!resp.isObject()) {
-                continue;
+    @Override
+    public List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException {
+        try {
+            JsonNode nodes = objectMapper.reader().readTree(content);
+            if (!nodes.isArray()) {
+                throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Not array");
             }
-            Integer id = resp.get("id").asInt();
-            if (!targets.containsKey(id)) {
-                continue;
+            Iterator<JsonNode> elements = nodes.elements();
+            List<ResponseJson<?,Integer>> parsedBatch = new ArrayList<>();
+            while (elements.hasNext()) {
+                JsonNode resp = elements.next();
+                if (!resp.isObject()) {
+                    continue;
+                }
+                Integer id = resp.get("id").asInt();
+                if (!targets.containsKey(id)) {
+                    continue;
+                }
+                Class[] inner = new Class[] { targets.get(id), Integer.class };
+                JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, inner);
+                ResponseJson parsedItem = objectMapper.reader().forType(type1).readValue(resp);
+                parsedBatch.add(parsedItem);
             }
-            Class[] inner = new Class[] { targets.get(id), Integer.class };
-            JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, inner);
-            ResponseJson parsedItem = objectMapper.reader().forType(type1).readValue(resp);
-            parsedBatch.add(parsedItem);
+            return parsedBatch;
+        } catch (IOException e) {
+            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, e.getMessage());
         }
-        return parsedBatch;
     }
 
-    public <T> List<T> fromJsonList(InputStream content, Class<T> target) throws IOException {
+    public <T> List<T> fromJsonList(InputStream content, Class<T> target) throws RpcException {
         JavaType dataType = objectMapper.getTypeFactory().constructParametricType(List.class, target);
         JavaType idType = objectMapper.getTypeFactory().constructType(Integer.class);
         JavaType type2 = objectMapper.getTypeFactory().constructParametricType(FullResponseJson.class, dataType, idType);
-        FullResponseJson<List<T>, Object> responseJson = objectMapper.readerFor(type2).readValue(content);
+        FullResponseJson<List<T>, Object> responseJson = null;
+        try {
+            responseJson = objectMapper.readerFor(type2).readValue(content);
+        } catch (IOException e) {
+            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, e.getMessage());
+        }
         if (responseJson.hasError()) {
             RpcResponseError error = responseJson.getError();
             throw new RpcException(error.getCode(), error.getMessage(), error.getData());

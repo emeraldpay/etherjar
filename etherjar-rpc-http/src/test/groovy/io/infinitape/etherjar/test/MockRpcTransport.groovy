@@ -15,39 +15,30 @@
  */
 package io.infinitape.etherjar.test
 
-import io.infinitape.etherjar.rpc.Batch
-import io.infinitape.etherjar.rpc.transport.BatchStatus
+import io.infinitape.etherjar.rpc.RpcException
+import io.infinitape.etherjar.rpc.RpcResponseError
 import io.infinitape.etherjar.rpc.transport.RpcTransport
 
 import java.util.concurrent.CompletableFuture
 
-class MockRpcTransport implements RpcTransport {
+class MockRpcTransport implements RpcTransport{
 
     List<MockedRequest> commands = []
 
     @Override
-    CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
-        int success = 0
-        int failed = 0
+    CompletableFuture<Iterable<RpcResponse>> execute(List<RpcRequest> items) {
+        List<RpcResponse> result = []
         items.forEach { item ->
             def found = commands.find {
-                it.accept(item.call.method, item.call.params)
+                it.accept(item.method, item.payload.params)
             }
             if (found != null) {
-                success++
-                item.onComplete(found.response)
+                result << item.asResponse(found.response)
             } else {
-                failed++
-                item.onError(new Exception("No command for $item.call.method($item.call.params)"))
+                result << item.asError(new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, "No command for $item.method($item.payload.params)"))
             }
         }
-        return CompletableFuture.completedFuture(
-                BatchStatus.newBuilder()
-                    .withTotal(items.size())
-                    .withSucceed(success)
-                    .withFailed(failed)
-                    .build()
-        )
+        return CompletableFuture.completedFuture(result)
     }
 
     @Override
@@ -62,6 +53,7 @@ class MockRpcTransport implements RpcTransport {
     void mock(String method, List params, Object response) {
         commands.add(new MockedRequest(method: method, params: params, response: response))
     }
+
 
     class MockedRequest {
         String method

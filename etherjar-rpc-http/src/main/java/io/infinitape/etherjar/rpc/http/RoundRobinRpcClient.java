@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.infinitape.etherjar.rpc.transport;
+package io.infinitape.etherjar.rpc.http;
 
-import io.infinitape.etherjar.rpc.Batch;
-import io.infinitape.etherjar.rpc.JacksonRpcConverter;
-import io.infinitape.etherjar.rpc.RpcConverter;
+import io.infinitape.etherjar.rpc.AbstractFuturesRcpClient;
+import io.infinitape.etherjar.rpc.DefaultBatch;
+import io.infinitape.etherjar.rpc.FuturesRcpClient;
+import io.infinitape.etherjar.rpc.UpstreamValidator;
+import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,27 +40,26 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Igor Artamonov
  */
-public class RoundRobinRpcTransport implements RpcTransport {
+public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements FuturesRcpClient, Closeable {
 
     private AtomicInteger seq = new AtomicInteger(0);
     private Lock validationLock = new ReentrantLock();
 
 
-    private final List<URI> knownHosts;
-    private final AtomicReference<List<RpcTransport>> active = new AtomicReference<>(Collections.emptyList());
+    private final List<FuturesRcpClient> knownHosts;
+    private final AtomicReference<List<FuturesRcpClient>> active = new AtomicReference<>(Collections.emptyList());
 
     private final ExecutorService executorService;
-    private RpcConverter rpcConverter = new JacksonRpcConverter();
 
     private ScheduledExecutorService scheduler;
 
     private UpstreamValidator upstreamValidator = new BasicUpstreamValidator();
 
-    public RoundRobinRpcTransport(List<URI> knownHosts) {
+    public RoundRobinRpcClient(List<FuturesRcpClient> knownHosts) {
         this(knownHosts, Executors.newCachedThreadPool());
     }
 
-    public RoundRobinRpcTransport(List<URI> knownHosts, ExecutorService executorService) {
+    public RoundRobinRpcClient(List<FuturesRcpClient> knownHosts, ExecutorService executorService) {
         if (knownHosts.isEmpty()) {
             throw new IllegalArgumentException("List of known upstreams should not be empty");
         }
@@ -103,21 +105,21 @@ public class RoundRobinRpcTransport implements RpcTransport {
     public boolean revalidate() {
         validationLock.lock();
         try {
-            List<RpcTransport> transports = new ArrayList<>(knownHosts.size());
-            List<Future<URI>> validations = new ArrayList<>(knownHosts.size());
-            for (URI uri: knownHosts) {
-                Future<URI> f = executorService.submit(
+            List<FuturesRcpClient> transports = new ArrayList<>(knownHosts.size());
+            List<Future<FuturesRcpClient>> validations = new ArrayList<>(knownHosts.size());
+            for (FuturesRcpClient uri: knownHosts) {
+                Future<FuturesRcpClient> f = executorService.submit(
                         () -> upstreamValidator.validate(uri) ? uri : null
                 );
                 validations.add(f);
             }
-            for (Future<URI> uriValidator: validations) {
-                URI uri = null;
+            for (Future<FuturesRcpClient> uriValidator: validations) {
+                FuturesRcpClient uri = null;
                 try {
                     uri = uriValidator.get();
                 } catch (Exception e) { }
                 if (uri != null) {
-                    transports.add(new DefaultRpcTransport(uri, rpcConverter, executorService));
+                    transports.add(uri);
                 }
             }
             active.set(transports);
@@ -128,12 +130,12 @@ public class RoundRobinRpcTransport implements RpcTransport {
     }
 
     public boolean hasUpstreams() {
-        List<RpcTransport> transports = active.get();
+        List<FuturesRcpClient> transports = active.get();
         return !transports.isEmpty();
     }
 
-    public RpcTransport next() {
-        List<RpcTransport> transports = active.get();
+    public FuturesRcpClient next() {
+        List<FuturesRcpClient> transports = active.get();
         if (transports.isEmpty()) {
             return null;
         }
@@ -147,14 +149,14 @@ public class RoundRobinRpcTransport implements RpcTransport {
     }
 
     @Override
-    public CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
-        RpcTransport next = next();
+    public CompletableFuture<List<DefaultBatch.FutureBatchItem>> execute(DefaultBatch batch) {
+        FuturesRcpClient next = next();
         if (next == null) {
-            CompletableFuture<BatchStatus> error = new CompletableFuture<>();
+            CompletableFuture<List<DefaultBatch.FutureBatchItem>> error = new CompletableFuture<>();
             error.completeExceptionally(new IllegalStateException("No valid upstreams available"));
             return error;
         }
-        return next.execute(items);
+        return next.execute(batch);
     }
 
     static class Builder {
@@ -199,11 +201,21 @@ public class RoundRobinRpcTransport implements RpcTransport {
             return this;
         }
 
-        public RoundRobinRpcTransport build() {
+        public RoundRobinRpcClient build() {
             if (executorService == null) {
                 executorService = Executors.newCachedThreadPool();
             }
-            RoundRobinRpcTransport transport = new RoundRobinRpcTransport(hosts, executorService);
+            List<FuturesRcpClient> clients = new ArrayList<>(hosts.size());
+            for (URI uri: hosts) {
+                RpcTransport transport = HttpRpcTransport.newBuilder()
+                    .setTarget(uri)
+                    .setExecutor(executorService)
+                    .build();
+                clients.add(
+                    new DefaultRpcClient(transport)
+                );
+            }
+            RoundRobinRpcClient transport = new RoundRobinRpcClient(clients, executorService);
             BasicUpstreamValidator upstreamValidator = new BasicUpstreamValidator();
             upstreamValidator.setMinPeers(minPeers);
             transport.setUpstreamValidator(upstreamValidator);
@@ -213,7 +225,6 @@ public class RoundRobinRpcTransport implements RpcTransport {
             }
             return transport;
         }
-
     }
 
     private static class SchedulerInstance {

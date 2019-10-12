@@ -15,7 +15,6 @@
  */
 package io.infinitape.etherjar.rpc.emerald;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import io.emeraldpay.api.proto.BlockchainGrpc;
@@ -26,7 +25,6 @@ import io.grpc.Channel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.infinitape.etherjar.rpc.*;
-import io.infinitape.etherjar.rpc.transport.BatchStatus;
 import io.infinitape.etherjar.rpc.transport.RpcTransport;
 import io.netty.handler.ssl.SslContextBuilder;
 
@@ -35,8 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * Example usage:
  * <pre><code>
- * RpcTransport transport = EmeraldGrpcTransport.newBuilder()
+ * RpcTransport transport = EmeraldTransport.newBuilder()
  *                 .forAddress("dshackle-server:9001")
  *                 .setThreadsCount(8)
  *                 .setChain(Chain.ETHEREUM)
@@ -54,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * RpcClient client = new DefaultRpcClient(transport);
  * </code></pre>
  */
-public class EmeraldGrpcTransport implements RpcTransport {
+public class EmeraldTransport implements RpcTransport {
 
     private final Channel channel;
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
@@ -65,11 +62,11 @@ public class EmeraldGrpcTransport implements RpcTransport {
     private Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
-    public EmeraldGrpcTransport(Channel channel,
-                                ObjectMapper objectMapper,
-                                RpcConverter rpcConverter,
-                                ExecutorService executorService,
-                                Common.ChainRef chainRef) {
+    public EmeraldTransport(Channel channel,
+                            ObjectMapper objectMapper,
+                            RpcConverter rpcConverter,
+                            ExecutorService executorService,
+                            Common.ChainRef chainRef) {
         this.channel = channel;
         this.objectMapper = objectMapper;
         this.rpcConverter = rpcConverter;
@@ -83,8 +80,8 @@ public class EmeraldGrpcTransport implements RpcTransport {
      *
      * @return new default configuration
      */
-    public static EmeraldGrpcTransport.Builder newBuilder() {
-        return new EmeraldGrpcTransport.Builder();
+    public static EmeraldTransport.Builder newBuilder() {
+        return new EmeraldTransport.Builder();
     }
 
     /**
@@ -94,8 +91,8 @@ public class EmeraldGrpcTransport implements RpcTransport {
      * @param chain chain for new calls through this transport
      * @return new instance of EmeraldGrpcTransport configured for new chain
      */
-    public EmeraldGrpcTransport copyForChain(Chain chain) {
-        return new EmeraldGrpcTransport(channel, objectMapper, rpcConverter, executorService, Common.ChainRef.forNumber(chain.getId()));
+    public EmeraldTransport copyForChain(Chain chain) {
+        return new EmeraldTransport(channel, objectMapper, rpcConverter, executorService, Common.ChainRef.forNumber(chain.getId()));
     }
 
     /**
@@ -132,74 +129,72 @@ public class EmeraldGrpcTransport implements RpcTransport {
      *
      * @return new instance of EmeraldGrpcTransport configured with new selector
      */
-    public EmeraldGrpcTransport copyWithSelector(BlockchainOuterClass.Selector selector) {
-        EmeraldGrpcTransport copy = new EmeraldGrpcTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
+    public EmeraldTransport copyWithSelector(BlockchainOuterClass.Selector selector) {
+        EmeraldTransport copy = new EmeraldTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
         copy.selector = selector;
         return copy;
     }
 
     @Override
-    public CompletableFuture<BatchStatus> execute(List<Batch.BatchItem<?, ?>> items) {
+    public CompletableFuture<Iterable<RpcResponse>> execute(List<RpcTransport.RpcRequest> items) {
         if (items.isEmpty()) {
-            return CompletableFuture.completedFuture(BatchStatus.empty());
+            return CompletableFuture.completedFuture(Collections.emptyList());
         }
-        CompletableFuture<BatchStatus> result = new CompletableFuture<>();
+        CompletableFuture<Iterable<RpcResponse>> f = new CompletableFuture<>();
         executorService.execute(() -> {
-            BlockchainOuterClass.NativeCallRequest.Builder req = BlockchainOuterClass.NativeCallRequest.newBuilder();
+            final BlockchainOuterClass.NativeCallRequest.Builder req = BlockchainOuterClass.NativeCallRequest.newBuilder();
             req.setChain(chainRef);
             if (selector != null) {
                 req.setSelector(selector);
             }
-            AtomicInteger i = new AtomicInteger(0);
+            final AtomicInteger i = new AtomicInteger(0); // because for lambda, must be final
+            final Map<Integer, RpcRequest> requestWithId = new HashMap<>(items.size());
             items.forEach( item -> {
-                try {
-                    String jsonStr = objectMapper.writeValueAsString(item.getCall().getParams());
-                    req.addItems(
-                        BlockchainOuterClass.NativeCallItem.newBuilder()
-                            .setId(i.getAndIncrement())
-                            .setMethod(item.getCall().getMethod())
-                            .setPayload(ByteString.copyFromUtf8(jsonStr))
-                            .build()
-                    );
-                } catch (JsonProcessingException e) {
-                    item.onError(new RpcException(RpcResponseError.CODE_INVALID_METHOD_PARAMS, "Unsupported request params"));
-                }
+                int id = i.getAndIncrement();
+                String json = rpcConverter.toJson(item.getPayload());
+                req.addItems(
+                    BlockchainOuterClass.NativeCallItem.newBuilder()
+                        .setId(id)
+                        .setMethod(item.getMethod())
+                        .setPayload(ByteString.copyFromUtf8(json))
+                        .build()
+                );
+                requestWithId.put(id, item);
             });
+            List<RpcTransport.RpcResponse> result = new ArrayList<>();
             Iterator<BlockchainOuterClass.NativeCallReplyItem> responses;
-            AtomicInteger succeeded = new AtomicInteger(0);
-            AtomicInteger failed = new AtomicInteger(0);
             try {
                 responses = blockingStub.nativeCall(req.build());
                 responses.forEachRemaining((resp) -> {
                     int id = resp.getId();
-                    Batch.BatchItem item = items.get(id);
-                    if (resp.getSucceed()) {
-                        try {
-                            Object parsed = rpcConverter.fromJson(resp.getPayload().newInput(), item.getCall().getJsonType());
-                            succeeded.getAndIncrement();
-                            item.onComplete(parsed);
-                        } catch (IOException e) {
-                            failed.getAndIncrement();
-                            item.onError(new RpcException(RpcResponseError.CODE_INVALID_JSON, e.getMessage()));
-                        }
-                    } else {
-                        failed.getAndIncrement();
-                        item.onError(new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, resp.getErrorMessage()));
-                    }
+                    RpcRequest request = requestWithId.get(id);
+                    result.add(process(request, resp));
                 });
             } catch (StatusRuntimeException e) {
-                if (succeeded.get() == 0) {
-                    result.completeExceptionally(e);
+                if (result.isEmpty()) {
+                    f.completeExceptionally(e);
                     return;
                 }
             }
-            result.complete(BatchStatus.newBuilder()
-                .withFailed(failed.get())
-                .withSucceed(succeeded.get())
-                .withTotal(items.size())
-                .build());
+            f.complete(result);
         });
-        return result;
+        return f;
+    }
+
+    protected <T> RpcResponse<T> process(RpcRequest<T> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+        if (resp.getSucceed()) {
+            try {
+                return request.asResponse(read(resp.getPayload(), request));
+            } catch (RpcException e) {
+                return request.asError(e);
+            }
+        } else {
+            return request.asError(new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, resp.getErrorMessage()));
+        }
+    }
+
+    protected <T> T read(ByteString bytes, RpcRequest<T> request) throws RpcException {
+        return rpcConverter.fromJson(bytes.newInput(), request.getType());
     }
 
     @Override
@@ -392,7 +387,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
          * @return configured grpc transport
          * @throws SSLException if problem with TLS certificates
          */
-        public EmeraldGrpcTransport build() throws SSLException {
+        public EmeraldTransport build() throws SSLException {
             if (channel == null) {
                 if (sslContextBuilder != null) {
                     channelBuilder.useTransportSecurity()
@@ -413,7 +408,7 @@ public class EmeraldGrpcTransport implements RpcTransport {
                 chain = Chain.UNSPECIFIED;
             }
             Common.ChainRef chainRef = Common.ChainRef.forNumber(chain.getId());
-            return new EmeraldGrpcTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
+            return new EmeraldTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
         }
     }
 }

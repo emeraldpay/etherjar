@@ -15,23 +15,22 @@
  */
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.rpc.transport.BatchStatus;
-
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * Batch that has assigned client so can be executed directly
  */
-public class ExecutableBatch extends Batch {
+public class ExecutableBatch extends DefaultBatch {
 
-    private final RpcClient client;
+    private final FuturesRcpClient client;
 
     /**
      * Create batch assigned to client
      *
      * @param client client
      */
-    public ExecutableBatch(RpcClient client) {
+    public ExecutableBatch(FuturesRcpClient client) {
         if (client == null) {
             throw new IllegalArgumentException("client must be not null");
         }
@@ -43,7 +42,7 @@ public class ExecutableBatch extends Batch {
      *
      * @return execution result
      */
-    public CompletableFuture<BatchStatus> execute() {
+    public CompletableFuture<List<FutureBatchItem>> execute() {
         return this.client.execute(this);
     }
 }

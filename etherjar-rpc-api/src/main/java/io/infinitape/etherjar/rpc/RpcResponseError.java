@@ -27,8 +27,12 @@ public class RpcResponseError {
     public static int CODE_METHOD_NOT_EXIST = -32601;
     public static int CODE_INVALID_METHOD_PARAMS = -32602;
     public static int CODE_INTERNAL_ERROR = -32603;
+
     public static int CODE_RESERVED_0 = -32000;
     public static int CODE_RESERVED_99 = -32099;
+
+    public static int CODE_UPSTREAM_INVALID_RESPONSE = -32000;
+    public static int CODE_UPSTREAM_CONNECTION_ERROR = -32001;
 
     /**
      * -32700 - Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.

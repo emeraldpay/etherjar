@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2016-2019 Igor Artamonov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.infinitape.etherjar.rpc.transport;
+package io.infinitape.etherjar.rpc;
 
-import java.net.URI;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-/**
- *  Validates an upstream URI to conform requirements of the current app
- *
- * @author Igor Artamonov
- */
-public interface UpstreamValidator {
+public interface ReactorRpcClient extends RpcClient<Flux<RpcCallResponse>, ReactorBatch.ReactorBatchItem, ReactorBatch> {
 
-    /**
-     * Validates an upstream URI to conform requirements of the current app
-     *
-     * @param uri upstream JSON RPC host:port
-     * @return true if valid
-     */
-    boolean validate(URI uri);
+    Flux<RpcCallResponse> execute(ReactorBatch batch);
+
+    <JS, RES> Mono<RES> execute(RpcCall<JS, RES> call);
 
 }
