@@ -94,7 +94,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
 
@@ -110,12 +110,12 @@ class ReactorHttpRpcClientSpec extends Specification {
                 return it.value == 1 && it.error == null
             }).as("receive value")
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         StepVerifier.create(call.result)
             .expectNext(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         requests.size() == 1
         requests[0] == "[{\"jsonrpc\":\"2.0\",\"method\":\"net_peerCount\",\"params\":[],\"id\":1}]"
@@ -135,7 +135,7 @@ class ReactorHttpRpcClientSpec extends Specification {
                 ']'
         }
         Spark.exception(Exception.class, { t, req, resp -> t.printStackTrace()})
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
 
@@ -156,17 +156,17 @@ class ReactorHttpRpcClientSpec extends Specification {
                 return it.value == Address.from("0x0000000000000000000000000000000000000000") && it.error == null
             }).as("receive value for coinbase")
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         StepVerifier.create(call1.result)
             .expectNext(68)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         StepVerifier.create(call2.result)
             .expectNext(Address.from("0x0000000000000000000000000000000000000000"))
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         requests.size() == 1
         requests[0] == "[{\"jsonrpc\":\"2.0\",\"method\":\"net_peerCount\",\"params\":[],\"id\":1},{\"jsonrpc\":\"2.0\",\"method\":\"eth_coinbase\",\"params\":[],\"id\":2}]"
@@ -183,7 +183,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
 
@@ -194,7 +194,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(resp)
             .expectNext(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         requests.size() == 1
         requests[0] == "[{\"jsonrpc\":\"2.0\",\"method\":\"net_peerCount\",\"params\":[],\"id\":1}]"
@@ -210,7 +210,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[]'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
 
@@ -222,11 +222,11 @@ class ReactorHttpRpcClientSpec extends Specification {
         then:
         StepVerifier.create(resp)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         StepVerifier.create(call.result)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
     }
 
@@ -239,7 +239,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[{"jsonrpc":"2.0","id":1, "result": 1'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
 
@@ -251,11 +251,11 @@ class ReactorHttpRpcClientSpec extends Specification {
         then:
         StepVerifier.create(resp)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         StepVerifier.create(call.result)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
     }
 
@@ -269,7 +269,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget(Mono.just("http://localhost:18545")).build()
 
@@ -282,7 +282,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(resp.then(call.result))
             .expectNext(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
     }
 
     def "Accept URI object"() {
@@ -295,7 +295,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder().setTarget(new URI("http://localhost:18545")).build()
 
@@ -308,7 +308,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(resp.then(call.result))
             .expectNext(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
     }
 
     def "Uses basic auth"() {
@@ -322,7 +322,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             resp.type("application/json")
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
-
+        Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder()
             .setTarget(new URI("http://localhost:18545"))
@@ -338,7 +338,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(resp.then(call.result))
             .expectNext(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(5))
 
         requests[1] == "Basic QWxhZGRpbjpPcGVuU2VzYW1l"
     }
