@@ -88,6 +88,7 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
      *
      * @param period the period between successive executions
      * @param unit the time unit of the initialDelay and period parameters
+     * @return future of the first validation result
      */
     public Future<Boolean> startAutoValidation(long period, TimeUnit unit) {
         if (scheduler == null) {

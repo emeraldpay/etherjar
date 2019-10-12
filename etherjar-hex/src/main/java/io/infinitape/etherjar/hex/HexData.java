@@ -67,6 +67,7 @@ public class HexData implements Serializable {
      * Parse hex representation for a number, should start with {@code 0x}.
      *
      * @param value hex value
+     * @return parsed value
      */
     public static HexData from(String value) {
         if (value.isEmpty())

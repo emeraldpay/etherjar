@@ -32,8 +32,8 @@ public class Web3Commands {
     }
 
     /**
-     *
-     * @return Keccak-256 of the given data
+     * @param data input data to hash
+     * @return Keccak-256 hash of the given data
      */
     public RpcCall<String, Hex32> sha3(HexData data) {
         return RpcCall.create("web3_sha3", data.toHex()).converted(Hex32.class, Hex32::from);

@@ -40,6 +40,10 @@ public abstract class BatchItem<PROC, JS, RES> {
         this.onResult(val);
     }
 
+    /**
+     * Called on successful result of the call
+     * @param value received value
+     */
     public abstract void onResult(RES value);
 
     /**
@@ -53,24 +57,25 @@ public abstract class BatchItem<PROC, JS, RES> {
     /**
      * Get result
      *
-     * @return
+     * @return result value
      */
     public abstract PROC getResult();
 
     /**
      * Read value from response
      *
-     * @param resp
-     * @return
+     * @param resp RPC response data
+     * @return true if parsed as result, or false if parsed as error
+     * @throws ClassCastException if response data cannot be casted to expected data type of RpcCall
      */
-    public boolean read(ResponseJson<?, Integer> resp) {
+    public boolean read(ResponseJson<?, Integer> resp) { //TODO duplicate reads
         if (resp.getError() != null) {
             onError(resp.getError().asException());
             return false;
         } else if (resp.getResult() == null) {
             onComplete(null);
             return true;
-        } else if (call.getJsonType().isAssignableFrom(resp.getResult().getClass())) {
+        } else if (!call.getJsonType().isAssignableFrom(resp.getResult().getClass())) {
             throw new ClassCastException("Expected " + call.getJsonType() + " but received " + resp.getResult().getClass());
         } else {
             onComplete((JS) resp.getResult());
@@ -81,8 +86,9 @@ public abstract class BatchItem<PROC, JS, RES> {
     /**
      * Read value from response
      *
-     * @param resp
-     * @return
+     * @param resp RPC response data
+     * @return true if parsed as result, or false if parsed as error
+     * @throws ClassCastException if response data cannot be casted to expected data type of RpcCall
      */
     public boolean read(RpcTransport.RpcResponse<JS> resp) {
         if (resp.getError() != null) {

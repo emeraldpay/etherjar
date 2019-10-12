@@ -135,10 +135,11 @@ public class HttpRpcTransport implements RpcTransport {
     }
 
     /**
-     * Called when batch call failed
-     *  @param t Exception caused to fail execution
+     * Called when batch call failed, marks all bath calls as failed
+     *
+     * @param t Exception caused to fail execution
      * @param batch batch items
-     * @return
+     * @return list of responses to original batch, all marked as errored
      */
     public List<RpcResponse> processError(RpcException t, List<RpcRequest> batch) {
         return batch.stream().map((item) ->
@@ -165,6 +166,7 @@ public class HttpRpcTransport implements RpcTransport {
          *
          * @param username username
          * @param password password
+         * @return builder
          */
         public Builder setBasicAuth(String username, String password) {
             this.httpClient = null;
@@ -191,6 +193,7 @@ public class HttpRpcTransport implements RpcTransport {
          * @param certificate input stream to certificate in DER format (binary or base64)
          * @throws GeneralSecurityException if there is a problem with the certificate
          * @throws IOException if unable to read certificate
+         * @return builder
          */
         public Builder setTrustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
             this.httpClient = null;

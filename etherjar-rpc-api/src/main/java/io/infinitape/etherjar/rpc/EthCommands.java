@@ -197,7 +197,7 @@ public class EthCommands {
 
     /**
      *
-     * @param block
+     * @param block block number
      * @return number of uncles in a block from a block matching the given block number.
      */
     public RpcCall<String, Long> getUncleCount(long block) {

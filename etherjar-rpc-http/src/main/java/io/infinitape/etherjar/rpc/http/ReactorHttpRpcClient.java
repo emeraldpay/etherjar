@@ -168,6 +168,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
          *
          * @param username username
          * @param password password
+         * @return builder
          */
         public Builder setBasicAuth(String username, String password) {
             String authString = username + ":" + password;
@@ -185,6 +186,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
          * @param certificate input stream to certificate in DER format (binary or base64)
          * @throws GeneralSecurityException if there is a problem with the certificate
          * @throws IOException if unable to read certificate
+         * @return builder
          */
         public Builder setTrustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");

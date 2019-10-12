@@ -94,6 +94,7 @@ public class Wei implements Serializable {
 
     /**
      * @param val amount in some custom denomination {@link Unit}
+     * @param unit target unit
      * @return corresponding amount in wei
      */
     public static Wei ofUnits(double val, Unit unit) {
@@ -102,13 +103,22 @@ public class Wei implements Serializable {
 
     /**
      * @param num amount in some custom denomination {@link Unit}
+     * @param unit target unit
      * @return corresponding amount in wei
      */
     public static Wei ofUnits(BigDecimal num, Unit unit) {
         return new Wei(num.scaleByPowerOfTen(unit.getScale()).toBigInteger());
     }
 
-    public static Wei from(String value) {
+    /**
+     * Parse hex representation of the amount, like 0x100
+     *
+     * @param value string representation of the amount
+     * @return parsed value or exception
+     * @throws IllegalArgumentException if passed value is null or not hex
+     */
+    public static Wei from(String value) { //TODO rename to fromHex?
+        //TODO return null?
         if (value == null) {
             throw new IllegalArgumentException("Null Address");
         }
@@ -168,6 +178,7 @@ public class Wei implements Serializable {
 
     /**
      * @param decimalPlaces scale of the {@code BigDecimal} value to be returned
+     * @param unit target unit
      * @return corresponding amount in custom denomination {@link Unit}
      * @see #toUnits(Unit, int)
      */
@@ -177,6 +188,7 @@ public class Wei implements Serializable {
 
     /**
      * @return corresponding amount in custom denomination {@link Unit}
+     * @param unit target unit
      * @see #toUnits(Unit)
      */
     public BigDecimal toUnits(Unit unit) {
