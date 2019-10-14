@@ -20,13 +20,15 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.domain.TransactionRef;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 
 @JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
-public class TransactionReceiptJson implements Serializable {
+public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     /**
      * hash of the transaction
@@ -133,24 +135,25 @@ public class TransactionReceiptJson implements Serializable {
     }
 
     @Override
+    public TransactionId getHash() {
+        return transactionHash;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TransactionReceiptJson)) return false;
 
         TransactionReceiptJson that = (TransactionReceiptJson) o;
 
-        if (transactionHash != null ? !transactionHash.equals(that.transactionHash) : that.transactionHash != null)
-            return false;
-        if (transactionIndex != null ? !transactionIndex.equals(that.transactionIndex) : that.transactionIndex != null)
-            return false;
-        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
-        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
-        if (cumulativeGasUsed != null ? !cumulativeGasUsed.equals(that.cumulativeGasUsed) : that.cumulativeGasUsed != null)
-            return false;
-        if (gasUsed != null ? !gasUsed.equals(that.gasUsed) : that.gasUsed != null) return false;
-        if (contractAddress != null ? !contractAddress.equals(that.contractAddress) : that.contractAddress != null)
-            return false;
-        return logs != null ? logs.equals(that.logs) : that.logs == null;
+        if (!Objects.equals(transactionHash, that.transactionHash)) return false;
+        if (!Objects.equals(transactionIndex, that.transactionIndex)) return false;
+        if (!Objects.equals(blockHash, that.blockHash)) return false;
+        if (!Objects.equals(blockNumber, that.blockNumber)) return false;
+        if (!Objects.equals(cumulativeGasUsed, that.cumulativeGasUsed)) return false;
+        if (!Objects.equals(gasUsed, that.gasUsed)) return false;
+        if (!Objects.equals(contractAddress, that.contractAddress)) return false;
+        return Objects.equals(logs, that.logs);
     }
 
     @Override

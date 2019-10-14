@@ -20,13 +20,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.domain.TransactionRef;
 import io.infinitape.etherjar.hex.HexData;
 
 import java.io.Serializable;
 import java.util.List;
 
 @JsonDeserialize(using = TransactionLogJsonDeserializer.class)
-public class TransactionLogJson implements Serializable {
+public class TransactionLogJson implements TransactionRef, Serializable {
 
     /**
      * true when the log was removed, due to a chain reorganization. false if its a valid log.
@@ -146,6 +147,11 @@ public class TransactionLogJson implements Serializable {
 
     public void setTopics(List<HexData> topics) {
         this.topics = topics;
+    }
+
+    @Override
+    public TransactionId getHash() {
+        return transactionHash;
     }
 
     @Override

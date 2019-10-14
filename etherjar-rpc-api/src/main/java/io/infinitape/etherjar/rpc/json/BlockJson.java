@@ -21,16 +21,18 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.domain.TransactionRef;
 import io.infinitape.etherjar.hex.HexData;
 
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @JsonDeserialize(using = BlockJsonDeserializer.class)
 @JsonSerialize(using = BlockJsonSerializer.class)
-public class BlockJson<T> implements Serializable {
+public class BlockJson<T extends TransactionRefJson> implements Serializable {
 
     //TODO nonce or sealFields
 
@@ -277,28 +279,24 @@ public class BlockJson<T> implements Serializable {
 
         BlockJson<?> blockJson = (BlockJson<?>) o;
 
-        if (number != null ? !number.equals(blockJson.number) : blockJson.number != null) return false;
-        if (hash != null ? !hash.equals(blockJson.hash) : blockJson.hash != null) return false;
-        if (parentHash != null ? !parentHash.equals(blockJson.parentHash) : blockJson.parentHash != null) return false;
-        if (sha3Uncles != null ? !sha3Uncles.equals(blockJson.sha3Uncles) : blockJson.sha3Uncles != null) return false;
-        if (logsBloom != null ? !logsBloom.equals(blockJson.logsBloom) : blockJson.logsBloom != null) return false;
-        if (transactionsRoot != null ? !transactionsRoot.equals(blockJson.transactionsRoot) : blockJson.transactionsRoot != null)
-            return false;
-        if (stateRoot != null ? !stateRoot.equals(blockJson.stateRoot) : blockJson.stateRoot != null) return false;
-        if (receiptsRoot != null ? !receiptsRoot.equals(blockJson.receiptsRoot) : blockJson.receiptsRoot != null)
-            return false;
-        if (miner != null ? !miner.equals(blockJson.miner) : blockJson.miner != null) return false;
-        if (difficulty != null ? !difficulty.equals(blockJson.difficulty) : blockJson.difficulty != null) return false;
-        if (totalDifficulty != null ? !totalDifficulty.equals(blockJson.totalDifficulty) : blockJson.totalDifficulty != null)
-            return false;
-        if (extraData != null ? !extraData.equals(blockJson.extraData) : blockJson.extraData != null) return false;
-        if (size != null ? !size.equals(blockJson.size) : blockJson.size != null) return false;
-        if (gasLimit != null ? !gasLimit.equals(blockJson.gasLimit) : blockJson.gasLimit != null) return false;
-        if (gasUsed != null ? !gasUsed.equals(blockJson.gasUsed) : blockJson.gasUsed != null) return false;
-        if (timestamp != null ? !timestamp.equals(blockJson.timestamp) : blockJson.timestamp != null) return false;
-        if (transactions != null ? !transactions.equals(blockJson.transactions) : blockJson.transactions != null)
-            return false;
-        return uncles != null ? uncles.equals(blockJson.uncles) : blockJson.uncles == null;
+        if (!Objects.equals(number, blockJson.number)) return false;
+        if (!Objects.equals(hash, blockJson.hash)) return false;
+        if (!Objects.equals(parentHash, blockJson.parentHash)) return false;
+        if (!Objects.equals(sha3Uncles, blockJson.sha3Uncles)) return false;
+        if (!Objects.equals(logsBloom, blockJson.logsBloom)) return false;
+        if (!Objects.equals(transactionsRoot, blockJson.transactionsRoot)) return false;
+        if (!Objects.equals(stateRoot, blockJson.stateRoot)) return false;
+        if (!Objects.equals(receiptsRoot, blockJson.receiptsRoot)) return false;
+        if (!Objects.equals(miner, blockJson.miner)) return false;
+        if (!Objects.equals(difficulty, blockJson.difficulty)) return false;
+        if (!Objects.equals(totalDifficulty, blockJson.totalDifficulty)) return false;
+        if (!Objects.equals(extraData, blockJson.extraData)) return false;
+        if (!Objects.equals(size, blockJson.size)) return false;
+        if (!Objects.equals(gasLimit, blockJson.gasLimit)) return false;
+        if (!Objects.equals(gasUsed, blockJson.gasUsed)) return false;
+        if (!Objects.equals(timestamp, blockJson.timestamp)) return false;
+        if (!Objects.equals(transactions, blockJson.transactions)) return false;
+        return Objects.equals(uncles, blockJson.uncles);
     }
 
     @Override

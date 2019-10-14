@@ -24,7 +24,7 @@ import io.infinitape.etherjar.rpc.json.*;
 public class EthCommands {
 
     private final Class<BlockJson<TransactionJson>> blockWithTxJson = null;
-    private final Class<BlockJson<TransactionId>> blockWithTxId = null;
+    private final Class<BlockJson<TransactionRefJson>> blockWithTxId = null;
 
 
     /**
@@ -60,7 +60,7 @@ public class EthCommands {
      * @param blockNumber block number
      * @return information about a block
      */
-    public RpcCall<BlockJson<TransactionId>, BlockJson<TransactionId>> getBlock(long blockNumber) {
+    public RpcCall<BlockJson<TransactionRefJson>, BlockJson<TransactionRefJson>> getBlock(long blockNumber) {
         RpcCall call = RpcCall.create("eth_getBlockByNumber", blockWithTxId, HexQuantity.from(blockNumber).toHex(), false).withJsonType(BlockJson.class);
         call.setResultType(BlockJson.class);
         return call;
@@ -83,7 +83,7 @@ public class EthCommands {
      * @param hash block hash
      * @return information about a block
      */
-    public RpcCall<BlockJson<TransactionId>, BlockJson<TransactionId>> getBlock(BlockHash hash) {
+    public RpcCall<BlockJson<TransactionRefJson>, BlockJson<TransactionRefJson>> getBlock(BlockHash hash) {
         RpcCall call = RpcCall.create("eth_getBlockByHash", blockWithTxId, hash.toHex(), false).withJsonType(BlockJson.class);
         call.setResultType(BlockJson.class);
         return call;

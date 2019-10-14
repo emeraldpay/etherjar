@@ -21,6 +21,7 @@ import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.rpc.RpcResponseError;
 import io.infinitape.etherjar.rpc.json.BlockJson;
 import io.infinitape.etherjar.rpc.json.RequestJson;
+import io.infinitape.etherjar.rpc.json.TransactionRefJson;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
@@ -89,7 +90,7 @@ public abstract class Subscription<T> {
         }
     }
 
-    public static class Block extends Subscription<BlockJson<TransactionId>> {
+    public static class Block extends Subscription<BlockJson<TransactionRefJson>> {
 
         private static final List PARAMS = Arrays.asList(
             "newHeads"
@@ -101,7 +102,7 @@ public abstract class Subscription<T> {
 
         @Override
         public void onReceive(SubscriptionJson json) {
-            BlockJson<TransactionId> blockJson = json.getBlockResult();
+            BlockJson<TransactionRefJson> blockJson = json.getBlockResult();
             onReceive(blockJson);
         }
     }

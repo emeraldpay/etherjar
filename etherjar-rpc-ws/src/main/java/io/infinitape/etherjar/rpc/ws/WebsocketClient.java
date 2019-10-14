@@ -17,6 +17,7 @@ package io.infinitape.etherjar.rpc.ws;
 
 import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.rpc.json.BlockJson;
+import io.infinitape.etherjar.rpc.json.TransactionRefJson;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -164,8 +165,8 @@ public class WebsocketClient implements Closeable {
      *
      * @param listener handler of new blocks
      */
-    public void onNewBlock(SubscriptionListener<BlockJson<TransactionId>> listener) {
-        Subscription<BlockJson<TransactionId>> sub = new Subscription.Block();
+    public void onNewBlock(SubscriptionListener<BlockJson<TransactionRefJson>> listener) {
+        Subscription<BlockJson<TransactionRefJson>> sub = new Subscription.Block();
         sub.addListener(listener);
         this.socketApiHandler.subscribe(sub);
     }

@@ -23,15 +23,11 @@ import io.infinitape.etherjar.hex.HexData;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Objects;
 
 @JsonDeserialize(using = TransactionJsonDeserializer.class)
 @JsonSerialize(using = TransactionJsonSerializer.class)
-public class TransactionJson implements Serializable {
-
-    /**
-     * hash of the transaction
-     */
-    private TransactionId hash;
+public class TransactionJson extends TransactionRefJson implements TransactionRef, Serializable {
 
     /**
      * the number of transactions made by the sender prior to this one.
@@ -89,14 +85,6 @@ public class TransactionJson implements Serializable {
     private HexData input;
 
     private TransactionSignature signature;
-
-    public TransactionId getHash() {
-        return hash;
-    }
-
-    public void setHash(TransactionId hash) {
-        this.hash = hash;
-    }
 
     public Long getNonce() {
         return nonce;
@@ -201,25 +189,24 @@ public class TransactionJson implements Serializable {
 
         TransactionJson that = (TransactionJson) o;
 
-        if (hash != null ? !hash.equals(that.hash) : that.hash != null) return false;
-        if (nonce != null ? !nonce.equals(that.nonce) : that.nonce != null) return false;
-        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
-        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
-        if (transactionIndex != null ? !transactionIndex.equals(that.transactionIndex) : that.transactionIndex != null)
-            return false;
-        if (from != null ? !from.equals(that.from) : that.from != null) return false;
-        if (to != null ? !to.equals(that.to) : that.to != null) return false;
-        if (value != null ? !value.equals(that.value) : that.value != null) return false;
-        if (gasPrice != null ? !gasPrice.equals(that.gasPrice) : that.gasPrice != null) return false;
-        if (gas != null ? !gas.equals(that.gas) : that.gas != null) return false;
-        if (input != null ? !input.equals(that.input) : that.input != null) return false;
-        if (creates != null ? !creates.equals(that.creates) : that.creates != null) return false;
-        return signature != null ? signature.equals(that.signature) : that.signature == null;
+        if (!Objects.equals(getHash(), that.getHash())) return false;
+        if (!Objects.equals(nonce, that.nonce)) return false;
+        if (!Objects.equals(blockHash, that.blockHash)) return false;
+        if (!Objects.equals(blockNumber, that.blockNumber)) return false;
+        if (!Objects.equals(transactionIndex, that.transactionIndex)) return false;
+        if (!Objects.equals(from, that.from)) return false;
+        if (!Objects.equals(to, that.to)) return false;
+        if (!Objects.equals(value, that.value)) return false;
+        if (!Objects.equals(gasPrice, that.gasPrice)) return false;
+        if (!Objects.equals(gas, that.gas)) return false;
+        if (!Objects.equals(input, that.input)) return false;
+        if (!Objects.equals(creates, that.creates)) return false;
+        return Objects.equals(signature, that.signature);
     }
 
     @Override
     public int hashCode() {
-        int result = hash != null ? hash.hashCode() : 0;
+        int result = super.hashCode();
         result = 31 * result + (blockHash != null ? blockHash.hashCode() : 0);
         return result;
     }

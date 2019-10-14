@@ -66,12 +66,12 @@ class JacksonEthRpcConverterSpec extends Specification {
         def act = jacksonRpcConverter.fromJson(json, BlockJson)
 
         then:
-        act instanceof BlockJson<TransactionId>
+        act instanceof BlockJson<TransactionRefJson>
         act.number == 1920000
         act.hash.toHex() == '0x94365e3a8c0b35089c1d1195081fe7489b528a84b22199c916180db8b28ade7f'
         sdf.format(act.timestamp) == '2016-07-20 13:20:39 +0000'
         act.transactions.size() == 4
-        act.transactions*.toHex() == ["0x6f75b64d9364b71b43cde81a889f95df72e6be004b28477f9083ed0ee471a7f9",
+        act.transactions.collect { it.hash.toHex() } == ["0x6f75b64d9364b71b43cde81a889f95df72e6be004b28477f9083ed0ee471a7f9",
                              "0x50d8156ee48d01b56cb17b6cb2ac8f29e1bf565be0e604b2d8ffb2fb50a0f611",
                              "0x4677a93807b73a0875d3a292eacb450d0af0d6f0eec6f283f8ad927ec539a17b",
                              "0x2a5177e6d6cea40594c7d4b0115dcd087443be3ec2fa81db3c21946a5e51cea9"]

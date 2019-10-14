@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
+import io.infinitape.etherjar.domain.TransactionRef;
 import io.infinitape.etherjar.hex.HexData;
 
 import java.io.IOException;
@@ -40,8 +41,8 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         return deserialize(node);
     }
 
-    public BlockJson deserialize(JsonNode node) {
-        BlockJson blockJson = new BlockJson();
+    public BlockJson<? extends TransactionRefJson> deserialize(JsonNode node) {
+        BlockJson<TransactionRefJson> blockJson = new BlockJson<>();
         BigInteger number = getQuantity(node, "number");
         if (number != null) {
             blockJson.setNumber(number.longValue());
@@ -53,12 +54,12 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         }
 
         if (node.has("transactions")) {
-            List txes = new ArrayList();
+            List<TransactionRefJson> txes = new ArrayList<>();
             for (JsonNode tx: node.get("transactions")) {
                 if (tx.isObject()) {
                     txes.add(transactionJsonDeserializer.deserialize(tx));
                 } else {
-                    txes.add(TransactionId.from(tx.textValue()));
+                    txes.add(new TransactionRefJson(TransactionId.from(tx.textValue())));
                 }
             }
             blockJson.setTransactions(txes);
@@ -77,7 +78,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         blockJson.setGasUsed(getQuantity(node, "gasUsed"));
         blockJson.setExtraData(getData(node, "extraData"));
 
-        List<HexData> uncles = new ArrayList<>();
+        List<BlockHash> uncles = new ArrayList<>();
         JsonNode unclesNode = node.get("uncles");
         if (unclesNode != null && unclesNode.isArray()) {
             for (JsonNode tx: unclesNode) {

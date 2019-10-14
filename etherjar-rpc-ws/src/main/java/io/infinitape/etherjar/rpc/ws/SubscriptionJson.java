@@ -21,6 +21,7 @@ import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.rpc.RpcResponseError;
 import io.infinitape.etherjar.rpc.json.BlockJson;
 import io.infinitape.etherjar.rpc.json.BlockJsonDeserializer;
+import io.infinitape.etherjar.rpc.json.TransactionRefJson;
 
 /**
  * JSON emitted from Websocket
@@ -53,8 +54,8 @@ public class SubscriptionJson {
         this.result = result;
     }
 
-    public BlockJson<TransactionId> getBlockResult() {
-        return blockJsonDeserializer.deserialize(result);
+    public BlockJson<TransactionRefJson> getBlockResult() {
+        return (BlockJson<TransactionRefJson>) blockJsonDeserializer.deserialize(result);
     }
 
     public String getStringResult() {
