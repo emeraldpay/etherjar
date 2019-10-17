@@ -23,6 +23,8 @@ import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.api.proto.ReactorBlockchainGrpc;
 import io.emeraldpay.grpc.Chain;
 import io.grpc.Channel;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.infinitape.etherjar.rpc.*;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
@@ -131,6 +133,11 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
                 System.err.println("Invalid id returned from upstream: " + item.getId());
             }
             return read(item, call);
+        }).onErrorResume(StatusRuntimeException.class, (e) -> {
+          if (e.getStatus().getCode() == Status.Code.CANCELLED) {
+              return Mono.empty();
+          }
+          return Mono.error(e);
         }).flatMap(new AbstractReactorRpcClient.ResponseTransformer(context));
         return result;
     }
