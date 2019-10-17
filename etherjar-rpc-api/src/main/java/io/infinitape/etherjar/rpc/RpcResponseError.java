@@ -94,4 +94,8 @@ public class RpcResponseError {
     public RpcException asException() {
         return new RpcException(code, message, data);
     }
+
+    public String toString() {
+        return "RPC Response Error (code: " + code + "; message: " + message + ")";
+    }
 }

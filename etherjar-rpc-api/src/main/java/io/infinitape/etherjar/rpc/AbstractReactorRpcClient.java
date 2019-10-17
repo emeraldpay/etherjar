@@ -26,7 +26,9 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
     public <JS, RES> Mono<RES> execute(RpcCall<JS, RES> call) {
         ReactorBatch batch = new ReactorBatch();
         ReactorBatch.ReactorBatchItem<JS, RES> item = batch.add(call);
-        return execute(batch).then(item.getResult());
+        return execute(batch)
+            .onErrorResume((t) -> Mono.empty())
+            .then(item.getResult());
     }
 
     public class ResponseTransformer implements Function<ResponseJson<?, Integer>, Mono<RpcCallResponse>> {

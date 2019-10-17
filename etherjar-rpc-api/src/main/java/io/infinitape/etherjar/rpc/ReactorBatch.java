@@ -46,6 +46,7 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
     }
 
     public static class ReactorBatchItem<JS, RES> extends BatchItem<Mono<RES>, JS, RES> {
+        //TODO change processor?!
         private MonoProcessor<RES> proc = MonoProcessor.create();
 
         public ReactorBatchItem(int id, RpcCall<JS, RES> call) {
@@ -54,11 +55,17 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
 
         @Override
         public void onResult(RES value) {
+            if (proc.isDisposed() || proc.isSuccess() || proc.isError()) {
+                return;
+            }
             proc.onNext(value);
         }
 
         @Override
         public void onError(RpcException err) {
+            if (proc.isDisposed() || proc.isSuccess() || proc.isError()) {
+                return;
+            }
             proc.onError(err);
         }
 
