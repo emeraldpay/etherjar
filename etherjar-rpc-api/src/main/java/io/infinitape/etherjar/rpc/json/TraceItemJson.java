@@ -153,7 +153,7 @@ public class TraceItemJson implements Serializable {
 
         private CallType callType;
         private Address from;
-        private BigInteger gas;
+        private Long gas;
         private HexData init;
         private HexData input;
         private Address to;
@@ -178,11 +178,11 @@ public class TraceItemJson implements Serializable {
             this.from = from;
         }
 
-        public BigInteger getGas() {
+        public Long getGas() {
             return gas;
         }
 
-        public void setGas(BigInteger gas) {
+        public void setGas(Long gas) {
             this.gas = gas;
         }
 
@@ -286,16 +286,16 @@ public class TraceItemJson implements Serializable {
     }
 
     public static class Result implements Serializable {
-        private BigInteger gasUsed;
+        private Long gasUsed;
         private HexData output;
         private Address address;
         private HexData code;
 
-        public BigInteger getGasUsed() {
+        public Long getGasUsed() {
             return gasUsed;
         }
 
-        public void setGasUsed(BigInteger gasUsed) {
+        public void setGasUsed(Long gasUsed) {
             this.gasUsed = gasUsed;
         }
 

@@ -51,7 +51,7 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
         tx.setTo(getAddress(node, "to"));
         tx.setValue(getWei(node, "value"));
         tx.setGasPrice(getWei(node, "gasPrice"));
-        tx.setGas(getQuantity(node, "gas"));
+        tx.setGas(getLong(node, "gas"));
         tx.setInput(getData(node, "input"));
 
         if (node.has("r") && node.has("v") && node.has("s")) {

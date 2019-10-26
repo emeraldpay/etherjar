@@ -33,7 +33,7 @@ public class TransactionCallJson implements Serializable {
     private Wei gasPrice;
     private Wei value;
     private HexData data;
-    private BigInteger nonce;
+    private Long nonce;
 
     public TransactionCallJson() {
     }
@@ -105,11 +105,11 @@ public class TransactionCallJson implements Serializable {
         this.data = data;
     }
 
-    public BigInteger getNonce() {
+    public Long getNonce() {
         return nonce;
     }
 
-    public void setNonce(BigInteger nonce) {
+    public void setNonce(Long nonce) {
         this.nonce = nonce;
     }
 

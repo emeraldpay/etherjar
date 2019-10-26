@@ -77,7 +77,7 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     /**
      * gas provided by the sender.
      */
-    private BigInteger gas;
+    private Long gas;
 
     /**
      * the data send along with the transaction.
@@ -150,11 +150,11 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         this.gasPrice = gasPrice;
     }
 
-    public BigInteger getGas() {
+    public Long getGas() {
         return gas;
     }
 
-    public void setGas(BigInteger gas) {
+    public void setGas(Long gas) {
         this.gas = gas;
     }
 

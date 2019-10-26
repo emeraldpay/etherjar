@@ -53,7 +53,7 @@ public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJs
                 }
             }
             action.setFrom(getAddress(actionNode, "from"));
-            action.setGas(getQuantity(actionNode, "gas"));
+            action.setGas(getLong(actionNode, "gas"));
             action.setInput(getData(actionNode, "input"));
             action.setTo(getAddress(actionNode, "to"));
             action.setValue(getWei(actionNode, "value"));
@@ -71,12 +71,11 @@ public class TraceItemJsonDeserializer extends EtherJsonDeserializer<TraceItemJs
             TraceItemJson.Result result = new TraceItemJson.Result();
             trace.setResult(result);
 
-            result.setGasUsed(getQuantity(resultNode, "gasUsed"));
+            result.setGasUsed(getLong(resultNode, "gasUsed"));
             result.setOutput(getData(resultNode, "output"));
 
             result.setAddress(getAddress(resultNode, "address"));
             result.setCode(getData(resultNode, "code"));
-            result.setGasUsed(getQuantity(resultNode, "gasUsed"));
         }
         JsonNode errorNode = node.get("error");
         if (errorNode != null) {

@@ -72,8 +72,8 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         if (size != null) {
             blockJson.setSize(size.longValue());
         }
-        blockJson.setGasLimit(getQuantity(node, "gasLimit"));
-        blockJson.setGasUsed(getQuantity(node, "gasUsed"));
+        blockJson.setGasLimit(getLong(node, "gasLimit"));
+        blockJson.setGasUsed(getLong(node, "gasUsed"));
         blockJson.setExtraData(getData(node, "extraData"));
 
         List<BlockHash> uncles = new ArrayList<>();

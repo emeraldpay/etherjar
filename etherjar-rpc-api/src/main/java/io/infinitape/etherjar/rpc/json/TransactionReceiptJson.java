@@ -53,12 +53,12 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     /**
      * total amount of gas used when this transaction was executed in the block.
      */
-    private BigInteger cumulativeGasUsed;
+    private Long cumulativeGasUsed;
 
     /**
      * amount of gas used by this specific transaction alone.
      */
-    private BigInteger gasUsed;
+    private Long gasUsed;
 
     /**
      * The contract address created, if the transaction was a contract creation, otherwise null.
@@ -102,19 +102,19 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
         this.blockNumber = blockNumber;
     }
 
-    public BigInteger getCumulativeGasUsed() {
+    public Long getCumulativeGasUsed() {
         return cumulativeGasUsed;
     }
 
-    public void setCumulativeGasUsed(BigInteger cumulativeGasUsed) {
+    public void setCumulativeGasUsed(Long cumulativeGasUsed) {
         this.cumulativeGasUsed = cumulativeGasUsed;
     }
 
-    public BigInteger getGasUsed() {
+    public Long getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(BigInteger gasUsed) {
+    public void setGasUsed(Long gasUsed) {
         this.gasUsed = gasUsed;
     }
 

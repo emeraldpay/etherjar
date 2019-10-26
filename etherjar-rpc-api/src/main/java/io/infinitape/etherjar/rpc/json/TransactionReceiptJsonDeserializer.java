@@ -38,8 +38,8 @@ public class TransactionReceiptJsonDeserializer extends EtherJsonDeserializer<Tr
         receipt.setBlockHash(getBlockHash(node, "blockHash"));
         receipt.setBlockNumber(getQuantity(node, "blockNumber").longValue());
         receipt.setContractAddress(getAddress(node, "contractAddress"));
-        receipt.setCumulativeGasUsed(getQuantity(node, "cumulativeGasUsed"));
-        receipt.setGasUsed(getQuantity(node, "gasUsed"));
+        receipt.setCumulativeGasUsed(getLong(node, "cumulativeGasUsed"));
+        receipt.setGasUsed(getLong(node, "gasUsed"));
         receipt.setTransactionHash(getTxHash(node, "transactionHash"));
         receipt.setTransactionIndex(getQuantity(node, "transactionIndex").longValue());
 

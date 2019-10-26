@@ -102,12 +102,12 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
     /**
      * the maximum gas allowed in this block.
      */
-    private BigInteger gasLimit;
+    private Long gasLimit;
 
     /**
      * the total used gas by all transactions in this block.
      */
-    private BigInteger gasUsed;
+    private Long gasUsed;
 
     /**
      * when the block was collated
@@ -230,19 +230,19 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.size = size;
     }
 
-    public BigInteger getGasLimit() {
+    public Long getGasLimit() {
         return gasLimit;
     }
 
-    public void setGasLimit(BigInteger gasLimit) {
+    public void setGasLimit(Long gasLimit) {
         this.gasLimit = gasLimit;
     }
 
-    public BigInteger getGasUsed() {
+    public Long getGasUsed() {
         return gasUsed;
     }
 
-    public void setGasUsed(BigInteger gasUsed) {
+    public void setGasUsed(Long gasUsed) {
         this.gasUsed = gasUsed;
     }
 
