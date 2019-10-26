@@ -35,6 +35,13 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
     private final AtomicInteger ids = new AtomicInteger(1);
     private final OnceExecuted onceExecuted = new OnceExecuted();
 
+    public static Mono<ReactorBatch> from(Flux<RpcCall<?, ?>> calls) {
+        ReactorBatch batch = new ReactorBatch();
+        return calls
+            .map(batch::add)
+            .then(Mono.just(batch));
+    }
+
     public <JS, RES> ReactorBatch.ReactorBatchItem<JS, RES> add(RpcCall<JS, RES> call) {
         ReactorBatch.ReactorBatchItem<JS, RES> b = new ReactorBatch.ReactorBatchItem<>(ids.getAndIncrement(), call, onceExecuted);
         items.add(b);

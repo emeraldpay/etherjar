@@ -16,11 +16,16 @@
 package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.rpc.json.ResponseJson;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
 public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
+
+    public Flux<RpcCallResponse> execute(Flux<RpcCall<?, ?>> calls) {
+        return ReactorBatch.from(calls).flatMapMany(this::execute);
+    }
 
     @Override
     public <JS, RES> Mono<RES> execute(RpcCall<JS, RES> call) {
