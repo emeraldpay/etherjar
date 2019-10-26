@@ -85,7 +85,7 @@ class JacksonEthEncodeSpec extends Specification {
 
     def "encode block with transactions (ids) and uncle"() {
         setup:
-        BlockJson<TransactionId> block = new BlockJson<>()
+        BlockJson<TransactionRefJson> block = new BlockJson<>()
         block.setMiner(Address.from("0xbe57c30111a068b9aac079d0dcda1a9e4ad51881"))
         block.setDifficulty(new BigInteger("7dea18c66b5", 16))
         block.setExtraData(HexData.from("0xd98301040a844765746887676f312e362e328777696e646f7773"))
@@ -103,7 +103,7 @@ class JacksonEthEncodeSpec extends Specification {
         block.setTransactions([
                 TransactionId.from("0x8239debcd3a242afb6a664784d2a2e2384c5192880d680331f00c50cccd88d0c"),
                 TransactionId.from("0x4556bec0c50d23a05d7d7eb056206ffbf8418244216aa4882c75bd6130f46637")
-        ])
+        ].collect { new TransactionRefJson(it) })
         block.setTransactionsRoot(HexData.from("0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba"))
         block.setUncles([
                 BlockHash.from("0x56f250f7de13d3fcb0cc4af795c14a303eaba5aaea981c646c2d7d139c405783")

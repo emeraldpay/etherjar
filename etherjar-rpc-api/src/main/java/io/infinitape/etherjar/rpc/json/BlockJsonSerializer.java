@@ -39,10 +39,10 @@ public class BlockJsonSerializer extends EtherJsonSerializer<BlockJson<?>>{
             for (Object tx: value.getTransactions()) {
                 if (tx == null) {
                     gen.writeNull();
-                } else if (tx instanceof TransactionId) {
-                    gen.writeString(((TransactionId) tx).toHex());
                 } else if (tx instanceof TransactionJson) {
                     transactionJsonSerializer.serialize((TransactionJson) tx, gen, serializers);
+                } else if (tx instanceof TransactionRefJson) {
+                    gen.writeString(((TransactionRefJson) tx).getHash().toHex());
                 }
             }
         }
