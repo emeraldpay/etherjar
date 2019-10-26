@@ -259,6 +259,30 @@ class ReactorHttpRpcClientSpec extends Specification {
 
     }
 
+    def "Response mono processed without waiting for batch flux"() {
+        setup:
+        def requests = []
+        Spark.post("/") {req, resp ->
+            requests.add(req.body())
+            resp.status(200)
+            resp.type("application/json")
+            return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
+        }
+        Spark.awaitInitialization()
+        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+
+        when:
+        ReactorBatch batch = new ReactorBatch()
+        def call = batch.add(Commands.net().peerCount())
+        client.execute(batch)
+
+        then:
+        StepVerifier.create(call.result)
+            .expectNext(1)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1))
+    }
+
     def "Accept mono url"() {
         setup:
         def requests = []

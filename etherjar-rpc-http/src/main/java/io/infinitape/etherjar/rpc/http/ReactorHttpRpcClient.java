@@ -99,7 +99,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
                 .post()
                 .uri(target)
                 .send(converted.getT1());
-        return response.response((resp, data) -> {
+        Flux<RpcCallResponse> result = response.response((resp, data) -> {
             if (resp.status() == HttpResponseStatus.OK) {
                 return data.aggregate().flatMapMany(new ResponseReader(context));
             } else {
@@ -108,7 +108,11 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             }
         }).onErrorResume(RpcException.class, (RpcException err) ->
             failBatch(batch, err)
-        );
+        ).share();
+
+        batch.withExecution(Flux.from(result));
+
+        return result;
     }
 
     public Publisher<RpcCallResponse> failBatch(ReactorBatch batch, RpcException err) {

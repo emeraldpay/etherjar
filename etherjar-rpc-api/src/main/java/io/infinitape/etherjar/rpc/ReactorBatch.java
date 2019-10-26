@@ -15,23 +15,28 @@
  */
 package io.infinitape.etherjar.rpc;
 
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consumer<RpcCall> {
 
-    private List<ReactorBatch.ReactorBatchItem<?, ?>> items = new ArrayList<>();
-    private AtomicInteger ids = new AtomicInteger(1);
+    private final List<ReactorBatch.ReactorBatchItem<?, ?>> items = new ArrayList<>();
+    private final AtomicInteger ids = new AtomicInteger(1);
+    private final OnceExecuted onceExecuted = new OnceExecuted();
 
     public <JS, RES> ReactorBatch.ReactorBatchItem<JS, RES> add(RpcCall<JS, RES> call) {
-        ReactorBatch.ReactorBatchItem<JS, RES> b = new ReactorBatch.ReactorBatchItem<>(ids.getAndIncrement(), call);
+        ReactorBatch.ReactorBatchItem<JS, RES> b = new ReactorBatch.ReactorBatchItem<>(ids.getAndIncrement(), call, onceExecuted);
         items.add(b);
         return b;
     }
@@ -45,17 +50,34 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
         add(rpcCall);
     }
 
+    /**
+     * Tracks execution result of the current batch and makes sure individual calls follow
+     * the main execution flow.
+     *
+     * @param execution execution of the current batch
+     */
+    public void withExecution(Flux<RpcCallResponse> execution) {
+        execution
+            .last()
+            .doOnNext((val) -> onceExecuted.onExecuted())
+            .doOnError(onceExecuted::onFailed)
+            .doOnCancel(() -> items.forEach(ReactorBatchItem::cancel))
+            .subscribe();
+    }
+
     public static class ReactorBatchItem<JS, RES> extends BatchItem<Mono<RES>, JS, RES> {
         //TODO change processor?!
         private MonoProcessor<RES> proc = MonoProcessor.create();
+        private final Publisher onceExecuted;
 
-        public ReactorBatchItem(int id, RpcCall<JS, RES> call) {
+        ReactorBatchItem(int id, RpcCall<JS, RES> call, Publisher onceExecuted) {
             super(id, call);
+            this.onceExecuted = onceExecuted;
         }
 
         @Override
         public void onResult(RES value) {
-            if (proc.isDisposed() || proc.isSuccess() || proc.isError()) {
+            if (isClosed()) {
                 return;
             }
             proc.onNext(value);
@@ -63,14 +85,83 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
 
         @Override
         public void onError(RpcException err) {
-            if (proc.isDisposed() || proc.isSuccess() || proc.isError()) {
+            if (isClosed()) {
                 return;
             }
             proc.onError(err);
         }
 
-        public Mono<RES> getResult() {
-            return Mono.from(proc);
+        void cancel() {
+            if (isClosed()) {
+                return;
+            }
+            proc.cancel();
         }
+
+        private boolean isClosed() {
+            return proc.isDisposed() || proc.isSuccess() || proc.isError() || proc.isCancelled();
+        }
+
+        public Mono<RES> getResult() {
+            return Mono.when(onceExecuted).then(Mono.from(proc));
+        }
+    }
+
+    /**
+     * Internal class to track execution result of a batch. It publishes result once it completed
+     * (published true) or failed (publishes false)
+     */
+    public static class OnceExecuted implements Publisher<Boolean> {
+
+        private Subscriber<? super Boolean> subscriber;
+        private AtomicBoolean requested = new AtomicBoolean(false);
+        private AtomicReference<State> executed = new AtomicReference<>(State.WAITING);
+
+        @Override
+        public void subscribe(Subscriber<? super Boolean> subscriber) {
+            this.subscriber = subscriber;
+            subscriber.onSubscribe(new Subscription() {
+                @Override
+                public void request(long n) {
+                    requested.set(true);
+                    tryPublish();
+                }
+
+                @Override
+                public void cancel() {
+                    requested.set(false);
+                }
+            });
+        }
+
+        void onExecuted() {
+            executed.set(State.EXECUTED);
+            tryPublish();
+        }
+
+        void onFailed(Throwable t) {
+            executed.set(State.FAILED);
+            tryPublish();
+        }
+
+        private void tryPublish() {
+            if (requested.get()) {
+                State state = executed.get();
+                if (state == State.EXECUTED) {
+                    subscriber.onNext(true);
+                    subscriber.onComplete();
+                } else if (state == State.FAILED) {
+                    subscriber.onNext(false);
+                    subscriber.onComplete();
+                }
+            }
+        }
+
+        enum State {
+            WAITING,
+            EXECUTED,
+            FAILED
+        }
+
     }
 }
