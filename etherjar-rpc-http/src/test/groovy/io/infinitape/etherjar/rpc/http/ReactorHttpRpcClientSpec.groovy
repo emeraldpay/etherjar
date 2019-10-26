@@ -25,6 +25,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.Regex
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import reactor.util.Loggers
 import spark.Filter
 import spark.Request
 import spark.Response
@@ -40,6 +41,7 @@ class ReactorHttpRpcClientSpec extends Specification {
 
     def setup() {
         Spark.port(18545)
+        Loggers.useVerboseConsoleLoggers()
     }
 
     def cleanup() {
@@ -199,6 +201,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         requests.size() == 1
         requests[0] == "[{\"jsonrpc\":\"2.0\",\"method\":\"net_peerCount\",\"params\":[],\"id\":1}]"
 
+        requests.size() == 1
     }
 
     def "Error on invalid http code"() {
@@ -228,6 +231,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             .expectError()
             .verify(Duration.ofSeconds(5))
 
+        requests.size() == 1
     }
 
     def "Error on invalid response"() {
@@ -257,6 +261,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             .expectError()
             .verify(Duration.ofSeconds(5))
 
+        requests.size() == 1
     }
 
     def "Response mono processed without waiting for batch flux"() {
@@ -281,6 +286,41 @@ class ReactorHttpRpcClientSpec extends Specification {
             .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(1))
+    }
+
+    def "Makes call only if actual result requested"() {
+        setup:
+        def requests = []
+        Spark.post("/") {req, resp ->
+            requests.add(req.body())
+            resp.status(200)
+            resp.type("application/json")
+            return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
+        }
+        Spark.awaitInitialization()
+        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+
+        when:
+        ReactorBatch batch = new ReactorBatch()
+        def call = batch.add(Commands.net().peerCount())
+        def execution = client.execute(batch)
+        def withoutExecution = Flux.just(2).concatWith(execution.map { 1 })
+            .buffer(1).take(1)
+        def withoutCall = Flux.just(100).concatWith(call.result.map { 101 })
+            .buffer(1).take(1)
+
+        then:
+        StepVerifier.create(withoutExecution)
+            .expectNext([2])
+            .expectComplete()
+            .verify(Duration.ofSeconds(1))
+
+        StepVerifier.create(withoutCall)
+            .expectNext([100])
+            .expectComplete()
+            .verify(Duration.ofSeconds(1))
+
+        requests.size() == 0
     }
 
     def "Accept mono url"() {

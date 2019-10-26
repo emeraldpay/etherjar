@@ -18,6 +18,7 @@ package io.infinitape.etherjar.rpc;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.MonoProcessor;
@@ -64,12 +65,10 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
      * @param execution execution of the current batch
      */
     public void withExecution(Flux<RpcCallResponse> execution) {
-        execution
+        Mono<RpcCallResponse> waiter = execution
             .last()
-            .doOnNext((val) -> onceExecuted.onExecuted())
-            .doOnError(onceExecuted::onFailed)
-            .doOnCancel(() -> items.forEach(ReactorBatchItem::cancel))
-            .subscribe();
+            .doOnCancel(() -> items.forEach(ReactorBatchItem::cancel));
+        onceExecuted.follow(waiter);
     }
 
     public static class ReactorBatchItem<JS, RES> extends BatchItem<Mono<RES>, JS, RES> {
@@ -110,7 +109,8 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
         }
 
         public Mono<RES> getResult() {
-            return Mono.when(onceExecuted).then(Mono.from(proc));
+            Mono<RES> value = Mono.from(proc);
+            return value.or(Mono.when(onceExecuted).then(value));
         }
     }
 
@@ -122,7 +122,9 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
 
         private Subscriber<? super Boolean> subscriber;
         private AtomicBoolean requested = new AtomicBoolean(false);
-        private AtomicReference<State> executed = new AtomicReference<>(State.WAITING);
+        private AtomicReference<State> executionState = new AtomicReference<>(
+            new State(Status.STARTING, null, null)
+        );
 
         @Override
         public void subscribe(Subscriber<? super Boolean> subscriber) {
@@ -141,33 +143,68 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
             });
         }
 
+        void follow(Mono<RpcCallResponse> execution) {
+            final Mono<RpcCallResponse> processed = execution
+                .doOnNext((val) -> this.onExecuted())
+                .doOnError(this::onFailed);
+            this.executionState.updateAndGet((state) -> {
+                if (state.subscription != null) {
+                    state.subscription.dispose();
+                }
+                return new State(state.status, processed, null);
+            });
+        }
+
         void onExecuted() {
-            executed.set(State.EXECUTED);
+            executionState.updateAndGet((state) -> state.update(Status.EXECUTED));
             tryPublish();
         }
 
         void onFailed(Throwable t) {
-            executed.set(State.FAILED);
+            executionState.updateAndGet((state) -> state.update(Status.FAILED));
             tryPublish();
         }
 
         private void tryPublish() {
             if (requested.get()) {
-                State state = executed.get();
-                if (state == State.EXECUTED) {
+                State status = executionState.get();
+                if (status.status == Status.STARTING) {
+                    Mono<RpcCallResponse> execution = status.execution;
+                    if (execution != null) {
+                        Disposable subscription = execution.subscribe();
+                        executionState.updateAndGet((state -> new State(Status.WAITING, execution, subscription)));
+                    }
+                } else if (status.status == Status.EXECUTED) {
                     subscriber.onNext(true);
                     subscriber.onComplete();
-                } else if (state == State.FAILED) {
+                } else if (status.status == Status.FAILED) {
                     subscriber.onNext(false);
                     subscriber.onComplete();
                 }
             }
         }
 
-        enum State {
+        enum Status {
+            STARTING,
             WAITING,
             EXECUTED,
             FAILED
+        }
+
+        class State {
+            private final Status status;
+            private final Mono<RpcCallResponse> execution;
+            private final Disposable subscription;
+
+            public State(Status status, Mono<RpcCallResponse> execution, Disposable subscription) {
+                this.status = status;
+                this.execution = execution;
+                this.subscription = subscription;
+            }
+
+            State update(Status status) {
+                return new State(status, this.execution, this.subscription);
+            }
         }
 
     }
