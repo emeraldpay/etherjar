@@ -29,7 +29,7 @@ import io.infinitape.etherjar.hex.HexEncoding;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 
 public abstract class EtherJsonSerializer<T> extends JsonSerializer<T> {
 
@@ -75,10 +75,10 @@ public abstract class EtherJsonSerializer<T> extends JsonSerializer<T> {
         gen.writeNumberField(name, value);
     }
 
-    protected void writeField(JsonGenerator gen, String name, Date value) throws IOException {
+    protected void writeField(JsonGenerator gen, String name, Instant value) throws IOException {
         if (value == null) {
             return;
         }
-        gen.writeStringField(name, "0x"+ Long.toString(value.getTime() / 1000L, 16));
+        gen.writeStringField(name, "0x"+ Long.toString(value.toEpochMilli() / 1000L, 16));
     }
 }

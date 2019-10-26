@@ -24,12 +24,14 @@ import io.infinitape.etherjar.domain.Wei
 import io.infinitape.etherjar.hex.HexData
 import io.infinitape.etherjar.rpc.json.BlockJson
 import io.infinitape.etherjar.rpc.json.TransactionJson
+import io.infinitape.etherjar.rpc.json.TransactionRefJson
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
+import java.time.Instant
 
 class JacksonEthEncodeSpec extends Specification {
-    
+
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z")
@@ -37,10 +39,10 @@ class JacksonEthEncodeSpec extends Specification {
     def setup() {
         sdf.setTimeZone(TimeZone.getTimeZone('UTC'))
     }
-    
+
     def "encode basic block"() {
         setup:
-        BlockJson<TransactionId> block = new BlockJson<>()
+        BlockJson<TransactionRefJson> block = new BlockJson<>()
         block.setMiner(Address.from("0x05a56e2d52c817161883f50c441c3228cfe54d9f"))
         block.setDifficulty(BigInteger.valueOf(17171480576))
         block.setExtraData(HexData.from('0x476574682f76312e302e302f6c696e75782f676f312e342e32'))
@@ -53,7 +55,7 @@ class JacksonEthEncodeSpec extends Specification {
         block.setSha3Uncles(HexData.from('0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'))
         block.setSize(537)
         block.setStateRoot(HexData.from('0xd67e4d450343046425ae4271474353857ab860dbc0a1dde64b41b5cd3a532bf3'))
-        block.setTimestamp(new Date(1438269988000))
+        block.setTimestamp(Instant.ofEpochMilli(1438269988000))
         block.setTotalDifficulty(new BigInteger('07ff800000', 16))
         block.setTransactionsRoot(HexData.from('0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'))
         when:
@@ -96,7 +98,7 @@ class JacksonEthEncodeSpec extends Specification {
         block.setSha3Uncles(HexData.from("0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630"))
         block.setSize(1310)
         block.setStateRoot(HexData.from("0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8"))
-        block.setTimestamp(new Date(1470921159000))
+        block.setTimestamp(Instant.ofEpochMilli(1470921159000))
         block.setTotalDifficulty(new BigInteger("231df208bad7ab602", 16))
         block.setTransactions([
                 TransactionId.from("0x8239debcd3a242afb6a664784d2a2e2384c5192880d680331f00c50cccd88d0c"),
@@ -129,7 +131,7 @@ class JacksonEthEncodeSpec extends Specification {
                 '  "transactionsRoot" : "0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba",\n' +
                 '  "uncles" : [ "0x56f250f7de13d3fcb0cc4af795c14a303eaba5aaea981c646c2d7d139c405783" ]\n' +
                 '}'
-            
+
 
     }
 
@@ -148,7 +150,7 @@ class JacksonEthEncodeSpec extends Specification {
         block.setSha3Uncles(HexData.from("0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630"))
         block.setSize(1310)
         block.setStateRoot(HexData.from("0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8"))
-        block.setTimestamp(new Date(1470921159000))
+        block.setTimestamp(Instant.ofEpochMilli(1470921159000))
         block.setTotalDifficulty(new BigInteger("231df208bad7ab602", 16))
         TransactionJson tx = new TransactionJson()
         tx.blockHash = block.getHash()

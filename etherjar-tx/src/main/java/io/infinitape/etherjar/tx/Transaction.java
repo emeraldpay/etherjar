@@ -91,7 +91,7 @@ public class Transaction {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
             tx.setData(new HexData(rdr.next()));
         } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Date");
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Data");
         }
 
         if (rdr.hasNext()) {

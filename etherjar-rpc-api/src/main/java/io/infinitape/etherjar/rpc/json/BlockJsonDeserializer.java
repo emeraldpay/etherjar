@@ -22,13 +22,11 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.infinitape.etherjar.domain.BlockHash;
 import io.infinitape.etherjar.domain.TransactionId;
-import io.infinitape.etherjar.domain.TransactionRef;
-import io.infinitape.etherjar.hex.HexData;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
@@ -50,7 +48,7 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         blockJson.setHash(getBlockHash(node, "hash"));
         BigInteger timestamp = getQuantity(node, "timestamp");
         if (timestamp != null && timestamp.signum() > 0) {
-            blockJson.setTimestamp(new Date(timestamp.longValue() * 1000L));
+            blockJson.setTimestamp(Instant.ofEpochSecond(timestamp.longValue()));
         }
 
         if (node.has("transactions")) {

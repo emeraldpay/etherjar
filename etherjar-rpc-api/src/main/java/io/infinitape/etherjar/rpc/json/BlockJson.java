@@ -20,13 +20,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.BlockHash;
-import io.infinitape.etherjar.domain.TransactionId;
-import io.infinitape.etherjar.domain.TransactionRef;
 import io.infinitape.etherjar.hex.HexData;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -114,7 +112,7 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
     /**
      * when the block was collated
      */
-    private Date timestamp;
+    private Instant timestamp;
 
     /**
      * List of transaction objects, or 32 Bytes transaction hashes depending on the last given parameter.
@@ -248,11 +246,11 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.gasUsed = gasUsed;
     }
 
-    public Date getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 

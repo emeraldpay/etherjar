@@ -24,16 +24,15 @@ import io.infinitape.etherjar.rpc.json.*
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class JacksonEthRpcConverterSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z")
+    DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z").withZone(ZoneId.of('UTC'))
 
-    def setup() {
-        sdf.setTimeZone(TimeZone.getTimeZone('UTC'))
-    }
 
     def "Parse block 1"() {
         InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("block/block-1.json")
