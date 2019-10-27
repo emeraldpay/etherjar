@@ -26,15 +26,15 @@ class ChainIdSpec extends Specification {
         then:
         act.value == 61
         act.toHex() == '0x3d'
-        act == ChainId.MAINNET
-        act != ChainId.EFNET
+        act == ChainId.ETHEREUM_CLASSIC
+        act != ChainId.FOUNDATION
         when:
         act = new ChainId(62)
         then:
         act.value == 62
         act.toHex() == '0x3e'
-        act == ChainId.TESTNET
-        act != ChainId.MAINNET
+        act == ChainId.MORDEN_TESTNET
+        act != ChainId.ETHEREUM_CLASSIC
     }
 
     def "Works for forked"() {
@@ -42,14 +42,14 @@ class ChainIdSpec extends Specification {
         def act = new ChainId(1)
         then:
         act.value == 1
-        act == ChainId.EFNET
+        act == ChainId.FOUNDATION
         act.toHex() == '0x01'
         when:
         act = new ChainId(3)
         then:
         act.value == 3
         act.toHex() == '0x03'
-        act == ChainId.ROPSTEN
+        act == ChainId.ROPSTEN_TESTNET
     }
 
     def "Accept byte numbers"() {

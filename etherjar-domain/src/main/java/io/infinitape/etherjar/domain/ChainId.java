@@ -21,10 +21,13 @@ package io.infinitape.etherjar.domain;
  */
 public class ChainId {
 
-    public static final ChainId MAINNET = new ChainId(61);
-    public static final ChainId TESTNET = new ChainId(62);
-    public static final ChainId EFNET = new ChainId(1);
-    public static final ChainId ROPSTEN = new ChainId(3);
+    public static final ChainId FOUNDATION = new ChainId(1);
+    public static final ChainId ETHEREUM_CLASSIC = new ChainId(61);
+
+    public static final ChainId MORDEN_TESTNET = new ChainId(62);
+    public static final ChainId ROPSTEN_TESTNET = new ChainId(3);
+    public static final ChainId RINKEBY_TESTNET = new ChainId(4);
+    public static final ChainId KOVAN_TESTNET = new ChainId(42);
 
     private int value;
 
