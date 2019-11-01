@@ -50,4 +50,11 @@ public class RpcCallResponse<JS, RES> {
     public boolean isError() {
         return error != null;
     }
+
+    public <T> RpcCallResponse<JS, T> cast(Class<T> clazz) {
+        if (value == null || clazz.isAssignableFrom(value.getClass())) {
+            return (RpcCallResponse<JS, T>) this;
+        }
+        throw new ClassCastException("Value of " + value.getClass() + " is not assignable to " + clazz);
+    }
 }
