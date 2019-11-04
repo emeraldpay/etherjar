@@ -49,43 +49,6 @@ class ReactorHttpRpcClientSpec extends Specification {
         Spark.awaitStop()
     }
 
-    def "Convert to JSON an empty call"() {
-        setup:
-        ReactorBatch batch = new ReactorBatch()
-        when:
-        def act = client.convertToJson(batch).getT1()
-        def actStr = new String(readBytes(act))
-        then:
-        actStr == '[]'
-    }
-
-    def "Convert to JSON a single call"() {
-        setup:
-        ReactorBatch batch = new ReactorBatch()
-        batch.add(Commands.eth().blockNumber)
-        when:
-        def act = client.convertToJson(batch).getT1()
-        def actStr = new String(readBytes(act))
-        then:
-        actStr == '[{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}]'
-    }
-
-    def "Convert to JSON two calls"() {
-        setup:
-        ReactorBatch batch = new ReactorBatch()
-        batch.add(Commands.eth().blockNumber)
-        batch.add(Commands.eth().getBalance(Address.EMPTY, BlockTag.LATEST))
-        when:
-        def act = client.convertToJson(batch).getT1()
-        def actStr = new String(readBytes(act))
-        then:
-        actStr == '[' +
-            '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' +
-            ',' +
-            '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0x0000000000000000000000000000000000000000","latest"],"id":2}' +
-            ']'
-    }
-
     def "Make simple call"() {
         setup:
         def requests = []
@@ -410,14 +373,5 @@ class ReactorHttpRpcClientSpec extends Specification {
     int readId(String json) {
         Pattern p = ~/"id":(\d+)/
         return p.matcher(json).group(1).toInteger()
-    }
-
-    byte[] readBytes(Flux<ByteBuf> input) {
-        ByteArrayOutputStream buf = new ByteArrayOutputStream()
-        input.reduce(buf, { x, val ->
-            x.write(val.array())
-            return x
-        }).subscribe()
-        return buf.toByteArray()
     }
 }

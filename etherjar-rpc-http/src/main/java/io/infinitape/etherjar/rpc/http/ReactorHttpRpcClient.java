@@ -28,11 +28,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.infinitape.etherjar.rpc.*;
-import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -43,8 +41,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.tcp.SslProvider;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements ReactorRpcClient {
 
@@ -52,17 +48,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
     private Mono<String> target;
     private HttpClient httpClient;
 
-    private Function<ReactorBatch.ReactorBatchItem, RequestJson> toRequest =
-        (bi) -> new RequestJson<>(bi.getCall().getMethod(), bi.getCall().getParams(), bi.getId());
-
-    private Function<Tuple2<String, Boolean>, Publisher<String>> arrange = (x) -> {
-        boolean first = x.getT2();
-        if (first) {
-            return Mono.just(x.getT1());
-        } else {
-            return Flux.just(",", x.getT1());
-        }
-    };
+    private BatchToString batchToString;
 
     public ReactorHttpRpcClient(RpcConverter rpcConverter,
                                  Mono<String> target,
@@ -70,35 +56,22 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
         this.rpcConverter = rpcConverter;
         this.target = target;
         this.httpClient = httpClient;
+        this.batchToString = new BatchToString(rpcConverter);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    protected Tuple2<Flux<ByteBuf>, BatchCallContext<ReactorBatch.ReactorBatchItem>> convertToJson(ReactorBatch batch) {
-        BatchCallContext<ReactorBatch.ReactorBatchItem> context = new BatchCallContext<>();
-        Flux<String> items = Flux.from(batch.getItems())
-            .doOnNext(context::add)
-            .map(toRequest)
-            .map(rpcConverter::toJson)
-            .zipWith(Flux.range(0, Integer.MAX_VALUE).map(i -> i == 0))
-            .flatMap(arrange);
-        Flux<ByteBuf> bytes = Flux.concat(Flux.just("["), items, Flux.just("]"))
-            .map(String::getBytes)
-            .map(Unpooled::wrappedBuffer);
-        return Tuples.of(bytes, context);
-    }
-
     @Override
     public Flux<RpcCallResponse> execute(ReactorBatch batch) {
-        Tuple2<Flux<ByteBuf>, BatchCallContext<ReactorBatch.ReactorBatchItem>> converted = convertToJson(batch);
-        BatchCallContext<ReactorBatch.ReactorBatchItem> context = converted.getT2();
+        BatchToString.BatchWithContext converted = batchToString.convertToJson(batch);
+        BatchCallContext<ReactorBatch.ReactorBatchItem> context = converted.getContext();
         HttpClient.ResponseReceiver<?> response =
             httpClient
                 .post()
                 .uri(target)
-                .send(converted.getT1());
+                .send(converted.getBatch());
         Flux<RpcCallResponse> result = response.response((resp, data) -> {
             if (resp.status() == HttpResponseStatus.OK) {
                 return data.aggregate().flatMapMany(new ResponseReader(context));
