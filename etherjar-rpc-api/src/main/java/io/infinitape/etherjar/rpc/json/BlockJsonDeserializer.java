@@ -41,14 +41,16 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
 
     public BlockJson<? extends TransactionRefJson> deserialize(JsonNode node) {
         BlockJson<TransactionRefJson> blockJson = new BlockJson<>();
-        BigInteger number = getQuantity(node, "number");
+        Long number = getLong(node, "number");
         if (number != null) {
-            blockJson.setNumber(number.longValue());
+            blockJson.setNumber(number);
         }
         blockJson.setHash(getBlockHash(node, "hash"));
-        BigInteger timestamp = getQuantity(node, "timestamp");
-        if (timestamp != null && timestamp.signum() > 0) {
-            blockJson.setTimestamp(Instant.ofEpochSecond(timestamp.longValue()));
+        Long timestamp = getLong(node, "timestamp");
+        if (timestamp != null) {
+            blockJson.setTimestamp(Instant.ofEpochSecond(timestamp));
+        } else {
+            System.err.println("Null timestamp for block " + number);
         }
 
         if (node.has("transactions")) {
@@ -68,9 +70,9 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         blockJson.setMiner(getAddress(node, "miner"));
         blockJson.setDifficulty(getQuantity(node, "difficulty"));
         blockJson.setTotalDifficulty(getQuantity(node, "totalDifficulty"));
-        BigInteger size = getQuantity(node, "size");
+        Long size = getLong(node, "size");
         if (size != null) {
-            blockJson.setSize(size.longValue());
+            blockJson.setSize(size);
         }
         blockJson.setGasLimit(getLong(node, "gasLimit"));
         blockJson.setGasUsed(getLong(node, "gasUsed"));
