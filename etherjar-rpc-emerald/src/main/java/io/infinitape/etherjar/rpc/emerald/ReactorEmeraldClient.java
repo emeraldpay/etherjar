@@ -29,6 +29,7 @@ import io.grpc.netty.NettyChannelBuilder;
 import io.infinitape.etherjar.rpc.*;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
 import io.netty.handler.ssl.SslContextBuilder;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,6 +37,7 @@ import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.function.Function;
 
 public class ReactorEmeraldClient extends AbstractReactorRpcClient implements ReactorRpcClient {
 
@@ -137,8 +139,22 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
           if (e.getStatus().getCode() == Status.Code.CANCELLED) {
               return Mono.empty();
           }
-          return Mono.error(e);
+          return Mono.error(new RpcException(
+              RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR,
+              "gRPC connection error. Status: " + e.getStatus(),
+              null,
+              e
+          ));
         }).flatMap(new AbstractReactorRpcClient.ResponseTransformer(context));
+
+        FailedBatchProcessor failedBatchProcessor = this.getFailedBatchProcessor();
+        if (failedBatchProcessor != null) {
+            Function<RpcException, Publisher<RpcCallResponse>> fallback = failedBatchProcessor.createFallback(batch);
+            if (fallback != null) {
+                result = result.onErrorResume(RpcException.class, fallback);
+            }
+        }
+
         return result;
     }
 

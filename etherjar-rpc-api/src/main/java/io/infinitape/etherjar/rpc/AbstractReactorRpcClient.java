@@ -16,12 +16,23 @@
 package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.rpc.json.ResponseJson;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
 public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
+
+    private FailedBatchProcessor failedBatchProcessor = new FailedBatchProcessor();
+
+    public FailedBatchProcessor getFailedBatchProcessor() {
+        return failedBatchProcessor;
+    }
+
+    public void setFailedBatchProcessor(FailedBatchProcessor failedBatchProcessor) {
+        this.failedBatchProcessor = failedBatchProcessor;
+    }
 
     public Flux<RpcCallResponse> execute(Flux<RpcCall<?, ?>> calls) {
         return ReactorBatch.from(calls).flatMapMany(this::execute);
@@ -36,7 +47,7 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
             .then(item.getResult());
     }
 
-    public class ResponseTransformer implements Function<ResponseJson<?, Integer>, Mono<RpcCallResponse>> {
+    public static class ResponseTransformer implements Function<ResponseJson<?, Integer>, Mono<RpcCallResponse>> {
         private final BatchCallContext<ReactorBatch.ReactorBatchItem> context;
 
         public ResponseTransformer(BatchCallContext<ReactorBatch.ReactorBatchItem> context) {
@@ -63,5 +74,18 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
                 return Mono.just(new RpcCallResponse<>(call, value));
             }
         }
+    }
+
+    /**
+     * Strategy to restore from upstream RpcException
+     */
+    public static class FailedBatchProcessor {
+
+        public Function<RpcException, Publisher<RpcCallResponse>> createFallback(ReactorBatch batch) {
+            return err -> batch.getItems()
+                .doOnNext((bi) -> bi.onError(err))
+                .then(Mono.error(err));
+        }
+
     }
 }

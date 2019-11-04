@@ -106,20 +106,23 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
                 RpcException err = new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Upstream connection error. Status: " + resp.status().code());
                 return Flux.error(err);
             }
-        }).onErrorResume(RpcException.class, (RpcException err) ->
-            failBatch(batch, err)
-        ).share();
+        });
+
+        FailedBatchProcessor failedBatchProcessor = this.getFailedBatchProcessor();
+        if (failedBatchProcessor != null) {
+            Function<RpcException, Publisher<RpcCallResponse>> fallback = failedBatchProcessor.createFallback(batch);
+            if (fallback != null) {
+                result = result.onErrorResume(RpcException.class, fallback);
+            }
+        }
+
+        result = result.share();
 
         batch.withExecution(Flux.from(result));
 
         return result;
     }
 
-    public Publisher<RpcCallResponse> failBatch(ReactorBatch batch, RpcException err) {
-        return batch.getItems()
-            .doOnNext((bi) -> bi.onError(err))
-            .then(Mono.error(err));
-    }
 
     public class ResponseReader implements Function<ByteBuf, Flux<RpcCallResponse>> {
         private final BatchCallContext<ReactorBatch.ReactorBatchItem> context;
