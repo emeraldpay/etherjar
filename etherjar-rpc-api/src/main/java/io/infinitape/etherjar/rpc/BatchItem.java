@@ -19,9 +19,8 @@ import io.infinitape.etherjar.rpc.json.ResponseJson;
 import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
-public abstract class BatchItem<PROC, JS, RES> {
+public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
     protected int id;
     protected RpcCall<JS, RES> call;
 
@@ -60,6 +59,15 @@ public abstract class BatchItem<PROC, JS, RES> {
      * @return result value
      */
     public abstract PROC getResult();
+
+    /**
+     * Called once batch is fully executed. It's always last call, after onComplete or onError
+     * if they were called.
+     */
+    @Override
+    public void close() {
+
+    }
 
     /**
      * Read value from response

@@ -41,6 +41,7 @@ public class DefaultRpcClient extends AbstractFuturesRcpClient implements Future
     public CompletableFuture<List<DefaultBatch.FutureBatchItem>> execute(DefaultBatch batch) {
         List<DefaultBatch.FutureBatchItem> items = batch.getItems();
         if (items.isEmpty()) {
+            batch.close();
             return CompletableFuture.completedFuture(
                 Collections.emptyList()
             );
@@ -53,6 +54,7 @@ public class DefaultRpcClient extends AbstractFuturesRcpClient implements Future
         return rpcTransport.execute(rpcRequests).thenApply((resp) -> {
             List<DefaultBatch.FutureBatchItem> result = batch.getItems();
             resp.forEach(new ResponseReader<Object>(context));
+            batch.close();
             return result;
         });
     }

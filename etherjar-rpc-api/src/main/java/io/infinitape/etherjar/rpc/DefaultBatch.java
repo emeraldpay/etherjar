@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * List of RPC commands to execute
  */
-public class DefaultBatch implements Batch<DefaultBatch.FutureBatchItem> {
+public class DefaultBatch implements Batch<DefaultBatch.FutureBatchItem>, AutoCloseable {
 
     private List<FutureBatchItem<?, ?>> items = new ArrayList<>();
     private AtomicInteger ids = new AtomicInteger(0);
@@ -63,6 +63,11 @@ public class DefaultBatch implements Batch<DefaultBatch.FutureBatchItem> {
     @Override
     public int hashCode() {
         return Objects.hash(items);
+    }
+
+    @Override
+    public void close() {
+        items.forEach(FutureBatchItem::close);
     }
 
     /**
@@ -105,5 +110,11 @@ public class DefaultBatch implements Batch<DefaultBatch.FutureBatchItem> {
             return result;
         }
 
+        @Override
+        public void close() {
+            if (!result.isDone()) {
+                result.completeExceptionally(new BatchNotExecutedException(this.id, this.call));
+            }
+        }
     }
 }

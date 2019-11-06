@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consumer<RpcCall> {
+public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consumer<RpcCall>, AutoCloseable {
 
     private final List<ReactorBatch.ReactorBatchItem<?, ?>> items = new ArrayList<>();
     private final AtomicInteger ids = new AtomicInteger(1);
@@ -69,6 +69,11 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
             .last()
             .doOnCancel(() -> items.forEach(ReactorBatchItem::cancel));
         onceExecuted.follow(waiter);
+    }
+
+    @Override
+    public void close() {
+        items.forEach(ReactorBatchItem::close);
     }
 
     public static class ReactorBatchItem<JS, RES> extends BatchItem<Mono<RES>, JS, RES> {
@@ -111,6 +116,13 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
         public Mono<RES> getResult() {
             Mono<RES> value = Mono.from(proc);
             return value.or(Mono.when(onceExecuted).then(value));
+        }
+
+        @Override
+        public void close() {
+            if (!isClosed()) {
+                proc.onError(new BatchNotExecutedException(this.id, this.call));
+            }
         }
     }
 

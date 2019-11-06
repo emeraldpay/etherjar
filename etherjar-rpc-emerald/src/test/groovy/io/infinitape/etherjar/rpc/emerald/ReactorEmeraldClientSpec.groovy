@@ -18,6 +18,8 @@ package io.infinitape.etherjar.rpc.emerald
 import com.google.protobuf.ByteString
 import io.emeraldpay.api.proto.BlockchainGrpc
 import io.emeraldpay.api.proto.BlockchainOuterClass
+import io.emeraldpay.api.proto.Common
+import io.emeraldpay.grpc.Chain
 import io.grpc.stub.StreamObserver
 import io.infinitape.etherjar.domain.Address
 import io.infinitape.etherjar.domain.Wei
@@ -88,6 +90,148 @@ class ReactorEmeraldClientSpec extends Specification {
             void nativeCall(BlockchainOuterClass.NativeCallRequest request, StreamObserver<BlockchainOuterClass.NativeCallReplyItem> responseObserver) {
                 actRequest = request
                 responseObserver.onError(new Exception("Test error"))
+            }
+        })
+
+        ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
+            .forChannel(server.channel)
+            .build()
+
+        when:
+        def act = client.execute(Commands.eth().getBalance(Address.from("0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983"), BlockTag.LATEST))
+
+        then:
+        StepVerifier.create(act)
+            .expectError()
+            .verify(Duration.ofSeconds(1))
+    }
+
+    def "Uses chain"() {
+        setup:
+
+        BlockchainOuterClass.NativeCallRequest actRequest = null
+
+        def server = MockServer.createFor(new BlockchainGrpc.BlockchainImplBase() {
+            @Override
+            void nativeCall(BlockchainOuterClass.NativeCallRequest request, StreamObserver<BlockchainOuterClass.NativeCallReplyItem> responseObserver) {
+                actRequest = request
+
+                responseObserver.onNext(
+                    BlockchainOuterClass.NativeCallReplyItem.newBuilder()
+                        .setId(1)
+                        .setSucceed(true)
+                        .setPayload(ByteString.copyFromUtf8('{\n' +
+                            '    "jsonrpc": "2.0",\n' +
+                            '    "result": "0xab5461ca4b100000",\n' +
+                            '    "id": 1\n' +
+                            '  }'))
+                        .build()
+                )
+                responseObserver.onCompleted()
+            }
+        })
+
+        ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
+            .forChannel(server.channel)
+            .build()
+            .copyForChain(Chain.ETHEREUM_CLASSIC)
+
+        when:
+        def act = client.execute(Commands.eth().getBalance(Address.from("0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983"), BlockTag.LATEST))
+
+        then:
+        StepVerifier.create(act)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1))
+
+        actRequest == BlockchainOuterClass.NativeCallRequest.newBuilder()
+            .setChain(Common.ChainRef.CHAIN_ETHEREUM_CLASSIC)
+            .addItems(
+                BlockchainOuterClass.NativeCallItem.newBuilder()
+                    .setId(1)
+                    .setMethod("eth_getBalance")
+                    .setPayload(ByteString.copyFromUtf8('["0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983","latest"]'))
+            )
+            .build()
+    }
+
+    def "Uses selector"() {
+        setup:
+
+        BlockchainOuterClass.NativeCallRequest actRequest = null
+
+        def server = MockServer.createFor(new BlockchainGrpc.BlockchainImplBase() {
+            @Override
+            void nativeCall(BlockchainOuterClass.NativeCallRequest request, StreamObserver<BlockchainOuterClass.NativeCallReplyItem> responseObserver) {
+                actRequest = request
+
+                responseObserver.onNext(
+                    BlockchainOuterClass.NativeCallReplyItem.newBuilder()
+                        .setId(1)
+                        .setSucceed(true)
+                        .setPayload(ByteString.copyFromUtf8('{\n' +
+                            '    "jsonrpc": "2.0",\n' +
+                            '    "result": "0xab5461ca4b100000",\n' +
+                            '    "id": 1\n' +
+                            '  }'))
+                        .build()
+                )
+                responseObserver.onCompleted()
+            }
+        })
+
+        ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
+            .forChannel(server.channel)
+            .build()
+            .copyForChain(Chain.ETHEREUM_CLASSIC)
+            .copyWithSelector(
+                BlockchainOuterClass.Selector.newBuilder()
+                .setLabelSelector(
+                    BlockchainOuterClass.LabelSelector.newBuilder()
+                    .setName("test")
+                    .addValue("baz")
+                )
+                .build())
+
+        when:
+        def act = client.execute(Commands.eth().getBalance(Address.from("0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983"), BlockTag.LATEST))
+
+        then:
+        StepVerifier.create(act)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofSeconds(1))
+
+        actRequest == BlockchainOuterClass.NativeCallRequest.newBuilder()
+            .setChain(Common.ChainRef.CHAIN_ETHEREUM_CLASSIC)
+            .setSelector(
+                BlockchainOuterClass.Selector.newBuilder()
+                    .setLabelSelector(
+                        BlockchainOuterClass.LabelSelector.newBuilder()
+                            .setName("test")
+                            .addValue("baz")
+                    )
+            )
+            .addItems(
+                BlockchainOuterClass.NativeCallItem.newBuilder()
+                    .setId(1)
+                    .setMethod("eth_getBalance")
+                    .setPayload(ByteString.copyFromUtf8('["0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983","latest"]'))
+            )
+            .build()
+    }
+
+    def "Fail call if execution doesn't return result"() {
+        setup:
+
+        BlockchainOuterClass.NativeCallRequest actRequest = null
+
+        def server = MockServer.createFor(new BlockchainGrpc.BlockchainImplBase() {
+            @Override
+            void nativeCall(BlockchainOuterClass.NativeCallRequest request, StreamObserver<BlockchainOuterClass.NativeCallReplyItem> responseObserver) {
+                actRequest = request
+                responseObserver.onCompleted()
             }
         })
 

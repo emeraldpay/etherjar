@@ -155,6 +155,10 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             }
         }
 
+        result = result
+            .doFinally((s) -> batch.close())
+            .share();
+
         return result;
     }
 

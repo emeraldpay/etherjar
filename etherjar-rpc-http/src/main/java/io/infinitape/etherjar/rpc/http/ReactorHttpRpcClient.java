@@ -89,7 +89,9 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             }
         }
 
-        result = result.share();
+        result = result
+            .doFinally((s) -> batch.close())
+            .share();
 
         batch.withExecution(Flux.from(result));
 
