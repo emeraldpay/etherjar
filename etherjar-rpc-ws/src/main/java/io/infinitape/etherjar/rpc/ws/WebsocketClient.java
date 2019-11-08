@@ -15,7 +15,6 @@
  */
 package io.infinitape.etherjar.rpc.ws;
 
-import io.infinitape.etherjar.domain.TransactionId;
 import io.infinitape.etherjar.rpc.json.BlockJson;
 import io.infinitape.etherjar.rpc.json.TransactionRefJson;
 import io.netty.bootstrap.Bootstrap;
@@ -33,6 +32,7 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -53,12 +53,16 @@ public class WebsocketClient implements Closeable {
     private String username;
     private String password;
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     /**
      *
      * @param upstream URI to a websocket server, ex. ws://localhost:8546
      * @param origin origin header, ex. http://localhost
      */
-    public WebsocketClient(URI upstream, URI origin) {
+    private WebsocketClient(URI upstream, URI origin) {
         this.upstream = upstream;
         this.origin = origin;
     }
@@ -69,7 +73,7 @@ public class WebsocketClient implements Closeable {
      * @param username username
      * @param password password
      */
-    public void setBasicAuth(String username, String password) {
+    protected void setBasicAuth(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -134,7 +138,7 @@ public class WebsocketClient implements Closeable {
         }
     }
 
-    public SslContext prepareSsl() throws GeneralSecurityException, SSLException, KeyStoreException {
+    protected SslContext prepareSsl() throws GeneralSecurityException, SSLException, KeyStoreException {
         if (!upstream.getScheme().equals("wss")) {
             return null;
         }
@@ -147,7 +151,7 @@ public class WebsocketClient implements Closeable {
         return sslCtx;
     }
 
-    public HttpHeaders prepareHeaders() {
+    protected HttpHeaders prepareHeaders() {
         HttpHeaders customHeaders = new DefaultHttpHeaders();
         customHeaders.add(HttpHeaderNames.ORIGIN.toString(), origin.toASCIIString());
         customHeaders.add(HttpHeaderNames.CONTENT_LENGTH.toString(), 0);
@@ -174,5 +178,79 @@ public class WebsocketClient implements Closeable {
     @Override
     public void close() throws IOException {
         socketApiHandler.stop();
+    }
+
+    /**
+     * Build a configuration for the WebsocketClient
+     */
+    public static class Builder {
+
+        private URI address;
+        private URI origin;
+
+        private String username;
+        private String password;
+
+        /**
+         *
+         * @param address address of a Websocket endpoint, e.g. ws://127.0.0.1:8546
+         * @return builder
+         */
+        public Builder setAddress(URI address) {
+            this.address = address;
+            return this;
+        }
+
+        /**
+         * Optional original of the current client, if a Websocket server requires it for connection
+         *
+         * @param origin origin to of the current client, e.g. http://localhost
+         * @return builder
+         */
+        public Builder setOrigin(URI origin) {
+            this.origin = origin;
+            return this;
+        }
+
+        /**
+         * Setup Basic Auth for RPC calls
+         *
+         * @param username username
+         * @param password password
+         * @return builder
+         */
+        public Builder setBasicAuth(String username, String password) {
+            if (username == null || username.length() == 0) {
+                throw new IllegalArgumentException("Username cannot be null or empty");
+            }
+            if (password == null || password.length() == 0) {
+                throw new IllegalArgumentException("Password cannot be null or empty");
+            }
+            this.username = username;
+            this.password = password;
+            return this;
+        }
+
+        /**
+         *
+         * @return client
+         */
+        public WebsocketClient build() {
+            if (address == null) {
+                try {
+                    address = new URI("ws://localhost:8546");
+                } catch (URISyntaxException e) { }
+            }
+            if (origin == null) {
+                try {
+                    origin = new URI("http://localhost");
+                } catch (URISyntaxException e) { }
+            }
+            WebsocketClient client = new WebsocketClient(address, origin);
+            if (username != null && password != null) {
+                client.setBasicAuth(username, password);
+            }
+            return client;
+        }
     }
 }
