@@ -58,7 +58,7 @@ class ReactorEmeraldClientSpec extends Specification {
         })
 
         ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
-            .forChannel(server.channel)
+            .connectUsing(server.channel)
             .build()
 
         when:
@@ -94,7 +94,7 @@ class ReactorEmeraldClientSpec extends Specification {
         })
 
         ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
-            .forChannel(server.channel)
+            .connectUsing(server.channel)
             .build()
 
         when:
@@ -132,7 +132,7 @@ class ReactorEmeraldClientSpec extends Specification {
         })
 
         ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
-            .forChannel(server.channel)
+            .connectUsing(server.channel)
             .build()
             .copyForChain(Chain.ETHEREUM_CLASSIC)
 
@@ -182,7 +182,7 @@ class ReactorEmeraldClientSpec extends Specification {
         })
 
         ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
-            .forChannel(server.channel)
+            .connectUsing(server.channel)
             .build()
             .copyForChain(Chain.ETHEREUM_CLASSIC)
             .copyWithSelector(
@@ -236,7 +236,7 @@ class ReactorEmeraldClientSpec extends Specification {
         })
 
         ReactorEmeraldClient client = ReactorEmeraldClient.newBuilder()
-            .forChannel(server.channel)
+            .connectUsing(server.channel)
             .build()
 
         when:

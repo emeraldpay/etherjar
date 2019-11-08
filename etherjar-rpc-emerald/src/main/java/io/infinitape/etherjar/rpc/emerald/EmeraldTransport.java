@@ -219,7 +219,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param channel existing channel
          * @return builder
          */
-        public Builder forChannel(Channel channel) {
+        public Builder connectUsing(Channel channel) {
             this.channel = channel;
             channelBuilder = null;
             sslContextBuilder = null;
@@ -232,12 +232,12 @@ public class EmeraldTransport implements RpcTransport {
          * @param hostPort address in host:port format
          * @return builder
          */
-        public Builder forAddress(String hostPort) {
+        public Builder connectTo(String hostPort) {
             String[] parts = hostPort.split(":");
             if (parts.length == 1) {
-                return forAddress(hostPort, 9001);
+                return connectTo(hostPort, 9001);
             } else {
-                return forAddress(parts[0], Integer.parseInt(parts[1]));
+                return connectTo(parts[0], Integer.parseInt(parts[1]));
             }
         }
 
@@ -247,7 +247,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param port port
          * @return builder
          */
-        public Builder forAddress(String host, int port) {
+        public Builder connectTo(String host, int port) {
             channelBuilder = NettyChannelBuilder.forAddress(host, port).usePlaintext();
             channel = null;
             return this;
@@ -258,13 +258,13 @@ public class EmeraldTransport implements RpcTransport {
          * @param uri uri (only host:port are used, could be anything like grpc://dshakle-server:9001)
          * @return builder
          */
-        public Builder forUri(URI uri) {
+        public Builder connectTo(URI uri) {
             String host = uri.getHost();
             int port = uri.getPort();
             if (port == -1) {
                 port = 9001;
             }
-            return forAddress(host, port);
+            return connectTo(host, port);
         }
 
         /**
@@ -334,7 +334,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param objectMapper custom Object Mapper
          * @return builder
          */
-        public Builder setObjectMapper(ObjectMapper objectMapper) {
+        public Builder objectMapper(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
             return this;
         }
@@ -344,7 +344,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param rpcConverter custom RpcConverter
          * @return builder
          */
-        public Builder setRpcConverter(RpcConverter rpcConverter) {
+        public Builder rpcConverter(RpcConverter rpcConverter) {
             this.rpcConverter = rpcConverter;
             return this;
         }
@@ -355,7 +355,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param executorService custom execute service
          * @return builder
          */
-        public Builder setExecutorService(ExecutorService executorService) {
+        public Builder executorService(ExecutorService executorService) {
             this.executorService = executorService;
             return this;
         }
@@ -366,7 +366,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param threads fixed threads count
          * @return builder
          */
-        public Builder setThreadsCount(int threads) {
+        public Builder threadsCount(int threads) {
             executorService = Executors.newFixedThreadPool(threads, r -> new Thread(r,"emerald-grpc"));
             return this;
         }
@@ -376,7 +376,7 @@ public class EmeraldTransport implements RpcTransport {
          * @param chain chain
          * @return builder
          */
-        public Builder setChain(Chain chain) {
+        public Builder chain(Chain chain) {
             this.chain = chain;
             return this;
         }
@@ -396,7 +396,7 @@ public class EmeraldTransport implements RpcTransport {
                 channel = channelBuilder.build();
             }
             if (executorService == null) {
-                setThreadsCount(2);
+                threadsCount(2);
             }
             if (objectMapper == null) {
                 objectMapper = new ObjectMapper();

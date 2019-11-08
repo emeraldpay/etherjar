@@ -167,7 +167,7 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
         private Long validateSeconds;
         private int minPeers = 3;
 
-        public Builder hosts(List<String> knownHosts) throws URISyntaxException {
+        public Builder connectTo(List<String> knownHosts) throws URISyntaxException {
             List<URI> hosts = new ArrayList<>(knownHosts.size());
             for (String uri: knownHosts) {
                 hosts.add(new URI(uri));

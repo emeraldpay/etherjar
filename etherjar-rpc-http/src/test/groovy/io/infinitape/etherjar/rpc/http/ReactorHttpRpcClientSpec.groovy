@@ -54,7 +54,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         }
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -95,7 +95,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         Spark.exception(Exception.class, { t, req, resp -> t.printStackTrace()})
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -151,7 +151,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder()
-            .setTarget("http://localhost:18545")
+            .connectTo("http://localhost:18545")
             .alwaysSeparate()
             .build()
 
@@ -201,7 +201,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         }
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         def resp = client.execute(Commands.net().peerCount())
@@ -229,7 +229,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         }
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -259,7 +259,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         }
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -281,7 +281,7 @@ class ReactorHttpRpcClientSpec extends Specification {
     def "Error on no connection using separated transport"() {
         setup:
         def client = ReactorHttpRpcClient.newBuilder()
-            .setTarget("http://localhost:18546")
+            .connectTo("http://localhost:18546")
             .alwaysSeparate()
             .build()
 
@@ -303,7 +303,7 @@ class ReactorHttpRpcClientSpec extends Specification {
     def "Error on no connection using separated transport using two calls"() {
         setup:
         def client = ReactorHttpRpcClient.newBuilder()
-            .setTarget("http://localhost:18546")
+            .connectTo("http://localhost:18546")
             .alwaysSeparate()
             .build()
 
@@ -336,7 +336,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
         Spark.awaitInitialization()
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -360,7 +360,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             return '[{"jsonrpc":"2.0","id":1, "result": 1}]'
         }
         Spark.awaitInitialization()
-        def client = ReactorHttpRpcClient.newBuilder().setTarget("http://localhost:18545").build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -397,7 +397,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         }
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget(Mono.just("http://localhost:18545")).build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo(Mono.just("http://localhost:18545")).build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -423,7 +423,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         }
         Spark.awaitInitialization()
 
-        def client = ReactorHttpRpcClient.newBuilder().setTarget(new URI("http://localhost:18545")).build()
+        def client = ReactorHttpRpcClient.newBuilder().connectTo(new URI("http://localhost:18545")).build()
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -451,8 +451,8 @@ class ReactorHttpRpcClientSpec extends Specification {
         Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder()
-            .setTarget(new URI("http://localhost:18545"))
-            .setBasicAuth("Aladdin", "OpenSesame")
+            .connectTo(new URI("http://localhost:18545"))
+            .basicAuth("Aladdin", "OpenSesame")
             .build()
 
         when:

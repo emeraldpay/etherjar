@@ -196,7 +196,7 @@ public class WebsocketClient implements Closeable {
          * @param address address of a Websocket endpoint, e.g. ws://127.0.0.1:8546
          * @return builder
          */
-        public Builder setAddress(URI address) {
+        public Builder connectTo(URI address) {
             this.address = address;
             return this;
         }
@@ -207,7 +207,7 @@ public class WebsocketClient implements Closeable {
          * @param origin origin to of the current client, e.g. http://localhost
          * @return builder
          */
-        public Builder setOrigin(URI origin) {
+        public Builder origin(URI origin) {
             this.origin = origin;
             return this;
         }
@@ -219,7 +219,7 @@ public class WebsocketClient implements Closeable {
          * @param password password
          * @return builder
          */
-        public Builder setBasicAuth(String username, String password) {
+        public Builder basicAuth(String username, String password) {
             if (username == null || username.length() == 0) {
                 throw new IllegalArgumentException("Username cannot be null or empty");
             }

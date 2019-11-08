@@ -118,22 +118,22 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             BATCH, SEPARATED
         }
 
-        public Builder setTarget(String url) {
+        public Builder connectTo(String url) {
             target = Mono.just(url);
             return this;
         }
 
-        public Builder setTarget(Mono<String> url) {
+        public Builder connectTo(Mono<String> url) {
             target = url;
             return this;
         }
 
-        public Builder setTarget(URI url) {
+        public Builder connectTo(URI url) {
             target = Mono.just(url.toString());
             return this;
         }
 
-        public Builder setRpcConverter(RpcConverter rpcConverter) {
+        public Builder rpcConverter(RpcConverter rpcConverter) {
             this.rpcConverter = rpcConverter;
             return this;
         }
@@ -145,7 +145,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
          * @param password password
          * @return builder
          */
-        public Builder setBasicAuth(String username, String password) {
+        public Builder basicAuth(String username, String password) {
             String authString = username + ":" + password;
             String authBase64 = Base64.getEncoder().encodeToString(authString.getBytes());
             final String auth = "Basic " + authBase64;
@@ -173,7 +173,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
          * @throws IOException if unable to read certificate
          * @return builder
          */
-        public Builder setTrustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
+        public Builder trustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate cert = (X509Certificate) cf.generateCertificate(certificate);
             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
