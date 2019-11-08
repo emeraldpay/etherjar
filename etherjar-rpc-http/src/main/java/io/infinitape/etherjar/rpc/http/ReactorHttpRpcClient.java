@@ -17,6 +17,7 @@ package io.infinitape.etherjar.rpc.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -33,7 +34,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.reactivestreams.Publisher;
@@ -44,19 +44,10 @@ import reactor.netty.tcp.SslProvider;
 
 public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements ReactorRpcClient {
 
-    private RpcConverter rpcConverter;
-    private Mono<String> target;
-    private HttpClient httpClient;
+    private final ReactorRpcTransport transport;
 
-    private BatchToString batchToString;
-
-    public ReactorHttpRpcClient(RpcConverter rpcConverter,
-                                 Mono<String> target,
-                                HttpClient httpClient) {
-        this.rpcConverter = rpcConverter;
-        this.target = target;
-        this.httpClient = httpClient;
-        this.batchToString = new BatchToString(rpcConverter);
+    private ReactorHttpRpcClient(ReactorRpcTransport transport) {
+        this.transport = transport;
     }
 
     public static Builder newBuilder() {
@@ -65,21 +56,15 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
 
     @Override
     public Flux<RpcCallResponse> execute(ReactorBatch batch) {
-        BatchToString.BatchWithContext converted = batchToString.convertToJson(batch);
-        BatchCallContext<ReactorBatch.ReactorBatchItem> context = converted.getContext();
-        HttpClient.ResponseReceiver<?> response =
-            httpClient
-                .post()
-                .uri(target)
-                .send(converted.getBatch());
-        Flux<RpcCallResponse> result = response.response((resp, data) -> {
-            if (resp.status() == HttpResponseStatus.OK) {
-                return data.aggregate().flatMapMany(new ResponseReader(context));
-            } else {
-                RpcException err = new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Upstream connection error. Status: " + resp.status().code());
-                return Flux.error(err);
-            }
-        });
+        BatchCallContext<ReactorBatch.ReactorBatchItem> context = new BatchCallContext<>();
+        Consumer<RpcCallResponse> processBatch = new ProcessBatchResult(context);
+
+        Flux<RpcCallResponse> result = batch.getItems()
+            .doOnNext(context::add)
+            .thenMany(transport.execute(batch.getItems(), context))
+            .onErrorResume(ConnectException.class, ReactorHandlers.catchConnectException())
+            ;
+
 
         FailedBatchProcessor failedBatchProcessor = this.getFailedBatchProcessor();
         if (failedBatchProcessor != null) {
@@ -90,6 +75,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
         }
 
         result = result
+            .doOnNext(processBatch)
             .doFinally((s) -> batch.close())
             .share();
 
@@ -99,10 +85,12 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
     }
 
 
-    public class ResponseReader implements Function<ByteBuf, Flux<RpcCallResponse>> {
+    public static class ResponseReader implements Function<ByteBuf, Flux<RpcCallResponse>> {
+        private RpcConverter rpcConverter;
         private final BatchCallContext<ReactorBatch.ReactorBatchItem> context;
 
-        public ResponseReader(BatchCallContext<ReactorBatch.ReactorBatchItem> context) {
+        public ResponseReader(RpcConverter rpcConverter, BatchCallContext<ReactorBatch.ReactorBatchItem> context) {
+            this.rpcConverter = rpcConverter;
             this.context = context;
         }
 
@@ -111,7 +99,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             List<ResponseJson<?, Integer>> responses;
             try {
                 responses = rpcConverter.parseBatch(new ByteBufInputStream(content), context.getJsonTypes());
-            } catch (IOException e) {
+            } catch (RpcException e) {
                 return Flux.error(e);
             }
             return Flux.fromIterable(responses)
@@ -124,6 +112,11 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
         private Mono<String> target;
         private Consumer<HttpHeaders> headers;
         private Consumer<SslProvider.SslContextSpec> sslProviderBuilder;
+        private TransportType transportType;
+
+        private enum TransportType {
+            BATCH, SEPARATED
+        }
 
         public Builder setTarget(String url) {
             target = Mono.just(url);
@@ -162,6 +155,16 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             return this;
         }
 
+        public Builder alwaysBatch() {
+            transportType = TransportType.BATCH;
+            return this;
+        }
+
+        public Builder alwaysSeparate() {
+            transportType = TransportType.SEPARATED;
+            return this;
+        }
+
         /**
          * Provide a trusted x509 certificate expected from RPC server
          *
@@ -186,6 +189,9 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
         }
 
         public ReactorHttpRpcClient build() {
+            if (transportType == null) {
+                transportType = TransportType.BATCH;
+            }
             if (target == null) {
                 target = Mono.just("http://127.0.0.1:8545");
             }
@@ -202,7 +208,16 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             if (sslProviderBuilder != null) {
                 clientBuilder = clientBuilder.secure(sslProviderBuilder);
             }
-            return new ReactorHttpRpcClient(rpcConverter, target, clientBuilder);
+            ReactorRpcTransport transport;
+            if (transportType == TransportType.BATCH) {
+                BatchToString batchToString = new BatchToString(rpcConverter);
+                transport = new BatchTransport(clientBuilder, target, rpcConverter, batchToString);
+            } else if (transportType == TransportType.SEPARATED) {
+                transport = new SeparatedTransport(clientBuilder, target, rpcConverter);
+            } else {
+                throw new IllegalStateException("Transport type cannot be null");
+            }
+            return new ReactorHttpRpcClient(transport);
         }
 
     }

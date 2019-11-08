@@ -16,11 +16,12 @@
 package io.infinitape.etherjar.rpc;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author Igor Artamonov
  */
-public class RpcException extends IOException {
+public class RpcException extends RuntimeException {
 
     private int code;
     private String rpcMessage;
@@ -67,4 +68,22 @@ public class RpcException extends IOException {
         return source;
     }
 
+    public String toString() {
+        return "RpcException(" + code + " " + rpcMessage + ", " + details.toString() + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RpcException that = (RpcException) o;
+        return code == that.code &&
+            Objects.equals(rpcMessage, that.rpcMessage) &&
+            Objects.equals(details, that.details);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, rpcMessage);
+    }
 }

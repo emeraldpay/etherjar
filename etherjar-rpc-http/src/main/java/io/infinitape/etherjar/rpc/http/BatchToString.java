@@ -58,18 +58,15 @@ public class BatchToString {
      * @param batch request batch
      * @return string serialized batch with individual mappings as context
      */
-    public BatchWithContext convertToJson(ReactorBatch batch) {
-        BatchCallContext<ReactorBatch.ReactorBatchItem> context = new BatchCallContext<>();
-        Flux<String> items = Flux.from(batch.getItems())
-            .doOnNext(context::add)
+    public Flux<ByteBuf> convertToJson(Flux<ReactorBatch.ReactorBatchItem> batch) {
+        Flux<String> items = batch
             .map(toRequest)
             .map(rpcConverter::toJson)
             .zipWith(Flux.range(0, Integer.MAX_VALUE).map(i -> i == 0))
             .flatMap(arrange);
-        Flux<ByteBuf> bytes = Flux.concat(Flux.just("["), items, Flux.just("]"))
+        return Flux.concat(Flux.just("["), items, Flux.just("]"))
             .map(String::getBytes)
             .map(Unpooled::wrappedBuffer);
-        return new BatchWithContext(bytes, context);
     }
 
     /**

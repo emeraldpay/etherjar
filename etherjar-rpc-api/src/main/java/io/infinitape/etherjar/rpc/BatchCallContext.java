@@ -21,11 +21,13 @@ import java.util.Map;
 public class BatchCallContext<T extends BatchItem> {
     private Map<Integer, T> resultMapper = new HashMap<>();
     private Map<Integer, Class> jsonTypes = new HashMap<>();
+    private Map<RpcCall, T> callMapper = new HashMap<>();
 
     public int add(T item) {
         int current = item.getId();
         resultMapper.put(current, item);
         jsonTypes.put(current, item.getCall().getJsonType());
+        callMapper.put(item.getCall(), item);
         return current;
     }
 
@@ -43,5 +45,9 @@ public class BatchCallContext<T extends BatchItem> {
 
     public <JS, RES> RpcCall<JS, RES> getCall(int id) {
         return resultMapper.get(id).getCall();
+    }
+
+    public T getBatchItem(RpcCall call) {
+        return callMapper.get(call);
     }
 }

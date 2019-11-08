@@ -15,6 +15,8 @@
  */
 package io.infinitape.etherjar.rpc;
 
+import java.util.Objects;
+
 public class RpcCallResponse<JS, RES> {
 
     private RpcCall<JS, RES> source;
@@ -56,5 +58,20 @@ public class RpcCallResponse<JS, RES> {
             return (RpcCallResponse<JS, T>) this;
         }
         throw new ClassCastException("Value of " + value.getClass() + " is not assignable to " + clazz);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RpcCallResponse<?, ?> that = (RpcCallResponse<?, ?>) o;
+        return Objects.equals(source, that.source) &&
+            Objects.equals(value, that.value) &&
+            Objects.equals(error, that.error);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, error);
     }
 }

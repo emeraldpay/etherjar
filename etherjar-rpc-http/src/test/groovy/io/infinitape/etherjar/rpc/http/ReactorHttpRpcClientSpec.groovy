@@ -18,17 +18,11 @@ package io.infinitape.etherjar.rpc.http
 import io.infinitape.etherjar.domain.Address
 import io.infinitape.etherjar.rpc.Commands
 import io.infinitape.etherjar.rpc.ReactorBatch
-import io.infinitape.etherjar.rpc.http.ReactorHttpRpcClient
-import io.infinitape.etherjar.rpc.json.BlockTag
-import io.netty.buffer.ByteBuf
-import jdk.nashorn.internal.runtime.regexp.joni.Regex
+import io.infinitape.etherjar.rpc.RpcException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import reactor.util.Loggers
-import spark.Filter
-import spark.Request
-import spark.Response
 import spark.Spark
 import spock.lang.Specification
 
@@ -37,7 +31,6 @@ import java.util.regex.Pattern
 
 class ReactorHttpRpcClientSpec extends Specification {
 
-    ReactorHttpRpcClient client = ReactorHttpRpcClient.newBuilder().build()
 
     def setup() {
         Spark.port(18545)
@@ -138,6 +131,64 @@ class ReactorHttpRpcClientSpec extends Specification {
 
     }
 
+    def "Make two calls using separated transport"() {
+        setup:
+        def requests = []
+        Spark.post("/") {req, resp ->
+            println("Received request: ${req.body()}")
+            requests.add(req.body())
+            resp.status(200)
+            resp.type("application/json")
+            if (req.body().contains('"id":1')) {
+                return '{"jsonrpc":"2.0","id":1,"result":68}'
+            } else if (req.body().contains('"id":2')) {
+                return '{"jsonrpc":"2.0","id":2,"result":"0x0000000000000000000000000000000000000000"}'
+            } else {
+                return '{}'
+            }
+        }
+        Spark.exception(Exception.class, { t, req, resp -> t.printStackTrace()})
+        Spark.awaitInitialization()
+
+        def client = ReactorHttpRpcClient.newBuilder()
+            .setTarget("http://localhost:18545")
+            .alwaysSeparate()
+            .build()
+
+        when:
+        ReactorBatch batch = new ReactorBatch()
+        def call1 = batch.add(Commands.net().peerCount())
+        def call2 = batch.add(Commands.eth().getCoinbase())
+        def resp = client.execute(batch)
+
+        then:
+        StepVerifier.create(resp)
+            .expectNextMatches({
+                println("Received value: $it.value ")
+                return it.value == 68 && it.error == null
+            }).as("receive value for peers")
+            .expectNextMatches({
+                println("Received value: $it.value ${it.value.class}")
+                return it.value == Address.from("0x0000000000000000000000000000000000000000") && it.error == null
+            }).as("receive value for coinbase")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5))
+
+        StepVerifier.create(call1.result)
+            .expectNext(68)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5))
+
+        StepVerifier.create(call2.result)
+            .expectNext(Address.from("0x0000000000000000000000000000000000000000"))
+            .expectComplete()
+            .verify(Duration.ofSeconds(5))
+
+        requests.size() == 2
+        requests.sort()[0] == '{"jsonrpc":"2.0","method":"eth_coinbase","params":[],"id":2}'
+        requests.sort()[1] == '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}'
+    }
+
     def "Make simple call with shortcut call"() {
         setup:
         def requests = []
@@ -225,6 +276,54 @@ class ReactorHttpRpcClientSpec extends Specification {
             .verify(Duration.ofSeconds(5))
 
         requests.size() == 1
+    }
+
+    def "Error on no connection using separated transport"() {
+        setup:
+        def client = ReactorHttpRpcClient.newBuilder()
+            .setTarget("http://localhost:18546")
+            .alwaysSeparate()
+            .build()
+
+        when:
+        ReactorBatch batch = new ReactorBatch()
+        def call = batch.add(Commands.net().peerCount())
+        def resp = client.execute(batch)
+
+        then:
+        StepVerifier.create(resp)
+            .expectError(RpcException)
+            .verify(Duration.ofSeconds(1))
+
+        StepVerifier.create(call.result)
+            .expectError(RpcException)
+            .verify(Duration.ofSeconds(1))
+    }
+
+    def "Error on no connection using separated transport using two calls"() {
+        setup:
+        def client = ReactorHttpRpcClient.newBuilder()
+            .setTarget("http://localhost:18546")
+            .alwaysSeparate()
+            .build()
+
+        when:
+        ReactorBatch batch = new ReactorBatch()
+        def call1 = batch.add(Commands.net().peerCount())
+        def call2 = batch.add(Commands.net().peerCount())
+        def resp = client.execute(batch)
+
+        then:
+        StepVerifier.create(resp)
+            .expectError(RpcException)
+            .verify(Duration.ofSeconds(1))
+
+        StepVerifier.create(call1.result)
+            .expectError(RpcException)
+            .verify(Duration.ofSeconds(1))
+        StepVerifier.create(call2.result)
+            .expectError(RpcException)
+            .verify(Duration.ofSeconds(1))
     }
 
     def "Response mono processed without waiting for batch flux"() {

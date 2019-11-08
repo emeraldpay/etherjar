@@ -31,7 +31,7 @@ class BatchToStringSpec extends Specification {
         BatchToString converter = new BatchToString(new JacksonRpcConverter())
         ReactorBatch batch = new ReactorBatch()
         when:
-        def act = converter.convertToJson(batch).getBatch()
+        def act = converter.convertToJson(batch.getItems())
         def actStr = new String(readBytes(act))
         then:
         actStr == '[]'
@@ -44,7 +44,7 @@ class BatchToStringSpec extends Specification {
         ReactorBatch batch = new ReactorBatch()
         batch.add(Commands.eth().blockNumber)
         when:
-        def act = converter.convertToJson(batch).getBatch()
+        def act = converter.convertToJson(batch.getItems())
         def actStr = new String(readBytes(act))
         then:
         actStr == '[{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}]'
@@ -58,7 +58,7 @@ class BatchToStringSpec extends Specification {
         batch.add(Commands.eth().blockNumber)
         batch.add(Commands.eth().getBalance(Address.EMPTY, BlockTag.LATEST))
         when:
-        def act = converter.convertToJson(batch).getBatch()
+        def act = converter.convertToJson(batch.getItems())
         def actStr = new String(readBytes(act))
         then:
         actStr == '[' +

@@ -49,7 +49,7 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
         return b;
     }
 
-    public Flux<ReactorBatchItem<?, ?>> getItems() {
+    public Flux<ReactorBatchItem> getItems() {
         return Flux.fromIterable(items);
     }
 
