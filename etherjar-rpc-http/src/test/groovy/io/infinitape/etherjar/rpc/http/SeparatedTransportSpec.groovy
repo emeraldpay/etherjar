@@ -124,8 +124,10 @@ class SeparatedTransportSpec extends Specification {
         then:
         StepVerifier.create(act)
             .expectErrorMatches { t ->
-                println("err ${t.class}")
-                t == new RpcException(RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR, "Connection error", ["message": "Connection refused: localhost/127.0.0.1:18546"])
+                println("Error: ${t}")
+                t.class == RpcException &&
+                    ((RpcException)t).code == RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR &&
+                    ((RpcException)t).rpcMessage == "Connection error"
             }
             .verify(Duration.ofSeconds(3))
     }
