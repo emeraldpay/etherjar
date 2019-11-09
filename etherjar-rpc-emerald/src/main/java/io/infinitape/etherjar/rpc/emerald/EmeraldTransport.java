@@ -15,6 +15,7 @@
  */
 package io.infinitape.etherjar.rpc.emerald;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import io.emeraldpay.api.proto.BlockchainGrpc;
@@ -22,6 +23,7 @@ import io.emeraldpay.api.proto.BlockchainOuterClass;
 import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.grpc.Chain;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.infinitape.etherjar.rpc.*;
@@ -135,6 +137,33 @@ public class EmeraldTransport implements RpcTransport {
         return copy;
     }
 
+    public BlockchainOuterClass.NativeCallRequest convert(List<RpcTransport.RpcRequest> items, Map<Integer, RpcRequest> idMapping) {
+        final BlockchainOuterClass.NativeCallRequest.Builder req = BlockchainOuterClass.NativeCallRequest.newBuilder();
+        req.setChain(chainRef);
+        if (selector != null) {
+            req.setSelector(selector);
+        }
+        final AtomicInteger i = new AtomicInteger(1); // because for lambda, must be final
+        items.forEach( item -> {
+            int id = i.getAndIncrement();
+            String json;
+            try {
+                json = objectMapper.writeValueAsString(item.getPayload().getParams());
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            req.addItems(
+                BlockchainOuterClass.NativeCallItem.newBuilder()
+                    .setId(id)
+                    .setMethod(item.getMethod())
+                    .setPayload(ByteString.copyFromUtf8(json))
+                    .build()
+            );
+            idMapping.put(id, item);
+        });
+        return req.build();
+    }
+
     @Override
     public CompletableFuture<Iterable<RpcResponse>> execute(List<RpcTransport.RpcRequest> items) {
         if (items.isEmpty()) {
@@ -142,32 +171,21 @@ public class EmeraldTransport implements RpcTransport {
         }
         CompletableFuture<Iterable<RpcResponse>> f = new CompletableFuture<>();
         executorService.execute(() -> {
-            final BlockchainOuterClass.NativeCallRequest.Builder req = BlockchainOuterClass.NativeCallRequest.newBuilder();
-            req.setChain(chainRef);
-            if (selector != null) {
-                req.setSelector(selector);
+            final Map<Integer, RpcRequest> idMapping = new HashMap<>(items.size());
+            BlockchainOuterClass.NativeCallRequest req;
+            try {
+                req = convert(items, idMapping);
+            } catch (Exception e) {
+                f.completeExceptionally(e);
+                return;
             }
-            final AtomicInteger i = new AtomicInteger(0); // because for lambda, must be final
-            final Map<Integer, RpcRequest> requestWithId = new HashMap<>(items.size());
-            items.forEach( item -> {
-                int id = i.getAndIncrement();
-                String json = rpcConverter.toJson(item.getPayload());
-                req.addItems(
-                    BlockchainOuterClass.NativeCallItem.newBuilder()
-                        .setId(id)
-                        .setMethod(item.getMethod())
-                        .setPayload(ByteString.copyFromUtf8(json))
-                        .build()
-                );
-                requestWithId.put(id, item);
-            });
             List<RpcTransport.RpcResponse> result = new ArrayList<>();
             Iterator<BlockchainOuterClass.NativeCallReplyItem> responses;
             try {
-                responses = blockingStub.nativeCall(req.build());
+                responses = blockingStub.nativeCall(req);
                 responses.forEachRemaining((resp) -> {
                     int id = resp.getId();
-                    RpcRequest request = requestWithId.get(id);
+                    RpcRequest request = idMapping.get(id);
                     result.add(process(request, resp));
                 });
             } catch (StatusRuntimeException e) {
@@ -199,6 +217,15 @@ public class EmeraldTransport implements RpcTransport {
 
     @Override
     public void close() throws IOException {
+        Channel channel = this.channel;
+        if (channel instanceof ManagedChannel) {
+            ((ManagedChannel) channel).shutdownNow();
+            try {
+                ((ManagedChannel) channel).awaitTermination(60, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                throw new IOException("Channel was not closed", e);
+            }
+        }
     }
 
     public static class Builder {
