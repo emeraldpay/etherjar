@@ -69,7 +69,9 @@ public class RpcException extends RuntimeException {
     }
 
     public String toString() {
-        return "RpcException(" + code + " " + rpcMessage + ", " + details.toString() + ")";
+        return "RpcException(" + code + " " + rpcMessage
+            + (details == null ? "" : ", " + details.toString())
+            + ")";
     }
 
     @Override
