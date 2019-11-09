@@ -15,6 +15,7 @@
  */
 package io.infinitape.etherjar.rpc.emerald
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import io.emeraldpay.api.proto.BlockchainGrpc
@@ -26,6 +27,7 @@ import io.infinitape.etherjar.rpc.transport.RpcTransport
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 class EmeraldTransportSpec extends Specification {
 
@@ -64,7 +66,7 @@ class EmeraldTransportSpec extends Specification {
         def transport = EmeraldTransport.newBuilder().connectTo("localhost:2449").chain(Chain.ETHEREUM).build()
         when:
         def batch = [
-            new RpcTransport.RpcRequest(Integer, "eth_test", new RequestJson<>("eth_test", [new Thread()], 10)),
+            new RpcTransport.RpcRequest(Integer, "eth_test", new RequestJson<>("eth_test", [new Object()], 10)),
         ]
         def act = transport.convert(batch, [:])
         then:
