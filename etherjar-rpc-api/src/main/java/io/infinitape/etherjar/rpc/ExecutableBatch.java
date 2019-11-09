@@ -23,14 +23,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public class ExecutableBatch extends DefaultBatch {
 
-    private final FuturesRcpClient client;
+    private final FuturesRpcClient client;
 
     /**
      * Create batch assigned to client
      *
      * @param client client
      */
-    public ExecutableBatch(FuturesRcpClient client) {
+    public ExecutableBatch(FuturesRpcClient client) {
         if (client == null) {
             throw new IllegalArgumentException("client must be not null");
         }

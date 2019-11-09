@@ -18,7 +18,7 @@ package io.infinitape.etherjar.rpc;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public interface FuturesRcpClient extends RpcClient<CompletableFuture<List<DefaultBatch.FutureBatchItem>>, DefaultBatch.FutureBatchItem, DefaultBatch> {
+public interface FuturesRpcClient extends RpcClient<CompletableFuture<List<DefaultBatch.FutureBatchItem>>, DefaultBatch.FutureBatchItem, DefaultBatch> {
 
     <JS, RES> CompletableFuture<RES> execute(RpcCall<JS, RES> call);
 }

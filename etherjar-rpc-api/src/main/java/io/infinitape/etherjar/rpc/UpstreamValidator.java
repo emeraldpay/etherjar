@@ -15,8 +15,6 @@
  */
 package io.infinitape.etherjar.rpc;
 
-import io.infinitape.etherjar.rpc.FuturesRcpClient;
-
 /**
  *  Validates an upstream URI to conform requirements of the current app
  *
@@ -30,6 +28,6 @@ public interface UpstreamValidator {
      * @param uri upstream JSON RPC host:port
      * @return true if valid
      */
-    boolean validate(FuturesRcpClient uri);
+    boolean validate(FuturesRpcClient uri);
 
 }

@@ -15,9 +15,9 @@
  */
 package io.infinitape.etherjar.rpc.http;
 
-import io.infinitape.etherjar.rpc.AbstractFuturesRcpClient;
+import io.infinitape.etherjar.rpc.AbstractFuturesRpcClient;
 import io.infinitape.etherjar.rpc.DefaultBatch;
-import io.infinitape.etherjar.rpc.FuturesRcpClient;
+import io.infinitape.etherjar.rpc.FuturesRpcClient;
 import io.infinitape.etherjar.rpc.UpstreamValidator;
 import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
@@ -40,14 +40,14 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Igor Artamonov
  */
-public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements FuturesRcpClient, Closeable {
+public class RoundRobinRpcClient extends AbstractFuturesRpcClient implements FuturesRpcClient, Closeable {
 
     private AtomicInteger seq = new AtomicInteger(0);
     private Lock validationLock = new ReentrantLock();
 
 
-    private final List<FuturesRcpClient> knownHosts;
-    private final AtomicReference<List<FuturesRcpClient>> active = new AtomicReference<>(Collections.emptyList());
+    private final List<FuturesRpcClient> knownHosts;
+    private final AtomicReference<List<FuturesRpcClient>> active = new AtomicReference<>(Collections.emptyList());
 
     private final ExecutorService executorService;
 
@@ -55,11 +55,11 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
 
     private UpstreamValidator upstreamValidator = new BasicUpstreamValidator();
 
-    public RoundRobinRpcClient(List<FuturesRcpClient> knownHosts) {
+    public RoundRobinRpcClient(List<FuturesRpcClient> knownHosts) {
         this(knownHosts, Executors.newCachedThreadPool());
     }
 
-    public RoundRobinRpcClient(List<FuturesRcpClient> knownHosts, ExecutorService executorService) {
+    public RoundRobinRpcClient(List<FuturesRpcClient> knownHosts, ExecutorService executorService) {
         if (knownHosts.isEmpty()) {
             throw new IllegalArgumentException("List of known upstreams should not be empty");
         }
@@ -106,16 +106,16 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
     public boolean revalidate() {
         validationLock.lock();
         try {
-            List<FuturesRcpClient> transports = new ArrayList<>(knownHosts.size());
-            List<Future<FuturesRcpClient>> validations = new ArrayList<>(knownHosts.size());
-            for (FuturesRcpClient uri: knownHosts) {
-                Future<FuturesRcpClient> f = executorService.submit(
+            List<FuturesRpcClient> transports = new ArrayList<>(knownHosts.size());
+            List<Future<FuturesRpcClient>> validations = new ArrayList<>(knownHosts.size());
+            for (FuturesRpcClient uri: knownHosts) {
+                Future<FuturesRpcClient> f = executorService.submit(
                         () -> upstreamValidator.validate(uri) ? uri : null
                 );
                 validations.add(f);
             }
-            for (Future<FuturesRcpClient> uriValidator: validations) {
-                FuturesRcpClient uri = null;
+            for (Future<FuturesRpcClient> uriValidator: validations) {
+                FuturesRpcClient uri = null;
                 try {
                     uri = uriValidator.get();
                 } catch (Exception e) { }
@@ -131,12 +131,12 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
     }
 
     public boolean hasUpstreams() {
-        List<FuturesRcpClient> transports = active.get();
+        List<FuturesRpcClient> transports = active.get();
         return !transports.isEmpty();
     }
 
-    public FuturesRcpClient next() {
-        List<FuturesRcpClient> transports = active.get();
+    public FuturesRpcClient next() {
+        List<FuturesRpcClient> transports = active.get();
         if (transports.isEmpty()) {
             return null;
         }
@@ -151,7 +151,7 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
 
     @Override
     public CompletableFuture<List<DefaultBatch.FutureBatchItem>> execute(DefaultBatch batch) {
-        FuturesRcpClient next = next();
+        FuturesRpcClient next = next();
         if (next == null) {
             CompletableFuture<List<DefaultBatch.FutureBatchItem>> error = new CompletableFuture<>();
             error.completeExceptionally(new IllegalStateException("No valid upstreams available"));
@@ -206,7 +206,7 @@ public class RoundRobinRpcClient extends AbstractFuturesRcpClient implements Fut
             if (executorService == null) {
                 executorService = Executors.newCachedThreadPool();
             }
-            List<FuturesRcpClient> clients = new ArrayList<>(hosts.size());
+            List<FuturesRpcClient> clients = new ArrayList<>(hosts.size());
             for (URI uri: hosts) {
                 RpcTransport transport = HttpRpcTransport.newBuilder()
                     .setTarget(uri)

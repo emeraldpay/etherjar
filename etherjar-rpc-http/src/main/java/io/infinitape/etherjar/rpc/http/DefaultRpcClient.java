@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class DefaultRpcClient extends AbstractFuturesRcpClient implements FuturesRcpClient {
+public class DefaultRpcClient extends AbstractFuturesRpcClient implements FuturesRpcClient {
 
     private RpcTransport rpcTransport;
 

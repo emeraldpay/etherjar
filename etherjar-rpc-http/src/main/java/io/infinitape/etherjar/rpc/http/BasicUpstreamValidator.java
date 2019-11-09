@@ -17,11 +17,10 @@ package io.infinitape.etherjar.rpc.http;
 
 import io.infinitape.etherjar.rpc.Commands;
 import io.infinitape.etherjar.rpc.DefaultBatch;
-import io.infinitape.etherjar.rpc.FuturesRcpClient;
+import io.infinitape.etherjar.rpc.FuturesRpcClient;
 import io.infinitape.etherjar.rpc.UpstreamValidator;
 import io.infinitape.etherjar.rpc.json.SyncingJson;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,7 +49,7 @@ public class BasicUpstreamValidator implements UpstreamValidator {
     }
 
     @Override
-    public boolean validate(FuturesRcpClient uri) {
+    public boolean validate(FuturesRpcClient uri) {
         DefaultBatch batch = new DefaultBatch();
         DefaultBatch.FutureBatchItem<?, SyncingJson> onSyncing = batch.add(Commands.eth().syncing());
         DefaultBatch.FutureBatchItem<?, Integer> onPeers = batch.add(Commands.net().peerCount());
