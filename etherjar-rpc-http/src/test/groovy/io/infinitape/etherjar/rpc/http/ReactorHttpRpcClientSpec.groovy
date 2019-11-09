@@ -293,11 +293,11 @@ class ReactorHttpRpcClientSpec extends Specification {
         then:
         StepVerifier.create(resp)
             .expectError(RpcException)
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         StepVerifier.create(call.result)
             .expectError(RpcException)
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 
     def "Error on no connection using separated transport using two calls"() {
@@ -316,14 +316,14 @@ class ReactorHttpRpcClientSpec extends Specification {
         then:
         StepVerifier.create(resp)
             .expectError(RpcException)
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         StepVerifier.create(call1.result)
             .expectError(RpcException)
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
         StepVerifier.create(call2.result)
             .expectError(RpcException)
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 
     def "Response mono processed without waiting for batch flux"() {
@@ -347,7 +347,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(call.result)
             .expectNext(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 
     def "Makes call only if actual result requested"() {
@@ -375,12 +375,12 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(withoutExecution)
             .expectNext([2])
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         StepVerifier.create(withoutCall)
             .expectNext([100])
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         requests.size() == 0
     }

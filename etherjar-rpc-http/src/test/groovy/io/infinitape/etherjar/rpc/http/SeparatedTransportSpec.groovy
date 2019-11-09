@@ -71,7 +71,7 @@ class SeparatedTransportSpec extends Specification {
         StepVerifier.create(act)
             .expectNext(new RpcCallResponse(call, 104))
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         requests == [
             '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}'
@@ -104,7 +104,7 @@ class SeparatedTransportSpec extends Specification {
         then:
         StepVerifier.create(act)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 
     def "Return RpcException on no connection"() {
@@ -127,6 +127,6 @@ class SeparatedTransportSpec extends Specification {
                 println("err ${t.class}")
                 t == new RpcException(RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR, "Connection error", ["message": "Connection refused: localhost/127.0.0.1:18546"])
             }
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 }

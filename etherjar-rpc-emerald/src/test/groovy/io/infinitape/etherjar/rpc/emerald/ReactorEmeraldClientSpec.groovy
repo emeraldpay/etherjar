@@ -68,7 +68,7 @@ class ReactorEmeraldClientSpec extends Specification {
         StepVerifier.create(act)
             .expectNext(Wei.ofEthers(12.3456))
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         actRequest == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .addItems(
@@ -103,7 +103,7 @@ class ReactorEmeraldClientSpec extends Specification {
         then:
         StepVerifier.create(act)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 
     def "Uses chain"() {
@@ -143,7 +143,7 @@ class ReactorEmeraldClientSpec extends Specification {
         StepVerifier.create(act)
             .expectNextCount(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         actRequest == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .setChain(Common.ChainRef.CHAIN_ETHEREUM_CLASSIC)
@@ -201,7 +201,7 @@ class ReactorEmeraldClientSpec extends Specification {
         StepVerifier.create(act)
             .expectNextCount(1)
             .expectComplete()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
 
         actRequest == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .setChain(Common.ChainRef.CHAIN_ETHEREUM_CLASSIC)
@@ -245,6 +245,6 @@ class ReactorEmeraldClientSpec extends Specification {
         then:
         StepVerifier.create(act)
             .expectError()
-            .verify(Duration.ofSeconds(1))
+            .verify(Duration.ofSeconds(3))
     }
 }
