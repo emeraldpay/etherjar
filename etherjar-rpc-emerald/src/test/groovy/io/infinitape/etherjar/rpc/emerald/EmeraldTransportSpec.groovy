@@ -15,19 +15,21 @@
  */
 package io.infinitape.etherjar.rpc.emerald
 
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import io.emeraldpay.api.proto.BlockchainGrpc
 import io.emeraldpay.api.proto.BlockchainOuterClass
 import io.emeraldpay.grpc.Chain
 import io.grpc.stub.StreamObserver
+import io.infinitape.etherjar.rpc.Conversion
+import io.infinitape.etherjar.rpc.DefaultBatch
+import io.infinitape.etherjar.rpc.RpcCall
 import io.infinitape.etherjar.rpc.json.RequestJson
-import io.infinitape.etherjar.rpc.transport.RpcTransport
+import io.infinitape.etherjar.rpc.RpcTransport
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
 
 class EmeraldTransportSpec extends Specification {
 
@@ -35,11 +37,10 @@ class EmeraldTransportSpec extends Specification {
         setup:
         def transport = EmeraldTransport.newBuilder().connectTo("localhost:2449").chain(Chain.ETHEREUM).build()
         when:
-        def batch = [
-            new RpcTransport.RpcRequest(Integer, "eth_test", new RequestJson<>("eth_test", [], 10)),
-            new RpcTransport.RpcRequest(Integer, "eth_test2", new RequestJson<>("eth_test2", ["test", 14], 11)),
-        ]
-        def act = transport.convert(batch, [:])
+        def batch = new DefaultBatch()
+        batch.add(RpcCall.create("eth_test", Integer))
+        batch.add(RpcCall.create("eth_test2", Integer, ["test", 14]))
+        def act = transport.convert(batch.getItems(), [:])
         then:
         act == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .setChainValue(Chain.ETHEREUM.id)
@@ -65,10 +66,9 @@ class EmeraldTransportSpec extends Specification {
         setup:
         def transport = EmeraldTransport.newBuilder().connectTo("localhost:2449").chain(Chain.ETHEREUM).build()
         when:
-        def batch = [
-            new RpcTransport.RpcRequest(Integer, "eth_test", new RequestJson<>("eth_test", [new Object()], 10)),
-        ]
-        def act = transport.convert(batch, [:])
+        def batch = new DefaultBatch()
+        batch.add(RpcCall.create("eth_test", Integer, [new Object()]))
+        def act = transport.convert(batch.getItems(), [:])
         then:
         thrown(RuntimeException)
 
@@ -98,10 +98,9 @@ class EmeraldTransportSpec extends Specification {
         def transport = EmeraldTransport.newBuilder().connectTo("localhost:2449").chain(Chain.ETHEREUM).build()
             .copyWithSelector(selector.build())
         when:
-        def batch = [
-            new RpcTransport.RpcRequest(Integer, "eth_test", new RequestJson<>("eth_test", ["hello"], 10)),
-        ]
-        def act = transport.convert(batch, [:])
+        def batch = new DefaultBatch()
+        batch.add(RpcCall.create("eth_test", Integer, ["hello"]))
+        def act = transport.convert(batch.getItems(), [:])
         then:
         act == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .setChainValue(Chain.ETHEREUM.id)
@@ -125,10 +124,9 @@ class EmeraldTransportSpec extends Specification {
             .build()
             .copyForChain(Chain.ETHEREUM_CLASSIC)
         when:
-        def batch = [
-            new RpcTransport.RpcRequest(Integer, "eth_test", new RequestJson<>("eth_test", [], 10)),
-        ]
-        def act = transport.convert(batch, [:])
+        def batch = new DefaultBatch()
+        batch.add(RpcCall.create("eth_test", Integer))
+        def act = transport.convert(batch.getItems(), [:])
         then:
         act == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .setChainValue(Chain.ETHEREUM_CLASSIC.id)
@@ -159,7 +157,7 @@ class EmeraldTransportSpec extends Specification {
                         .setSucceed(true)
                         .setPayload(ByteString.copyFromUtf8('{\n' +
                             '    "jsonrpc": "2.0",\n' +
-                            '    "result": "0xab5461ca4b100000",\n' +
+                            '    "result": "0xab5461ca4b100",\n' +
                             '    "id": 1\n' +
                             '  }'))
                         .build()
@@ -173,16 +171,15 @@ class EmeraldTransportSpec extends Specification {
             .build()
 
         when:
-        def batch = [
-            new RpcTransport.RpcRequest(String, "eth_test", new RequestJson<>("eth_test", [], 10)),
-        ]
-        def act = transport.execute(batch).get(300, TimeUnit.SECONDS).toList()
+        def batch = new DefaultBatch()
+        batch.add(RpcCall.create("eth_test").converted(Long.class, Conversion.asLong))
+        def act = transport.execute(batch.getItems()).get(300, TimeUnit.SECONDS).toList()
 
         then:
         act.size() == 1
         with(act[0]) {
             error == null
-            payload == "0xab5461ca4b100000"
+            value == 0xab5461ca4b100
         }
 
         cleanup:

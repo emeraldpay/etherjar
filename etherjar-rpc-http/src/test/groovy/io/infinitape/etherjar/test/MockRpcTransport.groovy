@@ -15,27 +15,29 @@
  */
 package io.infinitape.etherjar.test
 
+import io.infinitape.etherjar.rpc.DefaultBatch
+import io.infinitape.etherjar.rpc.RpcCallResponse
 import io.infinitape.etherjar.rpc.RpcException
 import io.infinitape.etherjar.rpc.RpcResponseError
-import io.infinitape.etherjar.rpc.transport.RpcTransport
+import io.infinitape.etherjar.rpc.RpcTransport
 
 import java.util.concurrent.CompletableFuture
 
-class MockRpcTransport implements RpcTransport{
+class MockRpcTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
 
     List<MockedRequest> commands = []
 
     @Override
-    CompletableFuture<Iterable<RpcResponse>> execute(List<RpcRequest> items) {
-        List<RpcResponse> result = []
+    CompletableFuture<Iterable<RpcCallResponse>> execute(List<DefaultBatch.FutureBatchItem> items) {
+        List<RpcCallResponse> result = []
         items.forEach { item ->
             def found = commands.find {
-                it.accept(item.method, item.payload.params)
+                it.accept(item.call.method, item.call.params)
             }
             if (found != null) {
-                result << item.asResponse(found.response)
+                result << new RpcCallResponse<>(item.call, found.response)
             } else {
-                result << item.asError(new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, "No command for $item.method($item.payload.params)"))
+                result << new RpcCallResponse<>(item.call, new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, "No command for $item.call.method($item.call.params)"))
             }
         }
         return CompletableFuture.completedFuture(result)

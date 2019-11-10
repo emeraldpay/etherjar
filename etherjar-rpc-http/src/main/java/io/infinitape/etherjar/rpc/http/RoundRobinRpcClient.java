@@ -19,7 +19,7 @@ import io.infinitape.etherjar.rpc.AbstractFuturesRpcClient;
 import io.infinitape.etherjar.rpc.DefaultBatch;
 import io.infinitape.etherjar.rpc.FuturesRpcClient;
 import io.infinitape.etherjar.rpc.UpstreamValidator;
-import io.infinitape.etherjar.rpc.transport.RpcTransport;
+import io.infinitape.etherjar.rpc.RpcTransport;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -150,12 +150,11 @@ public class RoundRobinRpcClient extends AbstractFuturesRpcClient implements Fut
     }
 
     @Override
-    public CompletableFuture<List<DefaultBatch.FutureBatchItem>> execute(DefaultBatch batch) {
+    public List<CompletableFuture> execute(DefaultBatch batch) {
         FuturesRpcClient next = next();
         if (next == null) {
-            CompletableFuture<List<DefaultBatch.FutureBatchItem>> error = new CompletableFuture<>();
-            error.completeExceptionally(new IllegalStateException("No valid upstreams available"));
-            return error;
+            batch.close();
+            return Collections.emptyList();
         }
         return next.execute(batch);
     }

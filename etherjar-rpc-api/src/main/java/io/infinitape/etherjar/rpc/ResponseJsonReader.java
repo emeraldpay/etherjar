@@ -15,10 +15,21 @@
  */
 package io.infinitape.etherjar.rpc;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import io.infinitape.etherjar.rpc.json.ResponseJson;
 
-public interface FuturesRpcClient extends RpcClient<List<CompletableFuture>, DefaultBatch.FutureBatchItem, DefaultBatch> {
+/**
+ * Reads JSON RPC raw response data, together with source Call data, and convert into RpcCallResponse
+ * suitable for further processing
+ */
+public class ResponseJsonReader {
 
-    <JS, RES> CompletableFuture<RES> execute(RpcCall<JS, RES> call);
+    public <JS, RES> RpcCallResponse<JS, RES> convert(RpcCall<JS, RES> call, ResponseJson<JS, Integer> response) {
+        if (response.getError() != null) {
+            return new RpcCallResponse<>(call, response.getError().asException());
+        } else {
+            RES value = call.getConverter().apply(response.getResult());
+            return new RpcCallResponse<>(call, value);
+        }
+    }
+
 }

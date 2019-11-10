@@ -19,7 +19,7 @@ package io.infinitape.etherjar.rpc.http;
 import io.infinitape.etherjar.rpc.*;
 import io.infinitape.etherjar.rpc.json.RequestJson;
 import io.infinitape.etherjar.rpc.json.ResponseJson;
-import io.infinitape.etherjar.rpc.transport.RpcTransport;
+import io.infinitape.etherjar.rpc.RpcTransport;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -54,9 +54,11 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class HttpRpcTransport implements RpcTransport {
+public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
 
     private static final Logger log = Logger.getLogger(HttpRpcTransport.class.getName());
+
+    private ResponseJsonReader responseJsonReader = new ResponseJsonReader();
 
     private final URI target;
     private final ExecutorService executorService;
@@ -87,22 +89,26 @@ public class HttpRpcTransport implements RpcTransport {
     }
 
     @Override
-    public CompletableFuture<Iterable<RpcResponse>> execute(List<RpcRequest> items) {
+    public CompletableFuture<Iterable<RpcCallResponse>> execute(List<DefaultBatch.FutureBatchItem> items) {
         if (items.isEmpty()) {
             return CompletableFuture.completedFuture(
                 Collections.emptyList()
             );
         }
-        Map<Integer, RpcRequest> requests = new HashMap<>(items.size());
+        Map<Integer, DefaultBatch.FutureBatchItem> requests = new HashMap<>(items.size());
         Map<Integer, Class> responseMapping = new HashMap<>(items.size());
         List<RequestJson<Integer>> rpcRequests = items.stream()
                 .map(item -> {
-                    Integer id = (Integer) item.getPayload().getId();
-                    requests.put(id, item);
-                    responseMapping.put(id, item.getType());
-                    return (RequestJson<Integer>)item.getPayload();
+                    RequestJson<Integer> request = new RequestJson<>(
+                        item.getCall().getMethod(),
+                        item.getCall().getParams(),
+                        item.getId()
+                    );
+                    requests.put(item.getId(), item);
+                    responseMapping.put(item.getId(), item.getCall().getJsonType());
+                    return request;
                 }).collect(Collectors.toList());
-        CompletableFuture<Iterable<RpcResponse>> f = new CompletableFuture<>();
+        CompletableFuture<Iterable<RpcCallResponse>> f = new CompletableFuture<>();
         executorService.submit(() -> {
             try {
                 String json = rpcConverter.toJson(rpcRequests);
@@ -117,36 +123,30 @@ public class HttpRpcTransport implements RpcTransport {
                 }
                 InputStream content = rcpResponse.getEntity().getContent();
                 List<ResponseJson<?, Integer>> response = rpcConverter.parseBatch(content, responseMapping);
-                List<RpcResponse> result = response.stream().map((resp) ->
-                    requests.get(resp.getId()).asResponse(resp)
-                ).collect(Collectors.toList());
+                List<RpcCallResponse> result = response.stream().map((resp) -> {
+                        RpcCall call = requests.get(resp.getId()).getCall();
+                        if (call != null) {
+                            return responseJsonReader.convert(call, resp);
+                        }
+                        return null;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
                 f.complete(result);
             } catch (Throwable e) {
                 RpcException rpcError;
                 if (e instanceof RpcException) {
                     rpcError = (RpcException) e;
+                } else if (e instanceof IOException) {
+                    rpcError = new RpcException(RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR, e.getMessage(), null, e);
                 } else {
                     rpcError = new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, e.getMessage(), null, e);
                 }
-                f.complete(processError(rpcError, items));
+                f.completeExceptionally(rpcError);
             }
         });
         return f;
     }
-
-    /**
-     * Called when batch call failed, marks all bath calls as failed
-     *
-     * @param t Exception caused to fail execution
-     * @param batch batch items
-     * @return list of responses to original batch, all marked as errored
-     */
-    public List<RpcResponse> processError(RpcException t, List<RpcRequest> batch) {
-        return batch.stream().map((item) ->
-            item.asError(t)
-        ).collect(Collectors.toList());
-    }
-
 
     public static class Builder {
         private URI target;

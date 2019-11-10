@@ -34,10 +34,10 @@ class DefaultRpcClientSpec extends Specification {
 
         when:
         def f = batch.add(call)
-        def act = client.execute(batch).get(5, TimeUnit.SECONDS)
+        def act = client.execute(batch)
         then:
         act.size() == 1
-        act[0].result.get(5, TimeUnit.SECONDS) == "foo"
+        act[0].get(5, TimeUnit.SECONDS) == "foo"
         f.result.get(5, TimeUnit.SECONDS) == "foo"
     }
 

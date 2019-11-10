@@ -16,7 +16,6 @@
 package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.rpc.json.ResponseJson;
-import io.infinitape.etherjar.rpc.transport.RpcTransport;
 
 import java.util.Objects;
 
@@ -65,9 +64,7 @@ public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
      * if they were called.
      */
     @Override
-    public void close() {
-
-    }
+    abstract public void close();
 
     /**
      * Read value from response
@@ -76,7 +73,7 @@ public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
      * @return true if parsed as result, or false if parsed as error
      * @throws ClassCastException if response data cannot be casted to expected data type of RpcCall
      */
-    public boolean read(ResponseJson<?, Integer> resp) { //TODO duplicate reads
+    public boolean read(ResponseJson<JS, Integer> resp) {
         if (resp.getError() != null) {
             onError(resp.getError().asException());
             return false;
@@ -90,29 +87,6 @@ public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
             return true;
         }
     }
-
-    /**
-     * Read value from response
-     *
-     * @param resp RPC response data
-     * @return true if parsed as result, or false if parsed as error
-     * @throws ClassCastException if response data cannot be casted to expected data type of RpcCall
-     */
-    public boolean read(RpcTransport.RpcResponse<JS> resp) {
-        if (resp.getError() != null) {
-            onError(resp.getError());
-            return false;
-        } else if (resp.getPayload() == null) {
-            onComplete(null);
-            return true;
-        } else if (!call.getJsonType().isAssignableFrom(resp.getPayload().getClass())) {
-            throw new ClassCastException("Expected " + call.getJsonType() + " but received " + resp.getPayload().getClass());
-        } else {
-            onComplete(resp.getPayload());
-            return true;
-        }
-    }
-
 
     public RpcCall<JS, RES> getCall() {
         return call;

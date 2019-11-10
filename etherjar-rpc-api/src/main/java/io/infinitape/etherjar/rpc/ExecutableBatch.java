@@ -42,7 +42,7 @@ public class ExecutableBatch extends DefaultBatch {
      *
      * @return execution result
      */
-    public CompletableFuture<List<FutureBatchItem>> execute() {
+    public List<CompletableFuture> execute() {
         return this.client.execute(this);
     }
 }

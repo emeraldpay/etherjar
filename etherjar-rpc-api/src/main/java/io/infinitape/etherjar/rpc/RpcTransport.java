@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 Igor Artamonov
+ * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.infinitape.etherjar.rpc;
 
+import io.infinitape.etherjar.rpc.BatchItem;
+import io.infinitape.etherjar.rpc.RpcCallResponse;
+
+import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public interface FuturesRpcClient extends RpcClient<List<CompletableFuture>, DefaultBatch.FutureBatchItem, DefaultBatch> {
+public interface RpcTransport<T extends BatchItem> extends Closeable {
 
-    <JS, RES> CompletableFuture<RES> execute(RpcCall<JS, RES> call);
+    CompletableFuture<Iterable<RpcCallResponse>> execute(List<T> items);
+
 }

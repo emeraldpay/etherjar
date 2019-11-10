@@ -48,34 +48,6 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
             .then(item.getResult());
     }
 
-    /**
-     * Processes all individual items in the batch, providing them with a result or error received from RpcCallResponse
-     *
-     */
-    public static class ProcessBatchResult implements Consumer<RpcCallResponse> {
-        private final BatchCallContext<?> context;
-
-        public ProcessBatchResult(BatchCallContext<?> context) {
-            this.context = context;
-        }
-
-        public <JS, RES> void process(BatchItem<?, JS, RES> bi, RpcCallResponse<JS, RES> response) {
-            if (response.isError()) {
-                bi.onError(response.getError());
-            } else {
-                RES value = response.getValue();
-                bi.onResult(value);
-            }
-        }
-
-        @Override
-        public void accept(RpcCallResponse response) {
-            BatchItem item = context.getBatchItem(response.getSource());
-            process(item, response);
-        }
-
-    }
-
     public static class ResponseTransformer implements Function<ResponseJson<?, Integer>, Mono<RpcCallResponse>> {
         private final BatchCallContext<ReactorBatch.ReactorBatchItem> context;
 

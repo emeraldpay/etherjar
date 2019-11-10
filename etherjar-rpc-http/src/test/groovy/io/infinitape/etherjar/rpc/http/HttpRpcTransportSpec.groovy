@@ -17,12 +17,10 @@
 package io.infinitape.etherjar.rpc.http
 
 import io.infinitape.etherjar.rpc.DefaultBatch
-import io.infinitape.etherjar.rpc.JacksonRpcConverter
 import io.infinitape.etherjar.rpc.RpcCall
 import io.infinitape.etherjar.rpc.RpcException
 import io.infinitape.etherjar.rpc.RpcResponseError
-import io.infinitape.etherjar.rpc.http.HttpRpcTransport
-import io.infinitape.etherjar.rpc.transport.RpcTransport
+import io.infinitape.etherjar.rpc.RpcTransport
 import org.apache.http.HttpResponse
 import org.apache.http.ProtocolVersion
 import org.apache.http.client.HttpClient
@@ -30,7 +28,6 @@ import org.apache.http.message.BasicStatusLine
 import spock.lang.Specification
 
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class HttpRpcTransportSpec extends Specification {
@@ -48,42 +45,33 @@ class HttpRpcTransportSpec extends Specification {
 
     def "Fail batch items on batch exception"() {
         when:
-        def req = new RpcTransport.RpcRequest(RpcCall.create("test"), 1)
-        def callF = defaultRpcTransport.execute([req])
+        def batch = new DefaultBatch()
+        def req = batch.add(RpcCall.create("test"))
+        def callF = defaultRpcTransport.execute(batch.getItems())
         def act = callF.get(1, TimeUnit.SECONDS)
         then:
+        def t = thrown(ExecutionException)
+        RpcException == t.cause.class
         1 * httpClientMock.execute(_, _) >> { throw new IOException("Test error") }
-        !callF.isCompletedExceptionally()
-        with(act[0]) {
-            error != null
-            with (error) {
-                code == RpcResponseError.CODE_INTERNAL_ERROR
-                rpcMessage == "Test error"
-            }
-            payload == null
-        }
+        callF.isCompletedExceptionally()
     }
 
     def "Fail batch items on non-OK response"() {
         setup:
         def respMock = Mock(HttpResponse)
         when:
-        def f = defaultRpcTransport.execute([
-            new RpcTransport.RpcRequest(RpcCall.create("test"), 1)
-        ])
+        def batch = new DefaultBatch()
+        def req = batch.add(RpcCall.create("test"))
+
+        def f = defaultRpcTransport.execute(batch.getItems())
         def act = f.get(1, TimeUnit.SECONDS)
         then:
+        def t = thrown(ExecutionException)
+        RpcException == t.cause.class
+
         1 * httpClientMock.execute(_, _) >> respMock
         1 * respMock.getStatusLine() >> new BasicStatusLine(new ProtocolVersion("HTTP", 1, 0), 503, "Test")
-        !f.isCompletedExceptionally()
-        with(act[0]) {
-            error != null
-            with (error) {
-                code == RpcResponseError.CODE_INTERNAL_ERROR
-                rpcMessage == "Server returned error response: 503"
-            }
-            payload == null
-        }
+        f.isCompletedExceptionally()
     }
 
     def "Empty batch"() {

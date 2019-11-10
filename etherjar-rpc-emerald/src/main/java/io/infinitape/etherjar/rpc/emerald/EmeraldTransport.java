@@ -27,7 +27,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.infinitape.etherjar.rpc.*;
-import io.infinitape.etherjar.rpc.transport.RpcTransport;
+import io.infinitape.etherjar.rpc.json.ResponseJson;
+import io.infinitape.etherjar.rpc.RpcTransport;
 import io.netty.handler.ssl.SslContextBuilder;
 
 import javax.net.ssl.SSLException;
@@ -53,10 +54,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * RpcClient client = new DefaultRpcClient(transport);
  * </code></pre>
  */
-public class EmeraldTransport implements RpcTransport {
+public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
 
     private final Channel channel;
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
+
+    private ResponseJsonReader responseJsonReader = new ResponseJsonReader();
+
 
     private ObjectMapper objectMapper;
     private RpcConverter rpcConverter;
@@ -137,7 +141,7 @@ public class EmeraldTransport implements RpcTransport {
         return copy;
     }
 
-    public BlockchainOuterClass.NativeCallRequest convert(List<RpcTransport.RpcRequest> items, Map<Integer, RpcRequest> idMapping) {
+    public BlockchainOuterClass.NativeCallRequest convert(List<DefaultBatch.FutureBatchItem> items, Map<Integer, DefaultBatch.FutureBatchItem> idMapping) {
         final BlockchainOuterClass.NativeCallRequest.Builder req = BlockchainOuterClass.NativeCallRequest.newBuilder();
         req.setChain(chainRef);
         if (selector != null) {
@@ -148,14 +152,14 @@ public class EmeraldTransport implements RpcTransport {
             int id = i.getAndIncrement();
             String json;
             try {
-                json = objectMapper.writeValueAsString(item.getPayload().getParams());
+                json = objectMapper.writeValueAsString(item.getCall().getParams());
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
             req.addItems(
                 BlockchainOuterClass.NativeCallItem.newBuilder()
                     .setId(id)
-                    .setMethod(item.getMethod())
+                    .setMethod(item.getCall().getMethod())
                     .setPayload(ByteString.copyFromUtf8(json))
                     .build()
             );
@@ -165,13 +169,13 @@ public class EmeraldTransport implements RpcTransport {
     }
 
     @Override
-    public CompletableFuture<Iterable<RpcResponse>> execute(List<RpcTransport.RpcRequest> items) {
+    public CompletableFuture<Iterable<RpcCallResponse>> execute(List<DefaultBatch.FutureBatchItem> items) {
         if (items.isEmpty()) {
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
-        CompletableFuture<Iterable<RpcResponse>> f = new CompletableFuture<>();
+        CompletableFuture<Iterable<RpcCallResponse>> f = new CompletableFuture<>();
         executorService.execute(() -> {
-            final Map<Integer, RpcRequest> idMapping = new HashMap<>(items.size());
+            final Map<Integer, DefaultBatch.FutureBatchItem> idMapping = new HashMap<>(items.size());
             BlockchainOuterClass.NativeCallRequest req;
             try {
                 req = convert(items, idMapping);
@@ -179,14 +183,15 @@ public class EmeraldTransport implements RpcTransport {
                 f.completeExceptionally(e);
                 return;
             }
-            List<RpcTransport.RpcResponse> result = new ArrayList<>();
+            List<RpcCallResponse> result = new ArrayList<>();
             Iterator<BlockchainOuterClass.NativeCallReplyItem> responses;
             try {
                 responses = blockingStub.nativeCall(req);
                 responses.forEachRemaining((resp) -> {
                     int id = resp.getId();
-                    RpcRequest request = idMapping.get(id);
-                    result.add(process(request, resp));
+                    DefaultBatch.FutureBatchItem request = idMapping.get(id);
+                    RpcCallResponse callResponse = convertToRpcResponse(request, resp);
+                    result.add(callResponse);
                 });
             } catch (StatusRuntimeException e) {
                 if (result.isEmpty()) {
@@ -199,20 +204,31 @@ public class EmeraldTransport implements RpcTransport {
         return f;
     }
 
-    protected <T> RpcResponse<T> process(RpcRequest<T> request, BlockchainOuterClass.NativeCallReplyItem resp) {
-        if (resp.getSucceed()) {
-            try {
-                return request.asResponse(read(resp.getPayload(), request));
-            } catch (RpcException e) {
-                return request.asError(e);
-            }
-        } else {
-            return request.asError(new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, resp.getErrorMessage()));
-        }
+    protected <JS, RES> RpcCallResponse<JS, RES> convertToRpcResponse(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+        ResponseJson<JS, Integer> responseJson = convertToResponseJson(request, resp);
+        return responseJsonReader.convert(request.getCall(), responseJson);
     }
 
-    protected <T> T read(ByteString bytes, RpcRequest<T> request) throws RpcException {
-        return rpcConverter.fromJson(bytes.newInput(), request.getType());
+    protected <JS, RES> ResponseJson<JS, Integer> convertToResponseJson(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+        ResponseJson<JS, Integer> responseJson = new ResponseJson<>();
+        if (resp.getSucceed()) {
+            try {
+                JS value = read(resp.getPayload(), request);
+                responseJson.setId(resp.getId());
+                responseJson.setResult(value);
+            } catch (RpcException e) {
+                responseJson.setResult(null);
+                responseJson.setError(e.getError());
+            }
+        } else {
+            responseJson.setResult(null);
+            responseJson.setError(new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, resp.getErrorMessage()).getError());
+        }
+        return responseJson;
+    }
+
+    protected <JS, RES> JS read(ByteString bytes, DefaultBatch.FutureBatchItem<JS, RES> request) throws RpcException {
+        return rpcConverter.fromJson(bytes.newInput(), request.getCall().getJsonType());
     }
 
     @Override
