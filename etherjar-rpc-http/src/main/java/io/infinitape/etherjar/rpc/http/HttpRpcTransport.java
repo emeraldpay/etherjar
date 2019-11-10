@@ -174,7 +174,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
          * @param password password
          * @return builder
          */
-        public Builder setBasicAuth(String username, String password) {
+        public Builder basicAuth(String username, String password) {
             this.httpClient = null;
 
             CredentialsProvider provider = new BasicCredentialsProvider();
@@ -201,7 +201,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
          * @throws IOException if unable to read certificate
          * @return builder
          */
-        public Builder setTrustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
+        public Builder trustedCertificate(InputStream certificate) throws GeneralSecurityException, IOException {
             this.httpClient = null;
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -217,17 +217,17 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
             return this;
         }
 
-        public Builder setTarget(String url) throws URISyntaxException {
-            return this.setTarget(new URI(url));
+        public Builder connectTo(String url) throws URISyntaxException {
+            return this.connectTo(new URI(url));
         }
 
-        public Builder setTarget(URI target) {
+        public Builder connectTo(URI target) {
             this.httpClient = null;
             this.target = target;
             return this;
         }
 
-        public Builder setExecutor(ExecutorService executorService) {
+        public Builder executor(ExecutorService executorService) {
             this.executorService = executorService;
             if (this.onClose != null) {
                 this.onClose.run();
@@ -236,20 +236,20 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
             return this;
         }
 
-        public Builder setHttpClient(HttpClient httpClient) {
+        public Builder httpClient(HttpClient httpClient) {
             this.httpClient = httpClient;
             return this;
         }
 
-        protected void setDefaults() {
+        protected void initDefaults() {
             if (httpClient == null && target == null) {
                 try {
-                    setTarget("http://127.0.0.1:8545");
+                    connectTo("http://127.0.0.1:8545");
                 } catch (URISyntaxException e) { }
             }
             if (executorService == null) {
                 ExecutorService executorService = Executors.newCachedThreadPool();
-                setExecutor(executorService);
+                executor(executorService);
                 onClose = executorService::shutdown;
             }
             if (rpcConverter == null) {
@@ -258,7 +258,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         }
 
         public HttpRpcTransport build() {
-            setDefaults();
+            initDefaults();
 
             if (this.httpClient == null) {
                 httpClient = HttpClients.custom()

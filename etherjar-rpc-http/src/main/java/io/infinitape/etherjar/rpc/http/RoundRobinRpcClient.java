@@ -207,9 +207,9 @@ public class RoundRobinRpcClient extends AbstractFuturesRpcClient implements Fut
             }
             List<FuturesRpcClient> clients = new ArrayList<>(hosts.size());
             for (URI uri: hosts) {
-                RpcTransport transport = HttpRpcTransport.newBuilder()
-                    .setTarget(uri)
-                    .setExecutor(executorService)
+                HttpRpcTransport transport = HttpRpcTransport.newBuilder()
+                    .connectTo(uri)
+                    .executor(executorService)
                     .build();
                 clients.add(
                     new DefaultRpcClient(transport)

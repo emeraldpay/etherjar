@@ -19,8 +19,6 @@ package io.infinitape.etherjar.rpc.http
 import io.infinitape.etherjar.rpc.DefaultBatch
 import io.infinitape.etherjar.rpc.RpcCall
 import io.infinitape.etherjar.rpc.RpcException
-import io.infinitape.etherjar.rpc.RpcResponseError
-import io.infinitape.etherjar.rpc.RpcTransport
 import org.apache.http.HttpResponse
 import org.apache.http.ProtocolVersion
 import org.apache.http.client.HttpClient
@@ -39,7 +37,7 @@ class HttpRpcTransportSpec extends Specification {
     def setup() {
         httpClientMock = Mock(HttpClient)
         defaultRpcTransport = HttpRpcTransport.newBuilder()
-            .setHttpClient(httpClientMock)
+            .httpClient(httpClientMock)
             .build()
     }
 
