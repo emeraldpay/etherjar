@@ -53,6 +53,7 @@ public class RpcCallResponse<JS, RES> {
         return error != null;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> RpcCallResponse<JS, T> cast(Class<T> clazz) {
         if (value == null || clazz.isAssignableFrom(value.getClass())) {
             return (RpcCallResponse<JS, T>) this;

@@ -61,4 +61,12 @@ public class ResponseJson<DATA, ID> {
     public void setError(RpcResponseError error) {
         this.error = error;
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> ResponseJson<T, ID> cast(Class<T> clazz) {
+        if (result == null || clazz.isAssignableFrom(result.getClass())) {
+            return (ResponseJson<T, ID>) this;
+        }
+        throw new ClassCastException("Value of " + result.getClass() + " is not assignable to " + clazz);
+    }
 }

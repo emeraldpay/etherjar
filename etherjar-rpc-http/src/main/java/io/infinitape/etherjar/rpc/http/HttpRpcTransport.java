@@ -51,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -123,13 +124,8 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                 }
                 InputStream content = rcpResponse.getEntity().getContent();
                 List<ResponseJson<?, Integer>> response = rpcConverter.parseBatch(content, responseMapping);
-                List<RpcCallResponse> result = response.stream().map((resp) -> {
-                        RpcCall call = requests.get(resp.getId()).getCall();
-                        if (call != null) {
-                            return responseJsonReader.convert(call, resp);
-                        }
-                        return null;
-                    })
+                List<RpcCallResponse> result = response.stream()
+                    .map(reader(requests))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
                 f.complete(result);
@@ -148,6 +144,16 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         return f;
     }
 
+    private <JS, RES> Function<ResponseJson<?, Integer>, RpcCallResponse<JS, RES>> reader(final Map<Integer, DefaultBatch.FutureBatchItem> requests) {
+        return (resp) -> {
+            RpcCall<JS, RES> call = requests.get(resp.getId()).getCall();
+            if (call != null) {
+                ResponseJson<JS, Integer> castResp = resp.cast(call.getJsonType());
+                return responseJsonReader.convert(call, castResp);
+            }
+            return null;
+        };
+    }
     public static class Builder {
         private URI target;
         private ExecutorService executorService;
