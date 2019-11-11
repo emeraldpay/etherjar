@@ -28,6 +28,15 @@ public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
         this.call = call;
     }
 
+    @SuppressWarnings("unchecked")
+    public <A, B> BatchItem<PROC, A, B> cast(Class<A> jsType, Class<B> javaType) {
+        return (BatchItem<PROC, A, B>) this;
+    }
+
+    public <A, B> BatchItem<PROC, A, B> cast(RpcCall<A, B> call) {
+        return cast(call.getJsonType(), call.getResultType());
+    }
+
     /**
      * Called after completion on RPC server
      *

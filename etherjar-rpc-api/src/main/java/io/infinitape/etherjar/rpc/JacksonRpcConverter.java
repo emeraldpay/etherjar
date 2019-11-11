@@ -110,14 +110,14 @@ public class JacksonRpcConverter implements RpcConverter {
     }
 
     @Override
-    public List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException {
+    public List<ResponseJson<Object,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException {
         try {
             JsonNode nodes = objectMapper.reader().readTree(content);
             if (!nodes.isArray()) {
                 throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Not array");
             }
             Iterator<JsonNode> elements = nodes.elements();
-            List<ResponseJson<?,Integer>> parsedBatch = new ArrayList<>();
+            List<ResponseJson<Object,Integer>> parsedBatch = new ArrayList<>();
             while (elements.hasNext()) {
                 JsonNode resp = elements.next();
                 if (!resp.isObject()) {

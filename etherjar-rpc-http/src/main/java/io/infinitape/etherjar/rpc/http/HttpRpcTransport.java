@@ -59,7 +59,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
 
     private static final Logger log = Logger.getLogger(HttpRpcTransport.class.getName());
 
-    private ResponseJsonReader responseJsonReader = new ResponseJsonReader();
+    private ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
     private final URI target;
     private final ExecutorService executorService;
@@ -123,7 +123,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                     throw new IOException("Server returned error response: " + statusCode);
                 }
                 InputStream content = rcpResponse.getEntity().getContent();
-                List<ResponseJson<?, Integer>> response = rpcConverter.parseBatch(content, responseMapping);
+                List<ResponseJson<Object, Integer>> response = rpcConverter.parseBatch(content, responseMapping);
                 List<RpcCallResponse> result = response.stream()
                     .map(reader(requests))
                     .filter(Objects::nonNull)
@@ -149,7 +149,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
             RpcCall<JS, RES> call = requests.get(resp.getId()).getCall();
             if (call != null) {
                 ResponseJson<JS, Integer> castResp = resp.cast(call.getJsonType());
-                return responseJsonReader.convert(call, castResp);
+                return responseJsonConverter.convert(call, castResp);
             }
             return null;
         };

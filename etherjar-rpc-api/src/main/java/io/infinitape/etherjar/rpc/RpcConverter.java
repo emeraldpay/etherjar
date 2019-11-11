@@ -28,7 +28,7 @@ public interface RpcConverter {
 
     <T> T fromJson(InputStream content, Class<T> clazz) throws RpcException;
 
-    List<ResponseJson<?,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException;
+    List<ResponseJson<Object,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException;
 
     String toJson(RequestJson request);
 

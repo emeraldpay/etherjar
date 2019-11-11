@@ -28,12 +28,12 @@ public class ProcessBatchResult implements Consumer<RpcCallResponse> {
         this.context = context;
     }
 
-    public <JS, RES> void process(BatchItem<?, JS, RES> bi, RpcCallResponse<JS, RES> response) {
+    public <JS, RES> void process(BatchItem<?, JS, RES> item, RpcCallResponse<JS, RES> response) {
         if (response.isError()) {
-            bi.onError(response.getError());
+            item.onError(response.getError());
         } else {
             RES value = response.getValue();
-            bi.onResult(value);
+            item.onResult(value);
         }
     }
 

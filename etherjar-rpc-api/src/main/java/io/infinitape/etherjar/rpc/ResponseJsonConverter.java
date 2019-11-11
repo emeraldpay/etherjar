@@ -17,11 +17,13 @@ package io.infinitape.etherjar.rpc;
 
 import io.infinitape.etherjar.rpc.json.ResponseJson;
 
+import java.util.function.Function;
+
 /**
  * Reads JSON RPC raw response data, together with source Call data, and convert into RpcCallResponse
  * suitable for further processing
  */
-public class ResponseJsonReader {
+public class ResponseJsonConverter {
 
     public <JS, RES> RpcCallResponse<JS, RES> convert(RpcCall<JS, RES> call, ResponseJson<JS, Integer> response) {
         if (response.getError() != null) {
@@ -30,6 +32,20 @@ public class ResponseJsonReader {
             RES value = call.getConverter().apply(response.getResult());
             return new RpcCallResponse<>(call, value);
         }
+    }
+
+    public <JS, RES> Function<ResponseJson<JS, Integer>, RpcCallResponse<JS, RES>> forCall(RpcCall<JS, RES> call) {
+        return (response) -> convert(call, response);
+    }
+
+    public <JS, RES> Function<ResponseJson<JS, Integer>, RpcCallResponse<JS, RES>> forContext(BatchCallContext context) {
+        return (response) -> {
+            RpcCall<JS, RES> call = context.getCall(response.getId());
+            if (call == null) {
+                throw new RuntimeException("No call was made with id " + response.getId());
+            }
+            return convert(call, response);
+        };
     }
 
 }

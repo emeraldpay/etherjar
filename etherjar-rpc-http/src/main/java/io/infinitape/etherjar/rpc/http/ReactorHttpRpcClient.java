@@ -57,7 +57,6 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
     @Override
     public Flux<RpcCallResponse> execute(ReactorBatch batch) {
         BatchCallContext<ReactorBatch.ReactorBatchItem> context = new BatchCallContext<>();
-        Consumer<RpcCallResponse> processBatch = new ProcessBatchResult(context);
 
         Flux<RpcCallResponse> result = batch.getItems()
             .doOnNext(context::add)
@@ -74,20 +73,18 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
             }
         }
 
-        result = result
-            .doOnNext(processBatch)
-            .doFinally((s) -> batch.close())
-            .share();
+        result = postProcess(batch, context, result);
 
-        batch.withExecution(Flux.from(result));
+        result = result.doOnError((t) -> System.err.println("HTTP Error " + t.getClass() + ": " + t.getMessage()));
 
-        return result;
+        return result.share();
     }
 
 
     public static class ResponseReader implements Function<ByteBuf, Flux<RpcCallResponse>> {
         private RpcConverter rpcConverter;
         private final BatchCallContext<ReactorBatch.ReactorBatchItem> context;
+        private ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
         public ResponseReader(RpcConverter rpcConverter, BatchCallContext<ReactorBatch.ReactorBatchItem> context) {
             this.rpcConverter = rpcConverter;
@@ -96,14 +93,15 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
 
         @Override
         public Flux<RpcCallResponse> apply(ByteBuf content) {
-            List<ResponseJson<?, Integer>> responses;
+            List<ResponseJson<Object, Integer>> responses;
             try {
                 responses = rpcConverter.parseBatch(new ByteBufInputStream(content), context.getJsonTypes());
             } catch (RpcException e) {
                 return Flux.error(e);
             }
-            return Flux.fromIterable(responses)
-                .flatMap(new AbstractReactorRpcClient.ResponseTransformer(context));
+            return Flux
+                .fromIterable(responses)
+                .map(responseJsonConverter.forContext(context));
         }
     }
 

@@ -48,33 +48,17 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
             .then(item.getResult());
     }
 
-    public static class ResponseTransformer implements Function<ResponseJson<?, Integer>, Mono<RpcCallResponse>> {
-        private final BatchCallContext<ReactorBatch.ReactorBatchItem> context;
+    public Flux<RpcCallResponse> postProcess(ReactorBatch batch, BatchCallContext context, Flux<RpcCallResponse> result) {
+        // Fill batch items with result
+        result = result.doOnNext(new ProcessBatchResult(context));
 
-        public ResponseTransformer(BatchCallContext<ReactorBatch.ReactorBatchItem> context) {
-            this.context = context;
-        }
+        // Connect batch items to execution
+        batch.withExecution(Flux.from(result));
 
-        @Override
-        public Mono<RpcCallResponse> apply(ResponseJson<?, Integer> singleResponse) {
-            ReactorBatch.ReactorBatchItem bi = context.getResultMapper().get(singleResponse.getId());
-            return extract(bi, singleResponse);
-        }
+        // Close unprocessed items
+        result = result.doFinally((s) -> batch.close());
 
-        public <JS, RES> Mono<RpcCallResponse> extract(ReactorBatch.ReactorBatchItem<JS, RES> bi, ResponseJson<JS, Integer> response)  {
-            RpcResponseError error = response.getError();
-            RpcCall<JS, RES> call = bi.getCall();
-            if (error != null) {
-                RpcException err = new RpcException(call, error.getCode(), error.getMessage(), error.getData(), null);
-                bi.onError(err);
-                return Mono.error(err);
-            } else {
-                JS js = response.getResult();
-                RES value = call.getConverter().apply(js);
-                bi.onResult(value);
-                return Mono.just(new RpcCallResponse<>(call, value));
-            }
-        }
+        return result;
     }
 
     /**

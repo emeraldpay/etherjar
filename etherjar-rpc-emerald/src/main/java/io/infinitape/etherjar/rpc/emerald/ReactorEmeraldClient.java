@@ -49,6 +49,8 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
     private Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
+    ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
+
     public ReactorEmeraldClient(Channel channel, ObjectMapper objectMapper, RpcConverter rpcConverter, Common.ChainRef chainRef) {
         this.channel = channel;
         this.stub = ReactorBlockchainGrpc.newReactorStub(channel);
@@ -127,25 +129,29 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             .reduce(requestBuilder, BlockchainOuterClass.NativeCallRequest.Builder::addItems)
             .map(BlockchainOuterClass.NativeCallRequest.Builder::build);
 
-        Flux<RpcCallResponse> result = stub.nativeCall(request).flatMap((item) -> {
-            RpcCall<?, ?> call = null;
-            try {
-                call = context.getCall(item.getId());
-            } catch (Exception e) {
-                System.err.println("Invalid id returned from upstream: " + item.getId());
-            }
-            return read(item, call);
-        }).onErrorResume(StatusRuntimeException.class, (e) -> {
-          if (e.getStatus().getCode() == Status.Code.CANCELLED) {
-              return Mono.empty();
-          }
-          return Mono.error(new RpcException(
-              RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR,
-              "gRPC connection error. Status: " + e.getStatus(),
-              null,
-              e
-          ));
-        }).flatMap(new AbstractReactorRpcClient.ResponseTransformer(context));
+        Flux<RpcCallResponse> result = stub.nativeCall(request)
+            .flatMap((item) -> {
+                RpcCall<?, ?> call = null;
+                try {
+                    call = context.getCall(item.getId());
+                } catch (Exception e) {
+                    System.err.println("Invalid id returned from upstream: " + item.getId());
+                }
+                return read(item, call);
+            })
+            .onErrorResume(StatusRuntimeException.class, (e) -> {
+              if (e.getStatus().getCode() == Status.Code.CANCELLED) {
+                  return Mono.empty();
+              }
+              return Mono.error(new RpcException(
+                  RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR,
+                  "gRPC connection error. Status: " + e.getStatus(),
+                  null,
+                  e
+              ));
+            })
+            .map(responseJsonConverter.forContext(context));
+
 
         FailedBatchProcessor failedBatchProcessor = this.getFailedBatchProcessor();
         if (failedBatchProcessor != null) {
@@ -155,11 +161,11 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             }
         }
 
-        result = result
-            .doFinally((s) -> batch.close())
-            .share();
+        result = result.doOnError((t) -> System.err.println("Client error " + t.getClass() + ": " + t.getMessage()));
 
-        return result;
+        result = postProcess(batch, context, result);
+
+        return result.share();
     }
 
     public <JS, RES> Mono<ResponseJson<JS, Integer>> read(BlockchainOuterClass.NativeCallReplyItem item, RpcCall<JS, RES> call) {

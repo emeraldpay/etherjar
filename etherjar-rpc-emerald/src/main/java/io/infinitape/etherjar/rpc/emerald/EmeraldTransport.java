@@ -59,7 +59,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     private final Channel channel;
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
 
-    private ResponseJsonReader responseJsonReader = new ResponseJsonReader();
+    private ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
 
     private ObjectMapper objectMapper;
@@ -206,7 +206,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
 
     protected <JS, RES> RpcCallResponse<JS, RES> convertToRpcResponse(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
         ResponseJson<JS, Integer> responseJson = convertToResponseJson(request, resp);
-        return responseJsonReader.convert(request.getCall(), responseJson);
+        return responseJsonConverter.convert(request.getCall(), responseJson);
     }
 
     protected <JS, RES> ResponseJson<JS, Integer> convertToResponseJson(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
