@@ -144,6 +144,7 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         return f;
     }
 
+    @SuppressWarnings("unchecked")
     private <JS, RES> Function<ResponseJson<?, Integer>, RpcCallResponse<JS, RES>> reader(final Map<Integer, DefaultBatch.FutureBatchItem> requests) {
         return (resp) -> {
             RpcCall<JS, RES> call = requests.get(resp.getId()).getCall();

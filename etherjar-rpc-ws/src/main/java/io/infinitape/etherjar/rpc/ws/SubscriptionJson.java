@@ -54,6 +54,7 @@ public class SubscriptionJson {
         this.result = result;
     }
 
+    @SuppressWarnings("unchecked")
     public BlockJson<TransactionRefJson> getBlockResult() {
         return (BlockJson<TransactionRefJson>) blockJsonDeserializer.deserialize(result);
     }

@@ -54,6 +54,7 @@ public class ReactorBatch implements Batch<ReactorBatch.ReactorBatchItem>, Consu
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void accept(RpcCall rpcCall) {
         add(rpcCall);
     }

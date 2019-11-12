@@ -55,8 +55,13 @@ public class SeparatedTransport implements ReactorRpcTransport {
                 Unpooled.wrappedBuffer(rpcConverter.toJson(request).getBytes()))
             )
             .flatMap(this::sendRequest)
-            .map((resp) -> processResponse(resp.getT2(), resp.getT1()))
+            .map(this::process)
             .onErrorResume(ConnectException.class, ReactorHandlers.catchConnectException());
+    }
+
+    @SuppressWarnings("unchecked")
+    private RpcCallResponse process(Tuple2<ReactorBatch.ReactorBatchItem, byte[]> resp) {
+        return processResponse(resp.getT2(), resp.getT1());
     }
 
     /**

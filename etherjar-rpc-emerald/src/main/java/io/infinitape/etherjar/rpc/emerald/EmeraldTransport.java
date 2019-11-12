@@ -190,7 +190,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                 responses.forEachRemaining((resp) -> {
                     int id = resp.getId();
                     DefaultBatch.FutureBatchItem request = idMapping.get(id);
-                    RpcCallResponse callResponse = convertToRpcResponse(request, resp);
+                    RpcCallResponse callResponse = convertUnchecked(request, resp);
                     result.add(callResponse);
                 });
             } catch (StatusRuntimeException e) {
@@ -204,12 +204,17 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         return f;
     }
 
-    protected <JS, RES> RpcCallResponse<JS, RES> convertToRpcResponse(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+    @SuppressWarnings("unchecked")
+    private RpcCallResponse convertUnchecked(DefaultBatch.FutureBatchItem request, BlockchainOuterClass.NativeCallReplyItem resp) {
+        return convertToRpcResponse(request, resp);
+    }
+
+    public <JS, RES> RpcCallResponse<JS, RES> convertToRpcResponse(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
         ResponseJson<JS, Integer> responseJson = convertToResponseJson(request, resp);
         return responseJsonConverter.convert(request.getCall(), responseJson);
     }
 
-    protected <JS, RES> ResponseJson<JS, Integer> convertToResponseJson(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+    public <JS, RES> ResponseJson<JS, Integer> convertToResponseJson(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
         ResponseJson<JS, Integer> responseJson = new ResponseJson<>();
         if (resp.getSucceed()) {
             try {
@@ -227,7 +232,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         return responseJson;
     }
 
-    protected <JS, RES> JS read(ByteString bytes, DefaultBatch.FutureBatchItem<JS, RES> request) throws RpcException {
+    public <JS, RES> JS read(ByteString bytes, DefaultBatch.FutureBatchItem<JS, RES> request) throws RpcException {
         return rpcConverter.fromJson(bytes.newInput(), request.getCall().getJsonType());
     }
 

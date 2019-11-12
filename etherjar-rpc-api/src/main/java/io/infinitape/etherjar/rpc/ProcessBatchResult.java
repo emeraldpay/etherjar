@@ -38,6 +38,7 @@ public class ProcessBatchResult implements Consumer<RpcCallResponse> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void accept(RpcCallResponse response) {
         BatchItem item = context.getBatchItem(response.getSource());
         process(item, response);

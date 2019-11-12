@@ -148,14 +148,19 @@ public class RpcCall<JS, RES> {
      *
      * @param clazz JSON data type
      */
-    public void setJsonType(Class clazz) {
-        this.jsonType = clazz;
+    @SuppressWarnings("unchecked")
+    public <T> RpcCall<T, RES> castJsonType(Class<T> clazz) {
+        if (this.jsonType == null || clazz.isAssignableFrom(this.jsonType)) {
+            return (RpcCall<T, RES>) this;
+        }
+        throw new ClassCastException("Value of " + this.jsonType + " is not assignable to " + clazz);
     }
 
     /**
      *
      * @param clazz Java data type
      */
+    @SuppressWarnings("unchecked")
     public void setResultType(Class clazz) {
         this.resultType = clazz;
     }
@@ -167,11 +172,28 @@ public class RpcCall<JS, RES> {
      * @param <T> JSON data type
      * @return new call definition
      */
+    @SuppressWarnings("unchecked")
     public <T> RpcCall<T, RES> withJsonType(Class<? extends T> clazz) {
         RpcCall<T, RES> copy = new RpcCall<>(this.method, this.params);
         copy.resultType = this.resultType;
         copy.jsonType = clazz;
         copy.converter = (Function<T, RES>) this.converter;
+        return copy;
+    }
+
+    /**
+     * Convert into a new call definition with specified Java data type
+     *
+     * @param clazz new Java data type
+     * @param <T> Java data type
+     * @return new call definition
+     */
+    @SuppressWarnings("unchecked")
+    public <T> RpcCall<JS, T> withResultType(Class<T> clazz) {
+        RpcCall<JS, T> copy = new RpcCall<>(this.method, this.params);
+        copy.resultType = clazz;
+        copy.jsonType = this.jsonType;
+        copy.converter = (Function<JS, T>) this.converter;
         return copy;
     }
 
@@ -196,6 +218,7 @@ public class RpcCall<JS, RES> {
      *
      * @return Java data type
      */
+    @SuppressWarnings("unchecked")
     public Class<RES> getResultType() {
         return (Class<RES>) resultType;
     }
@@ -204,6 +227,7 @@ public class RpcCall<JS, RES> {
      *
      * @return JSON data type
      */
+    @SuppressWarnings("unchecked")
     public Class<JS> getJsonType() {
         return (Class<JS>) jsonType;
     }

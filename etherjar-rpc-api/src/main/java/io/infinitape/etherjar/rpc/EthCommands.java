@@ -23,9 +23,20 @@ import io.infinitape.etherjar.rpc.json.*;
 
 public class EthCommands {
 
-    private final Class<BlockJson<TransactionJson>> blockWithTxJson = null;
-    private final Class<BlockJson<TransactionRefJson>> blockWithTxId = null;
+    private final Class<BlockJson<TransactionJson>> blockWithTxJson = getBlockWithTx();
+    private final Class<BlockJson<TransactionRefJson>> blockWithTxId = getBlockWithRef();
 
+    @SuppressWarnings("unchecked")
+    private Class<BlockJson<TransactionJson>> getBlockWithTx() {
+        BlockJson<TransactionJson> b = new BlockJson<>();
+        return (Class<BlockJson<TransactionJson>>) b.getClass();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<BlockJson<TransactionRefJson>> getBlockWithRef() {
+        BlockJson<TransactionRefJson> b = new BlockJson<>();
+        return (Class<BlockJson<TransactionRefJson>>) b.getClass();
+    }
 
     /**
      *
@@ -61,9 +72,9 @@ public class EthCommands {
      * @return information about a block
      */
     public RpcCall<BlockJson<TransactionRefJson>, BlockJson<TransactionRefJson>> getBlock(long blockNumber) {
-        RpcCall call = RpcCall.create("eth_getBlockByNumber", blockWithTxId, HexQuantity.from(blockNumber).toHex(), false).withJsonType(BlockJson.class);
-        call.setResultType(BlockJson.class);
-        return call;
+        return RpcCall.create("eth_getBlockByNumber", blockWithTxId, HexQuantity.from(blockNumber).toHex(), false)
+            .withJsonType(blockWithTxId)
+            .withResultType(blockWithTxId);
     }
 
 
@@ -73,9 +84,9 @@ public class EthCommands {
      * @return information about a block
      */
     public RpcCall<BlockJson<TransactionJson>, BlockJson<TransactionJson>> getBlockWithTransactions(long blockNumber) {
-        RpcCall call = RpcCall.create("eth_getBlockByNumber", blockWithTxJson, HexQuantity.from(blockNumber).toHex(), true).withJsonType(BlockJson.class);
-        call.setResultType(BlockJson.class);
-        return call;
+        return RpcCall.create("eth_getBlockByNumber", blockWithTxJson, HexQuantity.from(blockNumber).toHex(), true)
+            .withJsonType(blockWithTxJson)
+            .withResultType(blockWithTxJson);
     }
 
     /**
@@ -84,9 +95,9 @@ public class EthCommands {
      * @return information about a block
      */
     public RpcCall<BlockJson<TransactionRefJson>, BlockJson<TransactionRefJson>> getBlock(BlockHash hash) {
-        RpcCall call = RpcCall.create("eth_getBlockByHash", blockWithTxId, hash.toHex(), false).withJsonType(BlockJson.class);
-        call.setResultType(BlockJson.class);
-        return call;
+        return RpcCall.create("eth_getBlockByHash", blockWithTxId, hash.toHex(), false)
+            .withJsonType(blockWithTxId)
+            .withResultType(blockWithTxId);
     }
 
     /**
@@ -95,9 +106,9 @@ public class EthCommands {
      * @return information about a block
      */
     public RpcCall<BlockJson<TransactionJson>, BlockJson<TransactionJson>> getBlockWithTransactions(BlockHash hash) {
-        RpcCall call = RpcCall.create("eth_getBlockByHash", blockWithTxJson, hash.toHex(), true).withJsonType(BlockJson.class);
-        call.setResultType(BlockJson.class);
-        return call;
+        return RpcCall.create("eth_getBlockByHash", blockWithTxJson, hash.toHex(), true)
+            .withJsonType(blockWithTxJson)
+            .withResultType(blockWithTxJson);
     }
 
     /**

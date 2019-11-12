@@ -35,7 +35,7 @@ public class BatchCallContext<T extends BatchItem> {
         return jsonTypes;
     }
 
-    public <JS, RES> RpcCall<JS, RES> getCall(int id) {
+    public RpcCall getCall(int id) {
         return sourceMapping.get(id).getCall();
     }
 

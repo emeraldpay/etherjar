@@ -38,6 +38,7 @@ public class ResponseJsonConverter {
         return (response) -> convert(call, response);
     }
 
+    @SuppressWarnings("unchecked")
     public <JS, RES> Function<ResponseJson<JS, Integer>, RpcCallResponse<JS, RES>> forContext(BatchCallContext context) {
         return (response) -> {
             RpcCall<JS, RES> call = context.getCall(response.getId());

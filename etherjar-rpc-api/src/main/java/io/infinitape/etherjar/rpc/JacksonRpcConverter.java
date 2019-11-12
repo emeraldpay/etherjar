@@ -129,7 +129,7 @@ public class JacksonRpcConverter implements RpcConverter {
                 }
                 Class[] inner = new Class[] { targets.get(id), Integer.class };
                 JavaType type1 = objectMapper.getTypeFactory().constructParametricType(ResponseJson.class, inner);
-                ResponseJson parsedItem = objectMapper.reader().forType(type1).readValue(resp);
+                ResponseJson<Object, Integer> parsedItem = objectMapper.reader().forType(type1).readValue(resp);
                 parsedBatch.add(parsedItem);
             }
             return parsedBatch;
