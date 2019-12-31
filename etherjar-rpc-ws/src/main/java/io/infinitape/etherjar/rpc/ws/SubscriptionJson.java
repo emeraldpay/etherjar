@@ -83,8 +83,10 @@ public class SubscriptionJson {
         if (this.error == null) {
             return null;
         }
-        return new RpcResponseError(this.error.get("code").asInt(),
-            this.error.get("message").asText(), this.error.get("data").asText()
+        return new RpcResponseError(
+            this.error.has("code") ? this.error.get("code").asInt() : 0,
+            this.error.has("message") ? this.error.get("message").asText() : "UNKNOWN ERROR",
+            this.error.has("data") ? this.error.get("data").asText() : null
         );
     }
 }
