@@ -7,8 +7,8 @@
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.8.1
-- Latest Snapshot Version: 0.9.0-SNAPSHOT
+- Latest Stable Version: 0.9.0
+- Latest Snapshot Version: 0.10.0-SNAPSHOT
 
 ## Architecture
 
@@ -76,7 +76,7 @@ where
 <dependency>
   <groupId>io.infinitape</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
-  <version>0.8.1</version>
+  <version>0.9.0</version>
 </dependency>
 ```
 
@@ -90,7 +90,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.infinitape:etherjar-rpc-http:0.8.1'
+    compile 'io.infinitape:etherjar-rpc-http:0.9.0'
 }
 ```
 
@@ -101,10 +101,9 @@ How to call `web3_clientVersion` low-level JSON-RPC API method:
 ```java
 public class GetClientVersion {
     public static void main(String[] args)
-            throws URISyntaxException, IOException, ExecutionException, InterruptedException {
-
-        try (RpcTransport trans = new DefaultRpcTransport(new URI("http://127.0.0.1:8545"))) {
-            RpcClient client = new DefaultRpcClient(trans);
+            throws URISyntaxException, IOException, ExecutionException, InterruptedException {        
+        try (RpcTransport transport = HttpRpcTransport.newBuilder().connectTo("http://127.0.0.1:8545").build()) {
+            RpcClient client = new DefaultRpcClient(transport);
             Future<String> req = client.execute(Commands.web3().clientVersion());
 
             System.out.println(String.format("Client version: %s", req.get()));
@@ -121,8 +120,8 @@ public class GetGasPrice {
     public static void main(String[] args)
             throws URISyntaxException, IOException, ExecutionException, InterruptedException {
 
-        try (RpcTransport trans = new DefaultRpcTransport(new URI("http://127.0.0.1:8545"))) {
-            RpcClient client = new DefaultRpcClient(trans);
+        try (RpcTransport transport = HttpRpcTransport.newBuilder().connectTo("http://127.0.0.1:8545").build()) {
+            RpcClient client = new DefaultRpcClient(transport);
             Future<Wei> req = client.execute(Commands.eth().getGasPrice());
 
             System.out.println(String.format("Gas Price: %s Ether", req.get().toEthers(12)));
