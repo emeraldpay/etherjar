@@ -41,22 +41,38 @@ public class Address extends HexData {
         super(bytes, SIZE_BYTES);
     }
 
+    /**
+     * Create address from the provided value
+     *
+     * @param value 20 byte data
+     * @return address
+     */
+    public static Address from(HexData value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Null input value");
+        }
+        if (value.getSize() != SIZE_BYTES) {
+            throw new IllegalArgumentException("Invalid input length: " + value.getSize() + " != " + SIZE_BYTES);
+        }
+        return new Address(value.getBytes());
+    }
+
     public static Address from(byte[] value) {
         if (value == null) {
-            throw new IllegalArgumentException("Null Address");
+            throw new IllegalArgumentException("Null input value");
         }
         if (value.length != SIZE_BYTES) {
-            throw new IllegalArgumentException("Invalid Address length: " + value.length);
+            throw new IllegalArgumentException("Invalid input length: " + value.length + " != " + SIZE_BYTES);
         }
         return new Address(value);
     }
 
     public static Address from(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Null Address");
+            throw new IllegalArgumentException("Null input value");
         }
         if (value.length() != SIZE_HEX) {
-            throw new IllegalArgumentException("Invalid Address length: " + value.length());
+            throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_BYTES);
         }
         return new Address(HexData.from(value).getBytes());
     }

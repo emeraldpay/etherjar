@@ -16,7 +16,9 @@
 
 package io.infinitape.etherjar.domain
 
+import io.infinitape.etherjar.hex.HexData
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class AddressSpec extends Specification {
 
@@ -31,6 +33,33 @@ class AddressSpec extends Specification {
         '0xfffffffff3984f569b4c7ff5143499d94abe2ff2'    | [-1, -1, -1, -1, -13, -104, 79, 86, -101, 76, 127, -11, 20, 52, -103, -39, 74, -66, 47,-14] as byte[]
         '0x0000000000000000000000000000000000000000'    | [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as byte[]
         '0xffffffffffffffffffffffffffffffffffffffff'    | [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1] as byte[]
+    }
+
+    def "should create from valid HexData"() {
+        expect:
+        Address.from(HexData.from(hex)).toHex() == hex
+        where:
+        hex << [
+            '0x0000000000015b23c7e20b0ea5ebd84c39dcbe60',
+            '0xfffffffff3984f569b4c7ff5143499d94abe2ff2',
+            '0x0000000000000000000000000000000000000000',
+            '0xffffffffffffffffffffffffffffffffffffffff'
+        ]
+    }
+
+    def "should fail to create from invalid HexData"() {
+        when:
+        Address.from(hex)
+        then:
+        def err = thrown(IllegalArgumentException)
+
+        where:
+        hex << [
+            '0x00000000015b23c7e20b0ea5ebd84c39dcbe60',
+            '0x00000000000015b23c7e20b0ea5ebd84c39dcbe60',
+            '0x00000000000015b23c7e20b0ea5ebd84c39dcbe6000',
+            '0x00fffffffff3984f569b4c7ff5143499d94abe2ff2',
+        ].collect { HexData.from(it) }
     }
 
     def "should validate address with checksum"() {
