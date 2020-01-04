@@ -16,6 +16,7 @@
 
 package io.infinitape.etherjar.domain
 
+import io.infinitape.etherjar.hex.Hex32
 import io.infinitape.etherjar.hex.HexData
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -60,6 +61,41 @@ class AddressSpec extends Specification {
             '0x00000000000015b23c7e20b0ea5ebd84c39dcbe6000',
             '0x00fffffffff3984f569b4c7ff5143499d94abe2ff2',
         ].collect { HexData.from(it) }
+    }
+
+    def "should extract from valid Hex32"() {
+        expect:
+        Address.extract(Hex32.from(hex)).toHex() == address
+        where:
+        address                                      | hex
+        '0x2546f610a94d98d01ccf277b70af7c2df8185fc4' | '0x0000000000000000000000002546f610a94d98d01ccf277b70af7c2df8185fc4'
+        '0x0046f610a94d98d01ccf277b70af7c2df8185fc4' | '0x0000000000000000000000000046f610a94d98d01ccf277b70af7c2df8185fc4'
+        '0x2546f610a94d98d01ccf277b70af7c2df8185f00' | '0x0000000000000000000000002546f610a94d98d01ccf277b70af7c2df8185f00'
+        '0x0000000000000000000000000000000000000000' | '0x0000000000000000000000000000000000000000000000000000000000000000'
+        '0x0000000000000000000000000000000000000001' | '0x0000000000000000000000000000000000000000000000000000000000000001'
+        '0x1000000000000000000000000000000000000000' | '0x0000000000000000000000001000000000000000000000000000000000000000'
+        '0xf000000000000000000000000000000000000000' | '0x000000000000000000000000f000000000000000000000000000000000000000'
+        '0xffffffffffffffffffffffffffffffffffffffff' | '0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff'
+    }
+
+    def "should fail to extract from Hex32 with non-address bytes"() {
+        when:
+        def input = null
+        try {
+            input = Hex32.from(hex)
+        } catch (IllegalArgumentException e) {e.printStackTrace()}
+        Address.extract(input)
+        then:
+        def err = thrown(IllegalArgumentException)
+
+        where:
+        hex << [
+            '0x0100000000000000000000002546f610a94d98d01ccf277b70af7c2df8185f00',
+            '0x0000000000000000000000012546f610a94d98d01ccf277b70af7c2df8185f00',
+            '0x1000000000000000000000000000000000000000000000000000000000000000',
+            '0x0100000000000000000000000000000000000000000000000000000000000000',
+            '0x1000000000000000000000010000000000000000000000000000000000000000',
+        ]
     }
 
     def "should validate address with checksum"() {

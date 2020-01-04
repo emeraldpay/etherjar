@@ -16,10 +16,12 @@
 
 package io.infinitape.etherjar.domain;
 
+import io.infinitape.etherjar.hex.Hex32;
 import io.infinitape.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -32,6 +34,7 @@ public class Address extends HexData {
     public static final int SIZE_BYTES = 20;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
+    private static final byte[] EMPTY_12BYTES = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     public static final Address EMPTY = Address.from("0x0000000000000000000000000000000000000000");
 
     private static final Pattern CASE_INSENSITIVE_PATTERN = Pattern.compile("0x(?i:[0-9a-f]{40})");
@@ -75,6 +78,28 @@ public class Address extends HexData {
             throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_BYTES);
         }
         return new Address(HexData.from(value).getBytes());
+    }
+
+    /**
+     * Extract address from Hex32 (i.e. from method call parameters, logs, etc). The extract method verifies
+     * that the input in fact contains only address, i.e. input has zeroes for initial non-address bytes.
+     *
+     * @param value a Hex 32
+     * @return address
+     */
+    public static Address extract(Hex32 value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Null input value");
+        }
+        byte[] bytes = value.getBytes();
+        byte[] empty = new byte[Hex32.SIZE_BYTES - Address.SIZE_BYTES];
+        System.arraycopy(bytes, 0, empty, 0, empty.length);
+        if (!Arrays.equals(empty, EMPTY_12BYTES)) {
+            throw new IllegalArgumentException("Hex32 has non zero prefix for an Address");
+        }
+        byte[] address = new byte[Address.SIZE_BYTES];
+        System.arraycopy(bytes, Hex32.SIZE_BYTES - Address.SIZE_BYTES, address,0, address.length);
+        return new Address(address);
     }
 
     /**
