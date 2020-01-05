@@ -17,6 +17,7 @@
 rootProject.name = 'etherjar'
 
 include "etherjar-abi",
+    "etherjar-contract",
     "etherjar-domain",
     "etherjar-erc20",
     "etherjar-hex",

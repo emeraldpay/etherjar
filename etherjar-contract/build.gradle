@@ -1,0 +1,4 @@
+dependencies {
+    implementation project(':etherjar-abi')
+    implementation project(':etherjar-domain')
+}
