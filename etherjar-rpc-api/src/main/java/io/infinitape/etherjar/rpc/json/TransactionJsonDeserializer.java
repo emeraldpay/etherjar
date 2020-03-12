@@ -37,7 +37,7 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
     public TransactionJson deserialize(JsonNode node) {
         TransactionJson tx = new TransactionJson();
         tx.setHash(getTxHash(node, "hash"));
-        tx.setNonce(getQuantity(node, "nonce").longValue());
+        tx.setNonce(getLong(node, "nonce"));
         tx.setBlockHash(getBlockHash(node, "blockHash"));
         Long blockNumber = getLong(node, "blockNumber");
         if (blockNumber != null)  {
