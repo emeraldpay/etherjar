@@ -25,8 +25,10 @@ import io.infinitape.etherjar.hex.HexData;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @JsonDeserialize(using = BlockJsonDeserializer.class)
 @JsonSerialize(using = BlockJsonSerializer.class)
@@ -268,6 +270,57 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
 
     public void setUncles(List<BlockHash> uncles) {
         this.uncles = uncles;
+    }
+
+    /**
+     * If this instance is empty or contains only references, then return as is. Otherwise
+     * returns a copy of the BlockJson with transactions fields replaced with id references
+     *
+     * @return BlockJson instance with transactions ids only.
+     */
+    @SuppressWarnings("unchecked")
+    public BlockJson<TransactionRefJson> withoutTransactionDetails() {
+        // if empty then type doesn't matter
+        if (this.transactions == null || this.transactions.isEmpty()) {
+            return (BlockJson<TransactionRefJson>) this;
+        }
+        // if it's already just a reference
+        if (this.transactions.stream().noneMatch((tx) -> tx instanceof TransactionJson)) {
+            return (BlockJson<TransactionRefJson>) this;
+        }
+        BlockJson<TransactionRefJson> copy = (BlockJson<TransactionRefJson>) copy();
+        copy.transactions = new ArrayList<>(this.transactions.size());
+        for (T tx: this.transactions) {
+            copy.transactions.add(new TransactionRefJson(tx.getHash()));
+        }
+        return copy;
+    }
+
+    /**
+     *
+     * @return copy of the current instance
+     */
+    public BlockJson<T> copy() {
+        BlockJson<T> copy = new BlockJson<>();
+        copy.number = this.number;
+        copy.hash = this.hash;
+        copy.parentHash = this.parentHash;
+        copy.sha3Uncles = this.sha3Uncles;
+        copy.logsBloom = this.logsBloom;
+        copy.transactionsRoot = this.transactionsRoot;
+        copy.stateRoot = this.stateRoot;
+        copy.receiptsRoot = this.receiptsRoot;
+        copy.miner = this.miner;
+        copy.difficulty = this.difficulty;
+        copy.totalDifficulty = this.totalDifficulty;
+        copy.extraData = this.extraData;
+        copy.size = this.size;
+        copy.gasLimit = this.gasLimit;
+        copy.gasUsed = this.gasUsed;
+        copy.timestamp = this.timestamp;
+        copy.transactions = this.transactions;
+        copy.uncles = this.uncles;
+        return copy;
     }
 
     @Override
