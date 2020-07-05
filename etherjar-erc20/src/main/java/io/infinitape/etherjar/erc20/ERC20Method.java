@@ -23,6 +23,9 @@ public enum ERC20Method {
      * Code: 0x18160ddd
      * <p>
      * Get the total token supply
+     *
+     * @see ERC20Call.TotalSupply
+     * @see ERC20Result.TotalSupply
      */
     TOTAL_SUPPLY("totalSupply", Collections.emptyList()),
 
@@ -31,6 +34,9 @@ public enum ERC20Method {
      * Code: 0x70a08231
      * <p>
      * Get the account balance of another account with address _owner
+     *
+     * @see ERC20Call.BalanceOf
+     * @see ERC20Result.BalanceOf
      */
     BALANCE_OF("balanceOf", Collections.singletonList(AddressType.DEFAULT)),
 
@@ -39,6 +45,8 @@ public enum ERC20Method {
      * Code: 0xa9059cbb
      * <p>
      * Send _value amount of tokens to address _to
+     *
+     * @see ERC20Call.Transfer
      */
     TRANSFER("transfer", Arrays.asList(AddressType.DEFAULT, UIntType.DEFAULT)),
 
@@ -47,6 +55,8 @@ public enum ERC20Method {
      * Code: 0x23b872dd
      * <p>
      * Send _value amount of tokens from address _from to address _to
+     *
+     * @see ERC20Call.TransferFrom
      */
     TRANSFER_FROM("transferFrom", Arrays.asList(AddressType.DEFAULT, AddressType.DEFAULT, UIntType.DEFAULT)),
 
@@ -55,6 +65,8 @@ public enum ERC20Method {
      * Code: 0x095ea7b3
      * <p>
      * Allow _spender to withdraw from your account, multiple times, up to the _value amount. If this function is called again it overwrites the current allowance with _value
+     *
+     * @see ERC20Call.Approve
      */
     APPROVE("approve", Arrays.asList(AddressType.DEFAULT, UIntType.DEFAULT)),
 
@@ -63,6 +75,9 @@ public enum ERC20Method {
      * Code: 0xdd62ed3e
      * <p>
      * Returns the amount which _spender is still allowed to withdraw from _owner
+     *
+     * @see ERC20Call.Allowance
+     * @see ERC20Result.Allowance
      */
     ALLOWANCE("allowance", Arrays.asList(AddressType.DEFAULT, AddressType.DEFAULT));
 

@@ -6,16 +6,39 @@ import io.infinitape.etherjar.hex.HexQuantity;
 
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.function.Function;
 
+/**
+ * ERC-20 contract result encoders/decoders
+ */
 public class ERC20Result {
 
-    static abstract class Base {
+    /**
+     * Base class to encode/decode results of ERC-20 call result.
+     * Result here means the value of JSON field <code>result</code> after execution of <code>eth_call</code> RPC method.
+     */
+    static abstract class Base<T extends Base<?>> implements Function<HexData, T> {
+        /**
+         * @return hex encoded result
+         */
         public abstract HexData encode();
 
+        /**
+         * Decode data from the existing result
+         *
+         * @param input value of the result field
+         */
         public abstract void decode(HexData input);
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public T apply(HexData hexData) {
+            this.decode(hexData);
+            return (T) this;
+        }
     }
 
-    static abstract class ValueResult extends Base {
+    static abstract class ValueResult<T extends Base<?>> extends Base<T> {
         private BigInteger value;
 
         @Override
@@ -40,7 +63,7 @@ public class ERC20Result {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof ValueResult)) return false;
-            ValueResult that = (ValueResult) o;
+            ValueResult<?> that = (ValueResult<?>) o;
             return Objects.equals(value, that.value);
         }
 
@@ -50,12 +73,24 @@ public class ERC20Result {
         }
     }
 
-    public static class BalanceOf extends ValueResult {
+    /**
+     * Result for call of <code>balanceOf</code> method of a contract.
+     * The value is the balance of originally specified address
+     */
+    public static class BalanceOf extends ValueResult<BalanceOf> {
     }
 
-    public static class TotalSupply extends ValueResult {
+    /**
+     * Result for call of <code>totalSupply</code> method of a contract
+     * The value is the total supply of the token
+     */
+    public static class TotalSupply extends ValueResult<TotalSupply> {
     }
 
-    public static class Allowance extends ValueResult {
+    /**
+     * Result for call of <code>allowance</code> method of a contract
+     * The value is the allowance for the specified spender address allowed by owner
+     */
+    public static class Allowance extends ValueResult<Allowance> {
     }
 }

@@ -9,6 +9,12 @@ import java.math.BigInteger;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * Main interface to make ERC-20 calls.
+ * <code>read*</code> methods are for reading from blockchain using <code>eth_call</code> and <code>execute*</code> for creating a new transaction.
+ * <br>
+ * See <a href="https://github.com/ethereum/eips/issues/20">ERC-20 Specification</a>
+ */
 public class ERC20Token {
 
     private static final Function<HexData, BigInteger> processor = (result) ->
