@@ -61,4 +61,31 @@ public class Hex32 extends HexData {
         }
         return new Hex32(HexData.from(value).getBytes());
     }
+
+    public static Hex32 extendFrom(HexData value) {
+        return extendFrom(value.getBytes());
+    }
+
+    public static Hex32 extendFrom(HexQuantity value) {
+        return extendFrom(value.asData());
+    }
+
+    public static Hex32 extendFrom(Long value) {
+        return extendFrom(HexQuantity.from(value));
+    }
+
+    public static Hex32 extendFrom(byte[] value) {
+        if (value.length > SIZE_BYTES) {
+            throw new IllegalArgumentException("Data is too long: " + value.length);
+        }
+        if (value.length == SIZE_BYTES) {
+            return new Hex32(value);
+        }
+        if (value.length == 0) {
+            return EMPTY;
+        }
+        byte[] base = new byte[SIZE_BYTES];
+        System.arraycopy(value, 0, base, base.length - value.length, value.length);
+        return new Hex32(base);
+    }
 }

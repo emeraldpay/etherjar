@@ -1,8 +1,10 @@
 package io.infinitape.etherjar.contract;
 
+import io.infinitape.etherjar.domain.Address;
 import io.infinitape.etherjar.domain.MethodId;
 import io.infinitape.etherjar.hex.Hex32;
 import io.infinitape.etherjar.hex.HexData;
+import io.infinitape.etherjar.hex.HexQuantity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +15,7 @@ import java.util.Objects;
  * Operates data field of a transaction with regard to Smart Contract calls. Allows to prepare data for a call, or parse call details
  * from an existing transaction.
  */
-public class ContractTransactionData {
+public class ContractData {
 
     private final MethodId method;
     private final Hex32[] arguments;
@@ -23,29 +25,29 @@ public class ContractTransactionData {
      *
      * @param method method id, non-null
      */
-    public ContractTransactionData(MethodId method) {
+    public ContractData(MethodId method) {
         this(method, new Hex32[0]);
     }
 
     /**
      * Prepare a call with arguments
      *
-     * @param method method id, non null
+     * @param method    method id, non null
      * @param arguments arguments, may be null or empty for no arguments
      */
-    public ContractTransactionData(MethodId method, List<Hex32> arguments) {
+    public ContractData(MethodId method, List<Hex32> arguments) {
         this(method, arguments == null ? null : arguments.toArray(new Hex32[0]));
     }
 
     /**
      * Prepare a call with arguments
      *
-     * @param method method id, non null
+     * @param method    method id, non null
      * @param arguments arguments, may be null or empty for no arguments
      */
-    public ContractTransactionData(MethodId method, Hex32[] arguments) {
+    public ContractData(MethodId method, Hex32[] arguments) {
         if (method == null) {
-            throw new IllegalArgumentException("MethodId must be not null");
+            throw new NullPointerException("MethodId must be not null");
         }
         this.method = method;
         if (arguments == null) {
@@ -53,7 +55,7 @@ public class ContractTransactionData {
         } else {
             for (Hex32 argument : arguments) {
                 if (argument == null) {
-                    throw new IllegalArgumentException("Argument values cannot be null");
+                    throw new NullPointerException("Argument values cannot be null");
                 }
             }
             this.arguments = arguments;
@@ -65,8 +67,8 @@ public class ContractTransactionData {
      *
      * @return new builder to prepare a call
      */
-    public static ContractTransactionData.Builder newBuilder() {
-        return new ContractTransactionData.Builder();
+    public static ContractData.Builder newBuilder() {
+        return new ContractData.Builder();
     }
 
     /**
@@ -76,7 +78,7 @@ public class ContractTransactionData {
      * @return call details, or null if input is null or empty
      * @throws IllegalArgumentException if input is invalid call
      */
-    public static ContractTransactionData extract(HexData input) {
+    public static ContractData extract(HexData input) {
         if (input == null || input.getSize() == 0) {
             return null;
         }
@@ -90,7 +92,7 @@ public class ContractTransactionData {
             HexData arg = rawArguments[i];
             arguments[i] = Hex32.from(arg);
         }
-        return new ContractTransactionData(method, arguments);
+        return new ContractData(method, arguments);
     }
 
     /**
@@ -124,8 +126,8 @@ public class ContractTransactionData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ContractTransactionData)) return false;
-        ContractTransactionData that = (ContractTransactionData) o;
+        if (!(o instanceof ContractData)) return false;
+        ContractData that = (ContractData) o;
         return method.equals(that.method) &&
             Arrays.equals(arguments, that.arguments);
     }
@@ -142,7 +144,7 @@ public class ContractTransactionData {
      */
     public static class Builder {
         private MethodId method;
-        private List<Hex32> arguments = new ArrayList<>();
+        private final List<Hex32> arguments = new ArrayList<>();
 
         /**
          * @param method method id
@@ -193,6 +195,18 @@ public class ContractTransactionData {
             return this;
         }
 
+        public Builder argument(Address value) {
+            return argument(Hex32.extendFrom(value));
+        }
+
+        public Builder argument(HexQuantity value) {
+            return argument(Hex32.extendFrom(value));
+        }
+
+        public Builder argument(Long value) {
+            return argument(Hex32.extendFrom(value));
+        }
+
         /**
          * Add argument to the call
          *
@@ -218,11 +232,11 @@ public class ContractTransactionData {
          *
          * @return call data
          */
-        public ContractTransactionData build() {
+        public ContractData build() {
             if (method == null) {
-                throw new IllegalStateException("MethodId is not set");
+                throw new NullPointerException("MethodId is not set");
             }
-            return new ContractTransactionData(method, arguments);
+            return new ContractData(method, arguments);
         }
     }
 }

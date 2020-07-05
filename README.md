@@ -47,11 +47,21 @@ Structure of dependencies between modules:
 * `etherjar-tx`
   * `etherjar-rlp`
   * `etherjar-domain`
+* `etherjar-contract`
+  * `etherjar-abi`
+  * `etherjar-domain`
+  * `etherjar-rpc-api` 
+* `etherjar-erc20`  
+  * `etherjar-abi`
+  * `etherjar-domain`
+  * `etherjar-contract`
 
 where
 
 * `etherjar-abi` - Smart contract [Application Binary Interface (ABI)](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI)
+* `etherjar-contract` - Methods to organize contract call  
 * `etherjar-domain` - Core module contains pure domain logic (`Address`, `Block`, `Transaction`, `Wei` and so on)
+* `etherjar-erc20` - Classes to simplify use of ERC-20 tokens 
 * `etherjar-hex` - Hexadecimal encoding and encoding utils for `String`, `BigInteger`, byte arrays
 * `etherjar-rlp` - Reading and writing RLP (Recursive Length Prefix) encoded data 
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic implementation

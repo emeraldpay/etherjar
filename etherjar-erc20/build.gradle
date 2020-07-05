@@ -1,5 +1,5 @@
 dependencies {
     implementation project(':etherjar-abi')
     implementation project(':etherjar-domain')
-    implementation project(':etherjar-rpc-api')
+    implementation project(':etherjar-contract')
 }

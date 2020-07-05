@@ -1,25 +1,24 @@
 package io.infinitape.etherjar.contract
 
 import io.infinitape.etherjar.domain.MethodId
-import io.infinitape.etherjar.domain.Wei
 import io.infinitape.etherjar.hex.Hex32
 import io.infinitape.etherjar.hex.HexData
 import nl.jqno.equalsverifier.EqualsVerifier
 import nl.jqno.equalsverifier.Warning
 import spock.lang.Specification
 
-class ContractTransactionDataSpec extends Specification {
+class ContractDataSpec extends Specification {
 
     def "Extract null from empty"() {
         when:
-        def act = ContractTransactionData.extract(HexData.EMPTY)
+        def act = ContractData.extract(HexData.EMPTY)
         then:
         act == null
     }
 
     def "Extract method only"() {
         when:
-        def act = ContractTransactionData.extract(HexData.from("0x311b2da3"))
+        def act = ContractData.extract(HexData.from("0x311b2da3"))
         then:
         act != null
         act.method == MethodId.from("0x311b2da3")
@@ -29,7 +28,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Extract call with single argument"() {
         when:
-        def act = ContractTransactionData.extract(HexData.from("0x9979ef450000000000000000000000000000000000000000000000000000000000008f5c"))
+        def act = ContractData.extract(HexData.from("0x9979ef450000000000000000000000000000000000000000000000000000000000008f5c"))
         then:
         act != null
         act.method == MethodId.from("0x9979ef45")
@@ -40,7 +39,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Extract ERC20 transfer"() {
         when:
-        def act = ContractTransactionData.extract(HexData.from("0xa9059cbb000000000000000000000000c7dc5c95728d9ca387239af0a49b7bce8927d3090000000000000000000000000000000000000000000000000000005700ad9290"))
+        def act = ContractData.extract(HexData.from("0xa9059cbb000000000000000000000000c7dc5c95728d9ca387239af0a49b7bce8927d3090000000000000000000000000000000000000000000000000000005700ad9290"))
         then:
         act != null
         act.method == MethodId.from("0xa9059cbb")
@@ -52,7 +51,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Extract ERC20 transfer with short address"() {
         when:
-        def act = ContractTransactionData.extract(HexData.from("0xa9059cbb000000000000000000000000002ee48421ea53f4550e7d5a91d78e794b9a4a750000000000000000000000000000000000000000000000238fd42c5cf0400000"))
+        def act = ContractData.extract(HexData.from("0xa9059cbb000000000000000000000000002ee48421ea53f4550e7d5a91d78e794b9a4a750000000000000000000000000000000000000000000000238fd42c5cf0400000"))
         then:
         act != null
         act.method == MethodId.from("0xa9059cbb")
@@ -64,7 +63,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Extract ERC20 transferFrom"() {
         when:
-        def act = ContractTransactionData.extract(HexData.from("0x23b872dd000000000000000000000000fc2a1e3f1ed2009fd9b9af790c788dea424d14e3000000000000000000000000f191a02f92209e87731811cc651b8f1c1126594200000000000000000000000000000000000000000000000000000000000342c3"))
+        def act = ContractData.extract(HexData.from("0x23b872dd000000000000000000000000fc2a1e3f1ed2009fd9b9af790c788dea424d14e3000000000000000000000000f191a02f92209e87731811cc651b8f1c1126594200000000000000000000000000000000000000000000000000000000000342c3"))
         then:
         act != null
         act.method == MethodId.from("0x23b872dd")
@@ -77,7 +76,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Fail on invalid call"() {
         when:
-        ContractTransactionData.extract(HexData.from("0x3101037800197ab705ac13"))
+        ContractData.extract(HexData.from("0x3101037800197ab705ac13"))
         then:
         def err = thrown(IllegalArgumentException)
         err.message.startsWith("Invalid size")
@@ -85,7 +84,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "toData produces same result as input"() {
         expect:
-        ContractTransactionData.extract(HexData.from(hex)).toData().toHex() == hex
+        ContractData.extract(HexData.from(hex)).toData().toHex() == hex
         where:
         hex << [
             "0x311b2da3",
@@ -97,7 +96,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Create through constructor"() {
         when:
-        def act = new ContractTransactionData(
+        def act = new ContractData(
             MethodId.from("0x23b872dd"),
             [
                 Hex32.from("0x000000000000000000000000fc2a1e3f1ed2009fd9b9af790c788dea424d14e3"),
@@ -114,7 +113,7 @@ class ContractTransactionDataSpec extends Specification {
         act.arguments[2] == Hex32.from("0x00000000000000000000000000000000000000000000000000000000000342c3")
 
         when:
-        act = new ContractTransactionData(
+        act = new ContractData(
             MethodId.from("0x23b872dd"),
             [
                 Hex32.from("0x000000000000000000000000fc2a1e3f1ed2009fd9b9af790c788dea424d14e3"),
@@ -131,7 +130,7 @@ class ContractTransactionDataSpec extends Specification {
         act.arguments[2] == Hex32.from("0x00000000000000000000000000000000000000000000000000000000000342c3")
 
         when:
-        act = new ContractTransactionData(
+        act = new ContractData(
             MethodId.from("0x23b872dd")
         )
         then:
@@ -142,12 +141,12 @@ class ContractTransactionDataSpec extends Specification {
 
     def "Create with Builder"() {
         when:
-        def act = ContractTransactionData.newBuilder()
-                .method("0x23b872dd")
-                .argument("0x000000000000000000000000fc2a1e3f1ed2009fd9b9af790c788dea424d14e3")
-                .argument("0x000000000000000000000000f191a02f92209e87731811cc651b8f1c11265942")
-                .argument("0x00000000000000000000000000000000000000000000000000000000000342c3")
-                .build()
+        def act = ContractData.newBuilder()
+            .method("0x23b872dd")
+            .argument("0x000000000000000000000000fc2a1e3f1ed2009fd9b9af790c788dea424d14e3")
+            .argument("0x000000000000000000000000f191a02f92209e87731811cc651b8f1c11265942")
+            .argument("0x00000000000000000000000000000000000000000000000000000000000342c3")
+            .build()
         then:
         act.method == MethodId.from("0x23b872dd")
         act.arguments != null
@@ -157,7 +156,7 @@ class ContractTransactionDataSpec extends Specification {
         act.arguments[2] == Hex32.from("0x00000000000000000000000000000000000000000000000000000000000342c3")
 
         when:
-        act = ContractTransactionData.newBuilder()
+        act = ContractData.newBuilder()
             .method("0x23b872dd")
             .build()
         then:
@@ -166,7 +165,7 @@ class ContractTransactionDataSpec extends Specification {
         act.arguments.length == 0
 
         when:
-        act = ContractTransactionData.newBuilder()
+        act = ContractData.newBuilder()
             .method("transfer", "address", "uint256")
             .build()
         then:
@@ -177,7 +176,7 @@ class ContractTransactionDataSpec extends Specification {
 
     def "should meet equals and hashCode contract"() {
         expect:
-        EqualsVerifier.forClass(ContractTransactionData.class)
+        EqualsVerifier.forClass(ContractData.class)
             .suppress(Warning.STRICT_INHERITANCE)
             .withNonnullFields("method", "arguments")
             .verify()
