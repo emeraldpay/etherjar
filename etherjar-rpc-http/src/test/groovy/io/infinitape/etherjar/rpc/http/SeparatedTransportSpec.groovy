@@ -40,6 +40,7 @@ class SeparatedTransportSpec extends Specification {
 
     def setup() {
         Spark.port(++port)
+        Spark.awaitInitialization()
     }
 
     def cleanup() {
