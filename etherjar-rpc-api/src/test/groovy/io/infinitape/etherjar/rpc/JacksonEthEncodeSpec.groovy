@@ -16,6 +16,7 @@
 package io.infinitape.etherjar.rpc
 
 import com.fasterxml.jackson.core.PrettyPrinter
+import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import io.infinitape.etherjar.domain.Address
 import io.infinitape.etherjar.domain.BlockHash
@@ -35,6 +36,7 @@ class JacksonEthEncodeSpec extends Specification {
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z")
+    DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter().withObjectIndenter(new DefaultIndenter("  ", "\n"))
 
     def setup() {
         sdf.setTimeZone(TimeZone.getTimeZone('UTC'))
@@ -59,7 +61,7 @@ class JacksonEthEncodeSpec extends Specification {
         block.setTotalDifficulty(new BigInteger('07ff800000', 16))
         block.setTransactionsRoot(HexData.from('0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'))
         when:
-        def act = jacksonRpcConverter.getObjectMapper().writer().with(new DefaultPrettyPrinter()).writeValueAsString(block)
+        def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(block)
         then:
         act == '{\n'+
                 '  "number" : "0x1",\n' +
@@ -110,7 +112,7 @@ class JacksonEthEncodeSpec extends Specification {
         ])
 
         when:
-        def act = jacksonRpcConverter.getObjectMapper().writer().with(new DefaultPrettyPrinter()).writeValueAsString(block)
+        def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(block)
         then:
         act == '{\n' +
                 '  "number" : "0x1f47d0",\n' +
@@ -171,7 +173,7 @@ class JacksonEthEncodeSpec extends Specification {
         block.setTransactionsRoot(HexData.from("0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba"))
 
         when:
-        def act = jacksonRpcConverter.getObjectMapper().writer().with(new DefaultPrettyPrinter()).writeValueAsString(block)
+        def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(block)
         then:
         act == '{\n' +
                 '  "number" : "0x1f47d0",\n' +
@@ -222,7 +224,7 @@ class JacksonEthEncodeSpec extends Specification {
         tx.value = Wei.ZERO
 
         when:
-        def act = jacksonRpcConverter.getObjectMapper().writer().with(new DefaultPrettyPrinter()).writeValueAsString(tx)
+        def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(tx)
         then:
         act == '{\n' +
                 '  "hash" : "0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31",\n' +
@@ -252,7 +254,7 @@ class JacksonEthEncodeSpec extends Specification {
         tx.value = Wei.ZERO
 
         when:
-        def act = jacksonRpcConverter.getObjectMapper().writer().with(new DefaultPrettyPrinter()).writeValueAsString(tx)
+        def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(tx)
         then:
         act == '{\n' +
                 '  "hash" : "0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31",\n' +
@@ -282,7 +284,7 @@ class JacksonEthEncodeSpec extends Specification {
         tx.value = Wei.ZERO
 
         when:
-        def act = jacksonRpcConverter.getObjectMapper().writer().with(new DefaultPrettyPrinter()).writeValueAsString(tx)
+        def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(tx)
         then:
         act == '{\n' +
                 '  "hash" : "0x1e694eba2778d34855fa1e01e0765acb31ce75a9abe8667882ffc2c12f4372bc",\n' +
