@@ -36,10 +36,10 @@ class SeparatedTransportSpec extends Specification {
     RpcConverter rpcConverter = new JacksonRpcConverter()
 
     // port may be held open a couple of seconds after stopping the test, need new port each time to avoid collision
-    static int port = 18545 + new Random().nextInt(100)
+    static int port = 18545
 
     def setup() {
-        Spark.port(port)
+        Spark.port(++port)
     }
 
     def cleanup() {
