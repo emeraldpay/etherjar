@@ -23,6 +23,6 @@ dependencies {
     implementation "io.projectreactor:reactor-core:3.2.12.RELEASE"
     implementation "io.projectreactor.netty:reactor-netty:0.8.11.RELEASE"
 
-    testCompile "com.sparkjava:spark-core:2.8.0"
+    testCompile "com.sparkjava:spark-core:2.9.1"
     testCompile "io.projectreactor:reactor-test:3.2.12.RELEASE"
 }
