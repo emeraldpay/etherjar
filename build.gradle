@@ -12,6 +12,10 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
 
+// gradle aggregateJavadoc
+apply plugin: 'nebula-aggregate-javadocs'
+apply plugin: 'jacoco'
+
 allprojects {
     group = 'io.infinitape'
     version = "0.10.0-SNAPSHOT"
@@ -84,26 +88,11 @@ subprojects {
         }
     }
 
-    test.finalizedBy jacocoTestReport
-
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives sourcesJar
-        archives javadocJar
-    }
-
     jacoco {
         toolVersion = "0.8.5"
     }
+
+    test.finalizedBy jacocoTestReport
 
     // Show the list of failed tests and output only for them, helpful for CI
     ext.failedTests = []
@@ -137,6 +126,21 @@ subprojects {
             }
             println ""
         }
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
     }
 
     publishing {

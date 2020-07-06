@@ -41,7 +41,7 @@ jobs:
     # Make sure it works with all standard JVMs on main OSes
     platform-test:
         name: Java ${{ matrix.java }} on ${{ matrix.os }}
-        continue-on-error: ${{ matrix.java != '11' }}
+        continue-on-error: ${{ matrix.java != '8' && matrix.java != '11' }}
         strategy:
             matrix:
                 java: ["8", "11", "12", "13", "14"]
