@@ -1,0 +1,61 @@
+name: Tests
+
+on:
+    # if pushed directly to the master
+    push:
+        branches:
+            - master
+    # on a pull request
+    pull_request:
+        branches:
+            - master
+
+jobs:
+    # Run unit tests and submit Coverage Report
+    unit-test:
+        name: Standard Unit Test
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v2
+
+            -   name: Set up JDK
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 11
+
+            -   name: Check
+                uses: eskatos/gradle-command-action@v1
+                with:
+                    arguments: check
+
+            -   name: Build Coverage Report
+                uses: eskatos/gradle-command-action@v1
+                with:
+                    arguments: coverageReport
+
+            -   name: Upload Coverage Report
+                uses: codecov/codecov-action@v1
+                with:
+                    file: ./build/reports/jacoco/coverageReport/coverageReport.xml
+
+    # Make sure it works with all standard JVMs on main OSes
+    platform-test:
+        name: Java ${{ matrix.java }} on ${{ matrix.os }}
+        continue-on-error: ${{ matrix.java != '11' }}
+        strategy:
+            matrix:
+                java: ["8", "11", "12", "13", "14"]
+                os: ["windows-latest", "macos-latest", "ubuntu-latest"]
+        runs-on: ${{ matrix.os }}
+        steps:
+            -   uses: actions/checkout@v2
+
+            -   name: Set up JDK
+                uses: actions/setup-java@v1
+                with:
+                    java-version: ${{ matrix.java }}
+
+            -   name: Check
+                uses: eskatos/gradle-command-action@v1
+                with:
+                    arguments: check

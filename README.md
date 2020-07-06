@@ -1,13 +1,13 @@
 # EtherJar
 
 [![Bintray](https://img.shields.io/bintray/v/infinitape/etherjar/etherjar-domain.svg)](https://bintray.com/infinitape/etherjar)
-[![Build Status](https://travis-ci.org/Infinitape/etherjar.svg?branch=master)](https://travis-ci.org/Infinitape/etherjar)
-[![codecov](https://codecov.io/gh/Infinitape/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/Infinitape/etherjar)
-[![license](https://img.shields.io/github/license/infinitape/etherjar.svg?maxAge=2592000)](https://github.com/infinitape/etherjar/blob/master/LICENSE)
+![Build Status](https://github.com/emeraldpay/etherjar/workflows/Tests/badge.svg)
+[![codecov](https://codecov.io/gh/emeraldpay/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/emeraldpay/etherjar)
+[![license](https://img.shields.io/github/license/emeraldpay/etherjar.svg?maxAge=2592000)](https://github.com/emeraldpay/etherjar/blob/master/LICENSE)
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.9.0
+- Latest Stable Version: 0.9.1
 - Latest Snapshot Version: 0.10.0-SNAPSHOT
 
 ## Architecture

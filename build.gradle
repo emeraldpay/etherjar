@@ -31,9 +31,9 @@ def pomConfig = {
     }
 
     scm {
-        connection "scm:git:git://github.com/infinitape/etherjar.git"
-        developerConnection "scm:git:git://github.com/infinitape/etherjar.git"
-        url "https://github.com/infinitape/etherjar"
+        connection "scm:git:git://github.com/emeraldpay/etherjar.git"
+        developerConnection "scm:git:git://github.com/emeraldpay/etherjar.git"
+        url "https://github.com/emeraldpay/etherjar"
     }
 }
 
@@ -133,8 +133,8 @@ subprojects {
             userOrg = 'infinitape'
             name = project.name
             licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/infinitape/etherjar.git'
-            labels = ['ethereum', 'ethereum-classic', 'blockchain', 'smart-contracts', 'java-8']
+            vcsUrl = 'https://github.com/emeraldpay/etherjar.git'
+            labels = ['ethereum', 'blockchain', 'smart-contracts', 'java-8']
             publicDownloadNumbers = true
 
             version {
@@ -165,4 +165,11 @@ bintray {
             name = 'none'
         }
     }
+}
+
+task syncJars(type: Sync) {
+    allprojects { p ->
+        from p.tasks.withType(Jar)
+    }
+    into "${buildDir}/libs/"
 }
