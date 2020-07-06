@@ -35,8 +35,11 @@ class SeparatedTransportSpec extends Specification {
 
     RpcConverter rpcConverter = new JacksonRpcConverter()
 
+    // port may be held open a couple of seconds after stopping the test, need new port each time to avoid collision
+    static int port = 18545 + new Random().nextInt(100)
+
     def setup() {
-        Spark.port(18545)
+        Spark.port(port)
     }
 
     def cleanup() {
@@ -55,7 +58,7 @@ class SeparatedTransportSpec extends Specification {
             return '{"jsonrpc":"2.0","id":1,"result": "0x68"}'
         }
 
-        def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:18545"), rpcConverter)
+        def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:${port}".toString()), rpcConverter)
 
         def batch = new ReactorBatch();
         def call = Commands.net().peerCount()
@@ -89,7 +92,7 @@ class SeparatedTransportSpec extends Specification {
             return '{"jsonrpc":"2.0","id":1}'
         }
 
-        def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:18545"), rpcConverter)
+        def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:${port}".toString()), rpcConverter)
 
         def batch = new ReactorBatch();
         def call = Commands.net().peerCount()
@@ -109,7 +112,7 @@ class SeparatedTransportSpec extends Specification {
 
     def "Return RpcException on no connection"() {
         setup:
-        def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:18546"), rpcConverter)
+        def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:18000"), rpcConverter)
 
         def batch = new ReactorBatch();
         def call = Commands.net().peerCount()
