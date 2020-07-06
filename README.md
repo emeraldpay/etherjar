@@ -7,8 +7,8 @@
 
 Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.9.1
-- Latest Snapshot Version: 0.10.0-SNAPSHOT
+- Latest Stable Version: 0.10.0
+- Latest Snapshot Version: 0.11.0-SNAPSHOT
 
 ## Architecture
 
