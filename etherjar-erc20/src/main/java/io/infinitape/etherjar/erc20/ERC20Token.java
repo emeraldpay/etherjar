@@ -26,6 +26,10 @@ public class ERC20Token {
         this.contract = contract;
     }
 
+    public Address getContract() {
+        return contract;
+    }
+
     public ContractReadCall<BigInteger> readTotalSupply() {
         ERC20Call.TotalSupply call = new ERC20Call.TotalSupply();
         return new ContractReadCall<>(contract, call.encode(), processor);
