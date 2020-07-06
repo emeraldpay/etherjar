@@ -40,7 +40,6 @@ class SeparatedTransportSpec extends Specification {
 
     def setup() {
         Spark.port(++port)
-        Spark.awaitInitialization()
     }
 
     def cleanup() {
@@ -58,6 +57,7 @@ class SeparatedTransportSpec extends Specification {
             resp.type("application/json")
             return '{"jsonrpc":"2.0","id":1,"result": "0x68"}'
         }
+        Spark.awaitInitialization()
 
         def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:${port}".toString()), rpcConverter)
 
@@ -92,6 +92,7 @@ class SeparatedTransportSpec extends Specification {
             resp.type("application/json")
             return '{"jsonrpc":"2.0","id":1}'
         }
+        Spark.awaitInitialization()
 
         def transport = new SeparatedTransport(HttpClient.create(), Mono.just("http://localhost:${port}".toString()), rpcConverter)
 
