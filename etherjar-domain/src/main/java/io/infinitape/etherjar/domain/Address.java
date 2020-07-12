@@ -75,7 +75,7 @@ public class Address extends HexData {
             throw new IllegalArgumentException("Null input value");
         }
         if (value.length() != SIZE_HEX) {
-            throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_BYTES);
+            throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_HEX);
         }
         return new Address(HexData.from(value).getBytes());
     }
