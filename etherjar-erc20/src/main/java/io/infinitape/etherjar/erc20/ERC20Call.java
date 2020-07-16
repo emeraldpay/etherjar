@@ -12,13 +12,22 @@ import java.util.Objects;
 
 public class ERC20Call {
 
-    public Base decode(HexData input) {
+    public static Base decode(HexData input) {
         MethodId methodId = MethodId.fromInput(input);
-        Base parsed = null;
-        if (methodId == ERC20Method.BALANCE_OF.getMethodId()) {
+        Base parsed;
+        if (methodId.equals(ERC20Method.ALLOWANCE.getMethodId())) {
+            parsed = new Allowance();
+        } else if (methodId.equals(ERC20Method.APPROVE.getMethodId())) {
+            parsed = new Approve();
+        } else if (methodId.equals(ERC20Method.BALANCE_OF.getMethodId())) {
             parsed = new BalanceOf();
-        }
-        if (parsed == null) {
+        } else if (methodId.equals(ERC20Method.TOTAL_SUPPLY.getMethodId())) {
+            parsed = new TotalSupply();
+        } else if (methodId.equals(ERC20Method.TRANSFER.getMethodId())) {
+            parsed = new Transfer();
+        } else if (methodId.equals(ERC20Method.TRANSFER_FROM.getMethodId())) {
+            parsed = new TransferFrom();
+        } else {
             throw new IllegalStateException("Unsupported method: " + methodId);
         }
         parsed.decode(input);
@@ -50,7 +59,7 @@ public class ERC20Call {
                 throw new IllegalArgumentException("Empty or short methodId");
             }
             MethodId methodId = MethodId.fromInput(input);
-            if (methodId != getMethod().getMethodId()) {
+            if (!methodId.equals(getMethod().getMethodId())) {
                 throw new IllegalArgumentException("Invalid method id: " + methodId + " != " + getMethod().getMethodId());
             }
         }
