@@ -16,11 +16,13 @@
 package io.infinitape.etherjar.rpc.ws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.infinitape.etherjar.rpc.RpcResponseException;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +48,8 @@ public class SocketApiHandler extends SimpleChannelInboundHandler<Object> {
     private Channel channel;
     private List<Subscription> subscriptions = new ArrayList<>();
     private JacksonWsConverter rpcConverter = new JacksonWsConverter();
+
+    private List<String> buffer = new ArrayList<>();
 
     public ChannelFuture handshakeFuture() {
         return handshakeFuture;
@@ -75,52 +79,79 @@ public class SocketApiHandler extends SimpleChannelInboundHandler<Object> {
         }
 
         final WebSocketFrame frame = (WebSocketFrame) msg;
-        if (frame instanceof TextWebSocketFrame) {
-            final TextWebSocketFrame textFrame = (TextWebSocketFrame) frame;
-            SubscriptionJson json = rpcConverter.readSubscription(textFrame.text());
-            if (json.getSubscription() != null) {
-                boolean consumed = false;
-                String id = json.getSubscription();
-                for (int i = 0; i < subscriptions.size() && !consumed; i++) {
-                    Subscription s = subscriptions.get(i);
-                    if (id.equals(s.getId())) {
-                        consumed = true;
-                        s.onReceive(json);
-                    }
-                }
-                if (!consumed) {
-                    System.err.println("Unknown subscription:" + id);
-                }
-            } else if (json.getId() != null) {
-                subscribeLock.lock();
-                try {
-                    Subscription s = initializing.remove(json.getId());
-                    if (s != null) {
-                        s.setId(json.getStringResult());
-                        if (json.getError() != null) {
-                            subscriptions.remove(s);
-                            s.onClose(json.extractError());
-                        }
-                    } else {
-                        System.err.println("Cannot find subscriber " + json.getId());
-                    }
-                } finally {
-                    subscribeLock.unlock();
-                }
+        if (frame instanceof TextWebSocketFrame || frame instanceof ContinuationWebSocketFrame) {
+            String textFrameContent = frame.content().toString(CharsetUtil.UTF_8);
+            if (frame.isFinalFragment()) {
+                String fullMessage = extractBuffer(textFrameContent);
+                processMessage(fullMessage);
+            } else {
+                buffer.add(textFrameContent);
             }
         } else if (frame instanceof CloseWebSocketFrame) {
             ch.close();
+        } else {
+            System.err.println("Invalid frame: " + frame.getClass());
         }
+    }
 
+    protected String extractBuffer(String last) {
+        String fullMessage;
+        if (buffer.isEmpty()) {
+            fullMessage = last;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (String s : buffer) {
+                sb.append(s);
+            }
+            buffer = new ArrayList<>();
+            sb.append(last);
+            fullMessage = sb.toString();
+        }
+        return fullMessage;
+    }
+
+    public void processMessage(String message) throws RpcResponseException {
+        SubscriptionJson json = rpcConverter.readSubscription(message);
+        if (json.getSubscription() != null) {
+            boolean consumed = false;
+            String id = json.getSubscription();
+            for (int i = 0; i < subscriptions.size() && !consumed; i++) {
+                Subscription s = subscriptions.get(i);
+                if (id.equals(s.getId())) {
+                    consumed = true;
+                    s.onReceive(json);
+                }
+            }
+            if (!consumed) {
+                System.err.println("Unknown subscription:" + id);
+            }
+        } else if (json.getId() != null) {
+            subscribeLock.lock();
+            try {
+                Subscription s = initializing.remove(json.getId());
+                if (s != null) {
+                    s.setId(json.getStringResult());
+                    if (json.getError() != null) {
+                        subscriptions.remove(s);
+                        s.onClose(json.extractError());
+                    }
+                } else {
+                    System.err.println("Cannot find subscriber " + json.getId());
+                }
+            } finally {
+                subscribeLock.unlock();
+            }
+        }
     }
 
     public void stop() {
         subscribeLock.lock();
         try {
-            for (Subscription s: subscriptions) {
+            for (Subscription s : subscriptions) {
                 try {
                     s.stop(rpcConverter.getObjectMapper(), sequence.getAndIncrement());
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                }
             }
         } finally {
             subscribeLock.unlock();
