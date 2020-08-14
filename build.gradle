@@ -18,7 +18,7 @@ apply plugin: 'jacoco'
 
 allprojects {
     group = 'io.infinitape'
-    version = "0.10.0"
+    version = "0.10.1"
 
     repositories {
         mavenLocal()
