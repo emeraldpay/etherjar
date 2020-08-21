@@ -147,13 +147,15 @@ class ReactorHttpRpcClientSpec extends Specification {
                 return '{}'
             }
         }
-        Spark.exception(Exception.class, { t, req, resp -> t.printStackTrace()})
+        Spark.exception(Exception.class, { t, req, resp -> t.printStackTrace() })
         Spark.awaitInitialization()
 
         def client = ReactorHttpRpcClient.newBuilder()
             .connectTo("http://localhost:18545")
             .alwaysSeparate()
             .build()
+
+        def expecting = [68, Address.from("0x0000000000000000000000000000000000000000")]
 
         when:
         ReactorBatch batch = new ReactorBatch()
@@ -163,14 +165,19 @@ class ReactorHttpRpcClientSpec extends Specification {
 
         then:
         StepVerifier.create(resp)
+        // response can come in different order, so just check for uniqueness
             .expectNextMatches({
-                println("Received value: $it.value ")
-                return it.value == 68 && it.error == null
-            }).as("receive value for peers")
+                println("Received value 1: $it.value ${it.value.class}")
+                return expecting.indexOf(it.value) >= 0 &&
+                    expecting.remove(expecting.indexOf(it.value)) &&
+                    it.error == null
+            }).as("receive value 1")
             .expectNextMatches({
-                println("Received value: $it.value ${it.value.class}")
-                return it.value == Address.from("0x0000000000000000000000000000000000000000") && it.error == null
-            }).as("receive value for coinbase")
+                println("Received value 2: $it.value ${it.value.class}")
+                return expecting.indexOf(it.value) >= 0 &&
+                    expecting.remove(expecting.indexOf(it.value)) &&
+                    it.error == null
+            }).as("receive value 2")
             .expectComplete()
             .verify(Duration.ofSeconds(5))
 
