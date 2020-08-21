@@ -44,14 +44,14 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
     private final Channel channel;
     private final ReactorBlockchainGrpc.ReactorBlockchainStub stub;
 
-    private ObjectMapper objectMapper;
-    private RpcConverter rpcConverter;
-    private Common.ChainRef chainRef;
+    private final ObjectMapper objectMapper;
+    private final JacksonRpcConverter rpcConverter;
+    private final Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
     ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
-    public ReactorEmeraldClient(Channel channel, ObjectMapper objectMapper, RpcConverter rpcConverter, Common.ChainRef chainRef) {
+    public ReactorEmeraldClient(Channel channel, ObjectMapper objectMapper, JacksonRpcConverter rpcConverter, Common.ChainRef chainRef) {
         this.channel = channel;
         this.stub = ReactorBlockchainGrpc.newReactorStub(channel);
         this.objectMapper = objectMapper;
@@ -179,7 +179,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             result.setError(new RpcResponseError(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Unknown id returned from upstream"));
         } else {
             try {
-                JS value = rpcConverter.fromJson(item.getPayload().newInput(), call.getJsonType());
+                JS value = rpcConverter.fromJsonResult(item.getPayload().newInput(), call.getJsonType());
                 result.setResult(value);
             } catch (RpcException e) {
                 return Mono.error(e);
@@ -208,7 +208,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
         private Channel channel;
 
         private ObjectMapper objectMapper;
-        private RpcConverter rpcConverter;
+        private JacksonRpcConverter rpcConverter;
 
         private Chain chain;
 
@@ -339,11 +339,10 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
         }
 
         /**
-         *
          * @param rpcConverter custom RpcConverter
          * @return builder
          */
-        public Builder rpcConverter(RpcConverter rpcConverter) {
+        public Builder rpcConverter(JacksonRpcConverter rpcConverter) {
             this.rpcConverter = rpcConverter;
             return this;
         }

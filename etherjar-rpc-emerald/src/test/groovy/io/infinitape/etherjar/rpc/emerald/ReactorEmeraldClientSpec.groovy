@@ -46,11 +46,7 @@ class ReactorEmeraldClientSpec extends Specification {
                     BlockchainOuterClass.NativeCallReplyItem.newBuilder()
                         .setId(1)
                         .setSucceed(true)
-                        .setPayload(ByteString.copyFromUtf8('{\n' +
-                            '    "jsonrpc": "2.0",\n' +
-                            '    "result": "0xab5461ca4b100000",\n' +
-                            '    "id": 1\n' +
-                            '  }'))
+                        .setPayload(ByteString.copyFromUtf8('"0xab5461ca4b100000"'))
                         .build()
                 )
                 responseObserver.onCompleted()
@@ -73,9 +69,9 @@ class ReactorEmeraldClientSpec extends Specification {
         actRequest == BlockchainOuterClass.NativeCallRequest.newBuilder()
             .addItems(
                 BlockchainOuterClass.NativeCallItem.newBuilder()
-                .setId(1)
-                .setMethod("eth_getBalance")
-                .setPayload(ByteString.copyFromUtf8('["0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983","latest"]'))
+                    .setId(1)
+                    .setMethod("eth_getBalance")
+                    .setPayload(ByteString.copyFromUtf8('["0x1a9ce518a4a2d7a908f22547ef5e3aa29946f983","latest"]'))
             )
             .build()
     }
@@ -120,11 +116,7 @@ class ReactorEmeraldClientSpec extends Specification {
                     BlockchainOuterClass.NativeCallReplyItem.newBuilder()
                         .setId(1)
                         .setSucceed(true)
-                        .setPayload(ByteString.copyFromUtf8('{\n' +
-                            '    "jsonrpc": "2.0",\n' +
-                            '    "result": "0xab5461ca4b100000",\n' +
-                            '    "id": 1\n' +
-                            '  }'))
+                        .setPayload(ByteString.copyFromUtf8('"0xab5461ca4b100000"'))
                         .build()
                 )
                 responseObserver.onCompleted()
@@ -170,11 +162,7 @@ class ReactorEmeraldClientSpec extends Specification {
                     BlockchainOuterClass.NativeCallReplyItem.newBuilder()
                         .setId(1)
                         .setSucceed(true)
-                        .setPayload(ByteString.copyFromUtf8('{\n' +
-                            '    "jsonrpc": "2.0",\n' +
-                            '    "result": "0xab5461ca4b100000",\n' +
-                            '    "id": 1\n' +
-                            '  }'))
+                        .setPayload(ByteString.copyFromUtf8('"0xab5461ca4b100000"'))
                         .build()
                 )
                 responseObserver.onCompleted()
