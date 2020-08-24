@@ -48,6 +48,17 @@ class ResponseJsonSerializerSpec extends Specification {
         act == '{"jsonrpc":"2.0","id":"19591","result":"foo"}'
     }
 
+    def "Serialize when id is long"() {
+        setup:
+        def val = new ResponseJson()
+        val.id = 1057264140543346L
+        val.result = "foo"
+        when:
+        def act = objectMapper.toJson(val)
+        then:
+        act == '{"jsonrpc":"2.0","id":1057264140543346,"result":"foo"}'
+    }
+
     def "Serialize when id/result are number"() {
         setup:
         def val = new ResponseJson()
