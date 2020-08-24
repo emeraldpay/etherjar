@@ -30,8 +30,12 @@ public class RequestJson<T> {
     private T id;
 
     public RequestJson(String method, List params, T id) {
-        if (!(Integer.class.isAssignableFrom(id.getClass()) || String.class.isAssignableFrom(id.getClass()))) {
-            throw new IllegalArgumentException("ID must be String or Integer");
+        if (!(
+            Integer.class.isAssignableFrom(id.getClass())
+                || Long.class.isAssignableFrom(id.getClass())
+                || String.class.isAssignableFrom(id.getClass())
+        )) {
+            throw new IllegalArgumentException("ID must be String or Integer/Long");
         }
         this.method = method;
         this.params = params;

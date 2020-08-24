@@ -32,6 +32,14 @@ class RequestJsonSpec extends Specification {
         req.id != "101"
     }
 
+    def "Request can have long id"() {
+        when:
+        def req = new RequestJson("eth_none", [], 1057264140543346L)
+        then:
+        req.id == 1057264140543346
+        req.id != "101"
+    }
+
     def "Request can have string id"() {
         when:
         def req = new RequestJson("eth_none", [], "1a5f")

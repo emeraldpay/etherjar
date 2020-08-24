@@ -40,8 +40,12 @@ public class ResponseJson<DATA, ID> {
     }
 
     public void setId(ID id) {
-        if (!(Integer.class.isAssignableFrom(id.getClass()) || String.class.isAssignableFrom(id.getClass()))) {
-            throw new IllegalArgumentException("ID must be String or Integer");
+        if (!(
+            Integer.class.isAssignableFrom(id.getClass())
+                || Long.class.isAssignableFrom(id.getClass())
+                || String.class.isAssignableFrom(id.getClass())
+        )) {
+            throw new IllegalArgumentException("ID must be String or Integer/Long");
         }
         this.id = id;
     }
