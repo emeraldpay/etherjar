@@ -17,7 +17,7 @@ apply plugin: 'nebula-aggregate-javadocs'
 apply plugin: 'jacoco'
 
 allprojects {
-    group = 'io.infinitape'
+    group = 'io.emeraldpay.etherjar'
     version = "0.11.0-SNAPSHOT"
 
     repositories {
@@ -178,7 +178,7 @@ subprojects {
 
         pkg {
             repo = 'etherjar'
-            userOrg = 'infinitape'
+            userOrg = 'emerald'
             name = project.name
             licenses = ['Apache-2.0']
             vcsUrl = 'https://github.com/emeraldpay/etherjar.git'

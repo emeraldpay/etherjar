@@ -1,11 +1,11 @@
 # EtherJar
 
-[![Bintray](https://img.shields.io/bintray/v/infinitape/etherjar/etherjar-domain.svg)](https://bintray.com/infinitape/etherjar)
+[![Bintray](https://img.shields.io/bintray/v/emerald/etherjar/etherjar-domain.svg)](https://bintray.com/emerald/etherjar)
 ![Build Status](https://github.com/emeraldpay/etherjar/workflows/Tests/badge.svg)
 [![codecov](https://codecov.io/gh/emeraldpay/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/emeraldpay/etherjar)
 [![license](https://img.shields.io/github/license/emeraldpay/etherjar.svg?maxAge=2592000)](https://github.com/emeraldpay/etherjar/blob/master/LICENSE)
 
-Framework agnostic modular Java 8+ integration library for [Ethereum blockchains](https://www.ethereum.org)
+Framework agnostic modular Java 11+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
 - Latest Stable Version: 0.10.0
 - Latest Snapshot Version: 0.11.0-SNAPSHOT
@@ -79,12 +79,12 @@ where
 <repositories>
     <repository>
       <id>etherjar</id>
-      <url>https://dl.bintray.com/infinitape/etherjar</url>
+      <url>https://dl.bintray.com/emerald/etherjar</url>
     </repository>
 </repositories>
 
 <dependency>
-  <groupId>io.infinitape</groupId>
+  <groupId>io.emeraldpay.etherjar</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
   <version>0.9.0</version>
 </dependency>
@@ -95,12 +95,12 @@ where
 ```groovy
 repositories {
     maven {
-        url  "https://dl.bintray.com/infinitape/etherjar" 
+        url  "https://dl.bintray.com/emerald/etherjar" 
     }
 }
 
 dependencies {
-    compile 'io.infinitape:etherjar-rpc-http:0.9.0'
+    compile 'io.emerald.etherjar:etherjar-rpc-http:0.9.0'
 }
 ```
 
@@ -146,8 +146,17 @@ public class GetGasPrice {
 
 ## Bugs and Feedback
 
-For bugs, questions and discussions please use the [GitHub Issues](https://github.com/Infinitape/etherjar/issues).
+For bugs, questions and discussions please use the [GitHub Issues](https://github.com/emeraldpay/etherjar/issues).
 
 ## Licence
 
-[Apache 2.0](LICENSE)
+Copyright 2020 EmeraldPay, Inc
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+See the License for the specific language governing permissions and limitations under the License.
+

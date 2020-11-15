@@ -1,11 +1,11 @@
 package examples;
 
-import io.infinitape.etherjar.domain.Wei;
-import io.infinitape.etherjar.rpc.Commands;
-import io.infinitape.etherjar.rpc.DefaultRpcClient;
-import io.infinitape.etherjar.rpc.RpcClient;
-import io.infinitape.etherjar.rpc.transport.DefaultRpcTransport;
-import io.infinitape.etherjar.rpc.transport.RpcTransport;
+import io.emeraldpay.etherjar.domain.Wei;
+import io.emeraldpay.etherjar.rpc.Commands;
+import io.emeraldpay.etherjar.rpc.DefaultRpcClient;
+import io.emeraldpay.etherjar.rpc.RpcClient;
+import io.emeraldpay.etherjar.rpc.transport.DefaultRpcTransport;
+import io.emeraldpay.etherjar.rpc.transport.RpcTransport;
 
 import java.io.IOException;
 import java.net.URI;
