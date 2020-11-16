@@ -17,25 +17,35 @@ package io.emeraldpay.etherjar.tx;
 
 import io.emeraldpay.etherjar.domain.Address;
 import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.signers.ECDSASigner;
+import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.bouncycastle.jce.interfaces.ECKey;
 import org.bouncycastle.math.ec.ECAlgorithms;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.math.ec.FixedPointCombMultiplier;
 import org.bouncycastle.math.ec.custom.sec.SecP256K1Curve;
 
 import java.math.BigInteger;
+import java.security.KeyPair;
+import java.util.Arrays;
 
 /**
  * Signature of a message (i.e. of a transaction)
  */
 public class Signature {
 
-    private static final ECDomainParameters ecParams;
+    public static final ECDomainParameters ecParams;
+    public static final SecP256K1Curve curve;
     static {
         X9ECParameters params = CustomNamedCurves.getByName("secp256k1");
         ecParams = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
+        curve = (SecP256K1Curve)ecParams.getCurve();
     }
 
     private byte[] message;
@@ -60,6 +70,39 @@ public class Signature {
         this.v = v;
         this.r = r;
         this.s = s;
+    }
+
+    public static Signature create(byte[] hash, PrivateKey key, Integer chainId) {
+        ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+        signer.init(true, key.getECKey());
+        BigInteger[] signature = signer.generateSignature(hash);
+        if (signature.length != 2) {
+            throw new IllegalStateException("Invalid signature components: " + signature.length);
+        }
+        BigInteger r = signature[0];
+        BigInteger s = signature[1];
+
+        byte[] publicKey = key.getPublicKey();
+
+        if (chainId != null) {
+            int y = -1;
+            byte[] pub0 = ecrecover(0, hash, r, s);
+            if (Arrays.equals(publicKey, pub0)) {
+                y = 0;
+            }
+            if (y == -1) {
+                byte[] pub1 = ecrecover(1, hash, r, s);
+                if (Arrays.equals(publicKey, pub1)) {
+                    y = 1;
+                }
+            }
+            if (y == -1) {
+                throw new IllegalStateException("Cannot find correct y");
+            }
+
+            return new SignatureEip155(chainId, hash, Eip155.toV(y, chainId), r, s);
+        }
+        return new Signature(hash, 27, r, s);
     }
 
     public byte[] getMessage() {
@@ -126,11 +169,13 @@ public class Signature {
      *
      * @return public key derived from current v,R,S and message
      */
+    public byte[] ecrecover() {
+        return ecrecover(getRecId(), message, r, s);
+    }
+
     // implementation is based on BitcoinJ ECKey code
     // see https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/ECKey.java
-    public byte[] ecrecover() {
-        int recId = getRecId();
-        SecP256K1Curve curve = (SecP256K1Curve)ecParams.getCurve();
+    protected static byte[] ecrecover(int recId, byte[] message, BigInteger r, BigInteger s) {
         BigInteger n = ecParams.getN();
 
         // Let x = r + jn
@@ -185,7 +230,6 @@ public class Signature {
      * @return Uncompressed public key
      */
     private static ECPoint decompressKey(BigInteger xBN, boolean yBit) {
-        SecP256K1Curve curve = (SecP256K1Curve)ecParams.getCurve();
         ECFieldElement x = curve.fromBigInteger(xBN);
         ECFieldElement alpha = x.multiply(x.square().add(curve.getA())).add(curve.getB());
         ECFieldElement beta = alpha.sqrt();

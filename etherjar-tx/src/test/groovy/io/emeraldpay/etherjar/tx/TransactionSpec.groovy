@@ -23,11 +23,12 @@ import spock.lang.Specification
 class TransactionSpec extends Specification {
 
     def "read transaction 0x19442f"() {
+        // id: 0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31
         setup:
         def tx = Hex.decodeHex("f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b")
         when:
         def act = Transaction.fromRlp(tx)
-        act.signature.message = act.hash(false)
+        act.signature.message = act.hash()
 
         then:
         act.nonce == 15524
@@ -36,6 +37,8 @@ class TransactionSpec extends Specification {
         act.to.toHex() == "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac"
         act.value.toHex() == "0x0"
         act.data.toHex() == "0x667a2f58"
+        act.signature instanceof Signature
+        !(act.signature instanceof SignatureEip155)
         act.signature != null
         act.signature.v == 28
         act.signature.r.toString(16) == "d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64"
@@ -50,20 +53,20 @@ class TransactionSpec extends Specification {
                 Hex.decodeHex("f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b")
         )
         when:
-        def hash = tx.hash(false)
+        def hash = tx.hash()
         then:
         Hex.encodeHexString(hash) == "383caae49692ae021fb2189933518ca58fd04d88e99b41a4d18f5ae5fb5f52aa"
     }
 
-    def "Signed hash"() {
+    def "Get transaction id"() {
         setup:
         def tx = Transaction.fromRlp(
                 Hex.decodeHex("f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b")
         )
         when:
-        def hash = tx.hash(true)
+        def txid = tx.transactionId()
         then:
-        Hex.encodeHexString(hash) == "19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31"
+        txid.toString() == "0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31"
     }
 
     def "Parse goerli 0x6d4d85"() {
@@ -72,7 +75,7 @@ class TransactionSpec extends Specification {
         def tx = Hex.decodeHex("f8cb82afdc843b9aca008303d090947ef66b77759e12caf3ddb3e4aff524e577c59d8d80b864e9c6c1760000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000043c636a65ea4943acfacb227680b6ba20c477ba24ef87049a4a5b3958385e215bb08641ba01e8a3bacc31fc91ade73278d0267b70d38b53623ab0a28d1e20e133286f8a85ca02f2e0ac2c4e9e4410804fa62c9cba70e18eed8b93ec2a2ad5762279de8288b63")
         when:
         def act = Transaction.fromRlp(tx)
-        act.signature.message = act.hash(false)
+        act.signature.message = act.hash()
 
         then:
         act.nonce == 45020
@@ -92,7 +95,7 @@ class TransactionSpec extends Specification {
         def tx = Hex.decodeHex("f86c8227b2843b9aca008275309413ac1a2c6d1a4efc492a40d8f9d4e9f14b7c726887b1a2bc2ec50000001ca077313351aaa29a277e3cf015c354542e042b00c4757e1ac70fdbc9b1d0341c23a079c62b0c278676c590afd0f8bcfc4654b5babb99a5883baefc539acd55ee0365")
         when:
         def act = Transaction.fromRlp(tx)
-        act.signature.message = act.hash(false)
+        act.signature.message = act.hash()
 
         then:
         act.nonce == 10162
@@ -109,24 +112,62 @@ class TransactionSpec extends Specification {
         act.signature.recoverAddress().toHex() == "0x8ced5ad0d8da4ec211c17355ed3dbfec4cf0e5b9"
     }
 
-    def "Parse morden tx"() {
+    def "Encode EIP-155 official"() {
         setup:
-        def tx = Hex.decodeHex("f86d808501faa3b500825208945b30de96fdf94ac6c5b4a8c243f991c649d66fa188a688906bd8b0000080819fa008f248f8a0b9353c4261dc88bf879e9f76d72d92cf20b50a38af0074295868cba067c01e7c676df52cec7b4abe50b1467c83709c8d2e78f92529e0a41bf22557a0")
+        Transaction tx = new Transaction()
+        tx.tap {
+            nonce = 9
+            gasPrice = BigInteger.valueOf(20000000000)
+            gas = 0x5208 //21000
+            to = Address.from("0x3535353535353535353535353535353535353535")
+            value = Wei.ofEthers(1)
+        }
         when:
-        def act = Transaction.fromRlp(tx)
-        act.signature.message = act.hash(false)
-
+        def act = tx.toRlp(false, 1)
         then:
-        act.nonce == 0
-        act.gasPrice == 8500000000
-        act.gas == 21000
-        act.to.toHex() == "0x5b30de96fdf94ac6c5b4a8c243f991c649d66fa1"
-        act.value == Wei.ofEthers(12)
-        act.data.toHex() == "0x"
-        act.signature != null
-        act.signature instanceof SignatureEip155
-        act.signature.v == 159
+        Hex.encodeHexString(act) == "ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080"
+    }
 
-        act.signature.recoverAddress().toHex() == "0x7beba82e2f24ec647b916b9cbd928fb06cf0c71b"
+    def "Hash EIP-155 official"() {
+        setup:
+        Transaction tx = new Transaction()
+        tx.tap {
+            nonce = 9
+            gasPrice = BigInteger.valueOf(20000000000)
+            gas = 0x5208 //21000
+            to = Address.from("0x3535353535353535353535353535353535353535")
+            value = Wei.ofEthers(1)
+        }
+        when:
+        def act = tx.hash(1)
+        then:
+        Hex.encodeHexString(act) == "daf5a779ae972f972197303d7b574746c7ef83eadac0f2791ad23db92e4c8e53"
+    }
+
+    def "Encode basic"() {
+        setup:
+        Transaction tx = new Transaction()
+        tx.tap {
+            nonce = 1
+            gasPrice = BigInteger.valueOf(0x4e3b29200)
+            gas = 0x5208 //21000
+            to = Address.from("0x3eaf0b987b49c4d782ee134fdc1243fd0ccdfdd3")
+            value = new Wei(0xDE0B6B3A764000)
+        }
+        def exp = "" +
+            "eb" + //total size = 1 +6 +3 +21 +8 +1 +1 +1 +1 + 0xc0
+            "01" + //nonce
+            "85" + "04e3b29200" + //gasprice
+            "82" + "5208" + //gas
+            "94" + "3eaf0b987b49c4d782ee134fdc1243fd0ccdfdd3" + // to
+            "87" + "de0b6b3a764000" + //value
+            "80" + //data
+            "25" + //chain id
+            "80" + //r
+            "80" //s
+        when:
+        def act = tx.toRlp(false, 0x25)
+        then:
+        Hex.encodeHexString(act) == exp
     }
 }

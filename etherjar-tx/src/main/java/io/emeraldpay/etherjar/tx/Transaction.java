@@ -16,6 +16,7 @@
 package io.emeraldpay.etherjar.tx;
 
 import io.emeraldpay.etherjar.domain.Address;
+import io.emeraldpay.etherjar.domain.TransactionId;
 import io.emeraldpay.etherjar.domain.Wei;
 import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.rlp.RlpReader;
@@ -101,7 +102,7 @@ public class Transaction {
                 if (v == 27 || v == 28) {
                     signature = new Signature();
                 } else {
-                    int chainId = SignatureEip155.extractChainId(v);
+                    int chainId = Eip155.toChainId(v);
                     signature = new SignatureEip155(chainId);
                 }
                 signature.setV(v);
@@ -129,6 +130,44 @@ public class Transaction {
         }
 
         return tx;
+    }
+
+    public byte[] toRlp(boolean signed) {
+        Integer chainId = null;
+        if (signature != null && signature instanceof SignatureEip155) {
+            chainId = ((SignatureEip155)signature).getChainId();
+        }
+        return toRlp(signed, chainId);
+    }
+
+    public byte[] toRlp(boolean signed, Integer chainId) {
+        RlpWriter wrt = new RlpWriter();
+        wrt.startList()
+            .write(getNonce())
+            .write(getGasPrice())
+            .write(getGas())
+            .write(getTo().getBytes())
+            .write(getValue().getAmount());
+
+        HexData data = getData();
+        if (data == null) {
+            wrt.write(new byte[0]);
+        } else {
+            wrt.write(data.getBytes());
+        }
+
+        if (signed) {
+            wrt.write(signature.getV())
+                .write(signature.getR())
+                .write(signature.getS());
+        } else if (chainId != null) {
+            // if EIP-155 include chain id and empty r,s
+            wrt.write(chainId.byteValue())
+                .write(0)
+                .write(0);
+        }
+        wrt.closeList();
+        return wrt.toByteArray();
     }
 
     public long getNonce() {
@@ -198,11 +237,13 @@ public class Transaction {
      * @throws IllegalStateException if transaction is not signed
      * @see Signature#recoverAddress()
      */
-    public Address getFrom() {
+    public Address extractFrom() {
         if (!isSigned()) {
             throw new IllegalStateException("Transaction is not signed");
         }
-        signature.setMessage(hash(false));
+        if (signature.getMessage() == null) {
+            signature.setMessage(hash());
+        }
         return signature.recoverAddress();
     }
 
@@ -210,34 +251,30 @@ public class Transaction {
      * Hash of transaction. Usually used before signing it, at this case call it with signed=false and use resulting
      * hash as a message for the Signature. Signed hash is used as an identifier of the transaction.
      *
-     * @param signed if true then include signature
      * @return hash of the transaction
      * @see io.emeraldpay.etherjar.domain.TransactionId
      */
-    public byte[] hash(boolean signed) {
-        RlpWriter wrt = new RlpWriter();
-        wrt.startList()
-                .write(getNonce())
-                .write(getGasPrice())
-                .write(getGas())
-                .write(getTo().getBytes())
-                .write(getValue().getAmount())
-                .write(getData().getBytes());
-        if (signed) {
-            wrt.write(signature.getV())
-                    .write(signature.getR())
-                    .write(signature.getS());
-        } else if (signature instanceof SignatureEip155) {
-            wrt.write(((SignatureEip155) signature).getChainId())
-                    .write(0)
-                    .write(0);
-        }
-        wrt.closeList();
-        byte[] rlp = wrt.toByteArray();
+    public byte[] hash() {
+        return hash(signature != null && signature instanceof SignatureEip155 ? 1 : null);
+    }
+
+    public byte[] hash(Integer chainId) {
+        byte[] rlp = this.toRlp(false, chainId);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
         return keccak.digest();
+    }
+
+    public TransactionId transactionId() {
+        if (signature == null) {
+            throw new IllegalStateException("Transaction is not signed");
+        }
+        byte[] rlp = this.toRlp(true);
+
+        Keccak.Digest256 keccak = new Keccak.Digest256();
+        keccak.update(rlp);
+        return TransactionId.from(keccak.digest());
     }
 
 }

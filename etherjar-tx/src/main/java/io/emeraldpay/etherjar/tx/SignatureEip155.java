@@ -51,13 +51,6 @@ public class SignatureEip155 extends Signature {
     }
 
     public static int extractChainId(int v) {
-        if (v == 27 || v == 28) {
-            return 1;
-        }
-        int x = 35;
-        if (((v - 36) & 1) == 0) {
-            x = 36;
-        }
-        return (v - x) / 2;
+        return Eip155.toChainId(v);
     }
 }
