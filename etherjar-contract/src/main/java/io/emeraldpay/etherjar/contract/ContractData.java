@@ -218,6 +218,25 @@ public class ContractData {
         }
 
         /**
+         * Add argument which type is array of elements
+         *
+         * @param array value
+         * @return builder
+         */
+        public Builder argumentArray(Hex32[] array) {
+            argument(Hex32.extendFrom((arguments.size() + 1) * 32L));
+            argument(Hex32.extendFrom(Integer.toUnsignedLong(array.length)));
+            for (Hex32 item: array) {
+                argument(item);
+            }
+            return this;
+        }
+
+        public Builder argumentArray(List<Hex32> array) {
+            return argumentArray(array.toArray(new Hex32[0]));
+        }
+
+        /**
          * Add argument to the call
          *
          * @param value argument value, must be 32 bytes value
