@@ -145,15 +145,23 @@ public class Transaction {
         wrt.startList()
             .write(getNonce())
             .write(getGasPrice())
-            .write(getGas())
-            .write(getTo().getBytes())
-            .write(getValue().getAmount());
+            .write(getGas());
+        if (getTo() != null) {
+            wrt.write(getTo().getBytes());
+        } else {
+            wrt.write(new byte[0]);
+        }
+        if (getValue() != null) {
+            wrt.write(getValue().getAmount());
+        } else {
+            wrt.write(new byte[0]);
+        }
 
         HexData data = getData();
-        if (data == null) {
-            wrt.write(new byte[0]);
-        } else {
+        if (data != null) {
             wrt.write(data.getBytes());
+        } else {
+            wrt.write(new byte[0]);
         }
 
         if (signed) {
