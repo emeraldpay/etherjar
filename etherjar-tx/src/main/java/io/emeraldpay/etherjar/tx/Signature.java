@@ -20,19 +20,15 @@ import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.crypto.params.ECDomainParameters;
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
-import org.bouncycastle.jce.interfaces.ECKey;
 import org.bouncycastle.math.ec.ECAlgorithms;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.math.ec.FixedPointCombMultiplier;
 import org.bouncycastle.math.ec.custom.sec.SecP256K1Curve;
 
 import java.math.BigInteger;
-import java.security.KeyPair;
 import java.util.Arrays;
 
 /**
@@ -40,12 +36,15 @@ import java.util.Arrays;
  */
 public class Signature {
 
-    public static final ECDomainParameters ecParams;
-    public static final SecP256K1Curve curve;
+    public static final ECDomainParameters CURVE_PARAMS;
+    public static final SecP256K1Curve CURVE;
+    private static final BigInteger CURVE_ORDER;
+
     static {
         X9ECParameters params = CustomNamedCurves.getByName("secp256k1");
-        ecParams = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
-        curve = (SecP256K1Curve)ecParams.getCurve();
+        CURVE_PARAMS = new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
+        CURVE = (SecP256K1Curve) CURVE_PARAMS.getCurve();
+        CURVE_ORDER = CURVE_PARAMS.getN().shiftRight(1);
     }
 
     private byte[] message;
@@ -81,6 +80,9 @@ public class Signature {
         }
         BigInteger r = signature[0];
         BigInteger s = signature[1];
+        if (s.compareTo(CURVE_ORDER) > 0) {
+            s = CURVE_PARAMS.getN().subtract(s);
+        }
 
         byte[] publicKey = key.getPublicKey();
 
@@ -176,13 +178,13 @@ public class Signature {
     // implementation is based on BitcoinJ ECKey code
     // see https://github.com/bitcoinj/bitcoinj/blob/master/core/src/main/java/org/bitcoinj/core/ECKey.java
     protected static byte[] ecrecover(int recId, byte[] message, BigInteger r, BigInteger s) {
-        BigInteger n = ecParams.getN();
+        BigInteger n = CURVE_PARAMS.getN();
 
         // Let x = r + jn
         BigInteger i = BigInteger.valueOf((long)recId / 2);
         BigInteger x = r.add(i.multiply(n));
 
-        if (x.compareTo(curve.getQ()) >= 0) {
+        if (x.compareTo(CURVE.getQ()) >= 0) {
             // Cannot have point co-ordinates larger than this as everything takes place modulo Q.
             return null;
         }
@@ -213,7 +215,7 @@ public class Signature {
         BigInteger srInv = rInv.multiply(s).mod(n);
         BigInteger eInvrInv = rInv.multiply(eInv).mod(n);
 
-        ECPoint q = ECAlgorithms.sumOfTwoMultiplies(ecParams.getG(), eInvrInv, R, srInv);
+        ECPoint q = ECAlgorithms.sumOfTwoMultiplies(CURVE_PARAMS.getG(), eInvrInv, R, srInv);
 
         // For Ethereum we don't use first byte of the key
         byte[] full = q.getEncoded(false);
@@ -230,18 +232,18 @@ public class Signature {
      * @return Uncompressed public key
      */
     private static ECPoint decompressKey(BigInteger xBN, boolean yBit) {
-        ECFieldElement x = curve.fromBigInteger(xBN);
-        ECFieldElement alpha = x.multiply(x.square().add(curve.getA())).add(curve.getB());
+        ECFieldElement x = CURVE.fromBigInteger(xBN);
+        ECFieldElement alpha = x.multiply(x.square().add(CURVE.getA())).add(CURVE.getB());
         ECFieldElement beta = alpha.sqrt();
         if (beta == null)
             throw new IllegalArgumentException("Invalid point compression");
         ECPoint ecPoint;
         BigInteger nBeta = beta.toBigInteger();
         if (nBeta.testBit(0) == yBit) {
-            ecPoint = curve.createPoint(x.toBigInteger(), nBeta);
+            ecPoint = CURVE.createPoint(x.toBigInteger(), nBeta);
         } else {
-            ECFieldElement y = curve.fromBigInteger(curve.getQ().subtract(nBeta));
-            ecPoint = curve.createPoint(x.toBigInteger(), y.toBigInteger());
+            ECFieldElement y = CURVE.fromBigInteger(CURVE.getQ().subtract(nBeta));
+            ecPoint = CURVE.createPoint(x.toBigInteger(), y.toBigInteger());
         }
         return ecPoint;
     }

@@ -29,19 +29,18 @@ class SignerSpec extends Specification {
             "88" + // value
             "0de0b6b3a7640000" +
             "80" +
-            "26" + // v
+            "25" + // v
             "a0" +
             "3b74616467add207e580193b7142bdd8ea7698fac1a9758ae3a22811f7b9320f" +
             "a0" +
-            "90d0bd104ee13a3561832aa650bc35814d945401ceff0fb41c486d4e3896cfcf"
+            "6f2f42efb11ec5ca9e7cd559af43ca7d6d1a88e4e0499087a389f13e979f7172"
         when:
         def act = signer.sign(tx, pk, 1)
         then:
         act instanceof SignatureEip155
         act.r.toString(16) == "3b74616467add207e580193b7142bdd8ea7698fac1a9758ae3a22811f7b9320f"
-        act.s.toString(16) == "90d0bd104ee13a3561832aa650bc35814d945401ceff0fb41c486d4e3896cfcf"
-        act.v == 38
-        // or s=6f2f42efb11ec5ca9e7cd559af43ca7d6d1a88e4e0499087a389f13e979f7172 and v=37 ?
+        act.s.toString(16) == "6f2f42efb11ec5ca9e7cd559af43ca7d6d1a88e4e0499087a389f13e979f7172"
+        act.v == 37
 
         when:
         tx.signature = act

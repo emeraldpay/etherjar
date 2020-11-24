@@ -55,7 +55,7 @@ public class PrivateKey {
 
     public static byte[] getPublicKey(BigInteger pk) {
         FixedPointCombMultiplier mul = new FixedPointCombMultiplier();
-        ECPoint point = mul.multiply(Signature.ecParams.getG(), pk);
+        ECPoint point = mul.multiply(Signature.CURVE_PARAMS.getG(), pk);
         byte[] full = point.getEncoded(false);
         byte[] ethereum = new byte[full.length - 1];
         System.arraycopy(full, 1, ethereum, 0, ethereum.length);
@@ -65,7 +65,7 @@ public class PrivateKey {
     public ECPrivateKeyParameters getECKey() {
         return new ECPrivateKeyParameters(
             new BigInteger(1, raw),
-            Signature.ecParams
+            Signature.CURVE_PARAMS
         );
     }
 }
