@@ -32,7 +32,7 @@ class TransactionSpec extends Specification {
 
         then:
         act.nonce == 15524
-        act.gasPrice.toString(16) == "59b9b95f0"
+        act.gasPrice.toHex() == "0x59b9b95f0"
         act.gas == 0x03d090
         act.to.toHex() == "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac"
         act.value.toHex() == "0x0"
@@ -79,7 +79,7 @@ class TransactionSpec extends Specification {
 
         then:
         act.nonce == 45020
-        act.gasPrice == Wei.ofUnits(1, Wei.Unit.GWEI).amount
+        act.gasPrice == Wei.ofUnits(1, Wei.Unit.GWEI)
         act.gas == 250000
         act.to.toHex() == "0x7ef66b77759e12caf3ddb3e4aff524e577c59d8d"
         act.value.toHex() == "0x0"
@@ -99,7 +99,7 @@ class TransactionSpec extends Specification {
 
         then:
         act.nonce == 10162
-        act.gasPrice == Wei.ofUnits(1, Wei.Unit.GWEI).amount
+        act.gasPrice == Wei.ofUnits(1, Wei.Unit.GWEI)
         act.gas == 30000
         act.to.toHex() == "0x13ac1a2c6d1a4efc492a40d8f9d4e9f14b7c7268"
         act.value == Wei.ofEthers(0.05)

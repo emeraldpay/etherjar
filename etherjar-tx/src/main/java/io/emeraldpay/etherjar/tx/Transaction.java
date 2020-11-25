@@ -32,7 +32,7 @@ import java.math.BigInteger;
 public class Transaction {
 
     private long nonce;
-    private BigInteger gasPrice;
+    private Wei gasPrice;
     private long gas;
     private Address to;
     private Wei value;
@@ -144,7 +144,7 @@ public class Transaction {
         RlpWriter wrt = new RlpWriter();
         wrt.startList()
             .write(getNonce())
-            .write(getGasPrice())
+            .write(getGasPrice().getAmount())
             .write(getGas());
         if (getTo() != null) {
             wrt.write(getTo().getBytes());
@@ -186,11 +186,15 @@ public class Transaction {
         this.nonce = nonce;
     }
 
-    public BigInteger getGasPrice() {
+    public Wei getGasPrice() {
         return gasPrice;
     }
 
     public void setGasPrice(BigInteger gasPrice) {
+        setGasPrice(new Wei(gasPrice));
+    }
+
+    public void setGasPrice(Wei gasPrice) {
         this.gasPrice = gasPrice;
     }
 
