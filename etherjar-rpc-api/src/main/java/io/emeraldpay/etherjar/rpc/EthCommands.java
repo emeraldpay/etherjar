@@ -339,6 +339,17 @@ public class EthCommands {
     }
 
     /**
+     * Executes a new message call immediately without creating a transaction on the block chain.
+     *
+     * @param call the transaction call object
+     * @param block target block height
+     * @return return value of executed contract
+     */
+    public RpcCall<String, HexData> call(TransactionCallJson call, Long block) {
+        return RpcCall.create("eth_call", call, HexQuantity.from(block).toHex()).converted(HexData.class, HexData::from);
+    }
+
+    /**
      * Creates new message call transaction or a contract creation, if the data.data field contains code.
      *
      * @param data transaction object

@@ -364,6 +364,15 @@ class EthCommandsSpec extends Specification {
         call.params == [tx, 'latest']
         call.jsonType == String
         call.resultType == HexData
+
+        when:
+        call = Commands.eth().call(tx, 11_205_811)
+
+        then:
+        call.method == "eth_call"
+        call.params == [tx, '0xaafcb3']
+        call.jsonType == String
+        call.resultType == HexData
     }
 
     def sendTransaction() {
