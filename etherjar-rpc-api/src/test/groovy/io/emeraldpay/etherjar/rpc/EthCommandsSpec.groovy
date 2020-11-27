@@ -165,7 +165,7 @@ class EthCommandsSpec extends Specification {
 
         then:
         call.method == "eth_getTransactionCount"
-        call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911']
+        call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest']
         call.jsonType == String
         call.resultType == Long
 

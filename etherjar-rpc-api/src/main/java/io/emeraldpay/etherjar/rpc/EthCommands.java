@@ -176,7 +176,7 @@ public class EthCommands {
      * @return nonce value
      */
     public RpcCall<String, Long> getTransactionCount(Address address) {
-        return RpcCall.create("eth_getTransactionCount", address.toHex()).converted(Long.class, Conversion.asLong);
+        return getTransactionCount(address, BlockTag.LATEST);
     }
 
     /**
