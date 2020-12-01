@@ -265,8 +265,8 @@ public class ERC20Call {
             super(ERC20Method.BALANCE_OF);
         }
 
-        public BalanceOf(ERC20Method method, Address address) {
-            super(method);
+        public BalanceOf(Address address) {
+            this();
             this.address = address;
         }
 
