@@ -315,6 +315,47 @@ public class HexData implements Serializable {
         return new HexQuantity(new BigInteger(1, value));
     }
 
+    /**
+     * Try to extract an array of Hex32 packed into the value. The array is encoded with 32 bytes of offset
+     * value, 32 bytes of length and following items.
+     *
+     * @return array of values
+     * @throws IllegalArgumentException if invalid structure or length
+     */
+    public Hex32[] asEncodedArray() {
+        HexData[] parts = split(Hex32.SIZE_BYTES);
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Not an encoded array");
+        }
+        Hex32 _offset = Hex32.from(parts[0]);
+        int len = parts[1].asQuantity().getValue().intValue();
+        if (parts.length != 2 + len) {
+            throw new IllegalArgumentException("Invalid data length. " + parts.length + " != " + (2 + len));
+        }
+        Hex32[] result = new Hex32[len];
+        for (int i = 0; i < len; i++) {
+            result[i] = Hex32.from(parts[2 + i]);
+        }
+        return result;
+    }
+
+    /**
+     * Try to extract an array of <T> packed into the value. The array is encoded with 32 bytes of offset
+     * value, 32 bytes of length and following items.
+     *
+     * The conversion function must extract actual value (ex. an Address, or Number) from the Hex32 representation.
+     *
+     * @param converter conversion function to extract actual value
+     * @param <T> target type
+     * @return array of values
+     * @throws IllegalArgumentException if invalid structure or length
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T[] asEncodedArray(Function<Hex32, T> converter) {
+        Hex32[] values = asEncodedArray();
+        return (T[]) Arrays.stream(values).map(converter).toArray();
+    }
+
     public String toString() {
         return toHex();
     }

@@ -342,4 +342,30 @@ class HexDataSpec extends Specification {
         x.hashCode() == y.hashCode()
         y.hashCode() == z.hashCode()
     }
+
+    def "extract encoded array"() {
+        def data = "0x0000000000000000000000000000000000000000000000000000000000000020" +
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            "000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2" +
+            "0000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599"
+        when:
+        def act = HexData.from(data).asEncodedArray()
+        then:
+        act.length == 2
+        act[0].toHex() == "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+        act[1].toHex() == "0x0000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599"
+    }
+
+    def "extract encoded array of numbers"() {
+        def data = "0x0000000000000000000000000000000000000000000000000000000000000020" +
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            "000000000000000000000000000000000000000000000000000000003c756cc2" +
+            "00000000000000000000000000000000000000000000000000df7c193bc2c599"
+        when:
+        def act = HexData.from(data).asEncodedArray({it.asQuantity().value.longValue() })
+        then:
+        act.length == 2
+        act[0] == 0x3c756cc2
+        act[1] == 0xdf7c193bc2c599
+    }
 }
