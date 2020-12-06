@@ -22,7 +22,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.emeraldpay.etherjar.domain.BlockHash;
+import io.emeraldpay.etherjar.domain.Bloom;
 import io.emeraldpay.etherjar.domain.TransactionId;
+import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -77,6 +79,10 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         blockJson.setGasLimit(getLong(node, "gasLimit"));
         blockJson.setGasUsed(getLong(node, "gasUsed"));
         blockJson.setExtraData(getData(node, "extraData"));
+        HexData logsBloom = getData(node, "logsBloom");
+        if (logsBloom != null) {
+            blockJson.setLogsBloom(Bloom.from(logsBloom));
+        }
 
         List<BlockHash> uncles = new ArrayList<>();
         JsonNode unclesNode = node.get("uncles");

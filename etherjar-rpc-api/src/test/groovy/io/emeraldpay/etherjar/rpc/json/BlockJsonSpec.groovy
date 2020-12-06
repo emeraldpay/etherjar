@@ -96,4 +96,14 @@ class BlockJsonSpec extends Specification {
         copy.transactions == []
         orig == copy
     }
+
+    def "Reads logsBloom"() {
+        setup:
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-11388816.json")
+        JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
+        when:
+        def act = jacksonRpcConverter.fromJson(json, BlockJson)
+        then:
+        act.logsBloom.toHex() == "0x562568502e1a684125a8e28fc6e8dd81a11593a24c818b6eb159afe20082613b4cbd49456602d909fe2e5957029b87304e308817af4b9205c53122a2e07fa6024804ce70021487b86a71a7cae008f0f81698046882e18e4019c4c34ed9405af9739001448735b59b451c2271d444983f8512c411c68827c2c0a6103741b114c812bb2337c16e4a0585594442e06124bbc130d9074dc8375840d771f214d10f02924127c24400a122248b83ac4f51241ba6c2b525a4820a18dc0e323a372c412c014a808e4006148138a6903010988acc828306821c0b40b900fb211e01f1ec6d7cbcb434af400d28216820613b9180b93785a161a96675d036708a0266a3815a"
+    }
 }

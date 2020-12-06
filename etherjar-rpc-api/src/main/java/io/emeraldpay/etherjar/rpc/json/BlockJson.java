@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.BlockHash;
+import io.emeraldpay.etherjar.domain.Bloom;
 import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.Serializable;
@@ -59,7 +60,7 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
     /**
      * the bloom filter for the logs of the block. null when its pending block.
      */
-    private HexData logsBloom;
+    private Bloom logsBloom;
 
     /**
      * the root of the transaction trie of the block.
@@ -160,11 +161,11 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.sha3Uncles = sha3Uncles;
     }
 
-    public HexData getLogsBloom() {
+    public Bloom getLogsBloom() {
         return logsBloom;
     }
 
-    public void setLogsBloom(HexData logsBloom) {
+    public void setLogsBloom(Bloom logsBloom) {
         this.logsBloom = logsBloom;
     }
 

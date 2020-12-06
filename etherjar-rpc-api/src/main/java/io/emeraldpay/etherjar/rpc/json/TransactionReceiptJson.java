@@ -18,10 +18,7 @@
 package io.emeraldpay.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.emeraldpay.etherjar.domain.Address;
-import io.emeraldpay.etherjar.domain.BlockHash;
-import io.emeraldpay.etherjar.domain.TransactionId;
-import io.emeraldpay.etherjar.domain.TransactionRef;
+import io.emeraldpay.etherjar.domain.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -69,6 +66,8 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
      * Array of log objects, which this transaction generated.
      */
     private List<TransactionLogJson> logs;
+
+    private Bloom logsBloom;
 
     public TransactionId getTransactionHash() {
         return transactionHash;
@@ -134,6 +133,14 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
         this.logs = logs;
     }
 
+    public Bloom getLogsBloom() {
+        return logsBloom;
+    }
+
+    public void setLogsBloom(Bloom logsBloom) {
+        this.logsBloom = logsBloom;
+    }
+
     @Override
     public TransactionId getHash() {
         return transactionHash;
@@ -153,6 +160,7 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
         if (!Objects.equals(cumulativeGasUsed, that.cumulativeGasUsed)) return false;
         if (!Objects.equals(gasUsed, that.gasUsed)) return false;
         if (!Objects.equals(contractAddress, that.contractAddress)) return false;
+        if (!Objects.equals(logsBloom, that.logsBloom)) return false;
         return Objects.equals(logs, that.logs);
     }
 

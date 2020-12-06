@@ -340,7 +340,7 @@ public class HexData implements Serializable {
     }
 
     /**
-     * Try to extract an array of <T> packed into the value. The array is encoded with 32 bytes of offset
+     * Try to extract an array of &lt;T&gt; packed into the value. The array is encoded with 32 bytes of offset
      * value, 32 bytes of length and following items.
      *
      * The conversion function must extract actual value (ex. an Address, or Number) from the Hex32 representation.

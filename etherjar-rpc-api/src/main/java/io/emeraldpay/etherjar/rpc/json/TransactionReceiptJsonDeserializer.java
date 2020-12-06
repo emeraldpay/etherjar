@@ -21,6 +21,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.emeraldpay.etherjar.domain.Bloom;
+import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +45,10 @@ public class TransactionReceiptJsonDeserializer extends EtherJsonDeserializer<Tr
         receipt.setGasUsed(getLong(node, "gasUsed"));
         receipt.setTransactionHash(getTxHash(node, "transactionHash"));
         receipt.setTransactionIndex(getLong(node, "transactionIndex"));
+        HexData logsBloom = getData(node, "logsBloom");
+        if (logsBloom != null) {
+            receipt.setLogsBloom(Bloom.from(logsBloom));
+        }
 
         List<TransactionLogJson> logs = new ArrayList<>();
         if (node.hasNonNull("logs")) {

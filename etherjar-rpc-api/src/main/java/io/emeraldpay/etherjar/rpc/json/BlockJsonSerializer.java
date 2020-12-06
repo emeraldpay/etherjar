@@ -61,6 +61,7 @@ public class BlockJsonSerializer extends EtherJsonSerializer<BlockJson<?>>{
         writeField(gen, "stateRoot", value.getStateRoot());
         writeField(gen, "receiptsRoot", value.getReceiptsRoot());
         writeField(gen, "transactionsRoot", value.getTransactionsRoot());
+        writeField(gen, "logsBloom", value.getLogsBloom());
 
         gen.writeFieldName("uncles");
         gen.writeStartArray();
