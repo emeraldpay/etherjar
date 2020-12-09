@@ -34,6 +34,10 @@ import java.util.stream.Stream;
  */
 public class HexData implements Serializable {
 
+    /**
+     * Use {@link HexData#empty()}
+     */
+    @Deprecated
     public final static HexData EMPTY = new HexData(new byte[0]);
 
     private final static char[] HEX_DIGITS = "0123456789abcdef".toCharArray();
@@ -57,7 +61,7 @@ public class HexData implements Serializable {
      * @see #combine(HexData...)
      */
     public static HexData combine(Collection<? extends HexData> data) {
-        return EMPTY.concat(data);
+        return empty().concat(data);
     }
 
     public static HexData from(long value) {
@@ -79,7 +83,7 @@ public class HexData implements Serializable {
 
         value = value.substring(2);
 
-        if (value.length() <= 0) return EMPTY;
+        if (value.length() <= 0) return empty();
 
         byte[] bytes = new BigInteger(value, 16).toByteArray();
 
@@ -95,6 +99,17 @@ public class HexData implements Serializable {
         System.arraycopy(bytes, pos, buf, buf.length - bytes.length + pos, bytes.length - pos);
 
         return new HexData(buf);
+    }
+
+    public static HexData empty(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException("Size cannot be less than zero");
+        }
+        return new HexData(new byte[size]);
+    }
+
+    public static HexData empty() {
+        return empty(0);
     }
 
     protected final byte[] value;
@@ -203,7 +218,7 @@ public class HexData implements Serializable {
             throw new IllegalArgumentException("Insufficient size to extract");
 
         if (size == 0)
-            return conv.apply(EMPTY);
+            return conv.apply(empty());
 
         return conv.apply(
                 new HexData(Arrays.copyOfRange(value, offset, size + offset)));

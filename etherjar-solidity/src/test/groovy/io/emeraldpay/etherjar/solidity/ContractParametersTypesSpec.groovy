@@ -283,7 +283,7 @@ class ContractParametersTypesSpec extends Specification {
         def args = ContractParametersTypes.EMPTY.decode hex
 
         then:
-        hex == HexData.EMPTY
+        hex == HexData.empty()
         !args
     }
 
@@ -311,7 +311,7 @@ class ContractParametersTypesSpec extends Specification {
 
         where:
         _ | data
-        _ | HexData.EMPTY
+        _ | HexData.empty()
         _ | HexData.from('0x0123456789abcdef')
     }
 
@@ -404,7 +404,7 @@ class ContractParametersTypesSpec extends Specification {
         first   | second
         arr     | null
         arr     | arr.types[0..1] as ContractParametersTypes
-        arr     | HexData.EMPTY
+        arr     | HexData.empty()
     }
 
     def "should be converted to a string representation"() {

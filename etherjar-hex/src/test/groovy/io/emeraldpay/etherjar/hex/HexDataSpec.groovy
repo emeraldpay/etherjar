@@ -119,7 +119,7 @@ class HexDataSpec extends Specification {
 
     def "should detect a case with null concat"() {
         when:
-        HexData.EMPTY.concat(null as HexData[])
+        HexData.empty().concat(null as HexData[])
 
         then:
         thrown NullPointerException
@@ -127,7 +127,7 @@ class HexDataSpec extends Specification {
 
     def "should extract empty data"() {
         expect:
-        HexData.EMPTY.extract(0).is(HexData.EMPTY)
+        HexData.empty().extract(0) == HexData.empty()
     }
 
     def "should extract hex data"() {
@@ -174,8 +174,8 @@ class HexDataSpec extends Specification {
 
         where:
         hex                    | size | offset
-        HexData.EMPTY          | -1   | 0
-        HexData.EMPTY          | 0    | -1
+        HexData.empty()          | -1   | 0
+        HexData.empty()          | 0    | -1
         HexData.from('0x1234') | 3    | 0
         HexData.from('0x1234') | 1    | 2
     }
@@ -190,7 +190,7 @@ class HexDataSpec extends Specification {
 
     def "should split empty data"() {
         expect:
-        !HexData.EMPTY.split(8)
+        !HexData.empty().split(8)
     }
 
     def "should split hex data"() {
@@ -238,8 +238,8 @@ class HexDataSpec extends Specification {
 
         where:
         hex                                | size | offset
-        HexData.EMPTY                      | -1   | 0
-        HexData.EMPTY                      | 0    | -1
+        HexData.empty()                      | -1   | 0
+        HexData.empty()                      | 0    | -1
         HexData.from('0x1234')             | 2    | 1
         HexData.from('0x0123456789abcdef') | 3    | 0
         HexData.from('0x0123456789abcdef') | 4    | 2

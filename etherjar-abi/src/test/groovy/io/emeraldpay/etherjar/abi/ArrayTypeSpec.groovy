@@ -190,7 +190,7 @@ class ArrayTypeSpec extends Specification {
 
     def "should catch empty data to decode"() {
         when:
-        DEFAULT.decode(HexData.EMPTY)
+        DEFAULT.decode(HexData.empty())
 
         then:
         thrown IllegalArgumentException

@@ -59,4 +59,9 @@ public class TransactionId extends HexData {
         }
         return new TransactionId(HexData.from(value).getBytes());
     }
+
+    public static TransactionId empty() {
+        return new TransactionId(new byte[SIZE_BYTES]);
+    }
+
 }

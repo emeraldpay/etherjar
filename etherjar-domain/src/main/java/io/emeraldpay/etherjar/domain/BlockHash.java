@@ -47,4 +47,8 @@ public class BlockHash extends HexData {
         }
         return new BlockHash(HexData.from(value).getBytes());
     }
+
+    public static BlockHash empty() {
+        return new BlockHash(new byte[SIZE_BYTES]);
+    }
 }

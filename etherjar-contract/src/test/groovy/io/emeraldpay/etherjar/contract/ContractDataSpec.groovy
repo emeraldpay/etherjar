@@ -11,7 +11,7 @@ class ContractDataSpec extends Specification {
 
     def "Extract null from empty"() {
         when:
-        def act = ContractData.extract(HexData.EMPTY)
+        def act = ContractData.extract(HexData.empty())
         then:
         act == null
     }

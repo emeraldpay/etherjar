@@ -36,6 +36,11 @@ public class Address extends HexData {
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
     private static final byte[] EMPTY_12BYTES = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    /**
+     * Use {@link Address#empty()}
+     */
+    @Deprecated
     public static final Address EMPTY = Address.from("0x0000000000000000000000000000000000000000");
 
     private static final Pattern CASE_INSENSITIVE_PATTERN = Pattern.compile("0x(?i:[0-9a-f]{40})");
@@ -79,6 +84,10 @@ public class Address extends HexData {
             throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_HEX);
         }
         return new Address(HexData.from(value).getBytes());
+    }
+
+    public static Address empty() {
+        return new Address(new byte[SIZE_BYTES]);
     }
 
     /**

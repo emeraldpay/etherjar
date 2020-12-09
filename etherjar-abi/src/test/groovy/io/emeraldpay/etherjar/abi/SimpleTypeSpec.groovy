@@ -82,7 +82,7 @@ class SimpleTypeSpec extends Specification {
 
         where:
         _ | data
-        _ | HexData.EMPTY
+        _ | HexData.empty()
         _ | HexData.from('0x' + '12' * 48)
         _ | HexData.from('0x' + '00' * 64)
     }

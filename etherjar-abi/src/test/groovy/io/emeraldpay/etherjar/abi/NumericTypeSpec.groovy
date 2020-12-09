@@ -341,7 +341,7 @@ class NumericTypeSpec extends Specification {
         ] as NumericTypeImpl
 
         when:
-        obj.decodeSimple(Hex32.EMPTY)
+        obj.decodeSimple(Hex32.empty())
 
         then:
         thrown IllegalArgumentException

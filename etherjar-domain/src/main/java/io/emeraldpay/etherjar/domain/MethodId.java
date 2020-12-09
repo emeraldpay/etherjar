@@ -74,6 +74,10 @@ public class MethodId extends HexData {
         return new MethodId(HexData.from(value).getBytes());
     }
 
+    public static MethodId empty() {
+        return new MethodId(new byte[SIZE_BYTES]);
+    }
+
     public static MethodId fromInput(HexData input) {
         if (input == null) {
             return null;

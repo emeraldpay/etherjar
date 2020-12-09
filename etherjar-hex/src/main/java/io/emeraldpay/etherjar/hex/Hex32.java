@@ -25,6 +25,10 @@ public class Hex32 extends HexData {
     public static final int SIZE_BYTES = 32;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
+    /**
+     * Use {@link Hex32#empty()}
+     */
+    @Deprecated
     public static final Hex32 EMPTY =
             Hex32.from("0x0000000000000000000000000000000000000000000000000000000000000000");
 
@@ -63,6 +67,10 @@ public class Hex32 extends HexData {
         return new Hex32(HexData.from(value).getBytes());
     }
 
+    public static Hex32 empty() {
+        return new Hex32(new byte[SIZE_BYTES]);
+    }
+
     public static Hex32 extendFrom(HexData value) {
         return extendFrom(value.getBytes());
     }
@@ -83,7 +91,7 @@ public class Hex32 extends HexData {
             return new Hex32(value);
         }
         if (value.length == 0) {
-            return EMPTY;
+            return empty();
         }
         byte[] base = new byte[SIZE_BYTES];
         System.arraycopy(value, 0, base, base.length - value.length, value.length);

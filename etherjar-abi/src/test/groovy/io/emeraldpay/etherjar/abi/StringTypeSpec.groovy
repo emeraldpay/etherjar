@@ -110,15 +110,15 @@ class StringTypeSpec extends Specification {
         where:
         _ | hex
         _ | Type.encodeLength(4)
-        _ | Type.encodeLength(17).concat(Hex32.EMPTY, Hex32.EMPTY)
-        _ | Type.encodeLength(32).concat(Hex32.EMPTY, Hex32.EMPTY)
-        _ | Type.encodeLength(34).concat(Hex32.EMPTY)
-        _ | Type.encodeLength(0).concat(Hex32.EMPTY)
+        _ | Type.encodeLength(17).concat(Hex32.empty(), Hex32.empty())
+        _ | Type.encodeLength(32).concat(Hex32.empty(), Hex32.empty())
+        _ | Type.encodeLength(34).concat(Hex32.empty())
+        _ | Type.encodeLength(0).concat(Hex32.empty())
     }
 
     def "should catch empty data to decode"() {
         when:
-        StringType.DEFAULT.decode(HexData.EMPTY)
+        StringType.DEFAULT.decode(HexData.empty())
 
         then:
         thrown IllegalArgumentException

@@ -53,7 +53,7 @@ class BloomSpec extends Specification {
             "0000000000000000000000000000000000000000000000000000000000000000"
         when:
         def act = Bloom.newBuilder()
-            .add(Hex32.EMPTY)
+            .add(Hex32.empty())
             .build()
         then:
         act.toHex() == exp

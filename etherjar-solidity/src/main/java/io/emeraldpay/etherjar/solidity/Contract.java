@@ -31,7 +31,7 @@ public class Contract {
 
     public static class Builder {
 
-        private Address address = Address.EMPTY;
+        private Address address = Address.empty();
 
         private Collection<ContractMethod> methods = Collections.emptyList();
 

@@ -96,14 +96,14 @@ class DynamicBytesTypeSpec extends Specification {
         where:
         _ | hex
         _ | Type.encodeLength(1)
-        _ | Type.encodeLength(32).concat(Hex32.EMPTY, Hex32.EMPTY)
+        _ | Type.encodeLength(32).concat(Hex32.empty(), Hex32.empty())
         _ | Type.encodeLength(34).concat(Hex32.from('0x6461766500000000000000000000000000000000000000000000000000000000'))
-        _ | Type.encodeLength(0).concat(Hex32.EMPTY)
+        _ | Type.encodeLength(0).concat(Hex32.empty())
     }
 
     def "should catch empty data to decode"() {
         when:
-        DynamicBytesType.DEFAULT.decode(HexData.EMPTY)
+        DynamicBytesType.DEFAULT.decode(HexData.empty())
 
         then:
         thrown IllegalArgumentException
