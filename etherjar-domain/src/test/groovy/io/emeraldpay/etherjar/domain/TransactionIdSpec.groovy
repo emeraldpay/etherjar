@@ -57,6 +57,34 @@ class TransactionIdSpec extends Specification {
         TransactionId.from('0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
         then:
         thrown(IllegalArgumentException)
+    }
 
+    def "Equals"() {
+        when:
+        def act = TransactionId.from("0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236")
+            .equals(TransactionId.from("0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236"))
+        then:
+        act
+
+        when:
+        act = TransactionId.empty().equals(TransactionId.empty())
+        then:
+        act
+
+        when:
+        act = TransactionId.empty().equals(TransactionId.from("0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236"))
+        then:
+        !act
+
+        when:
+        act = TransactionId.from("0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236").equals(TransactionId.empty())
+        then:
+        !act
+
+        when:
+        act = TransactionId.from("0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236")
+            .equals(TransactionId.from("0x77c2a467384023874418ca1df4cd80ffe6512360f4f762709c13a6d5253c794f"))
+        then:
+        !act
     }
 }
