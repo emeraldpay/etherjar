@@ -284,4 +284,60 @@ class RlpReaderSpec extends Specification {
         rdr.consumed
     }
 
+    def "Read long 127"() {
+        setup:
+        def tx = Hex.decodeHex("7f")
+        when:
+        def rdr = new RlpReader(tx)
+        def act = rdr.nextLong()
+        then:
+        act == 127
+    }
+
+    def "Read long 128"() {
+        setup:
+        def tx = Hex.decodeHex("8180")
+        when:
+        def rdr = new RlpReader(tx)
+        def act = rdr.nextLong()
+        then:
+        act == 128
+    }
+
+    def "Read list of 55 bytes"() {
+        setup:
+        def tx = Hex.decodeHex("f701010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010203")
+        when:
+        def rdr = new RlpReader(tx)
+        rdr = rdr.nextList()
+        53.times {
+            rdr.next()
+        }
+        then:
+        rdr.hasNext()
+        Hex.encodeHexString(rdr.next()) == "02"
+        rdr.hasNext()
+        Hex.encodeHexString(rdr.next()) == "03"
+        !rdr.hasNext()
+    }
+
+    def "Read list of 56 bytes"() {
+        setup:
+        def tx = Hex.decodeHex("f8380101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010203")
+        when:
+        def rdr = new RlpReader(tx)
+        rdr = rdr.nextList()
+        53.times {
+            rdr.next()
+        }
+        then:
+        rdr.hasNext()
+        Hex.encodeHexString(rdr.next()) == "01"
+        rdr.hasNext()
+        Hex.encodeHexString(rdr.next()) == "02"
+        rdr.hasNext()
+        Hex.encodeHexString(rdr.next()) == "03"
+        !rdr.hasNext()
+    }
+
 }

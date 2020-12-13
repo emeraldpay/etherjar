@@ -141,7 +141,7 @@ public class RlpWriter {
                 if (value.length == 0) {
                     buffer.write(0x80);
                 } else if (value.length == 1) {
-                    if ((value[0] & 0xff) < 0x7f) {
+                    if ((value[0] & 0xff) <= 0x7f) {
                         // the data is a string if the range of the first byte(i.e. prefix) is [0x00, 0x7f], and the
                         // string is the first byte itself exactly;
                         buffer.write(value[0]);
@@ -166,7 +166,7 @@ public class RlpWriter {
                     buffer.write(value);
                 }
             } else if (type == RlpType.LIST) {
-                if (value.length < 0xf7 - 0xc0) {
+                if (value.length <= 0xf7 - 0xc0) {
                     // the data is a list if the range of the first byte is [0xc0, 0xf7], and the concatenation of the
                     // RLP encodings of all items of the list which the total payload is equal to the first byte minus
                     // 0xc0 follows the first byte;

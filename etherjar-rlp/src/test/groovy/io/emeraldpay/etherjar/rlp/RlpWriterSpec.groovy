@@ -193,4 +193,44 @@ class RlpWriterSpec extends Specification {
         then:
         Hex.encodeHexString(act) == "f86b823ca485059b9b95f08303d090948b3b3b624c3c0397d3da8fd861512393d51dcbac8084667a2f581ca0d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64a039837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b"
     }
+
+    def "Encode long 127"() {
+        when:
+        def wrt = new RlpWriter()
+        wrt.write(127)
+        def act = wrt.toByteArray()
+
+        then:
+        Hex.encodeHexString(act) == "7f"
+    }
+
+    def "Encode long 128"() {
+        when:
+        def wrt = new RlpWriter()
+        wrt.write(128)
+        def act = wrt.toByteArray()
+
+        then:
+        Hex.encodeHexString(act) == "8180"
+    }
+
+    def "Encode list of 55 bytes"() {
+        when:
+        def wrt = new RlpWriter()
+        wrt.write(Hex.decodeHex("01010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101"), RlpType.LIST)
+        def act = wrt.toByteArray()
+
+        then:
+        Hex.encodeHexString(act) == "f701010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101"
+    }
+
+    def "Encode list of 56 bytes"() {
+        when:
+        def wrt = new RlpWriter()
+        wrt.write(Hex.decodeHex("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010102"), RlpType.LIST)
+        def act = wrt.toByteArray()
+
+        then:
+        Hex.encodeHexString(act) == "f8380101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010102"
+    }
 }

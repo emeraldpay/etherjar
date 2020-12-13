@@ -47,6 +47,33 @@ class TransactionSpec extends Specification {
         act.signature.recoverAddress().toHex() == "0xed059bc543141c8c93031d545079b3da0233b27f"
     }
 
+    def "re-encode transaction 0x4cd4de"() {
+        // id: 0x4cd4deba8e414a0e60a41b4c0d8470853ebfb4f3d793f09d63b78de7437a220c
+
+        setup:
+        def tx = "f8cb82190785055ae8260082d2e2949ca222a6350c37c1b5014c5c59dc36892af3335880b864beabacc80000000000000000000000009ca222a6350c37c1b5014c5c59dc36892af333580000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000126a040f7779aa122cee043e26bce3c65ea8f8fcbc6eba8de5534e59227818e67d290a06b5a4e78a378231e4d95d681b106ea02daa967db5404683306ef51959ff938ab"
+        when:
+        def parsed = Transaction.fromRlp(Hex.decodeHex(tx))
+        parsed.signature.message = parsed.hash()
+        def act = parsed.toRlp(true)
+
+        then:
+        Hex.encodeHexString(act) == tx
+    }
+
+    def "encode transaction with nonce 127"() {
+        // id: 0xc49a95e7aafc11acf436bda1b545a3aa4e8370244d264ea85efffa20265801f5
+        setup:
+        def tx = "f901287f843b9aca0082eb80945e07b6f1b98a11f7e04e7ffa8707b63f1c17775380b8c471b773440000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000005db51c820000000000000000000000000000000000000000000000000000000000000041a71d8021704d529b7bd1552395702fbad11abbe13cb4c04ec60c5ad26139ada60395c36474526b0edd88a7edfb6bbc16baa8cc3c28419d2c4c44f3757aef68c8010000000000000000000000000000000000000000000000000000000000000026a0055a78daaf221cc6edfe378dfa9f7401346616b69126061982fed9533f13a019a0287773ddfb9b2c6fd08a8da52830d888dc009780cc1eecec85c64cdb51f9ec7a"
+        when:
+        def parsed = Transaction.fromRlp(Hex.decodeHex(tx))
+        parsed.signature.message = parsed.hash()
+        def act = parsed.toRlp(true)
+
+        then:
+        Hex.encodeHexString(act) == tx
+    }
+
     def "Unsigned hash"() {
         setup:
         def tx = Transaction.fromRlp(
