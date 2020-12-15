@@ -153,11 +153,7 @@ class EmeraldTransportSpec extends Specification {
                     BlockchainOuterClass.NativeCallReplyItem.newBuilder()
                         .setId(1)
                         .setSucceed(true)
-                        .setPayload(ByteString.copyFromUtf8('{\n' +
-                            '    "jsonrpc": "2.0",\n' +
-                            '    "result": "0xab5461ca4b100",\n' +
-                            '    "id": 1\n' +
-                            '  }'))
+                        .setPayload(ByteString.copyFromUtf8('"0xab5461ca4b100"'))
                         .build()
                 )
                 responseObserver.onCompleted()

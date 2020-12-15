@@ -63,14 +63,14 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
 
 
     private ObjectMapper objectMapper;
-    private RpcConverter rpcConverter;
+    private JacksonRpcConverter rpcConverter;
     private ExecutorService executorService;
     private Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
     public EmeraldTransport(Channel channel,
                             ObjectMapper objectMapper,
-                            RpcConverter rpcConverter,
+                            JacksonRpcConverter rpcConverter,
                             ExecutorService executorService,
                             Common.ChainRef chainRef) {
         this.channel = channel;
@@ -233,7 +233,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     }
 
     public <JS, RES> JS read(ByteString bytes, DefaultBatch.FutureBatchItem<JS, RES> request) throws RpcException {
-        return rpcConverter.fromJson(bytes.newInput(), request.getCall().getJsonType());
+        return rpcConverter.fromJsonResult(bytes.newInput(), request.getCall().getJsonType());
     }
 
     @Override
@@ -256,7 +256,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         private Channel channel;
 
         private ObjectMapper objectMapper;
-        private RpcConverter rpcConverter;
+        private JacksonRpcConverter rpcConverter;
         private ExecutorService executorService;
 
         private Chain chain;
@@ -392,7 +392,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
          * @param rpcConverter custom RpcConverter
          * @return builder
          */
-        public Builder rpcConverter(RpcConverter rpcConverter) {
+        public Builder rpcConverter(JacksonRpcConverter rpcConverter) {
             this.rpcConverter = rpcConverter;
             return this;
         }
