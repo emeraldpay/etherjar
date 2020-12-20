@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * Wei amount.
  */
-public class Wei implements Serializable {
+public class Wei implements Serializable, Comparable<Wei> {
 
     /**
      * Wei denomination units.
@@ -192,6 +192,11 @@ public class Wei implements Serializable {
      */
     public BigDecimal toUnits(Unit unit) {
         return new BigDecimal(amount).scaleByPowerOfTen(-unit.getScale());
+    }
+
+    @Override
+    public int compareTo(Wei o) {
+        return amount.compareTo(o.amount);
     }
 
     @Override
