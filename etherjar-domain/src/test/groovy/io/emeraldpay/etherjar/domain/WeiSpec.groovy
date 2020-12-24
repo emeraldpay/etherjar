@@ -76,4 +76,34 @@ class WeiSpec extends Specification {
         expect:
         EqualsVerifier.forClass(Wei.class).verify()
     }
+
+    def "sum with another"() {
+        when:
+        def act = Wei.ofEthers(1.2) + Wei.ofEthers(2.3)
+        then:
+        act == Wei.ofEthers(3.5)
+    }
+
+    def "minus another"() {
+        when:
+        def act = Wei.ofEthers(1.2) - Wei.ofEthers(0.3)
+        then:
+        act == Wei.ofEthers(0.9)
+    }
+
+    def "divide"() {
+        when:
+        def act = Wei.ofEthers(1.2) / 2
+        then:
+        act == Wei.ofEthers(0.6)
+    }
+
+    def "multiply"() {
+        when:
+        def act = Wei.ofEthers(1.2) * 4
+        then:
+        act == Wei.ofEthers(4.8)
+    }
+
+
 }

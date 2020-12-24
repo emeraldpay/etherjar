@@ -158,6 +158,36 @@ public class Wei implements Serializable, Comparable<Wei> {
         return amount;
     }
 
+    public Wei plus(Wei another) {
+        Objects.requireNonNull(another);
+        return new Wei(amount.add(another.amount));
+    }
+
+    public Wei minus(Wei another) {
+        Objects.requireNonNull(another);
+        return new Wei(amount.subtract(another.amount));
+    }
+
+    public Wei multiply(Long multiplier) {
+        Objects.requireNonNull(multiplier);
+        return new Wei(amount.multiply(BigInteger.valueOf(multiplier)));
+    }
+
+    public Wei multiply(Integer multiplier) {
+        Objects.requireNonNull(multiplier);
+        return new Wei(amount.multiply(BigInteger.valueOf(multiplier)));
+    }
+
+    public Wei div(Long divider) {
+        Objects.requireNonNull(divider);
+        return new Wei(amount.divide(BigInteger.valueOf(divider)));
+    }
+
+    public Wei div(Integer divider) {
+        Objects.requireNonNull(divider);
+        return new Wei(amount.divide(BigInteger.valueOf(divider)));
+    }
+
     /**
      * @param decimalPlaces scale of the {@code BigDecimal} value to be returned
      * @return corresponding amount in {@link Unit#ETHER}
