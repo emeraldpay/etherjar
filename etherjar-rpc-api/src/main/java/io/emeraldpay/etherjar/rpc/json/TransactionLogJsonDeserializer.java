@@ -50,6 +50,7 @@ public class TransactionLogJsonDeserializer extends EtherJsonDeserializer<Transa
         log.setTopics(topics);
         log.setTransactionHash(getTxHash(node, "transactionHash"));
         log.setTransactionIndex(getLong(node, "transactionIndex"));
+        log.setRemoved(getBoolean(node, "removed"));
 
         return log;
     }

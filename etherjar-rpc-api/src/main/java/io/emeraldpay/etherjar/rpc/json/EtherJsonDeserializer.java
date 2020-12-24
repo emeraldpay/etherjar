@@ -106,4 +106,11 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         if (value == null) return null;
         return BlockHash.from(value);
     }
+
+    protected Boolean getBoolean(JsonNode node, String name) {
+        if (!node.has(name)) {
+            return null;
+        }
+        return node.get(name).asBoolean();
+    }
 }
