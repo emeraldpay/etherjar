@@ -58,6 +58,11 @@ public class TransactionReceiptJsonDeserializer extends EtherJsonDeserializer<Tr
         }
         receipt.setLogs(logs);
 
+        Long status = getLong(node, "status");
+        if (status != null) {
+            receipt.setStatus(status.intValue());
+        }
+
         return receipt;
     }
 }

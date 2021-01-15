@@ -267,6 +267,27 @@ class JacksonEthRpcConverterSpec extends Specification {
         act.transactionHash.toHex() == '0x5929b36be4586c57bd87dfb7ea6be3b985c1f527fa3d69d221604b424aeb4197'
         act.transactionIndex == 0
         act.logs.size() == 0
+        act.status == null
+    }
+
+    def "Parse receipt 0x3f34b1 with status 1"() {
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x3f34b1.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        act.status == 1
+    }
+
+    def "Parse receipt 0x8ca5b1 with status 0"() {
+        InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("receipt/0x8ca5b1.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        act.status == 0
     }
 
     def "Parse receipt 0x8883dd"() {

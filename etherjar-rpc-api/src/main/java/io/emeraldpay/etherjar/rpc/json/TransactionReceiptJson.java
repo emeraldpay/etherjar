@@ -69,6 +69,11 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     private Bloom logsBloom;
 
+    /**
+     * Optinal tx status. 0 if failed, 1 if successfull
+     */
+    private Integer status;
+
     public TransactionId getTransactionHash() {
         return transactionHash;
     }
@@ -139,6 +144,14 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     public void setLogsBloom(Bloom logsBloom) {
         this.logsBloom = logsBloom;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Override
