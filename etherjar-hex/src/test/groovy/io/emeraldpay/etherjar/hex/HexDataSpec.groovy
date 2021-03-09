@@ -148,6 +148,29 @@ class HexDataSpec extends Specification {
         HexData.from('0x0123456789abcdef') | 1    | 2      | HexData.from('0x45')
     }
 
+    def "should skip head data"() {
+        when:
+        def act = HexData.from(hex).skip(offset)
+
+        then:
+        act == HexData.from(exp)
+
+        where:
+        hex                 | offset | exp
+        '0x1234'            | 0      | '0x1234'
+        '0x1234'            | 1      | '0x34'
+        '0x1234'            | 2      | '0x'
+        '0x0123456789abcdef'| 4      | '0x89abcdef'
+    }
+
+    def "should error when skip wrong offset"() {
+        when:
+        HexData.from('0x1234').skip(8)
+
+        then:
+        thrown(IndexOutOfBoundsException)
+    }
+
     def "should extract custom instances"() {
         def x = HexData.from '0x0123456789abcdef'
 

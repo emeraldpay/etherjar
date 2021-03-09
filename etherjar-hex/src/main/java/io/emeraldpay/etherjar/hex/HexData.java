@@ -198,6 +198,22 @@ public class HexData implements Serializable {
     }
 
     /**
+     * Extract tail of the underlying data, skipping {@code offset} bytes.
+     *
+     * @param offset size in bytes to skip
+     * @return extracted data
+     */
+    public HexData skip(int offset) {
+        if (offset > this.value.length) {
+            throw new IndexOutOfBoundsException("Cannot skip " + offset + " of " + this.value.length);
+        }
+        if (offset == this.value.length) {
+            return HexData.empty();
+        }
+        return extract(this.value.length - offset, offset);
+    }
+
+    /**
      * Extract a new object by required {@code size} bytes
      * and from {@code offset}.
      *
