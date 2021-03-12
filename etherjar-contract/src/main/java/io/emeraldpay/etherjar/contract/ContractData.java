@@ -6,6 +6,7 @@ import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.hex.HexQuantity;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -201,6 +202,10 @@ public class ContractData {
 
         public Builder argument(HexQuantity value) {
             return argument(Hex32.extendFrom(value));
+        }
+
+        public Builder argument(BigInteger value) {
+            return argument(HexQuantity.from(value));
         }
 
         public Builder argument(Long value) {
