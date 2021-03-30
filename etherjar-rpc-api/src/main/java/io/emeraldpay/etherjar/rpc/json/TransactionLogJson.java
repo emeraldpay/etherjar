@@ -18,6 +18,7 @@
 package io.emeraldpay.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.BlockHash;
 import io.emeraldpay.etherjar.domain.TransactionId;
@@ -26,8 +27,10 @@ import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 @JsonDeserialize(using = TransactionLogJsonDeserializer.class)
+@JsonSerialize(using = TransactionLogJsonSerializer.class)
 public class TransactionLogJson implements TransactionRef, Serializable {
 
     /**
@@ -162,17 +165,17 @@ public class TransactionLogJson implements TransactionRef, Serializable {
 
         TransactionLogJson that = (TransactionLogJson) o;
 
-        if (removed != null ? !removed.equals(that.removed) : that.removed != null) return false;
-        if (logIndex != null ? !logIndex.equals(that.logIndex) : that.logIndex != null) return false;
-        if (transactionIndex != null ? !transactionIndex.equals(that.transactionIndex) : that.transactionIndex != null)
+        if (!Objects.equals(removed, that.removed)) return false;
+        if (!Objects.equals(logIndex, that.logIndex)) return false;
+        if (!Objects.equals(transactionIndex, that.transactionIndex))
             return false;
-        if (transactionHash != null ? !transactionHash.equals(that.transactionHash) : that.transactionHash != null)
+        if (!Objects.equals(transactionHash, that.transactionHash))
             return false;
-        if (blockHash != null ? !blockHash.equals(that.blockHash) : that.blockHash != null) return false;
-        if (blockNumber != null ? !blockNumber.equals(that.blockNumber) : that.blockNumber != null) return false;
-        if (address != null ? !address.equals(that.address) : that.address != null) return false;
-        if (data != null ? !data.equals(that.data) : that.data != null) return false;
-        return topics != null ? topics.equals(that.topics) : that.topics == null;
+        if (!Objects.equals(blockHash, that.blockHash)) return false;
+        if (!Objects.equals(blockNumber, that.blockNumber)) return false;
+        if (!Objects.equals(address, that.address)) return false;
+        if (!Objects.equals(data, that.data)) return false;
+        return Objects.equals(topics, that.topics);
     }
 
     @Override

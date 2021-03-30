@@ -18,6 +18,7 @@
 package io.emeraldpay.etherjar.rpc.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.*;
 
 import java.io.Serializable;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 @JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
+@JsonSerialize(using = TransactionReceiptJsonSerializer.class)
 public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     /**
@@ -51,6 +53,16 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
      * total amount of gas used when this transaction was executed in the block.
      */
     private Long cumulativeGasUsed;
+
+    /**
+     * Sender
+     */
+    private Address from;
+
+    /**
+     * Target address
+     */
+    private Address to;
 
     /**
      * amount of gas used by this specific transaction alone.
@@ -114,6 +126,22 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
         this.cumulativeGasUsed = cumulativeGasUsed;
     }
 
+    public Address getFrom() {
+        return from;
+    }
+
+    public void setFrom(Address from) {
+        this.from = from;
+    }
+
+    public Address getTo() {
+        return to;
+    }
+
+    public void setTo(Address to) {
+        this.to = to;
+    }
+
     public Long getGasUsed() {
         return gasUsed;
     }
@@ -168,6 +196,8 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
 
         if (!Objects.equals(transactionHash, that.transactionHash)) return false;
         if (!Objects.equals(transactionIndex, that.transactionIndex)) return false;
+        if (!Objects.equals(from, that.from)) return false;
+        if (!Objects.equals(to, that.to)) return false;
         if (!Objects.equals(blockHash, that.blockHash)) return false;
         if (!Objects.equals(blockNumber, that.blockNumber)) return false;
         if (!Objects.equals(cumulativeGasUsed, that.cumulativeGasUsed)) return false;

@@ -74,4 +74,11 @@ public abstract class EtherJsonSerializer<T> extends JsonSerializer<T> {
         }
         gen.writeStringField(name, "0x"+ Long.toString(value.toEpochMilli() / 1000L, 16));
     }
+
+    protected void writeField(JsonGenerator gen, String name, Boolean value) throws IOException {
+        if (value == null) {
+            return;
+        }
+        gen.writeBooleanField(name, value);
+    }
 }
