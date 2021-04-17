@@ -15,7 +15,13 @@ public class ERC20Call {
     public static Base decode(HexData input) {
         MethodId methodId = MethodId.fromInput(input);
         Base parsed;
-        if (methodId.equals(ERC20Method.ALLOWANCE.getMethodId())) {
+        if (methodId.equals(ERC20Method.SYMBOL.getMethodId())) {
+            parsed = new Symbol();
+        } else if (methodId.equals(ERC20Method.NAME.getMethodId())) {
+            parsed = new Name();
+        } else if (methodId.equals(ERC20Method.DECIMALS.getMethodId())) {
+            parsed = new Decimals();
+        } else if (methodId.equals(ERC20Method.ALLOWANCE.getMethodId())) {
             parsed = new Allowance();
         } else if (methodId.equals(ERC20Method.APPROVE.getMethodId())) {
             parsed = new Approve();
@@ -41,8 +47,16 @@ public class ERC20Call {
             this.method = method;
         }
 
+        /**
+         * Encode contract call
+         * @return encoded call
+         */
         public abstract ContractData encode();
 
+        /**
+         * Decode existing contract call (not call response)
+         * @param input existing [encoded] call
+         */
         public abstract void decode(HexData input);
 
         public ERC20Method getMethod() {
@@ -62,6 +76,57 @@ public class ERC20Call {
             if (!methodId.equals(getMethod().getMethodId())) {
                 throw new IllegalArgumentException("Invalid method id: " + methodId + " != " + getMethod().getMethodId());
             }
+        }
+    }
+
+    public static class Symbol extends Base {
+
+        public Symbol() {
+            super(ERC20Method.SYMBOL);
+        }
+
+        @Override
+        public ContractData encode() {
+            return encodeBuilder().build();
+        }
+
+        @Override
+        public void decode(HexData input) {
+            verifyMethod(input);
+        }
+    }
+
+    public static class Name extends Base {
+
+        public Name() {
+            super(ERC20Method.NAME);
+        }
+
+        @Override
+        public ContractData encode() {
+            return encodeBuilder().build();
+        }
+
+        @Override
+        public void decode(HexData input) {
+            verifyMethod(input);
+        }
+    }
+
+    public static class Decimals extends Base {
+
+        public Decimals() {
+            super(ERC20Method.DECIMALS);
+        }
+
+        @Override
+        public ContractData encode() {
+            return encodeBuilder().build();
+        }
+
+        @Override
+        public void decode(HexData input) {
+            verifyMethod(input);
         }
     }
 

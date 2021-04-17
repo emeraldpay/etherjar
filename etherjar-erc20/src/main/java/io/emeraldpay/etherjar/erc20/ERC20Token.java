@@ -30,6 +30,24 @@ public class ERC20Token {
         return contract;
     }
 
+    public ContractReadCall<String> readSymbol() {
+        ERC20Call.Symbol call = new ERC20Call.Symbol();
+        ERC20Result.Symbol result = new ERC20Result.Symbol();
+        return new ContractReadCall<>(contract, call.encode(), result);
+    }
+
+    public ContractReadCall<String> readName() {
+        ERC20Call.Name call = new ERC20Call.Name();
+        ERC20Result.Name result = new ERC20Result.Name();
+        return new ContractReadCall<>(contract, call.encode(), result);
+    }
+
+    public ContractReadCall<Integer> readDecimals() {
+        ERC20Call.Decimals call = new ERC20Call.Decimals();
+        ERC20Result.Decimals result = new ERC20Result.Decimals();
+        return new ContractReadCall<>(contract, call.encode(), result);
+    }
+
     public ContractReadCall<BigInteger> readTotalSupply() {
         ERC20Call.TotalSupply call = new ERC20Call.TotalSupply();
         return new ContractReadCall<>(contract, call.encode(), processor);

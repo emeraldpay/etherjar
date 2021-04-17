@@ -72,4 +72,28 @@ class ERC20CallSpec extends Specification {
             "000000000000000000000000e3c2e70acbc9ba12de6cd1e453c050efc9a56253" +
             "000000000000000000000000d3e52099a6a48f132cb23b1364b7dee212d862f6"
     }
+
+    def "Encode symbol"() {
+        when:
+        def act = new ERC20Call.Symbol()
+            .encode().toData()
+        then:
+        act.toHex() == "0x95d89b41"
+    }
+
+    def "Encode name"() {
+        when:
+        def act = new ERC20Call.Name()
+            .encode().toData()
+        then:
+        act.toHex() == "0x06fdde03"
+    }
+
+    def "Encode decimals"() {
+        when:
+        def act = new ERC20Call.Decimals()
+            .encode().toData()
+        then:
+        act.toHex() == "0x313ce567"
+    }
 }

@@ -19,6 +19,39 @@ import java.util.stream.Collectors;
 public enum ERC20Method {
 
     /**
+     * symbol() public view returns (string memory)
+     * Code: 0x95d89b41
+     * <p>
+     * Returns the name of the token.
+     *
+     * @see ERC20Call.Symbol
+     * @see ERC20Result.Symbol
+     */
+    SYMBOL("symbol", Collections.emptyList()),
+
+    /**
+     * name() public view returns (string memory)
+     * Code: 0x06fdde03
+     * <p>
+     * Returns the name of the token.
+     *
+     * @see ERC20Call.Name
+     * @see ERC20Result.Name
+     */
+   NAME("name", Collections.emptyList()),
+
+    /**
+     * decimals() public view returns (uint8)
+     * Code: 0x313ce567
+     * <p>
+     * Returns the name of the token.
+     *
+     * @see ERC20Call.Decimals
+     * @see ERC20Result.Decimals
+     */
+    DECIMALS("decimals", Collections.emptyList()),
+
+    /**
      * totalSupply() public view returns (uint256 totalSupply)
      * Code: 0x18160ddd
      * <p>
