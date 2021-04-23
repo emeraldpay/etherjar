@@ -2,4 +2,7 @@ dependencies {
     implementation project(':etherjar-abi')
     implementation project(':etherjar-domain')
     implementation project(':etherjar-rpc-api')
+    implementation project(':etherjar-rlp')
+
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 }
