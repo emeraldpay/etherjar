@@ -1,6 +1,8 @@
 package io.emeraldpay.etherjar.contract
 
 import io.emeraldpay.etherjar.domain.Address
+import io.emeraldpay.etherjar.hex.Hex32
+import io.emeraldpay.etherjar.hex.HexData
 import spock.lang.Specification
 
 class AddressGeneratorSpec extends Specification {
@@ -34,5 +36,24 @@ class AddressGeneratorSpec extends Specification {
         then:
         act == Address.from("0x9e8e587b71c38b2dec6d7d7c906c64864b75e005")
     }
+
+    def "CREATE2 spec examples"() {
+        setup:
+        def generator = new AddressGenerator()
+        expect:
+        generator.create2(
+            Address.from(from), Hex32.from(salt), HexData.from(initCode)
+        ) == Address.from(exp)
+        where:
+        exp                                          | from                                         | salt                                                                 | initCode
+        "0x4D1A2e2bB4F88F0250f26Ffff098B0b30B26BF38" | "0x0000000000000000000000000000000000000000" | "0x0000000000000000000000000000000000000000000000000000000000000000" | "0x00"
+        "0xB928f69Bb1D91Cd65274e3c79d8986362984fDA3" | "0xdeadbeef00000000000000000000000000000000" | "0x0000000000000000000000000000000000000000000000000000000000000000" | "0x00"
+        "0xD04116cDd17beBE565EB2422F2497E06cC1C9833" | "0xdeadbeef00000000000000000000000000000000" | "0x000000000000000000000000feed000000000000000000000000000000000000" | "0x00"
+        "0x70f2b2914A2a4b783FaEFb75f459A580616Fcb5e" | "0x0000000000000000000000000000000000000000" | "0x0000000000000000000000000000000000000000000000000000000000000000" | "0xdeadbeef"
+        "0x60f3f640a8508fC6a86d45DF051962668E1e8AC7" | "0x00000000000000000000000000000000deadbeef" | "0x00000000000000000000000000000000000000000000000000000000cafebabe" | "0xdeadbeef"
+        "0x1d8bfDC5D46DC4f61D6b6115972536eBE6A8854C" | "0x00000000000000000000000000000000deadbeef" | "0x00000000000000000000000000000000000000000000000000000000cafebabe" | "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+        "0xE33C0C7F7df4809055C3ebA6c09CFe4BaF1BD9e0" | "0x0000000000000000000000000000000000000000" | "0x0000000000000000000000000000000000000000000000000000000000000000" | "0x"
+    }
+
 
 }
