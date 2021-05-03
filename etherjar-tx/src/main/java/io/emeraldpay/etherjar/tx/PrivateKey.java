@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.emeraldpay.etherjar.tx;
 
 import io.emeraldpay.etherjar.domain.Address;
@@ -55,7 +70,7 @@ public class PrivateKey {
 
     public static byte[] getPublicKey(BigInteger pk) {
         FixedPointCombMultiplier mul = new FixedPointCombMultiplier();
-        ECPoint point = mul.multiply(Signature.CURVE_PARAMS.getG(), pk);
+        ECPoint point = mul.multiply(Signer.CURVE_PARAMS.getG(), pk);
         byte[] full = point.getEncoded(false);
         byte[] ethereum = new byte[full.length - 1];
         System.arraycopy(full, 1, ethereum, 0, ethereum.length);
@@ -65,7 +80,7 @@ public class PrivateKey {
     public ECPrivateKeyParameters getECKey() {
         return new ECPrivateKeyParameters(
             new BigInteger(1, raw),
-            Signature.CURVE_PARAMS
+            Signer.CURVE_PARAMS
         );
     }
 }

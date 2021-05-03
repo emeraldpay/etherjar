@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
  * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +19,10 @@ package io.emeraldpay.etherjar.tx
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
-class SignatureEip155Spec extends Specification {
+class SignatureEIP155Spec extends Specification {
 
     def "valid recId for ETC"() {
-        SignatureEip155 signature = new SignatureEip155(61)
+        SignatureEIP155 signature = new SignatureEIP155(61)
         when:
         signature.setV(0x9d)
         def recid = signature.getRecId()
@@ -53,34 +54,19 @@ class SignatureEip155Spec extends Specification {
 
     def "extracts chain id for ETC"() {
         expect:
-        SignatureEip155.extractChainId(0x9d) == 61
-        SignatureEip155.extractChainId(0x9e) == 61
+        SignatureEIP155.extractChainId(0x9d) == 61
+        SignatureEIP155.extractChainId(0x9e) == 61
     }
 
     def "extracts chain id for ETH"() {
         expect:
-        SignatureEip155.extractChainId(0x26) == 1
-        SignatureEip155.extractChainId(0x27) == 2
-    }
-
-    def "extract pubkey from 0x9d2b0a"() {
-        setup:
-        Signature signature = new SignatureEip155(61)
-        signature.message = Hex.decodeHex("ee83527ea74d7b08cca67de5f2adfe7bf371c5e6dbcf7e851db83cfa27e50afb")
-        signature.v = 157
-        signature.r = new BigInteger("271658e49edd3495771f43734d29fac87cac9e740bf4c60a5847a6606ea8b38e", 16)
-        signature.s = new BigInteger("209874432a43edb6376afe704940b78521058fdbc7c85e55c6f5b2280c2b4942", 16)
-
-        when:
-        def pubkey = signature.ecrecover()
-
-        then:
-        Hex.encodeHexString(pubkey) == "653952d0020981cf0332c34fe3c931a8fc4c85e4380eb9c11bc16dcdcaae6ef961b4461519c04dd83b4d2937b2585f6734ef074b3859d58b0093183858ab0ca1"
+        SignatureEIP155.extractChainId(0x26) == 1
+        SignatureEIP155.extractChainId(0x27) == 2
     }
 
     def "extract addresses from tx in 7100000 in ETC"() {
         expect:
-        Signature signature = new SignatureEip155(
+        Signature signature = new SignatureEIP155(
                 61,
                 Hex.decodeHex(message),
                 v,
@@ -101,7 +87,7 @@ class SignatureEip155Spec extends Specification {
 
     def "extract addresses from tx in 7100000 in ETH"() {
         expect:
-        Signature signature = new SignatureEip155(
+        Signature signature = new SignatureEIP155(
                 1,
                 Hex.decodeHex(message),
                 v,

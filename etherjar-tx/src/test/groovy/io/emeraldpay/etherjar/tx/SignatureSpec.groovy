@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
  * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,12 +28,6 @@ class SignatureSpec extends Specification {
         signature.v = 28
         signature.r = new BigInteger("d7ddf1368fa81f6092ec15734000f911501af11876ef908a418f015030503a64", 16)
         signature.s = new BigInteger("39837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b", 16)
-
-        when:
-        def pubkey = signature.ecrecover()
-
-        then:
-        Hex.encodeHexString(pubkey) == "b5c5e005c6396a8f78dd4ac3f09c8a5dc88f56fe7764323f925e8c0d4991e730a12e0cfa5cac29b4fffc2852134fbd589ed3a99a8094a8f3d243a86204b72d01"
 
         when:
         def addr = signature.recoverAddress()

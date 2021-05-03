@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
  * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,9 +20,6 @@ import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.TransactionId;
 import io.emeraldpay.etherjar.domain.Wei;
 import io.emeraldpay.etherjar.hex.HexData;
-import io.emeraldpay.etherjar.rlp.RlpReader;
-import io.emeraldpay.etherjar.rlp.RlpType;
-import io.emeraldpay.etherjar.rlp.RlpWriter;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import java.math.BigInteger;
@@ -31,6 +29,8 @@ import java.math.BigInteger;
  */
 public class Transaction {
 
+    private static final TransactionEncoder ENCODER = new TransactionEncoder();
+
     private long nonce;
     private Wei gasPrice;
     private long gas;
@@ -38,145 +38,6 @@ public class Transaction {
     private Wei value;
     private HexData data;
     private Signature signature;
-
-    /**
-     * Import transaction from an RLP encoded data
-     *
-     * @param encoded RLP encoded transaction
-     * @return transaction
-     * @throws IllegalArgumentException if RLP is invalid or corrupted
-     */
-    public static Transaction fromRlp(byte[] encoded) {
-        RlpReader toprdr = new RlpReader(encoded);
-        if (toprdr.getType() != RlpType.LIST) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list");
-        }
-        if (!toprdr.isConsumed()) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has additional data after tx definition");
-        }
-
-        RlpReader rdr = toprdr.nextList();
-        Transaction tx = new Transaction();
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setNonce(rdr.nextLong());
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Nonce");
-        }
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setGasPrice(rdr.nextBigInt());
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas Price");
-        }
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setGas(rdr.nextLong());
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas");
-        }
-
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setTo(Address.from(rdr.next()));
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: To");
-        }
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setValue(new Wei(rdr.nextBigInt()));
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Value");
-        }
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setData(new HexData(rdr.next()));
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Data");
-        }
-
-        if (rdr.hasNext()) {
-            Signature signature;
-            if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-                int v = rdr.nextInt();
-                if (v == 27 || v == 28) {
-                    signature = new Signature();
-                } else {
-                    int chainId = Eip155.toChainId(v);
-                    signature = new SignatureEip155(chainId);
-                }
-                signature.setV(v);
-            } else {
-                throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: V");
-            }
-
-            if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-                signature.setR(rdr.nextBigInt());
-            } else {
-                throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: R");
-            }
-
-            if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-                signature.setS(rdr.nextBigInt());
-            } else {
-                throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: S");
-            }
-
-            tx.setSignature(signature);
-        }
-
-        if (!rdr.isConsumed()) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has more data than expected");
-        }
-
-        return tx;
-    }
-
-    public byte[] toRlp(boolean signed) {
-        Integer chainId = null;
-        if (signature != null && signature instanceof SignatureEip155) {
-            chainId = ((SignatureEip155)signature).getChainId();
-        }
-        return toRlp(signed, chainId);
-    }
-
-    public byte[] toRlp(boolean signed, Integer chainId) {
-        RlpWriter wrt = new RlpWriter();
-        wrt.startList()
-            .write(getNonce())
-            .write(getGasPrice().getAmount())
-            .write(getGas());
-        if (getTo() != null) {
-            wrt.write(getTo().getBytes());
-        } else {
-            wrt.write(new byte[0]);
-        }
-        if (getValue() != null) {
-            wrt.write(getValue().getAmount());
-        } else {
-            wrt.write(new byte[0]);
-        }
-
-        HexData data = getData();
-        if (data != null) {
-            wrt.write(data.getBytes());
-        } else {
-            wrt.write(new byte[0]);
-        }
-
-        if (signed) {
-            wrt.write(signature.getV())
-                .write(signature.getR())
-                .write(signature.getS());
-        } else if (chainId != null) {
-            // if EIP-155 include chain id and empty r,s
-            wrt.write(chainId.byteValue())
-                .write(0)
-                .write(0);
-        }
-        wrt.closeList();
-        return wrt.toByteArray();
-    }
 
     public long getNonce() {
         return nonce;
@@ -267,11 +128,11 @@ public class Transaction {
      * @see io.emeraldpay.etherjar.domain.TransactionId
      */
     public byte[] hash() {
-        return hash(signature != null && signature instanceof SignatureEip155 ? 1 : null);
+        return hash(signature != null && signature instanceof SignatureEIP155 ? 1 : null);
     }
 
     public byte[] hash(Integer chainId) {
-        byte[] rlp = this.toRlp(false, chainId);
+        byte[] rlp = ENCODER.encode(this, false, chainId);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
@@ -282,7 +143,7 @@ public class Transaction {
         if (signature == null) {
             throw new IllegalStateException("Transaction is not signed");
         }
-        byte[] rlp = this.toRlp(true);
+        byte[] rlp = ENCODER.encode(this,true);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);

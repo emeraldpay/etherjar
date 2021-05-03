@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
  * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,9 +32,13 @@ public class RlpWriter {
     private ByteArrayOutputStream buffer;
     private LinkedList<ByteArrayOutputStream> levels;
 
-    public RlpWriter() {
+    public RlpWriter(ByteArrayOutputStream buffer) {
         levels = new LinkedList<>();
-        buffer = new ByteArrayOutputStream();
+        this.buffer = buffer;
+    }
+
+    public RlpWriter() {
+        this(new ByteArrayOutputStream());
     }
 
     /**
@@ -125,6 +130,11 @@ public class RlpWriter {
     public RlpWriter write(byte[] value) {
         return this.write(value, RlpType.BYTES);
     }
+
+    public RlpWriter write(byte value) {
+        return write(new byte[] {value});
+    }
+
 
     /**
      *

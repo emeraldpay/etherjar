@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
  * Copyright (c) 2016-2019 Igor Artamonov, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,21 +26,21 @@ import java.math.BigInteger;
  *
  * See spec at https://github.com/ethereum/eips/issues/155
  */
-public class SignatureEip155 extends Signature {
+public class SignatureEIP155 extends Signature {
 
-    private int chainId;
+    private final int chainId;
 
-    public SignatureEip155(int chainId) {
+    public SignatureEIP155(int chainId) {
         this.chainId = chainId;
     }
 
-    public SignatureEip155(int chainId, byte[] message, int v, BigInteger r, BigInteger s) {
+    public SignatureEIP155(int chainId, byte[] message, int v, BigInteger r, BigInteger s) {
         super(message, v, r, s);
         this.chainId = chainId;
     }
 
     @Override
-    protected int getRecId() {
+    public int getRecId() {
         if (getV() == 27 || getV() == 28) {
             return super.getRecId();
         }
