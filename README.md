@@ -79,7 +79,7 @@ where
 <repositories>
     <repository>
       <id>etherjar</id>
-      <url>https://dl.bintray.com/emerald/etherjar</url>
+      <url>https://maven.emrld.io</url>
     </repository>
 </repositories>
 
@@ -94,9 +94,9 @@ where
 
 ```groovy
 repositories {
-    maven {
-        url  "https://dl.bintray.com/emerald/etherjar" 
-    }
+  maven {
+    url "https://maven.emrld.io"
+  }
 }
 
 dependencies {
