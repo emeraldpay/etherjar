@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.1"
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.1" apply false
 }
 
 // gradle aggregateJavadoc
@@ -34,7 +34,10 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
+
+    if (System.getenv("ENABLE_GCP") == "true") {
+        apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
+    }
 
     targetCompatibility = '1.8'
     sourceCompatibility = '1.8'

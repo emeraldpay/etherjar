@@ -60,3 +60,5 @@ jobs:
                 uses: eskatos/gradle-command-action@v1
                 with:
                     arguments: publish
+                env:
+                    ENABLE_GCP: true
