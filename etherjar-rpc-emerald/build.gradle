@@ -1,12 +1,12 @@
 repositories {
     maven {
-        url  "https://dl.bintray.com/emerald/emerald-api"
+        url  "https://maven.emrld.io"
     }
 }
 
 dependencies {
     api project(':etherjar-rpc-api')
-    implementation "io.emeraldpay:emerald-api:0.9.2"
+    api "io.emeraldpay:emerald-api:0.9.2"
     implementation 'io.grpc:grpc-netty:1.20.0'
 
     testCompile "io.projectreactor:reactor-test:3.2.12.RELEASE"
