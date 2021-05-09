@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url "https://dl.bintray.com/nebula/gradle-plugins" }
+        mavenCentral()
     }
 
     dependencies {
@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.bintray" version "1.8.4"
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.1"
 }
 
 // gradle aggregateJavadoc
@@ -23,31 +23,7 @@ allprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
         maven { url 'https://oss.jfrog.org/artifactory/repo' }
-    }
-}
-
-def pomConfig = {
-    licenses {
-        license {
-            name "The Apache Software License, Version 2.0"
-            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-            distribution "repo"
-        }
-    }
-    developers {
-        developer {
-            id "splix"
-            name "Igor Artamonov"
-            email "igor@artamonov.ru"
-        }
-    }
-
-    scm {
-        connection "scm:git:git://github.com/emeraldpay/etherjar.git"
-        developerConnection "scm:git:git://github.com/emeraldpay/etherjar.git"
-        url "https://github.com/emeraldpay/etherjar"
     }
 }
 
@@ -58,7 +34,7 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
-    apply plugin: 'com.jfrog.bintray'
+    apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
 
     targetCompatibility = '1.8'
     sourceCompatibility = '1.8'
@@ -144,6 +120,12 @@ subprojects {
     }
 
     publishing {
+        repositories {
+            maven {
+                url "artifactregistry://us-maven.pkg.dev/emeraldpay-prod/maven"
+            }
+        }
+
         publications {
             EtherJarPublication(MavenPublication) {
                 from components.java
@@ -157,62 +139,31 @@ subprojects {
                 groupId project.group
                 artifactId project.name
                 version project.version
-                pom.withXml {
-                    def root = asNode()
-                    root.appendNode('name', 'EtherJar - Java Library to Build Application on Ethereum')
-                    root.children().last() + pomConfig
+                pom {
+                    name = "EtherJar - Java client library for Ethereum"
+                    licenses {
+                        license {
+                            name = "The Apache Software License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = "splix"
+                            name = "Igor Artamonov"
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git://github.com/emeraldpay/etherjar.git"
+                        developerConnection = "scm:git:git://github.com/emeraldpay/etherjar.git"
+                        url = "https://github.com/emeraldpay/etherjar"
+                    }
                 }
             }
         }
     }
 
-    bintray {
-        user = System.getProperty('bintrayUser') ? System.getProperty('bintrayUser') : System.getenv('BINTRAY_USER')
-        key = System.getProperty('bintrayApiKey') ? System.getProperty('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-
-        publications = ['EtherJarPublication']
-
-        dryRun=false
-        publish=true
-        override=true
-
-        pkg {
-            repo = 'etherjar'
-            userOrg = 'infinitape'
-            name = project.name
-            licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/emeraldpay/etherjar.git'
-            labels = ['ethereum', 'blockchain', 'smart-contracts', 'java-8']
-            publicDownloadNumbers = true
-
-            version {
-                name = project.version
-                description = 'EtherJar ' + project.version + ' Beta'
-                released  = new Date()
-                vcsTag = project.version
-
-                gpg {
-                    sign = true
-                }
-            }
-        }
-    }
-}
-
-// Skip Bintray for the root module
-bintray {
-    dryRun=true
-    publish=false
-    override=true
-    publications = []
-    configurations = []
-    pkg {
-        repo = 'none'
-        name = 'none'
-        version {
-            name = 'none'
-        }
-    }
 }
 
 task syncJars(type: Sync) {
