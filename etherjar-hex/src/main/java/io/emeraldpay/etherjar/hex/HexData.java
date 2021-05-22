@@ -255,6 +255,18 @@ public class HexData implements Serializable {
     }
 
     /**
+     * Returns an array of {@link Hex32} by splitting the value bytes
+     *
+     * @return an array of split 32-bytes data
+     * @throws IllegalArgumentException if the summary length to split
+     * is not a multiple of given {@code size}
+     * @see #split32(int)
+     */
+    public Hex32[] split32() {
+        return split32(0);
+    }
+
+    /**
      * Returns an array of the elements were split by required {@code size}
      * bytes from start.
      *
@@ -285,6 +297,19 @@ public class HexData implements Serializable {
      */
     public HexData[] split(int size, int offset) {
         return split(size, offset, HexData[]::new, Function.identity());
+    }
+
+    /**
+     * Returns an array of {@link Hex32} by splitting the value bytes starting from {@code offset}.
+     *
+     * @param offset an offset in bytes to split from
+     * @return an array of split 32-bytes data
+     * @throws IllegalArgumentException if the summary length to split
+     * is not a multiple of given {@code size}
+     * @see #split32()
+     */
+    public Hex32[] split32(int offset) {
+        return split(Hex32.SIZE_BYTES, offset, Hex32[]::new, v -> Hex32.from(v.value));
     }
 
     /**
