@@ -17,10 +17,17 @@
 
 package io.emeraldpay.etherjar.hex;
 
+import java.math.BigInteger;
+
 /**
  * Fixed-size 32-bytes hex value.
  */
 public class Hex32 extends HexData {
+
+    // 0x1000 > MAX_NUMBER
+    private static final BigInteger NUMBER_LIMIT = BigInteger.valueOf(2).pow(256);
+    // 0xffff.... as for 256-bit value
+    private static final BigInteger MAX_NUMBER = NUMBER_LIMIT.subtract(BigInteger.ONE);
 
     public static final int SIZE_BYTES = 32;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
@@ -96,5 +103,29 @@ public class Hex32 extends HexData {
         byte[] base = new byte[SIZE_BYTES];
         System.arraycopy(value, 0, base, base.length - value.length, value.length);
         return new Hex32(base);
+    }
+
+    /**
+     * Convert bytes to an unsigned number. I.e., <code>uint</code> -&gt; <code>BigInteger</code>
+     * @return number
+     */
+    public BigInteger asUInt() {
+        return new BigInteger(1, value);
+    }
+
+    /**
+     * Convert bytes to a signed number. I.e., <code>int</code> -&gt; <code>BigInteger</code>
+     * @return number
+     */
+    public BigInteger asInt() {
+        BigInteger number = new BigInteger(1, value);
+        // for negative value the highest bit is set to 1
+        if (value[0] >= 0) {
+            // just positive number, return as is
+            return number;
+        } else {
+            // calculate signed part
+            return NUMBER_LIMIT.subtract(number).negate();
+        }
     }
 }
