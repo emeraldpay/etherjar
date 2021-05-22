@@ -62,4 +62,23 @@ class Hex32Spec extends Specification {
         "0x000000000000000000000000000000000000000000000000000000000a3140c0"   | 0xa3140c0
         "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcff76"   | -196746 // == 0xfcff76 − 0xffffff - 1
     }
+
+    def "Extend from negative long"() {
+        expect:
+        Hex32.extendFrom(q).toHex() == hex
+        where:
+        q          | hex
+        -1         | "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        -2         | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"
+        -196746    | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcff76"
+    }
+
+    def "Extend from negative big int"() {
+        expect:
+        Hex32.extendFrom(BigInteger.valueOf(q)).toHex() == hex
+        where:
+        q          | hex
+        -1         | "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        -196746    | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcff76"
+    }
 }

@@ -83,10 +83,29 @@ public class Hex32 extends HexData {
     }
 
     public static Hex32 extendFrom(HexQuantity value) {
+        if (value.getValue().signum() < 0) {
+            // use .add() because it's already negative
+            BigInteger asNegative = MAX_NUMBER.add(value.getValue()).add(BigInteger.ONE);
+
+            byte[] bytesAll = asNegative.toByteArray();
+            // usually it have a 0-byte prefix and we need to remove it
+            if (bytesAll[0] == 0) {
+                byte[] bytesClean = new byte[bytesAll.length - 1];
+                System.arraycopy(bytesAll, 1, bytesClean, 0, bytesClean.length);
+
+                return extendFrom(bytesClean);
+            } else {
+                return extendFrom(bytesAll);
+            }
+        }
         return extendFrom(value.asData());
     }
 
     public static Hex32 extendFrom(Long value) {
+        return extendFrom(HexQuantity.from(value));
+    }
+
+    public static Hex32 extendFrom(BigInteger value) {
         return extendFrom(HexQuantity.from(value));
     }
 
