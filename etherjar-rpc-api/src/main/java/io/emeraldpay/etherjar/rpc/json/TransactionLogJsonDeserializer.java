@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.IOException;
@@ -43,9 +44,9 @@ public class TransactionLogJsonDeserializer extends EtherJsonDeserializer<Transa
         log.setBlockNumber(getLong(node, "blockNumber"));
         log.setData(getData(node, "data"));
         log.setLogIndex(getLong(node, "logIndex"));
-        List<HexData> topics = new ArrayList<>();
+        List<Hex32> topics = new ArrayList<>();
         for (JsonNode topic: node.get("topics")) {
-            topics.add(HexData.from(topic.textValue()));
+            topics.add(Hex32.from(topic.textValue()));
         }
         log.setTopics(topics);
         log.setTransactionHash(getTxHash(node, "transactionHash"));
