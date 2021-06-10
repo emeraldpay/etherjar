@@ -16,9 +16,11 @@
 package io.emeraldpay.etherjar.rpc;
 
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
@@ -48,15 +50,19 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
 
     public Flux<RpcCallResponse> postProcess(ReactorBatch batch, BatchCallContext context, Flux<RpcCallResponse> result) {
         // Fill batch items with result
-        result = result.doOnNext(new ProcessBatchResult(context));
+        Flux<RpcCallResponse> shared = result
+            .doOnNext(new ProcessBatchResult(context))
+            // each batch item would attach to the the response flux to build it's own result
+            .share()
+            // cache the results to avoid double calls when both execute() and individual call has own subscriptions
+            .cache();
 
         // Connect batch items to execution
-        batch.withExecution(Flux.from(result));
+        batch.withExecution(shared);
 
         // Close unprocessed items
-        result = result.doFinally((s) -> batch.close());
-
-        return result;
+        return shared
+            .doFinally((s) -> batch.close());
     }
 
     /**

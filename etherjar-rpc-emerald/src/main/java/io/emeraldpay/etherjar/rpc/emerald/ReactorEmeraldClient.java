@@ -165,7 +165,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
 
         result = postProcess(batch, context, result);
 
-        return result.share();
+        return result;
     }
 
     public <JS, RES> Mono<ResponseJson<JS, Integer>> read(BlockchainOuterClass.NativeCallReplyItem item, RpcCall<JS, RES> call) {

@@ -77,7 +77,7 @@ public class ReactorHttpRpcClient extends AbstractReactorRpcClient implements Re
 
         result = result.doOnError((t) -> System.err.println("HTTP Error " + t.getClass() + ": " + t.getMessage()));
 
-        return result.share();
+        return result;
     }
 
 

@@ -16,6 +16,7 @@
 package io.emeraldpay.etherjar.rpc.http
 
 import io.emeraldpay.etherjar.domain.Address
+import io.emeraldpay.etherjar.domain.BlockHash
 import io.emeraldpay.etherjar.rpc.Commands
 import io.emeraldpay.etherjar.rpc.ReactorBatch
 import io.emeraldpay.etherjar.rpc.RpcException
@@ -221,6 +222,29 @@ class ReactorHttpRpcClientSpec extends Specification {
 
         requests.size() == 1
         requests[0] == "[{\"jsonrpc\":\"2.0\",\"method\":\"net_peerCount\",\"params\":[],\"id\":1}]"
+    }
+
+    def "Produce empty on null response"() {
+        setup:
+        def requests = []
+        Spark.post("/") {req, resp ->
+            println("Received request: ${req.body()}")
+            requests.add(req.body())
+            resp.status(200)
+            resp.type("application/json")
+            return '[{"jsonrpc":"2.0","id":1, "result": null}]'
+        }
+        Spark.awaitInitialization()
+
+        def client = ReactorHttpRpcClient.newBuilder().connectTo("http://localhost:18545").build()
+
+        when:
+        def resp = client.execute(Commands.eth().getBlock(BlockHash.empty()))
+
+        then:
+        StepVerifier.create(resp)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5))
 
         requests.size() == 1
     }
@@ -355,6 +379,7 @@ class ReactorHttpRpcClientSpec extends Specification {
             .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(3))
+        requests.size() == 1
     }
 
     def "Makes call only if actual result requested"() {
