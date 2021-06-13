@@ -101,7 +101,7 @@ public class JacksonRpcConverter implements RpcConverter {
         try {
             responseJson = objectMapper.readerFor(type1).readValue(content);
         } catch (IOException e) {
-            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Invalid response from RPC endpoint");
+            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Invalid JSON received from RPC endpoint: " + e.getMessage());
         }
         if (responseJson.hasError()) {
             RpcResponseError error = responseJson.getError();
@@ -114,7 +114,7 @@ public class JacksonRpcConverter implements RpcConverter {
         try {
             return objectMapper.readerFor(target).readValue(content);
         } catch (IOException e) {
-            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Invalid response from RPC endpoint");
+            throw new RpcException(RpcResponseError.CODE_UPSTREAM_INVALID_RESPONSE, "Invalid JSON received from RPC endpoint: " + e.getMessage());
         }
     }
 
