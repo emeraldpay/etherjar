@@ -233,4 +233,15 @@ class RlpWriterSpec extends Specification {
         then:
         Hex.encodeHexString(act) == "f8380101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010102"
     }
+
+    def "Write pre-encoded list"() {
+        when:
+        def wrt = new RlpWriter()
+        def list = new RlpWriter()
+        list.write("dog")
+        wrt.writeList(list.toByteArray())
+        def act = wrt.toByteArray()
+        then:
+        Hex.encodeHexString(act)  == "c483646f67"
+    }
 }

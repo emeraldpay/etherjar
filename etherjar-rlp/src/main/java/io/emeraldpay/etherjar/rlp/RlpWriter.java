@@ -131,6 +131,15 @@ public class RlpWriter {
         return this.write(value, RlpType.BYTES);
     }
 
+    /**
+     * Write a pre-encoded RLP List
+     * @param value pre-encoded RLP List
+     * @return writer for the list
+     */
+    public RlpWriter writeList(byte[] value) {
+        return this.write(value, RlpType.LIST);
+    }
+
     public RlpWriter write(byte value) {
         return write(new byte[] {value});
     }
