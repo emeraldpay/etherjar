@@ -37,6 +37,7 @@ import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 
 public class ReactorEmeraldClient extends AbstractReactorRpcClient implements ReactorRpcClient {
@@ -347,6 +348,10 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             return this;
         }
 
+        public Builder executor(Executor executor) {
+            channelBuilder.executor(executor);
+            return this;
+        }
 
         /**
          *
