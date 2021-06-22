@@ -58,6 +58,22 @@ public class RlpReader {
         return ((int)b) & 0xff;
     }
 
+    /**
+     * Access to the underlying bytes data
+     * @return the whole input
+     */
+    public byte[] getRawData() {
+        return input;
+    }
+
+    /**
+     * Access current position of the reader
+     * @return position
+     */
+    public int getPosition() {
+        return position;
+    }
+
     private Current read() {
         if (notEnough(1)) {
             return new Current(RlpType.NONE, input);
