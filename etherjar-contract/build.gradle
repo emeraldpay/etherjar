@@ -3,6 +3,7 @@ dependencies {
     implementation project(':etherjar-domain')
     implementation project(':etherjar-rpc-api')
     implementation project(':etherjar-rlp')
+    implementation project(':etherjar-tx')
 
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 }
