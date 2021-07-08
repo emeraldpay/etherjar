@@ -7,10 +7,7 @@ import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.hex.HexQuantity;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Operates data field of a transaction with regard to Smart Contract calls. Allows to prepare data for a call, or parse call details
@@ -140,12 +137,35 @@ public class ContractData {
         return result;
     }
 
+    private static class Argument {
+        private final boolean struct;
+        private final List<Hex32> value;
+
+        public Argument(List<Hex32> value) {
+            this.struct = true;
+            this.value = value;
+        }
+
+        public Argument(Hex32 value) {
+            this.struct = false;
+            this.value = Collections.singletonList(value);
+        }
+
+        public boolean isStruct() {
+            return struct;
+        }
+
+        public List<Hex32> getValue() {
+            return value;
+        }
+    }
+
     /**
      * Call builder
      */
     public static class Builder {
         private MethodId method;
-        private final List<Hex32> arguments = new ArrayList<>();
+        private final List<Argument> arguments = new ArrayList<>();
 
         /**
          * @param method method id
@@ -192,7 +212,7 @@ public class ContractData {
          * @return builder
          */
         public Builder argument(Hex32 value) {
-            arguments.add(value);
+            arguments.add(new Argument(value));
             return this;
         }
 
@@ -229,16 +249,13 @@ public class ContractData {
          * @return builder
          */
         public Builder argumentArray(Hex32[] array) {
-            argument(Hex32.extendFrom((arguments.size() + 1) * 32L));
-            argument(Hex32.extendFrom(Integer.toUnsignedLong(array.length)));
-            for (Hex32 item: array) {
-                argument(item);
-            }
+            arguments.add(new Argument(Arrays.asList(array)));
             return this;
         }
 
         public Builder argumentArray(List<Hex32> array) {
-            return argumentArray(array.toArray(new Hex32[0]));
+            arguments.add(new Argument(array));
+            return this;
         }
 
         /**
@@ -260,7 +277,23 @@ public class ContractData {
             if (method == null) {
                 throw new NullPointerException("MethodId is not set");
             }
-            return new ContractData(method, arguments);
+            List<Hex32> base = new ArrayList<>(arguments.size());
+            List<Hex32> structs = new ArrayList<>();
+            long position = arguments.size();
+            for (Argument arg: arguments) {
+                if (arg.struct) {
+                    base.add(Hex32.extendFrom(position * 32));
+                    structs.add(Hex32.extendFrom(Integer.toUnsignedLong(arg.value.size())));
+                    structs.addAll(arg.value);
+                    position += 1 + arg.value.size();
+                } else {
+                    base.add(arg.value.get(0));
+                }
+            }
+            if (!structs.isEmpty()) {
+                base.addAll(structs);
+            }
+            return new ContractData(method, base);
         }
     }
 }
