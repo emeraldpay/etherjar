@@ -204,6 +204,9 @@ public class HexData implements Serializable {
      * @return extracted data
      */
     public HexData skip(int offset) {
+        if (offset == 0) {
+            return this;
+        }
         if (offset > this.value.length) {
             throw new IndexOutOfBoundsException("Cannot skip " + offset + " of " + this.value.length);
         }
