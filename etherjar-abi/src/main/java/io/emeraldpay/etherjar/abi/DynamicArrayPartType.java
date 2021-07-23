@@ -21,7 +21,7 @@ import io.emeraldpay.etherjar.hex.HexData;
 /**
  * DynamicArray as a part of a larger data blob
  *
- * @param <T>
+ * @param <T> type of data
  */
 public class DynamicArrayPartType<T> extends DynamicArrayType<T> {
     /**

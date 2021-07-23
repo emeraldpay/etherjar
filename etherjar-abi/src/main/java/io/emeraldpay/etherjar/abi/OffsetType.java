@@ -9,26 +9,26 @@ import io.emeraldpay.etherjar.hex.HexData;
  * and arrays.
  *
  * Example:
- * <code><pre>
+ * <pre><code>
  * 0x0000000000000000000000000000000000000000000000000000000000000020
  *   0000000000000000000000000000000000000000000000000000000000000002
  *   00000000000000000000000000000000000000000000000000000000000000e1
  *   00000000000000000000000000000000000000000000000000000000000000e2
- * </pre></code>
+ * </code></pre>
  *
  * The first item there is an offset (<code>0x20</code> or 32 bytes) of the actual data, which right after
  * that. I.e. the encoded data is 1-element type of array with 2 items in it; and the encoded data
  * consists of _list of 32-byte items_ (1 elements) + additional data referenced by position (array starting after 0x20 bytes).
  *
  * Example:
- * <code><pre>
+ * <pre><code>
  * 0x00000000000000000000000000000000000000000000000000000000000000f1
  *   0000000000000000000000000000000000000000000000000000000000000060
  *   00000000000000000000000000000000000000000000000000000000000000f3
  *   0000000000000000000000000000000000000000000000000000000000000002
  *   00000000000000000000000000000000000000000000000000000000000000e1
  *   00000000000000000000000000000000000000000000000000000000000000e2
- * </pre></code>
+ * </code></pre>
  *
  * In that case we have 3-element value, where the second element is an array specified as a reference in the data blob.
  * I.e. the first element is <code>0xf1</code>, the second is only an offset <code>0x60</code> (i.e. the actual data starts
