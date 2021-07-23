@@ -27,6 +27,10 @@ import java.util.List;
 
 public class TransactionDecoder {
 
+    public Transaction decode(HexData raw) {
+        return decode(raw.getBytes());
+    }
+
     public Transaction decode(byte[] raw) {
         if (raw.length <= 1) {
             throw new IllegalArgumentException("Raw TX is too short: " + raw.length);
