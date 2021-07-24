@@ -54,4 +54,13 @@ public class SignatureEIP155 extends Signature {
     public static int extractChainId(int v) {
         return Eip155.toChainId(v);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SignatureEIP155 that = (SignatureEIP155) o;
+        if (!super.canEqual(that)) return false;
+        return chainId == that.chainId;
+    }
 }

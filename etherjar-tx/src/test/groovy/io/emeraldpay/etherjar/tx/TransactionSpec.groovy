@@ -18,6 +18,10 @@ package io.emeraldpay.etherjar.tx
 
 import io.emeraldpay.etherjar.domain.Address
 import io.emeraldpay.etherjar.domain.Wei
+import io.emeraldpay.etherjar.hex.Hex32
+import nl.jqno.equalsverifier.EqualsVerifier
+import nl.jqno.equalsverifier.Func
+import nl.jqno.equalsverifier.Warning
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
@@ -64,4 +68,16 @@ class TransactionSpec extends Specification {
     }
 
 
+    def "EqualVerify"() {
+        expect:
+        EqualsVerifier.forClass(Transaction)
+            .withPrefabValues(
+                Address,
+                Address.extract(Hex32.extendFrom(1)), Address.extract(Hex32.extendFrom(2))
+            )
+            .usingGetClass()
+            .suppress(Warning.NONFINAL_FIELDS)
+            .suppress(Warning.STRICT_HASHCODE)
+            .verify()
+    }
 }

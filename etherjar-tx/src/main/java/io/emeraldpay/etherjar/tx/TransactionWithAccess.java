@@ -61,6 +61,15 @@ public class TransactionWithAccess extends Transaction {
         return keccak.digest();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TransactionWithAccess that = (TransactionWithAccess) o;
+        if (!super.canEqual(that)) return false;
+        return  chainId == that.chainId && Objects.equals(accessList, that.accessList);
+    }
+
     static class Access {
         private Address address;
         private List<Hex32> storageKeys;

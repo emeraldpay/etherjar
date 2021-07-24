@@ -27,6 +27,8 @@ import java.util.List;
 
 public class TransactionDecoder {
 
+    public static final TransactionDecoder DEFAULT = new TransactionDecoder();
+
     public Transaction decode(HexData raw) {
         return decode(raw.getBytes());
     }

@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream;
 
 public class TransactionEncoder {
 
+    public static final TransactionEncoder DEFAULT = new TransactionEncoder();
+
     public byte[] encode(Transaction tx, boolean includeSignature) {
         if (includeSignature) {
             return encode(tx, true, null);

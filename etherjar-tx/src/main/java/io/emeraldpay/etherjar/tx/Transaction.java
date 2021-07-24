@@ -23,13 +23,14 @@ import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * A transaction information
  */
 public class Transaction {
 
-    private static final TransactionEncoder ENCODER = new TransactionEncoder();
+
 
     private long nonce;
     private Wei gasPrice;
@@ -132,7 +133,7 @@ public class Transaction {
     }
 
     public byte[] hash(Integer chainId) {
-        byte[] rlp = ENCODER.encode(this, false, chainId);
+        byte[] rlp = TransactionEncoder.DEFAULT.encode(this, false, chainId);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
@@ -143,11 +144,45 @@ public class Transaction {
         if (signature == null) {
             throw new IllegalStateException("Transaction is not signed");
         }
-        byte[] rlp = ENCODER.encode(this,true);
+        byte[] rlp = TransactionEncoder.DEFAULT.encode(this,true);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
         return TransactionId.from(keccak.digest());
     }
 
+    public boolean canEqual(Transaction that) {
+        if (this == that) return true;
+        return nonce == that.nonce
+            && gas == that.gas
+            && Objects.equals(gasPrice, that.gasPrice)
+            && Objects.equals(to, that.to)
+            && Objects.equals(value, that.value)
+            && Objects.equals(data, that.data)
+            && Objects.equals(signature, that.signature);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return canEqual((Transaction) o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nonce, to);
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+            "nonce=" + nonce +
+            ", to=" + to +
+            ", gasPrice=" + gasPrice +
+            ", gas=" + gas +
+            ", value=" + value +
+            ", data=" + data +
+            '}';
+    }
 }

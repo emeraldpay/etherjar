@@ -20,6 +20,8 @@ import io.emeraldpay.etherjar.domain.Address;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Signature of a message (i.e. of a transaction)
@@ -108,5 +110,25 @@ public class Signature {
 
     public int getRecId() {
         return v - 27;
+    }
+
+    public boolean canEqual(Signature signature) {
+        return v == signature.v
+            && Arrays.equals(message, signature.message)
+            && Objects.equals(r, signature.r)
+            && Objects.equals(s, signature.s);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Signature signature = (Signature) o;
+        return canEqual(signature);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(r, s);
     }
 }

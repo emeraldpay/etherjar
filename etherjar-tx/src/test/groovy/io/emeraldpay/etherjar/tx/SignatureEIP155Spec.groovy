@@ -16,6 +16,8 @@
  */
 package io.emeraldpay.etherjar.tx
 
+import nl.jqno.equalsverifier.EqualsVerifier
+import nl.jqno.equalsverifier.Warning
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
@@ -104,7 +106,15 @@ class SignatureEIP155Spec extends Specification {
         "0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5" | "928255af54c2d8339a16917757f75d93918f74bdab2f25e40430a853f79a3423" | 0x26 | "b3f13916a129bf0d6834534d9219475cf2e80b0707afd3ccf1fcb06d90c9a1d3" | "1a18178efe212d12bf5dc33f9f75778ac4d526fe918352d6626c4fca1efdf72c"
         "0x52bc44d5378309ee2abf1539bf71de1b7d7be3b5" | "c9ac20c3116943489a2be2c2a14d117ba1c6dd441285fe872ebd90d0f71dcfa3" | 0x25 | "bbe86585313eb25981e14fd4e7148c02b3b36081f554cffa3e7e47009995a31e" | "1287e151a0995e9aae7abaf163bd032b2ec6cad8db72f09853b1cb5a25932231"
         "0x564286362092d8e7936f0549571a803b203aaced" | "b75a5cb333ca776d8aea44f2c82d19243ead096bf5f64669613e9aba20eade15" | 0x26 | "a755b0b141fc114d5c357dc0e19408b5aa6800d0ada71632a43b37244f5ce9c2" | "b81505d3317b49c550fda63efb5bf8778829cc2fcb3c1eb45db3ba823b6700"
-     }
+    }
 
+    def "EqualVerify"() {
+        expect:
+        EqualsVerifier.forClass(SignatureEIP155)
+            .usingGetClass()
+            .suppress(Warning.NONFINAL_FIELDS)
+            .suppress(Warning.STRICT_HASHCODE)
+            .verify()
+    }
 }
 

@@ -57,4 +57,13 @@ public class SignatureEIP2930 extends Signature {
     public int getRecId() {
         return getYParity();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SignatureEIP2930 that = (SignatureEIP2930) o;
+        if (!super.canEqual(that)) return false;
+        return yParity == that.yParity && chainId == that.chainId;
+    }
 }
