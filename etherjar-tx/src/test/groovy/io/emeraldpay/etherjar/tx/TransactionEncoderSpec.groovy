@@ -18,6 +18,7 @@ package io.emeraldpay.etherjar.tx
 import io.emeraldpay.etherjar.domain.Address
 import io.emeraldpay.etherjar.domain.Wei
 import io.emeraldpay.etherjar.hex.Hex32
+import io.emeraldpay.etherjar.hex.HexData
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
@@ -182,5 +183,37 @@ class TransactionEncoderSpec extends Specification {
         def act = encoder.encode(tx, true)
         then:
         Hex.encodeHexString(act) == "01f8e201018504a817c800830249f0943535353535353535353535353535353535353535880de0b6b3a764000080f872f85994de0b295669a9fd93d5f28d9ec85e40f4cb697baef842a00000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000007d694bb9bc244d798123fde783fcc1c72d3bb8c189413c080a0b935047bf9b8464afec5bda917281610b2aaabd8de4b01d2eba6e876c934ca7aa0431b406eb13aefca05a0320c3595700b9375df6fac8cc8ec5603ac2e42af4894"
+    }
+
+    def "Encode signed tx with gas priority"() {
+        // 0xe2c9ad4b92dfdea74203f83c503b769525ada75b9a53745f70113f23c077162c
+        setup:
+        TransactionWithGasPriority tx = new TransactionWithGasPriority()
+        tx.tap {
+            nonce = 150
+            maxGasPrice = new Wei(82684598939)
+            priorityGasPrice = new Wei(4000000000)
+            gas = 51_101
+            to = Address.from("0x7bebd226154e865954a87650faefa8f485d36081")
+            value = Wei.ZERO
+            data = HexData.from("0x095ea7b300000000000000000000000003f7724180aa6b939894b5ca4314783b0b36b329ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+            chainId = 1
+            accessList = []
+            signature = new SignatureEIP2930().tap {
+                setYParity(1)
+                r = new BigInteger(1, Hex.decodeHex("d978ed98e78dd480b2aec86d1521962a8fe4009e44fb19f45b70d8005e602182"))
+                s = new BigInteger(1, Hex.decodeHex("347c933f78131995c1abd07c1d0be67d8f04c2cf99cd79510657e97ead8c1a9f"))
+            }
+            with((SignatureEIP2930)signature) {
+                YParity == 1
+                r.toString(16) == "d978ed98e78dd480b2aec86d1521962a8fe4009e44fb19f45b70d8005e602182"
+                s.toString(16) == "347c933f78131995c1abd07c1d0be67d8f04c2cf99cd79510657e97ead8c1a9f"
+            }
+        }
+
+        when:
+        def act = encoder.encode(tx, true)
+        then:
+        Hex.encodeHexString(act) == "02f8b101819684ee6b280085134062da9b82c79d947bebd226154e865954a87650faefa8f485d3608180b844095ea7b300000000000000000000000003f7724180aa6b939894b5ca4314783b0b36b329ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc001a0d978ed98e78dd480b2aec86d1521962a8fe4009e44fb19f45b70d8005e602182a0347c933f78131995c1abd07c1d0be67d8f04c2cf99cd79510657e97ead8c1a9f"
     }
 }

@@ -81,15 +81,7 @@ public class TransactionEncoder {
         return wrt.toByteArray();
     }
 
-    public byte[] encode(TransactionWithAccess tx, boolean includeSignature) {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        buffer.write(1);
-        RlpWriter wrt = new RlpWriter(buffer);
-        wrt.startList()
-            .write(Integer.valueOf(tx.getChainId()).byteValue())
-            .write(tx.getNonce())
-            .write(tx.getGasPrice().getAmount())
-            .write(tx.getGas());
+    protected void writeBody(RlpWriter wrt, TransactionWithAccess tx, boolean includeSignature) {
         if (tx.getTo() != null) {
             wrt.write(tx.getTo().getBytes());
         } else {
@@ -143,6 +135,33 @@ public class TransactionEncoder {
                 }
             }
         }
+    }
+
+    public byte[] encode(TransactionWithAccess tx, boolean includeSignature) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(TransactionType.ACCESS_LIST.getFlag());
+        RlpWriter wrt = new RlpWriter(buffer);
+        wrt.startList()
+            .write(Integer.valueOf(tx.getChainId()).byteValue())
+            .write(tx.getNonce())
+            .write(tx.getGasPrice().getAmount())
+            .write(tx.getGas());
+        writeBody(wrt, tx, includeSignature);
+        wrt.closeList();
+        return buffer.toByteArray();
+    }
+
+    public byte[] encode(TransactionWithGasPriority tx, boolean includeSignature) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(TransactionType.GAS_PRIORITY.getFlag());
+        RlpWriter wrt = new RlpWriter(buffer);
+        wrt.startList()
+            .write(Integer.valueOf(tx.getChainId()).byteValue())
+            .write(tx.getNonce())
+            .write(tx.getPriorityGasPrice().getAmount())
+            .write(tx.getMaxGasPrice().getAmount())
+            .write(tx.getGas());
+        writeBody(wrt, tx, includeSignature);
         wrt.closeList();
         return buffer.toByteArray();
     }

@@ -25,7 +25,13 @@ public enum TransactionType {
     /**
      * Transaction with Access List introduced by EIP-2930 and available since Berlin Fork of Ethereum Mainnet.
      */
-    ACCESS_LIST((byte)1);
+    ACCESS_LIST((byte)1),
+
+    /**
+     * Transaction with Gas Max and Priority prices.
+     * @see <a href="https://eips.ethereum.org/EIPS/eip-1559">EIP-1559</a>
+     */
+    GAS_PRIORITY((byte)2);
 
     private final byte flag;
 
@@ -51,6 +57,9 @@ public enum TransactionType {
         int u = ((int)prefix) & 0xff;
         if (u <= 0x7f) {
             //
+            if (u == 2) {
+                return TransactionType.GAS_PRIORITY;
+            }
             if (u == 1) {
                 return TransactionType.ACCESS_LIST;
             }

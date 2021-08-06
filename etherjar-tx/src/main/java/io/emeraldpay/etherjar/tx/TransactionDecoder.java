@@ -38,6 +38,9 @@ public class TransactionDecoder {
             throw new IllegalArgumentException("Raw TX is too short: " + raw.length);
         }
         TransactionType type = TransactionType.fromPrefix(raw[0]);
+        if (type == TransactionType.GAS_PRIORITY) {
+            return decodeGasPriority(raw);
+        }
         if (type == TransactionType.STANDARD) {
             return decodeStandard(raw);
         }
@@ -55,19 +58,16 @@ public class TransactionDecoder {
      * @throws IllegalArgumentException if RLP is invalid or corrupted
      */
     public Transaction decodeStandard(byte[] raw) {
-        RlpReader toprdr = new RlpReader(raw);
-        if (toprdr.getType() != RlpType.LIST) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list");
-        }
-        if (!toprdr.isConsumed()) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has additional data after tx definition");
-        }
-
-        RlpReader rdr = toprdr.nextList();
+        RlpReader rdr = startReader(raw, 0);
         Transaction tx = new Transaction();
+        readDefinitionsPart(rdr, tx);
+        readBodyPart(rdr, tx);
+        tryReadBaseSignature(rdr, tx);
+        ensureFullyRead(rdr);
+        return tx;
+    }
 
-        this.readMainPart(rdr, tx);
-
+    private void tryReadBaseSignature(RlpReader rdr, Transaction tx) {
         if (rdr.hasNext()) {
             Signature signature;
             if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
@@ -97,18 +97,41 @@ public class TransactionDecoder {
 
             tx.setSignature(signature);
         }
-
-        if (!rdr.isConsumed()) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has more data than expected");
-        }
-
-        return tx;
     }
 
     public TransactionWithAccess decodeAccessList(byte[] raw) {
         // rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])
+        RlpReader rdr = startReader(raw, 1);
+        TransactionWithAccess tx = new TransactionWithAccess();
+        readChainId(rdr, tx);
+        readDefinitionsPart(rdr, tx);
+        readBodyPart(rdr, tx);
+        readAccessList(rdr, tx);
+        tryReadSignature(rdr, tx);
+        ensureFullyRead(rdr);
+        return tx;
+    }
 
-        RlpReader toprdr = new RlpReader(raw, 1, raw.length - 1);
+    public TransactionWithGasPriority decodeGasPriority(byte[] raw) {
+        // rlp([chain_id, nonce, priorityGasPrice, maxGasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])
+        RlpReader rdr = startReader(raw, 1);
+        TransactionWithGasPriority tx = new TransactionWithGasPriority();
+
+        readChainId(rdr, tx);
+        readNonce(rdr, tx);
+        readPriorityGasPrice(rdr, tx);
+        readMaxGasPrice(rdr, tx);
+        readGasLimit(rdr, tx);
+
+        readBodyPart(rdr, tx);
+        readAccessList(rdr, tx);
+        tryReadSignature(rdr, tx);
+        ensureFullyRead(rdr);
+        return tx;
+    }
+
+    private RlpReader startReader(byte[] raw, int position) {
+        RlpReader toprdr = new RlpReader(raw, position, raw.length - position);
         if (toprdr.getType() != RlpType.LIST) {
             throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list");
         }
@@ -116,43 +139,24 @@ public class TransactionDecoder {
         if (!toprdr.isConsumed()) {
             throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has additional data after tx definition");
         }
+        return toprdr.nextList();
+    }
 
-        RlpReader rdr = toprdr.nextList();
-        TransactionWithAccess tx = new TransactionWithAccess();
+    private void ensureFullyRead(RlpReader rdr) {
+        if (!rdr.isConsumed()) {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has more data than expected");
+        }
+    }
 
+    private void readChainId(RlpReader rdr, TransactionWithAccess tx) {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
             tx.setChainId(rdr.nextInt());
         } else {
             throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: ChainID");
         }
+    }
 
-        this.readMainPart(rdr, tx);
-
-        if (rdr.hasNext() && rdr.getType() == RlpType.LIST) {
-            RlpReader accessListRdr = rdr.nextList();
-            List<TransactionWithAccess.Access> accessList = new ArrayList<>();
-
-            while (accessListRdr.hasNext()) {
-                RlpReader accessItemRdr = accessListRdr.nextList();
-                Address address = Address.from(accessItemRdr.next());
-                RlpReader storageListRdr = accessItemRdr.nextList();
-                List<Hex32> storageList = new ArrayList<>();
-                while (storageListRdr.hasNext()) {
-                    storageList.add(Hex32.from(storageListRdr.next()));
-                }
-                accessList.add(new TransactionWithAccess.Access(address, storageList));
-                if (!accessItemRdr.isConsumed()) {
-                    throw new IllegalArgumentException("Transaction has invalid RLP encoding. Invalid value: Access List Item");
-                }
-            }
-            if (!accessListRdr.isConsumed()) {
-                throw new IllegalArgumentException("Transaction has invalid RLP encoding. Invalid value: Access List");
-            }
-            tx.setAccessList(accessList);
-        } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list: Access List");
-        }
-
+    private void tryReadSignature(RlpReader rdr, TransactionWithAccess tx) {
         if (rdr.hasNext()) {
             SignatureEIP2930 signature = new SignatureEIP2930();
             signature.setChainId(tx.getChainId());
@@ -177,34 +181,64 @@ public class TransactionDecoder {
 
             tx.setSignature(signature);
         }
-
-        if (!rdr.isConsumed()) {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Has more data than expected");
-        }
-
-        return tx;
     }
 
-    protected void readMainPart(RlpReader rdr, Transaction tx) {
-        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setNonce(rdr.nextLong());
+    private void readAccessList(RlpReader rdr, TransactionWithAccess tx) {
+        if (rdr.hasNext() && rdr.getType() == RlpType.LIST) {
+            RlpReader accessListRdr = rdr.nextList();
+            List<TransactionWithAccess.Access> accessList = new ArrayList<>();
+
+            while (accessListRdr.hasNext()) {
+                RlpReader accessItemRdr = accessListRdr.nextList();
+                Address address = Address.from(accessItemRdr.next());
+                RlpReader storageListRdr = accessItemRdr.nextList();
+                List<Hex32> storageList = new ArrayList<>();
+                while (storageListRdr.hasNext()) {
+                    storageList.add(Hex32.from(storageListRdr.next()));
+                }
+                accessList.add(new TransactionWithAccess.Access(address, storageList));
+                if (!accessItemRdr.isConsumed()) {
+                    throw new IllegalArgumentException("Transaction has invalid RLP encoding. Invalid value: Access List Item");
+                }
+            }
+            if (!accessListRdr.isConsumed()) {
+                throw new IllegalArgumentException("Transaction has invalid RLP encoding. Invalid value: Access List");
+            }
+            tx.setAccessList(accessList);
         } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Nonce");
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list: Access List");
         }
+    }
 
+    protected void readDefinitionsPart(RlpReader rdr, Transaction tx) {
+        readNonce(rdr, tx);
+        readGasPrice(rdr, tx);
+        readGasLimit(rdr, tx);
+    }
+
+    protected void readBodyPart(RlpReader rdr, Transaction tx) {
+        readTo(rdr, tx);
+        readValue(rdr, tx);
+        readData(rdr, tx);
+    }
+
+    private void readData(RlpReader rdr, Transaction tx) {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setGasPrice(rdr.nextBigInt());
+            tx.setData(new HexData(rdr.next()));
         } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas Price");
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Data");
         }
+    }
 
+    private void readValue(RlpReader rdr, Transaction tx) {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setGas(rdr.nextLong());
+            tx.setValue(new Wei(rdr.nextBigInt()));
         } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas");
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Value");
         }
+    }
 
-
+    private void readTo(RlpReader rdr, Transaction tx) {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
             byte[] address = rdr.next();
             if (address != null && address.length > 0) {
@@ -213,17 +247,45 @@ public class TransactionDecoder {
         } else {
             throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: To");
         }
+    }
 
+    private void readGasLimit(RlpReader rdr, Transaction tx) {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setValue(new Wei(rdr.nextBigInt()));
+            tx.setGas(rdr.nextLong());
         } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Value");
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas");
         }
+    }
 
+    private void readGasPrice(RlpReader rdr, Transaction tx) {
         if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
-            tx.setData(new HexData(rdr.next()));
+            tx.setGasPrice(rdr.nextBigInt());
         } else {
-            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Data");
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas Price");
+        }
+    }
+
+    private void readMaxGasPrice(RlpReader rdr, TransactionWithGasPriority tx) {
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            tx.setMaxGasPrice(rdr.nextBigInt());
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas Price");
+        }
+    }
+
+    private void readPriorityGasPrice(RlpReader rdr, TransactionWithGasPriority tx) {
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            tx.setPriorityGasPrice(rdr.nextBigInt());
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Gas Price");
+        }
+    }
+
+    private void readNonce(RlpReader rdr, Transaction tx) {
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            tx.setNonce(rdr.nextLong());
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Nonce");
         }
     }
 }

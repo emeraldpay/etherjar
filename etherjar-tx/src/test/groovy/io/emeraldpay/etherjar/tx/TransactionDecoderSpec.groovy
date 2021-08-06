@@ -163,4 +163,68 @@ class TransactionDecoderSpec extends Specification {
         }
         act.signature.recoverAddress().toHex() == "0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f"
     }
+
+    def "Parse tx with gas priority same as max - 0x26acb4b"() {
+        // EIP-1559 tx
+        // 0x26acb4b776574c2610c82d0a846d54a993a16f0cf5018a32c7860e0e60dd8255
+        setup:
+        def tx = Hex.decodeHex("02f87401038509524eafc38509524eafc382520894e993226e3ebd2852c9ee9efab6a0e3260be0cb0688359768e80ed7c9ee80c001a06f1aafac255225b837f5dcfdfd7e2180c53acf23d44edf67cebb3cf62b872dcfa001eb68b217fd9c007ab3b51996b5d2d05f0c335e674700c39617ed155fdde6df")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act instanceof TransactionWithGasPriority
+        with((TransactionWithGasPriority)act) {
+            nonce == 3
+            maxGasPrice == new Wei(40035594179)
+            priorityGasPrice == new Wei(40035594179)
+            gas == 21_000
+            to.toHex() == "0xe993226e3ebd2852c9ee9efab6a0e3260be0cb06"
+            value == Wei.from("0x359768e80ed7c9ee")
+            data.toHex() == "0x"
+            signature != null
+            chainId == 1
+            accessList.size() == 0
+            signature instanceof SignatureEIP2930
+            with((SignatureEIP2930)signature) {
+                YParity == 1
+                r.toString(16) == "6f1aafac255225b837f5dcfdfd7e2180c53acf23d44edf67cebb3cf62b872dcf"
+                s.toString(16) == "1eb68b217fd9c007ab3b51996b5d2d05f0c335e674700c39617ed155fdde6df"
+            }
+            act.signature.recoverAddress().toHex() == "0xfac40888ed4b06e7b832e0a6460d7fa2065d1a28"
+        }
+    }
+
+    def "Parse tx with gas priority - 0xe2c9ad"() {
+        // EIP-1559 tx
+        // 0xe2c9ad4b92dfdea74203f83c503b769525ada75b9a53745f70113f23c077162c
+        setup:
+        def tx = Hex.decodeHex("02f8b101819684ee6b280085134062da9b82c79d947bebd226154e865954a87650faefa8f485d3608180b844095ea7b300000000000000000000000003f7724180aa6b939894b5ca4314783b0b36b329ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc001a0d978ed98e78dd480b2aec86d1521962a8fe4009e44fb19f45b70d8005e602182a0347c933f78131995c1abd07c1d0be67d8f04c2cf99cd79510657e97ead8c1a9f")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act instanceof TransactionWithGasPriority
+        with((TransactionWithGasPriority)act) {
+            nonce == 150
+            maxGasPrice == new Wei(82684598939)
+            priorityGasPrice == new Wei(4000000000)
+            gas == 51_101
+            to.toHex() == "0x7bebd226154e865954a87650faefa8f485d36081"
+            value == Wei.ZERO
+            data.toHex() == "0x095ea7b300000000000000000000000003f7724180aa6b939894b5ca4314783b0b36b329ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            signature != null
+            chainId == 1
+            accessList.size() == 0
+            signature instanceof SignatureEIP2930
+            with((SignatureEIP2930)signature) {
+                YParity == 1
+                r.toString(16) == "d978ed98e78dd480b2aec86d1521962a8fe4009e44fb19f45b70d8005e602182"
+                s.toString(16) == "347c933f78131995c1abd07c1d0be67d8f04c2cf99cd79510657e97ead8c1a9f"
+            }
+            act.signature.recoverAddress().toHex() == "0xcf85118573955817f86795fc68feed6937d61064"
+        }
+    }
 }

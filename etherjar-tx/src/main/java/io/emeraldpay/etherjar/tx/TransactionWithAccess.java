@@ -53,12 +53,17 @@ public class TransactionWithAccess extends Transaction {
     }
 
     @Override
-    public byte[] hash(Integer chainId) {
+    public byte[] hash() {
         byte[] rlp = ENCODER.encode(this, false);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
         return keccak.digest();
+    }
+
+    @Override
+    public byte[] hash(Integer chainId) {
+        return hash();
     }
 
     @Override

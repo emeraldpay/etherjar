@@ -91,6 +91,9 @@ public class Signature {
      */
     public Address recoverAddress() {
         try {
+            if (message == null || message.length == 0) {
+                throw new IllegalStateException("Transaction/Message hash are not set");
+            }
             byte[] pubkey = Signer.ecrecover(this);
             if (pubkey == null) {
                 return null;
