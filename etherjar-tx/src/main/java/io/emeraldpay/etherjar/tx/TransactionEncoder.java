@@ -27,6 +27,12 @@ public class TransactionEncoder {
 
     public byte[] encode(Transaction tx, boolean includeSignature) {
         if (includeSignature) {
+            if (tx instanceof TransactionWithGasPriority) {
+                return encode((TransactionWithGasPriority) tx, includeSignature);
+            }
+            if (tx instanceof TransactionWithAccess) {
+                return encode((TransactionWithAccess) tx, includeSignature);
+            }
             return encode(tx, true, null);
         } else {
             Signature signature = tx.getSignature();

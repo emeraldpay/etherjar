@@ -48,6 +48,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.s.toString(16) == "39837b1d2ee9c8ee011f44407927b540df893884eef98f67b164c8cafb82061b"
 
         act.signature.recoverAddress().toHex() == "0xed059bc543141c8c93031d545079b3da0233b27f"
+        act.transactionId().toHex() == "0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31"
     }
 
     def "Parse goerli 0x6d4d85"() {
@@ -68,6 +69,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature != null
 
         act.signature.recoverAddress() == Address.from("0x79047abf3af2a1061b108d71d6dc7bdb06474790")
+        act.transactionId().toHex() == "0x6d4d85482c59b6fe2f416996c802ceae2e30b9fe6bc27fe5c72d2fa9b1b2e28b"
     }
 
     def "Parse goerli 0x8d8367"() {
@@ -91,6 +93,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.s.toString(16) == "79c62b0c278676c590afd0f8bcfc4654b5babb99a5883baefc539acd55ee0365"
 
         act.signature.recoverAddress().toHex() == "0x8ced5ad0d8da4ec211c17355ed3dbfec4cf0e5b9"
+        act.transactionId().toHex() == "0x8d8367acc4c8f17fa6b9e8a856833b3406b200f96a5fa98018128411b1f0c6d1"
     }
 
     def "Parse tx with Access List"() {
@@ -194,6 +197,7 @@ class TransactionDecoderSpec extends Specification {
             }
             act.signature.recoverAddress().toHex() == "0xfac40888ed4b06e7b832e0a6460d7fa2065d1a28"
         }
+        act.transactionId().toHex() == "0x26acb4b776574c2610c82d0a846d54a993a16f0cf5018a32c7860e0e60dd8255"
     }
 
     def "Parse tx with gas priority - 0xe2c9ad"() {
@@ -226,5 +230,6 @@ class TransactionDecoderSpec extends Specification {
             }
             act.signature.recoverAddress().toHex() == "0xcf85118573955817f86795fc68feed6937d61064"
         }
+        act.transactionId().toHex() == "0xe2c9ad4b92dfdea74203f83c503b769525ada75b9a53745f70113f23c077162c"
     }
 }
