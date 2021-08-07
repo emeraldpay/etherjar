@@ -67,6 +67,11 @@ public class TransactionWithAccess extends Transaction {
     }
 
     @Override
+    public TransactionType getType() {
+        return TransactionType.ACCESS_LIST;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

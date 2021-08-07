@@ -59,6 +59,11 @@ public class SignatureEIP2930 extends Signature {
     }
 
     @Override
+    public SignatureType getType() {
+        return SignatureType.EIP2930;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

@@ -30,8 +30,6 @@ import java.util.Objects;
  */
 public class Transaction {
 
-
-
     private long nonce;
     private Wei gasPrice;
     private long gas;
@@ -106,6 +104,14 @@ public class Transaction {
 
     /**
      *
+     * @return type of the transaction
+     */
+    public TransactionType getType() {
+        return TransactionType.STANDARD;
+    }
+
+    /**
+     *
      * @return signer of the transaction, if it's signed. May return null if can't recover correct public key from
      * signature
      * @throws IllegalStateException if transaction is not signed
@@ -129,7 +135,7 @@ public class Transaction {
      * @see io.emeraldpay.etherjar.domain.TransactionId
      */
     public byte[] hash() {
-        return hash(signature != null && signature instanceof SignatureEIP155 ? 1 : null);
+        return hash(signature != null && signature.getType() == SignatureType.EIP155 ? ((SignatureEIP155)signature).getChainId() : null);
     }
 
     public byte[] hash(Integer chainId) {

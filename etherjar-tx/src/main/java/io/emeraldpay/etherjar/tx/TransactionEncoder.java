@@ -26,23 +26,26 @@ public class TransactionEncoder {
     public static final TransactionEncoder DEFAULT = new TransactionEncoder();
 
     public byte[] encode(Transaction tx, boolean includeSignature) {
-        if (includeSignature) {
-            if (tx instanceof TransactionWithGasPriority) {
-                return encode((TransactionWithGasPriority) tx, includeSignature);
-            }
-            if (tx instanceof TransactionWithAccess) {
-                return encode((TransactionWithAccess) tx, includeSignature);
-            }
-            return encode(tx, true, null);
-        } else {
-            Signature signature = tx.getSignature();
-            if (signature instanceof SignatureEIP155) {
-                int chainId = ((SignatureEIP155)signature).getChainId();
-                return encode(tx, false, chainId);
+        if (tx.getType() == TransactionType.GAS_PRIORITY) {
+            return encode((TransactionWithGasPriority) tx, includeSignature);
+        }
+        if (tx.getType() == TransactionType.ACCESS_LIST) {
+            return encode((TransactionWithAccess) tx, includeSignature);
+        }
+        if (tx.getType() == TransactionType.STANDARD) {
+            if (includeSignature) {
+                return encode(tx, true, null);
             } else {
-                throw new IllegalStateException("Neigher signature not chainId specified");
+                Signature signature = tx.getSignature();
+                if (signature.getType() == SignatureType.EIP155) {
+                    int chainId = ((SignatureEIP155)signature).getChainId();
+                    return encode(tx, false, chainId);
+                } else {
+                    throw new IllegalStateException("Neither signature nor chainId specified");
+                }
             }
         }
+        throw new IllegalStateException("Unsupported transaction type: " + tx.getType());
     }
 
     public byte[] encode(Transaction tx, boolean includeSignature, Integer chainId) {
@@ -127,7 +130,7 @@ public class TransactionEncoder {
                     .write(0)
                     .write(0);
             } else {
-                if (signature instanceof SignatureEIP2930) {
+                if (signature.getType() == SignatureType.EIP2930) {
                     int yParity = ((SignatureEIP2930)signature).getYParity();
                     if (yParity == 0) {
                         wrt.write(0);

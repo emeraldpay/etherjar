@@ -34,12 +34,14 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.STANDARD
         act.nonce == 15524
         act.gasPrice.toHex() == "0x59b9b95f0"
         act.gas == 0x03d090
         act.to.toHex() == "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac"
         act.value.toHex() == "0x0"
         act.data.toHex() == "0x667a2f58"
+        act.signature.getType() == SignatureType.LEGACY
         act.signature instanceof Signature
         !(act.signature instanceof SignatureEIP155)
         act.signature != null
@@ -60,6 +62,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.STANDARD
         act.nonce == 45020
         act.gasPrice == Wei.ofUnits(1, Wei.Unit.GWEI)
         act.gas == 250000
@@ -67,7 +70,7 @@ class TransactionDecoderSpec extends Specification {
         act.value.toHex() == "0x0"
         act.data.toHex() == "0xe9c6c1760000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000043c636a65ea4943acfacb227680b6ba20c477ba24ef87049a4a5b3958385e215bb0864"
         act.signature != null
-
+        act.signature.getType() == SignatureType.LEGACY
         act.signature.recoverAddress() == Address.from("0x79047abf3af2a1061b108d71d6dc7bdb06474790")
         act.transactionId().toHex() == "0x6d4d85482c59b6fe2f416996c802ceae2e30b9fe6bc27fe5c72d2fa9b1b2e28b"
     }
@@ -81,6 +84,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.STANDARD
         act.nonce == 10162
         act.gasPrice == Wei.ofUnits(1, Wei.Unit.GWEI)
         act.gas == 30000
@@ -88,6 +92,7 @@ class TransactionDecoderSpec extends Specification {
         act.value == Wei.ofEthers(0.05)
         act.data.toHex() == "0x00"
         act.signature != null
+        act.signature.getType() == SignatureType.LEGACY
         act.signature.v == 28
         act.signature.r.toString(16) == "77313351aaa29a277e3cf015c354542e042b00c4757e1ac70fdbc9b1d0341c23"
         act.signature.s.toString(16) == "79c62b0c278676c590afd0f8bcfc4654b5babb99a5883baefc539acd55ee0365"
@@ -104,6 +109,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.ACCESS_LIST
         act instanceof TransactionWithAccess
         act.nonce == 0
         act.gasPrice == Wei.ofUnits(20, Wei.Unit.GWEI)
@@ -121,6 +127,7 @@ class TransactionDecoderSpec extends Specification {
                 Hex32.from("0x0000000000000000000000000000000000000000000000000000000000000007")
             )
         }
+        act.signature.getType() == SignatureType.EIP2930
         act.signature instanceof SignatureEIP2930
         with((SignatureEIP2930)act.signature) {
             YParity == 1
@@ -138,6 +145,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.ACCESS_LIST
         act instanceof TransactionWithAccess
         act.nonce == 1
         act.gasPrice == Wei.ofUnits(20, Wei.Unit.GWEI)
@@ -158,6 +166,7 @@ class TransactionDecoderSpec extends Specification {
                 Address.from("0xbb9bc244d798123fde783fcc1c72d3bb8c189413")
             )
         }
+        act.signature.getType() == SignatureType.EIP2930
         act.signature instanceof SignatureEIP2930
         with((SignatureEIP2930)act.signature) {
             YParity == 0
@@ -177,6 +186,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.GAS_PRIORITY
         act instanceof TransactionWithGasPriority
         with((TransactionWithGasPriority)act) {
             nonce == 3
@@ -189,6 +199,7 @@ class TransactionDecoderSpec extends Specification {
             signature != null
             chainId == 1
             accessList.size() == 0
+            signature.getType() == SignatureType.EIP2930
             signature instanceof SignatureEIP2930
             with((SignatureEIP2930)signature) {
                 YParity == 1
@@ -210,6 +221,7 @@ class TransactionDecoderSpec extends Specification {
         act.signature.message = act.hash()
 
         then:
+        act.getType() == TransactionType.GAS_PRIORITY
         act instanceof TransactionWithGasPriority
         with((TransactionWithGasPriority)act) {
             nonce == 150
@@ -222,6 +234,7 @@ class TransactionDecoderSpec extends Specification {
             signature != null
             chainId == 1
             accessList.size() == 0
+            signature.getType() == SignatureType.EIP2930
             signature instanceof SignatureEIP2930
             with((SignatureEIP2930)signature) {
                 YParity == 1

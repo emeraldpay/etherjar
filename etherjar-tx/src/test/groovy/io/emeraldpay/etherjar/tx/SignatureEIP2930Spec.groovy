@@ -6,6 +6,13 @@ import spock.lang.Specification
 
 class SignatureEIP2930Spec extends Specification {
 
+    def "correct type"() {
+        when:
+        Signature signature = new SignatureEIP2930()
+        then:
+        signature.getType() == SignatureType.EIP2930
+    }
+
     def "EqualVerify"() {
         expect:
         EqualsVerifier.forClass(SignatureEIP2930)

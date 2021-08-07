@@ -60,6 +60,10 @@ public class Signature {
         this.message = message;
     }
 
+    public SignatureType getType() {
+        return SignatureType.LEGACY;
+    }
+
     public int getV() {
         return v;
     }

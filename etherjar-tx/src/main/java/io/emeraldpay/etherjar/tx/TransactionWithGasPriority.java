@@ -96,6 +96,11 @@ public class TransactionWithGasPriority extends TransactionWithAccess {
     }
 
     @Override
+    public TransactionType getType() {
+        return TransactionType.GAS_PRIORITY;
+    }
+
+    @Override
     public byte[] hash() {
         byte[] rlp = TransactionEncoder.DEFAULT.encode(this, false);
         Keccak.Digest256 keccak = new Keccak.Digest256();

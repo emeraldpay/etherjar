@@ -23,6 +23,13 @@ import spock.lang.Specification
 
 class SignatureEIP155Spec extends Specification {
 
+    def "correct type"() {
+        when:
+        Signature signature = new SignatureEIP155(61)
+        then:
+        signature.getType() == SignatureType.EIP155
+    }
+
     def "valid recId for ETC"() {
         SignatureEIP155 signature = new SignatureEIP155(61)
         when:

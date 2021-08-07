@@ -167,8 +167,7 @@ public class Signer {
     public Signature sign(Transaction tx, PrivateKey pk) {
         byte[] hash = hash(tx);
         Class<? extends Signature> type = Signature.class;
-        // TransactionWithAccess (or TransactionWithGasPriority, which extends it)
-        if (tx instanceof TransactionWithAccess) {
+        if (tx.getType() != TransactionType.STANDARD) {
             type = SignatureEIP2930.class;
         } else if (chainId != null) {
             type = SignatureEIP155.class;
