@@ -80,7 +80,7 @@ public class TransactionWithAccess extends Transaction {
         return  chainId == that.chainId && Objects.equals(accessList, that.accessList);
     }
 
-    static class Access {
+    public static class Access {
         private Address address;
         private List<Hex32> storageKeys;
 
