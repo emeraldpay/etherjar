@@ -19,6 +19,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -52,7 +53,7 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
         // Fill batch items with result
         Flux<RpcCallResponse> shared = result
             .doOnNext(new ProcessBatchResult(context))
-            // each batch item would attach to the the response flux to build it's own result
+            // each batch item would attach to the response flux to build its own result
             .share()
             // cache the results to avoid double calls when both execute() and individual call has own subscriptions
             .cache();
@@ -62,7 +63,9 @@ public abstract class AbstractReactorRpcClient implements ReactorRpcClient {
 
         // Close unprocessed items
         return shared
-            .doFinally((s) -> batch.close());
+            .doFinally((s) -> {
+                if (s != SignalType.CANCEL) batch.close();
+            });
     }
 
     /**
