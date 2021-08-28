@@ -25,11 +25,11 @@ import java.nio.ByteBuffer;
  */
 public class RlpReader {
 
-    private byte[] input;
+    private final byte[] input;
 
     private Current current;
     private int position = 0;
-    private int limit;
+    private final int limit;
 
     /**
      * Read from provided input
@@ -84,7 +84,7 @@ public class RlpReader {
         // the data is a string if the range of the first byte(i.e. prefix)
         // is [0x00, 0x7f], and the string is the first byte itself exactly;
         if (i0 <= 0x7f) {
-            return new Current(RlpType.BYTES, new byte[] {b0});
+            return new Current(RlpType.BYTES, new byte[]{b0});
         }
         // the data is a string if the range of the first byte is [0x80, 0xb7], and the
         // string whose length is equal to the first byte minus 0x80 follows the first byte;
@@ -204,9 +204,10 @@ public class RlpReader {
     /**
      * Skip next element
      */
-    public void skip() {
+    public RlpReader skip() {
         tryRead();
         current = null;
+        return this;
     }
 
     /**
@@ -291,7 +292,7 @@ public class RlpReader {
         return list;
     }
 
-    private class Current {
+    private static class Current {
         RlpType type;
         byte[] data;
         RlpReader list;
