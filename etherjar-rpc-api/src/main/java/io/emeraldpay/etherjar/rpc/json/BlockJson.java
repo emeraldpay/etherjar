@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.BlockHash;
 import io.emeraldpay.etherjar.domain.Bloom;
+import io.emeraldpay.etherjar.domain.Wei;
 import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.Serializable;
@@ -128,6 +129,11 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
      * list of uncle hashes.
      */
     private List<BlockHash> uncles;
+
+    /**
+     * basefee value for that block, as per EIP-1559
+     */
+    private Wei baseFeePerGas;
 
     public Long getNumber() {
         return number;
@@ -273,6 +279,14 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.uncles = uncles;
     }
 
+    public Wei getBaseFeePerGas() {
+        return baseFeePerGas;
+    }
+
+    public void setBaseFeePerGas(Wei baseFeePerGas) {
+        this.baseFeePerGas = baseFeePerGas;
+    }
+
     /**
      * If this instance is empty or contains only references, then return as is. Otherwise
      * returns a copy of the BlockJson with transactions fields replaced with id references
@@ -321,6 +335,7 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         copy.timestamp = this.timestamp;
         copy.transactions = this.transactions;
         copy.uncles = this.uncles;
+        copy.baseFeePerGas = this.baseFeePerGas;
         return copy;
     }
 
@@ -348,6 +363,7 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         if (!Objects.equals(gasUsed, blockJson.gasUsed)) return false;
         if (!Objects.equals(timestamp, blockJson.timestamp)) return false;
         if (!Objects.equals(transactions, blockJson.transactions)) return false;
+        if (!Objects.equals(baseFeePerGas, blockJson.baseFeePerGas)) return false;
         return Objects.equals(uncles, blockJson.uncles);
     }
 

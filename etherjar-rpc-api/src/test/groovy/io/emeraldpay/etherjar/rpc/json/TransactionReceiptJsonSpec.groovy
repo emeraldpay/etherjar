@@ -173,4 +173,27 @@ class TransactionReceiptJsonSpec extends Specification {
         orig == read
         json.contains("0x57c09bd9f137287b3a4d2691bf5259df2107fcf3c1c69f5a50c9324f528d1793")
     }
+
+    def "reads effectiveGasPrice"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("receipt/0xb8e7e1.json")
+
+        when:
+        def receipt = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        receipt.effectiveGasPrice != null
+        receipt.effectiveGasPrice.toHex() == "0x1cc398813a"
+    }
+
+    def "reads type"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("receipt/0xb8e7e1.json")
+
+        when:
+        def receipt = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        receipt.type == 2
+    }
 }

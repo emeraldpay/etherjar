@@ -18,6 +18,7 @@ package io.emeraldpay.etherjar.rpc.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.emeraldpay.etherjar.domain.BlockHash;
+import io.emeraldpay.etherjar.domain.Wei;
 
 import java.io.IOException;
 
@@ -31,6 +32,11 @@ public class BlockJsonSerializer extends EtherJsonSerializer<BlockJson<?>>{
         writeField(gen, "number", value.getNumber());
         writeField(gen, "hash", value.getHash());
         writeField(gen, "timestamp", value.getTimestamp());
+
+        Wei baseFeePerGas = value.getBaseFeePerGas();
+        if (baseFeePerGas != null) {
+            writeField(gen, "baseFeePerGas", baseFeePerGas);
+        }
 
         gen.writeFieldName("transactions");
         gen.writeStartArray();

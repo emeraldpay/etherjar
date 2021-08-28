@@ -71,16 +71,40 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         return HexEncoding.fromHex(value);
     }
 
+    protected Integer getInt(JsonNode node, String name) {
+        if (!node.has(name)) {
+            return null;
+        }
+        return getInt(node.get(name));
+    }
+
+    protected Integer getInt(JsonNode node) {
+        if (node instanceof NumericNode) {
+            return node.intValue();
+        }
+        String hex = getHexString(node);
+        if (hex == null || hex.length() <= 2) {
+            return null;
+        }
+        return Integer.parseInt(hex.substring(2), 16);
+    }
+
     protected Long getLong(JsonNode node, String name) {
-        BigInteger quantity = getQuantity(node, name);
-        if (quantity == null) return null;
-        return quantity.longValue();
+        if (!node.has(name)) {
+            return null;
+        }
+        return getLong(node.get(name));
     }
 
     protected Long getLong(JsonNode node) {
-        BigInteger quantity = getQuantity(node);
-        if (quantity == null) return null;
-        return quantity.longValue();
+        if (node instanceof NumericNode) {
+            return node.longValue();
+        }
+        String hex = getHexString(node);
+        if (hex == null || hex.length() <= 2) {
+            return null;
+        }
+        return Long.parseLong(hex.substring(2), 16);
     }
 
     protected Address getAddress(JsonNode node, String name) {

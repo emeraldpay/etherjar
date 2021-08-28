@@ -93,6 +93,8 @@ public class BlockJsonDeserializer extends EtherJsonDeserializer<BlockJson<?>> {
         }
         blockJson.setUncles(uncles);
 
+        blockJson.setBaseFeePerGas(getWei(node, "baseFeePerGas"));
+
         return blockJson;
     }
 

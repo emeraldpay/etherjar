@@ -15,6 +15,9 @@
  */
 package io.emeraldpay.etherjar.tx;
 
+/**
+ * @see <a href="https://eips.ethereum.org/EIPS/eip-2718">EIP-2718: Typed Transaction Envelope</a>
+ */
 public enum TransactionType {
 
     /**

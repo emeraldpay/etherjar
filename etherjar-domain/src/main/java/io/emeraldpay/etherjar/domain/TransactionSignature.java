@@ -19,6 +19,8 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
 
+import java.util.Objects;
+
 /**
  * Transaction signature with support of Replay Protection (EIP-155)
  */
@@ -96,5 +98,18 @@ public class TransactionSignature {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TransactionSignature)) return false;
+        TransactionSignature that = (TransactionSignature) o;
+        return Objects.equals(chainId, that.chainId) && Objects.equals(publicKey, that.publicKey) && Objects.equals(r, that.r) && Objects.equals(s, that.s) && Objects.equals(v, that.v);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(chainId, s, v);
     }
 }

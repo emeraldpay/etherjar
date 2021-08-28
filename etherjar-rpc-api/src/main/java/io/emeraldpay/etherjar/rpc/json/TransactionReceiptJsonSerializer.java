@@ -34,6 +34,7 @@ public class TransactionReceiptJsonSerializer extends EtherJsonSerializer<Transa
         writeField(gen, "to", value.getTo());
         writeField(gen, "cumulativeGasUsed", value.getCumulativeGasUsed());
         writeField(gen, "gasUsed", value.getGasUsed());
+        writeField(gen, "effectiveGasPrice", value.getEffectiveGasPrice());
         writeField(gen, "transactionHash", value.getTransactionHash());
         writeField(gen, "transactionIndex", value.getTransactionIndex());
         writeField(gen, "logsBloom", value.getLogsBloom());
@@ -50,6 +51,9 @@ public class TransactionReceiptJsonSerializer extends EtherJsonSerializer<Transa
 
         if (value.getStatus() != null) {
             writeField(gen, "status", value.getStatus());
+        }
+        if (value.getType() != 0) {
+            writeField(gen, "type", value.getType());
         }
         gen.writeEndObject();
     }

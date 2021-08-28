@@ -86,6 +86,14 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
      */
     private Integer status;
 
+    private Wei effectiveGasPrice;
+
+    /**
+     * Transaction type
+     * @see <a href="https://eips.ethereum.org/EIPS/eip-2718">EIP-2718: Typed Transaction Envelope</a>
+     */
+    private int type = 0;
+
     public TransactionId getTransactionHash() {
         return transactionHash;
     }
@@ -180,6 +188,22 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Wei getEffectiveGasPrice() {
+        return effectiveGasPrice;
+    }
+
+    public void setEffectiveGasPrice(Wei effectiveGasPrice) {
+        this.effectiveGasPrice = effectiveGasPrice;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     @Override

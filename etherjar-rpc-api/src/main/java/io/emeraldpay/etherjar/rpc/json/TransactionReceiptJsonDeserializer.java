@@ -45,6 +45,7 @@ public class TransactionReceiptJsonDeserializer extends EtherJsonDeserializer<Tr
         receipt.setTo(getAddress(node, "to"));
         receipt.setCumulativeGasUsed(getLong(node, "cumulativeGasUsed"));
         receipt.setGasUsed(getLong(node, "gasUsed"));
+        receipt.setEffectiveGasPrice(getWei(node, "effectiveGasPrice"));
         receipt.setTransactionHash(getTxHash(node, "transactionHash"));
         receipt.setTransactionIndex(getLong(node, "transactionIndex"));
         HexData logsBloom = getData(node, "logsBloom");
@@ -60,9 +61,13 @@ public class TransactionReceiptJsonDeserializer extends EtherJsonDeserializer<Tr
         }
         receipt.setLogs(logs);
 
-        Long status = getLong(node, "status");
+        Integer status = getInt(node, "status");
         if (status != null) {
-            receipt.setStatus(status.intValue());
+            receipt.setStatus(status);
+        }
+        Integer type = getInt(node, "type");
+        if (type != null) {
+            receipt.setType(type);
         }
 
         return receipt;

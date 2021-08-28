@@ -20,9 +20,13 @@ package io.emeraldpay.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.*;
+import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 @JsonDeserialize(using = TransactionJsonDeserializer.class)
@@ -73,6 +77,8 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
      * gas price provided by the sender in Wei.
      */
     private Wei gasPrice;
+    private Wei maxFeePerGas;
+    private Wei maxPriorityFeePerGas;
 
     /**
      * gas provided by the sender.
@@ -85,6 +91,16 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     private HexData input;
 
     private TransactionSignature signature;
+
+    /**
+     * Transaction type
+     * @see <a href="https://eips.ethereum.org/EIPS/eip-2718">EIP-2718: Typed Transaction Envelope</a>
+     */
+    private int type = 0;
+
+    private Integer chainId;
+
+    private List<Access> accessList;
 
     public Long getNonce() {
         return nonce;
@@ -150,6 +166,30 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         this.gasPrice = gasPrice;
     }
 
+    public Wei getMaxFeePerGas() {
+        return maxFeePerGas;
+    }
+
+    public void setMaxFeePerGas(Wei maxFeePerGas) {
+        this.maxFeePerGas = maxFeePerGas;
+    }
+
+    public Wei getMaxPriorityFeePerGas() {
+        return maxPriorityFeePerGas;
+    }
+
+    public void setMaxPriorityFeePerGas(Wei maxPriorityFeePerGas) {
+        this.maxPriorityFeePerGas = maxPriorityFeePerGas;
+    }
+
+    public Integer getChainId() {
+        return chainId;
+    }
+
+    public void setChainId(Integer chainId) {
+        this.chainId = chainId;
+    }
+
     public Long getGas() {
         return gas;
     }
@@ -182,6 +222,29 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         this.creates = creates;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public List<Access> getAccessList() {
+        return accessList;
+    }
+
+    public void setAccessList(List<Access> accessList) {
+        this.accessList = accessList;
+    }
+
+    public void addAccess(Access access) {
+        if (this.accessList == null) {
+            this.accessList = new ArrayList<>();
+        }
+        accessList.add(access);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -201,13 +264,67 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         if (!Objects.equals(gas, that.gas)) return false;
         if (!Objects.equals(input, that.input)) return false;
         if (!Objects.equals(creates, that.creates)) return false;
+        if (type != that.type) return false;
+        if (!Objects.equals(maxFeePerGas, that.maxFeePerGas)) return false;
+        if (!Objects.equals(maxPriorityFeePerGas, that.maxPriorityFeePerGas)) return false;
+        if (!Objects.equals(accessList, that.accessList)) return false;
         return Objects.equals(signature, that.signature);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
+        result = 31 * result + type;
+        result = 31 * result + (from != null ? from.hashCode() : 0);
         result = 31 * result + (blockHash != null ? blockHash.hashCode() : 0);
         return result;
+    }
+
+    public static class Access {
+        private Address address;
+        private List<Hex32> storageKeys;
+
+        public Access() {
+            storageKeys = Collections.emptyList();
+        }
+
+        public Access(Address address) {
+            this();
+            this.address = address;
+        }
+
+        public Access(Address address, List<Hex32> storageKeys) {
+            this.address = address;
+            this.storageKeys = storageKeys;
+        }
+
+        public Address getAddress() {
+            return address;
+        }
+
+        public void setAddress(Address address) {
+            this.address = address;
+        }
+
+        public List<Hex32> getStorageKeys() {
+            return storageKeys;
+        }
+
+        public void setStorageKeys(List<Hex32> storageKeys) {
+            this.storageKeys = storageKeys;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Access)) return false;
+            Access that = (Access) o;
+            return Objects.equals(address, that.address) && Objects.equals(storageKeys, that.storageKeys);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(address);
+        }
     }
 }

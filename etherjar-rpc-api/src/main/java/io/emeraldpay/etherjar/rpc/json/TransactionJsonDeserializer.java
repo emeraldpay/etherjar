@@ -21,10 +21,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.ChainId;
+import io.emeraldpay.etherjar.domain.TransactionId;
 import io.emeraldpay.etherjar.domain.TransactionSignature;
+import io.emeraldpay.etherjar.hex.Hex32;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionJsonDeserializer extends EtherJsonDeserializer<TransactionJson> {
 
@@ -39,6 +44,14 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
         tx.setHash(getTxHash(node, "hash"));
         tx.setNonce(getLong(node, "nonce"));
         tx.setBlockHash(getBlockHash(node, "blockHash"));
+        Integer type = getInt(node, "type");
+        if (type != null) {
+            tx.setType(type);
+        }
+        Integer chainId = getInt(node, "chainId");
+        if (chainId != null) {
+            tx.setChainId(chainId);
+        }
         Long blockNumber = getLong(node, "blockNumber");
         if (blockNumber != null)  {
             tx.setBlockNumber(blockNumber);
@@ -51,6 +64,8 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
         tx.setTo(getAddress(node, "to"));
         tx.setValue(getWei(node, "value"));
         tx.setGasPrice(getWei(node, "gasPrice"));
+        tx.setMaxFeePerGas(getWei(node, "maxFeePerGas"));
+        tx.setMaxPriorityFeePerGas(getWei(node, "maxPriorityFeePerGas"));
         tx.setGas(getLong(node, "gas"));
         tx.setInput(getData(node, "input"));
 
@@ -66,6 +81,23 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
             signature.setPublicKey(getData(node, "publicKey"));
 
             tx.setSignature(signature);
+        }
+
+        if (node.has("accessList")) {
+            List<TransactionJson.Access> accessList = new ArrayList<>();
+            for (JsonNode access: node.get("accessList")) {
+                Address address = getAddress(access, "address");
+                if (access.has("storageKeys")) {
+                    List<Hex32> storageKeys = new ArrayList<>();
+                    for (JsonNode storageKey: access.get("storageKeys")) {
+                        storageKeys.add(Hex32.from(storageKey.textValue()));
+                    }
+                    accessList.add(new TransactionJson.Access(address, storageKeys));
+                } else {
+                    accessList.add(new TransactionJson.Access(address));
+                }
+            }
+            tx.setAccessList(accessList);
         }
 
         return tx;

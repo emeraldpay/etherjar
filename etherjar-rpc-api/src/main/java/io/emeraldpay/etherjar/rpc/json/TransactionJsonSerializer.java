@@ -18,8 +18,11 @@ package io.emeraldpay.etherjar.rpc.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import io.emeraldpay.etherjar.domain.TransactionSignature;
+import io.emeraldpay.etherjar.domain.Wei;
+import io.emeraldpay.etherjar.hex.Hex32;
 
 import java.io.IOException;
+import java.util.List;
 
 public class TransactionJsonSerializer extends EtherJsonSerializer<TransactionJson> {
     @Override
@@ -29,6 +32,12 @@ public class TransactionJsonSerializer extends EtherJsonSerializer<TransactionJs
         writeField(gen, "nonce", value.getNonce());
         writeField(gen, "blockHash", value.getBlockHash());
         writeField(gen, "blockNumber", value.getBlockNumber());
+        if (value.getType() != 0) {
+            writeField(gen, "type", value.getType());
+        }
+        writeField(gen, "chainId", value.getChainId());
+        writeField(gen, "maxFeePerGas", value.getMaxFeePerGas());
+        writeField(gen, "maxPriorityFeePerGas", value.getMaxPriorityFeePerGas());
         if (value.getTransactionIndex() != null) {
             writeField(gen, "transactionIndex", value.getTransactionIndex().intValue());
         }
@@ -54,6 +63,26 @@ public class TransactionJsonSerializer extends EtherJsonSerializer<TransactionJs
                 writeField(gen, "v", signature.getV().longValue());
             }
             writeField(gen, "publicKey", signature.getPublicKey());
+        }
+        List<TransactionJson.Access> accessList = value.getAccessList();
+        if (accessList != null) {
+            gen.writeFieldName("accessList");
+            gen.writeStartArray();
+            for (TransactionJson.Access access: accessList) {
+                gen.writeStartObject();
+                writeField(gen, "address", access.getAddress());
+                gen.writeFieldName("storageKeys");
+                gen.writeStartArray();
+                List<Hex32> storageKeys = access.getStorageKeys();
+                if (storageKeys != null) {
+                    for (Hex32 key : storageKeys) {
+                        gen.writeString(key.toHex());
+                    }
+                }
+                gen.writeEndArray();
+                gen.writeEndObject();
+            }
+            gen.writeEndArray();
         }
         gen.writeEndObject();
     }
