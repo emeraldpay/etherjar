@@ -73,7 +73,7 @@ public class TransactionSignature {
     }
 
     public void setV(Integer v) {
-        if (v == null || v < 0 || v > 255) {
+        if (v == null || v <= 0) {
             throw new IllegalArgumentException("Invalid V: " + v);
         }
         this.v = v;

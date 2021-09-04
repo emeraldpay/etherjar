@@ -67,6 +67,17 @@ class TransactionJsonDeserializeSpec extends Specification {
         act.signature == null
     }
 
+    def "Parse tx with large V"() {
+        InputStream json = this.class.classLoader.getResourceAsStream("tx/matic-0xaf4008.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+
+        then:
+        act.hash.toHex() == '0x6fe439fa7b6f3b4883aa48f85018405e3ae61de3ad72aec614db69bebbd522b5'
+        act.signature.v == 0x135
+    }
+
     def "Reads type"() {
         setup:
         InputStream json = this.class.classLoader.getResourceAsStream("tx/0x1ccad3.json")

@@ -245,4 +245,27 @@ class TransactionDecoderSpec extends Specification {
         }
         act.transactionId().toHex() == "0xe2c9ad4b92dfdea74203f83c503b769525ada75b9a53745f70113f23c077162c"
     }
+
+    def "Parse tx with high V"() {
+        // Matic TX 0x6fe439fa7b6f3b4883aa48f85018405e3ae61de3ad72aec614db69bebbd522b5
+        setup:
+        def tx = Hex.decodeHex("f86c01844190ab0082947094cf281b9d76894627e54234604ef26d35f33860c887482a88e5d2489080820135a0813bbf0d2e686a6c82ce5726d8ec11ba1df0d5b401bf271d7a08ada9cad008dda0759ce1bbc912667e56dbf2ccd35ca06843265393430daa7437c447dfe3ad7dc1")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act.getType() == TransactionType.STANDARD
+        act.signature != null
+        act.signature.getType() == SignatureType.EIP155
+        act.signature instanceof SignatureEIP155
+        with((SignatureEIP155)act.signature) {
+            v == 0x135
+            r.toString(16) == "813bbf0d2e686a6c82ce5726d8ec11ba1df0d5b401bf271d7a08ada9cad008dd"
+            s.toString(16) == "759ce1bbc912667e56dbf2ccd35ca06843265393430daa7437c447dfe3ad7dc1"
+
+            recoverAddress().toHex() == "0x7a3972dce76a4089898e12e0606eba38766f3106"
+        }
+        act.transactionId().toHex() == "0x6fe439fa7b6f3b4883aa48f85018405e3ae61de3ad72aec614db69bebbd522b5"
+    }
 }
