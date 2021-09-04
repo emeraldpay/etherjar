@@ -1,14 +1,13 @@
 # EtherJar
 
-[![Bintray](https://img.shields.io/bintray/v/emerald/etherjar/etherjar-domain.svg)](https://bintray.com/emerald/etherjar)
 ![Build Status](https://github.com/emeraldpay/etherjar/workflows/Tests/badge.svg)
 [![codecov](https://codecov.io/gh/emeraldpay/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/emeraldpay/etherjar)
 [![license](https://img.shields.io/github/license/emeraldpay/etherjar.svg?maxAge=2592000)](https://github.com/emeraldpay/etherjar/blob/master/LICENSE)
 
 Framework agnostic modular Java 11+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.10.0
-- Latest Snapshot Version: 0.11.0-SNAPSHOT
+- Latest Stable Version: 0.11.0
+- Latest Snapshot Version: 0.12.0-SNAPSHOT
 
 ## Architecture
 
@@ -86,7 +85,7 @@ where
 <dependency>
   <groupId>io.emeraldpay.etherjar</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
-  <version>0.9.0</version>
+  <version>0.11.0</version>
 </dependency>
 ```
 
@@ -100,7 +99,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.emerald.etherjar:etherjar-rpc-http:0.9.0'
+    implementation "io.emeraldpay.etherjar:etherjar-rpc-http:0.11.0"
 }
 ```
 
@@ -150,7 +149,7 @@ For bugs, questions and discussions please use the [GitHub Issues](https://githu
 
 ## Licence
 
-Copyright 2020 EmeraldPay, Inc
+Copyright 2021 EmeraldPay, Inc
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. 
 You may obtain a copy of the License at
