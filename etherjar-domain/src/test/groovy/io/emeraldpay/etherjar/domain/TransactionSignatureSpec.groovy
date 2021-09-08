@@ -95,10 +95,6 @@ class TransactionSignatureSpec extends Specification {
 
     def "decline invalid v"() {
         when:
-        signature.setV(0)
-        then:
-        thrown(IllegalArgumentException)
-        when:
         signature.setV(-1)
         then:
         thrown(IllegalArgumentException)

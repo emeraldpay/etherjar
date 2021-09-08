@@ -155,4 +155,13 @@ class TransactionJsonDeserializeSpec extends Specification {
             ]
         }
     }
+
+    def "Reads tx with v=0"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("tx/0xd67a48.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+        then:
+        act.signature.v == 0
+    }
 }
