@@ -5,10 +5,14 @@ on:
     push:
         branches:
             - master
+            - release/*
+            - ci/*
     # on a pull request
     pull_request:
         branches:
             - master
+            - release/*
+            - ci/*
 
 jobs:
     # Run unit tests and submit Coverage Report
