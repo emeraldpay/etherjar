@@ -16,7 +16,7 @@
 package io.emeraldpay.etherjar.rpc.http;
 
 import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.json.RequestJson;
+import io.emeraldpay.etherjar.rpc.RequestJson;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpResponseStatus;

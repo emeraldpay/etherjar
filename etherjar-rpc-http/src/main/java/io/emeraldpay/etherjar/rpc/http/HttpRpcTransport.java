@@ -18,8 +18,8 @@
 package io.emeraldpay.etherjar.rpc.http;
 
 import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.json.RequestJson;
-import io.emeraldpay.etherjar.rpc.json.ResponseJson;
+import io.emeraldpay.etherjar.rpc.RequestJson;
+import io.emeraldpay.etherjar.rpc.ResponseJson;
 import io.emeraldpay.etherjar.rpc.RpcTransport;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;

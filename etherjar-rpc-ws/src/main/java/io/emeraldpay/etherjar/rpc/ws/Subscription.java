@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.emeraldpay.etherjar.rpc.RpcResponseError;
 import io.emeraldpay.etherjar.rpc.json.BlockJson;
-import io.emeraldpay.etherjar.rpc.json.RequestJson;
+import io.emeraldpay.etherjar.rpc.RequestJson;
 import io.emeraldpay.etherjar.rpc.json.TransactionRefJson;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;

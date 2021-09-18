@@ -18,7 +18,7 @@ package io.emeraldpay.etherjar.rpc.http;
 import io.emeraldpay.etherjar.rpc.BatchCallContext;
 import io.emeraldpay.etherjar.rpc.ReactorBatch;
 import io.emeraldpay.etherjar.rpc.RpcConverter;
-import io.emeraldpay.etherjar.rpc.json.RequestJson;
+import io.emeraldpay.etherjar.rpc.RequestJson;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.reactivestreams.Publisher;

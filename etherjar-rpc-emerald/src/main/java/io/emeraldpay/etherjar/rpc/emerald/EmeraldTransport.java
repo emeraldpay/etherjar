@@ -27,7 +27,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.json.ResponseJson;
+import io.emeraldpay.etherjar.rpc.ResponseJson;
 import io.emeraldpay.etherjar.rpc.RpcTransport;
 import io.netty.handler.ssl.SslContextBuilder;
 

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2020 EmeraldPay Inc, All Rights Reserved.
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2021 EmeraldPay Inc, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +14,10 @@
  * limitations under the License.
  */
 
-rootProject.name = 'etherjar'
+dependencies {
+    api project(':etherjar-hex')
+    api project(':etherjar-domain')
 
-include "etherjar-abi",
-    "etherjar-contract",
-    "etherjar-domain",
-    "etherjar-erc20",
-    "etherjar-hex",
-    "etherjar-rlp",
-    "etherjar-rpc-json",
-    "etherjar-rpc-api",
-    "etherjar-rpc-emerald",
-    "etherjar-rpc-http",
-    "etherjar-rpc-ws",
-    "etherjar-solidity",
-    "etherjar-tx"
-
+    api "com.fasterxml.jackson.core:jackson-core:2.9.8"
+    api "com.fasterxml.jackson.core:jackson-databind:2.9.8"
+}

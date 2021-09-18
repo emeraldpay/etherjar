@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-rootProject.name = 'etherjar'
+package io.emeraldpay.etherjar.rpc;
 
-include "etherjar-abi",
-    "etherjar-contract",
-    "etherjar-domain",
-    "etherjar-erc20",
-    "etherjar-hex",
-    "etherjar-rlp",
-    "etherjar-rpc-json",
-    "etherjar-rpc-api",
-    "etherjar-rpc-emerald",
-    "etherjar-rpc-http",
-    "etherjar-rpc-ws",
-    "etherjar-solidity",
-    "etherjar-tx"
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
+public interface RpcConverter {
+
+    <T> T fromJson(InputStream content, Class<T> clazz) throws RpcException;
+
+    List<ResponseJson<Object,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException;
+
+    String toJson(RequestJson request);
+
+    String toJson(List<RequestJson<Integer>> batch);
+
+}

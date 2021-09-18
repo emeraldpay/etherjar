@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.json.ResponseJson;
+import io.emeraldpay.etherjar.rpc.ResponseJson;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.handler.codec.http.HttpHeaderNames;

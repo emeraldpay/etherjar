@@ -27,7 +27,7 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.json.ResponseJson;
+import io.emeraldpay.etherjar.rpc.ResponseJson;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
