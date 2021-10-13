@@ -17,8 +17,23 @@ package io.emeraldpay.etherjar.hex;
 
 import java.util.Comparator;
 
+/**
+ * Compares two <strong>same size</strong> HexData object by their byte representation.
+ * Can be used for Hex32, TransactionId, BlockHash, MethodId and other types of HexData.
+ */
 public class HexDataComparator implements Comparator<HexData> {
 
+    /**
+     * Default instance. Can be shared and used anywhere.
+     */
+    public static final HexDataComparator INSTANCE = new HexDataComparator();
+
+    /**
+     * @param o1 left side of comparison
+     * @param o2 right side of comparison
+     * @return -1, 0 or 1 for &lt;, == or &gt;
+     * @throws IllegalArgumentException if the compared values have different length
+     */
     @Override
     public int compare(HexData o1, HexData o2) {
         if (o1.getSize() != o2.getSize()) {
