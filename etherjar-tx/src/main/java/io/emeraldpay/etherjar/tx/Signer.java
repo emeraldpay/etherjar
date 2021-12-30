@@ -79,7 +79,7 @@ public class Signer {
      */
     public Signature signMessage(byte[] msg, PrivateKey pk) {
         byte[] hash = getMessageHash(msg);
-        return create(hash, pk, Signature.class);
+        return create(hash, pk, SignatureType.LEGACY);
     }
 
     /**
@@ -166,11 +166,11 @@ public class Signer {
 
     public Signature sign(Transaction tx, PrivateKey pk) {
         byte[] hash = hash(tx);
-        Class<? extends Signature> type = Signature.class;
+        SignatureType type = SignatureType.LEGACY;
         if (tx.getType() != TransactionType.STANDARD) {
-            type = SignatureEIP2930.class;
+            type = SignatureType.EIP2930;
         } else if (chainId != null) {
-            type = SignatureEIP155.class;
+            type = SignatureType.EIP155;
         }
         return create(hash, pk, type);
     }
@@ -179,8 +179,19 @@ public class Signer {
         return tx.hash(chainId);
     }
 
-    @SuppressWarnings("unchecked")
+    @Deprecated
     public <T extends Signature> T create(byte[] hash, PrivateKey key, Class<T> type) {
+        if (SignatureEIP155.class.equals(type)) {
+            return create(hash, key, SignatureType.EIP155);
+        }
+        if (SignatureEIP2930.class.equals(type)) {
+            return create(hash, key, SignatureType.EIP2930);
+        }
+        return create(hash, key, SignatureType.LEGACY);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Signature> T create(byte[] hash, PrivateKey key, SignatureType type) {
         ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
         signer.init(true, key.getECKey());
         BigInteger[] signature = signer.generateSignature(hash);
@@ -195,10 +206,10 @@ public class Signer {
         byte[] publicKey = key.getPublicKey();
 
         int y = getY(hash, r, s, publicKey);
-        if (SignatureEIP155.class.equals(type)) {
+        if (SignatureType.EIP155.equals(type)) {
             return (T) new SignatureEIP155(chainId, hash, Eip155.toV(y, chainId), r, s);
         }
-        if (SignatureEIP2930.class.equals(type)) {
+        if (SignatureType.EIP2930.equals(type)) {
             return (T) new SignatureEIP2930(hash, y, chainId, r, s);
         }
         return (T) new Signature(hash, 27 + y, r, s);
