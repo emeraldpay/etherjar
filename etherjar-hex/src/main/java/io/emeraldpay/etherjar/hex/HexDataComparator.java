@@ -42,10 +42,13 @@ public class HexDataComparator implements Comparator<HexData> {
         byte[] val1 = o1.getBytes();
         byte[] val2 = o2.getBytes();
         for (int i = 0; i < val1.length; i++) {
-            if (val1[i] < val2[i]) {
+            // convert to _unsigned_ value
+            int a = val1[i] & 0xff;
+            int b = val2[i] & 0xff;
+            if (a < b) {
                 return -1;
             }
-            if (val1[i] > val2[i]) {
+            if (a > b) {
                 return 1;
             }
         }

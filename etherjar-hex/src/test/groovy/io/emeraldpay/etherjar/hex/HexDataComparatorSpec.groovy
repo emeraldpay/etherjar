@@ -49,4 +49,11 @@ class HexDataComparatorSpec extends Specification {
         act > 0
     }
 
+    def "compare negative sign bytes"() {
+        when:
+        def act = comparator.compare(HexData.from("0xf234"), HexData.from("0x0123"))
+        then:
+        act > 0
+    }
+
 }
