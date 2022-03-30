@@ -1,0 +1,46 @@
+{
+    "output": "0x",
+    "stateDiff": {
+        "0x18f3414db9e334ec8ab1daf6e13ddd90fe91f135": {
+            "balance": {
+                "*": {
+                    "from": "0xdec70b06a7e6000",
+                    "to": "0x0"
+                }
+            },
+            "code": "=",
+            "nonce": {
+                "*": {
+                    "from": "0x0",
+                    "to": "0x1"
+                }
+            },
+            "storage": {}
+        },
+        "0x98d9522a22b7c4fd86c63c4035946494afa2434e": {
+            "balance": {
+                "*": {
+                    "from": "0x7e2d0c7778e7d400",
+                    "to": "0x8c0d078ed22c0400"
+                }
+            },
+            "code": "=",
+            "nonce": "=",
+            "storage": {}
+        },
+        "0xb3b7874f13387d44a3398d298b075b7a3505d8d4": {
+            "balance": {
+                "*": {
+                    "from": "0x322107e896eec45724b",
+                    "to": "0x322108aff07fd7fa24b"
+                }
+            },
+            "code": "=",
+            "nonce": "=",
+            "storage": {}
+        }
+    },
+    "trace": [],
+    "vmTrace": null,
+    "transactionHash": "0xe8c9d2f5868a697cc42a0eea8ff0413fe36ac7c1379bdfe1b5b2a26384e0349a"
+}
