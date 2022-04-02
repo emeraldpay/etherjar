@@ -238,10 +238,58 @@ class SignerSpec extends Specification {
 
         when:
         def act = signer.sign(tx, pk)
+
+        then:
+        act instanceof SignatureEIP2930
+        with((SignatureEIP2930)act) {
+            r.toString(16) == "b935047bf9b8464afec5bda917281610b2aaabd8de4b01d2eba6e876c934ca7a"
+            s.toString(16) == "431b406eb13aefca05a0320c3595700b9375df6fac8cc8ec5603ac2e42af4894"
+            YParity == 0
+        }
+
+        when:
         tx.signature = act
         def rlp = encoder.encode(tx, true)
         then:
         Hex.encodeHexString(rlp) == "01f8e201018504a817c800830249f0943535353535353535353535353535353535353535880de0b6b3a764000080f872f85994de0b295669a9fd93d5f28d9ec85e40f4cb697baef842a00000000000000000000000000000000000000000000000000000000000000003a00000000000000000000000000000000000000000000000000000000000000007d694bb9bc244d798123fde783fcc1c72d3bb8c189413c080a0b935047bf9b8464afec5bda917281610b2aaabd8de4b01d2eba6e876c934ca7aa0431b406eb13aefca05a0320c3595700b9375df6fac8cc8ec5603ac2e42af4894"
+    }
+
+    def "Sign tx with Gas Priority"() {
+        setup:
+        TransactionWithGasPriority tx = new TransactionWithGasPriority()
+        tx.tap {
+            chainId = 1
+            nonce = 1234 // 0x04d2
+            maxGasPrice = Wei.ofUnits(20, Wei.Unit.GWEI)
+            priorityGasPrice = Wei.ofUnits(1, Wei.Unit.GWEI)
+            gas = 150_000 // 0x0249f0
+            to = Address.from("0x3535353535353535353535353535353535353535")
+            value = Wei.ofEthers(1.2345)
+            accessList = []
+        }
+        PrivateKey pk = PrivateKey.create("0x4646464646464646464646464646464646464646464646464646464646464646")
+
+        when:
+        def hash = signer.hash(tx)
+
+        then:
+        Hex.encodeHexString(hash) == "68fe011ba5be4a03369d51810e7943abab15fbaf757f9296711558aee8ab772b"
+
+        when:
+        def act = signer.sign(tx, pk)
+        then:
+        act instanceof SignatureEIP2930
+        with((SignatureEIP2930)act) {
+            r.toString(16) == "f0b3347ec48e78bf5ef6075b332334518ebc2f90d2bf0fea080623179936382e"
+            s.toString(16) == "5c58c5beeafb2398d5e79b40b320421112a9672167f27e7fc55e76d2d7d11062"
+            YParity == 1
+        }
+
+        when:
+        tx.signature = act
+        def rlp = encoder.encode(tx, true)
+        then:
+        Hex.encodeHexString(rlp) == "02f876018204d2843b9aca008504a817c800830249f0943535353535353535353535353535353535353535881121d3359738400080c001a0f0b3347ec48e78bf5ef6075b332334518ebc2f90d2bf0fea080623179936382ea05c58c5beeafb2398d5e79b40b320421112a9672167f27e7fc55e76d2d7d11062"
     }
 
     def "extract pubkey from base tx - 0x19442f"() {
