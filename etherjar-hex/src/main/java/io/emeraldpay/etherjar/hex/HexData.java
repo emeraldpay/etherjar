@@ -126,6 +126,14 @@ public class HexData implements Serializable {
     }
 
     /**
+     *
+     * @return true if the underlying data is empty, i.e. when has no bytes in it
+     */
+    public boolean isEmpty() {
+        return this.value.length == 0;
+    }
+
+    /**
      * Concat with an array of {@link HexData}.
      *
      * @param data an array of {@link HexData}

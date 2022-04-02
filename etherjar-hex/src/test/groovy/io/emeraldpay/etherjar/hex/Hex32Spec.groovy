@@ -70,6 +70,10 @@ class Hex32Spec extends Specification {
         q          | hex
         -1         | "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         -2         | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"
+        // https://docs.soliditylang.org/en/latest/types.html?#explicit-conversions
+        -3         | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd"
+        // https://ethereum.stackexchange.com/questions/96426/how-to-assign-to-negative-numbers-in-yul
+        -15        | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff1"
         -196746    | "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffcff76"
     }
 

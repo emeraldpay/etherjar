@@ -38,6 +38,8 @@ public class Hex32 extends HexData {
     @Deprecated
     public static final Hex32 EMPTY =
             Hex32.from("0x0000000000000000000000000000000000000000000000000000000000000000");
+    private static final byte[] FULL =
+            Hex32.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").getBytes();
 
     public static Hex32 from(HexData data) {
         if (data instanceof Hex32)
@@ -74,8 +76,28 @@ public class Hex32 extends HexData {
         return new Hex32(HexData.from(value).getBytes());
     }
 
+    /**
+     *
+     * @return a Hex32 where NO bits are set. (<code>0x0000....0000</code>)
+     */
     public static Hex32 empty() {
+        // Always create a new array to avoid having a shared instance of the array which can be modified by anyone
         return new Hex32(new byte[SIZE_BYTES]);
+    }
+
+    /**
+     *
+     * @return a Hex32 where all bits are set. (<code>0xffff....ffff</code>)
+     */
+    public static Hex32 full() {
+        // Always make a copy to protect original source from modifications
+        byte[] copy = new byte[SIZE_BYTES];
+        System.arraycopy(FULL, 0, copy, 0, SIZE_BYTES);
+        return new Hex32(copy);
+    }
+
+    public static Hex32 extendFrom(String value) {
+        return extendFrom(HexData.from(value));
     }
 
     public static Hex32 extendFrom(HexData value) {
@@ -88,7 +110,7 @@ public class Hex32 extends HexData {
             BigInteger asNegative = MAX_NUMBER.add(value.getValue()).add(BigInteger.ONE);
 
             byte[] bytesAll = asNegative.toByteArray();
-            // usually it have a 0-byte prefix and we need to remove it
+            // usually it has a 0-byte prefix, and we need to remove it
             if (bytesAll[0] == 0) {
                 byte[] bytesClean = new byte[bytesAll.length - 1];
                 System.arraycopy(bytesAll, 1, bytesClean, 0, bytesClean.length);
