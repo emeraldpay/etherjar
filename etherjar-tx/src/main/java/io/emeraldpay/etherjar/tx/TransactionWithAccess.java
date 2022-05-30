@@ -41,6 +41,7 @@ public class TransactionWithAccess extends Transaction {
     }
 
     public void setAccessList(List<Access> accessList) {
+        this.transactionId = null;
         this.accessList = accessList;
     }
 
@@ -49,6 +50,7 @@ public class TransactionWithAccess extends Transaction {
     }
 
     public void setChainId(int chainId) {
+        this.transactionId = null;
         this.chainId = chainId;
     }
 

@@ -69,6 +69,7 @@ public class TransactionWithGasPriority extends TransactionWithAccess {
 
     @Override
     public void setGasPrice(Wei gasPrice) {
+        this.transactionId = null;
         super.setGasPrice(gasPrice);
         if (priorityGasPrice == null) {
             priorityGasPrice = gasPrice;
@@ -88,6 +89,7 @@ public class TransactionWithGasPriority extends TransactionWithAccess {
      * @param priorityGasPrice priority_fee
      */
     public void setPriorityGasPrice(Wei priorityGasPrice) {
+        this.transactionId = null;
         this.priorityGasPrice = priorityGasPrice;
     }
 

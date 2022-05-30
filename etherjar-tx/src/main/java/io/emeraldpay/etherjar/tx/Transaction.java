@@ -38,11 +38,18 @@ public class Transaction {
     private HexData data;
     private Signature signature;
 
+    /**
+     * Used to _cache_ the current transaction id. Must be erased each time the components
+     * of the transaction are changed.
+     */
+    protected transient TransactionId transactionId;
+
     public long getNonce() {
         return nonce;
     }
 
     public void setNonce(long nonce) {
+        this.transactionId = null;
         this.nonce = nonce;
     }
 
@@ -55,6 +62,7 @@ public class Transaction {
     }
 
     public void setGasPrice(Wei gasPrice) {
+        this.transactionId = null;
         this.gasPrice = gasPrice;
     }
 
@@ -63,6 +71,7 @@ public class Transaction {
     }
 
     public void setGas(long gas) {
+        this.transactionId = null;
         this.gas = gas;
     }
 
@@ -71,6 +80,7 @@ public class Transaction {
     }
 
     public void setTo(Address to) {
+        this.transactionId = null;
         this.to = to;
     }
 
@@ -79,6 +89,7 @@ public class Transaction {
     }
 
     public void setValue(Wei value) {
+        this.transactionId = null;
         this.value = value;
     }
 
@@ -87,6 +98,7 @@ public class Transaction {
     }
 
     public void setData(HexData data) {
+        this.transactionId = null;
         this.data = data;
     }
 
@@ -95,6 +107,7 @@ public class Transaction {
     }
 
     public void setSignature(Signature signature) {
+        this.transactionId = null;
         this.signature = signature;
     }
 
@@ -147,6 +160,9 @@ public class Transaction {
     }
 
     public TransactionId transactionId() {
+        if (transactionId != null) {
+            return transactionId;
+        }
         if (signature == null) {
             throw new IllegalStateException("Transaction is not signed");
         }
@@ -154,7 +170,8 @@ public class Transaction {
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
-        return TransactionId.from(keccak.digest());
+        this.transactionId = TransactionId.from(keccak.digest());
+        return this.transactionId;
     }
 
     public boolean canEqual(Transaction that) {
