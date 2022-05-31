@@ -34,6 +34,8 @@ public class Signature {
     private BigInteger r;
     private BigInteger s;
 
+    private transient Address address;
+
     public Signature() {
     }
 
@@ -57,6 +59,7 @@ public class Signature {
     }
 
     public void setMessage(byte[] message) {
+        this.address = null;
         this.message = message;
     }
 
@@ -69,6 +72,7 @@ public class Signature {
     }
 
     public void setV(int v) {
+        this.address = null;
         this.v = v;
     }
 
@@ -77,6 +81,7 @@ public class Signature {
     }
 
     public void setR(BigInteger r) {
+        this.address = null;
         this.r = r;
     }
 
@@ -85,6 +90,7 @@ public class Signature {
     }
 
     public void setS(BigInteger s) {
+        this.address = null;
         this.s = s;
     }
 
@@ -94,6 +100,9 @@ public class Signature {
      * @return Address which signed the message, or null if address cannot be extracted
      */
     public Address recoverAddress() {
+        if (address != null) {
+            return address;
+        }
         try {
             if (message == null || message.length == 0) {
                 throw new IllegalStateException("Transaction/Message hash are not set");
@@ -108,7 +117,9 @@ public class Signature {
 
             byte[] buf = new byte[20];
             System.arraycopy(hash, 12, buf, 0, 20);
-            return Address.from(buf);
+            Address address = Address.from(buf);
+            this.address = address;
+            return address;
         } catch (Exception e) {
             e.printStackTrace();
         }
