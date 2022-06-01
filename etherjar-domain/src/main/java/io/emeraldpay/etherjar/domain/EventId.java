@@ -25,7 +25,7 @@ import java.util.Objects;
 
 /**
  * A 32-byte long id representing a contract event, i.e. first item of the topics array in the log.
- * Calculated as keccac256("EventName(types...)")
+ * Calculated as keccak256("EventName(types...)")
  */
 public class EventId extends Hex32 {
 
