@@ -84,7 +84,15 @@ public class HexQuantity implements Serializable {
     }
 
     public HexData asData() {
-        return new HexData(value.toByteArray());
+        byte[] bytesAll = value.toByteArray();
+        // BigNumber serialization may have a 0-byte prefix, and we need to remove it because it is not supposed to be in Ethereum Hex-based values
+        if (bytesAll[0] == 0) {
+            byte[] bytesClean = new byte[bytesAll.length - 1];
+            System.arraycopy(bytesAll, 1, bytesClean, 0, bytesClean.length);
+            return new HexData(bytesClean);
+        } else {
+            return new HexData(bytesAll);
+        }
     }
 
     @Override

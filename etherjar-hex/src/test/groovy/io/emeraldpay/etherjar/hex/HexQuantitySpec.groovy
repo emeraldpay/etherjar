@@ -176,6 +176,13 @@ class HexQuantitySpec extends Specification {
         act == "0x0110"
     }
 
+    def "Converts to data max amount"() {
+        when:
+        def act = HexQuantity.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff").asData().toHex()
+        then:
+        act == "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    }
+
     def "hash code is consistent"() {
         def x = HexQuantity.from(256)
         def y = HexQuantity.from("0x100")
