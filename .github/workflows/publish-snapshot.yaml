@@ -27,6 +27,7 @@ jobs:
                 if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
 
     publish-gcp-artifacts:
+        needs: check-if-snapshots
         if: ${{ needs.check-if-snapshots.outputs.snapshot }}
         runs-on: ubuntu-latest
         steps:
