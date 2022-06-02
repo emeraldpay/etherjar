@@ -26,6 +26,21 @@ jobs:
                 run: echo "::set-output name=snapshot::true"
                 if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
 
+    debug:
+        needs: check-if-snapshots
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Show var
+                run: echo ${{ needs.check-if-snapshots.outputs.snapshot }}
+
+            -   name: Show vars
+                run: echo ${{ needs.check-if-snapshots.outputs }}
+
+            -   name: Run if
+                run: echo "ok"
+                if: ${{ needs.check-if-snapshots.outputs.snapshot }}
+
     publish-gcp-artifacts:
         needs: check-if-snapshots
         if: ${{ needs.check-if-snapshots.outputs.snapshot }}
