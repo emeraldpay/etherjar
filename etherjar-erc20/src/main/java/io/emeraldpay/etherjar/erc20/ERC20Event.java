@@ -27,14 +27,15 @@ import java.util.List;
  *
  * <p>
  * Example for extracting the ERC-20 transfers:
+ * </p>
  *
- * <code><pre>
+ * <pre><code>
  * TransactionReceiptJson receipt;
  *
  * for (TransactionLogJson log: receipt.getLogs()) {
  *    ERC20Event event = ERC20Event.extractFrom(log);
  *    if (ERC20Event.TRANSFER.equals(event)) {
- *        TransferDetails details = ((ContractEvent.Factory<TransferDetails>)event.getFactory())
+ *        TransferDetails details = ((ContractEvent.Factory&lt;TransferDetails&gt;)event.getFactory())
  *            .readFrom(log);
  *
  *        System.out.println(
@@ -43,8 +44,8 @@ import java.util.List;
  *                  + " of " + details.getAmount());
  *    }
  * }
- * </pre></code>
- * </p>
+ * </code></pre>
+ *
  */
 public enum ERC20Event {
 

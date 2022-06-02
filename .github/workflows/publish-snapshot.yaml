@@ -1,61 +1,68 @@
-name: Publish
+name: Publish Snapshot
 
 on:
-    release:
-        types: [created]
+    push:
+        branches:
+            - master
+            - ci/*
 
 jobs:
-    publish-github:
-        runs-on: ubuntu-latest
-        steps:
-            -   uses: actions/checkout@master
-                with:
-                    ref: ${{ github.ref }}
-            -   name: Set up JDK
-                uses: actions/setup-java@v1
-                with:
-                    java-version: 11
-            -   name: Check
-                uses: eskatos/gradle-command-action@v1
-                with:
-                    arguments: check
-            -   name: Build
-                uses: eskatos/gradle-command-action@v1
-                with:
-                    arguments: build
-            -   name: Sync Jars
-                uses: eskatos/gradle-command-action@v1
-                with:
-                    arguments: syncJars
-            -   name: Upload Jars
-                id: upload-release-asset
-                uses: svenstaro/upload-release-action@v1-release
-                with:
-                    repo_token: ${{ secrets.GITHUB_TOKEN }}
-                    tag: ${{ github.ref }}
-                    file: ./build/libs/*.jar
-                    file_glob: true
 
+    #
+    # Checks if it's a SNAPSHOT commit and only in this case the Snapshot Build should be enabled.
+    # Because for Releases we use a manual release process that includes publishing to GitHub and so on (see publish.yaml)
+    #
+    check-if-snapshot:
+        runs-on: ubuntu-latest
+        outputs:
+            is_snapshot: ${{ steps.set-if-snapshot.outputs.snapshot }}
+        steps:
+            -   uses: actions/checkout@master
+                with:
+                    ref: ${{ github.ref }}
+
+            -   name: Set up JDK
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 11
+
+            -   name: Get Version
+                run: ./gradlew properties -q | grep "^version:" | awk '{printf "PROJECT_VERSION=" $2}' >> $GITHUB_ENV
+
+            -   name: Enable if Snapshot
+                id: set-if-snapshot
+                run: echo "::set-output name=snapshot::true"
+                if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
+
+    #
+    # Run only if SNAPSHOT. See above
+    #
     publish-gcp-artifacts:
+        needs: check-if-snapshot
+        if: ${{ needs.check-if-snapshot.outputs.is_snapshot }}
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@master
                 with:
                     ref: ${{ github.ref }}
+
             -   name: Set up JDK
                 uses: actions/setup-java@v1
                 with:
                     java-version: 11
+
             -   name: Check
                 uses: eskatos/gradle-command-action@v1
                 with:
                     arguments: check
+
             -   name: Setup GCP
                 uses: google-github-actions/setup-gcloud@v0
                 with:
                     project_id: ${{ secrets.GCP_PROJECT_ID }}
                     service_account_key: ${{ secrets.GCP_ARTIFACTS_KEY }}
                     export_default_credentials: true
+
             -   name: Upload to GCP
                 uses: eskatos/gradle-command-action@v1
                 with:
