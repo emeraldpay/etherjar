@@ -7,6 +7,11 @@ on:
             - ci/*
 
 jobs:
+
+    #
+    # Checks if it's a SNAPSHOT commit and only in this case the Snapshot Build should be enabled.
+    # Because for Releases we use a manual release process that includes publishing to GitHub and so on (see publish.yaml)
+    #
     check-if-snapshot:
         runs-on: ubuntu-latest
         outputs:
@@ -29,6 +34,9 @@ jobs:
                 run: echo "::set-output name=snapshot::true"
                 if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
 
+    #
+    # Run only if SNAPSHOT. See above
+    #
     publish-gcp-artifacts:
         needs: check-if-snapshot
         if: ${{ needs.check-if-snapshot.outputs.is_snapshot }}
