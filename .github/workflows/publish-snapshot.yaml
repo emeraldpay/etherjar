@@ -27,7 +27,7 @@ jobs:
             -   name: Enable if Snapshot
                 id: set-if-snapshot
                 run: echo "::set-output name=snapshot::true"
-                if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
+                if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT_NOT')
 
     debug:
         needs: check-if-snapshot
