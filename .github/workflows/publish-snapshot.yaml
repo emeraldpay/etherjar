@@ -27,22 +27,7 @@ jobs:
             -   name: Enable if Snapshot
                 id: set-if-snapshot
                 run: echo "::set-output name=snapshot::true"
-                if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT_NOT')
-
-    debug:
-        needs: check-if-snapshot
-        runs-on: ubuntu-latest
-
-        steps:
-            -   name: Show var
-                run: echo ${{ needs.check-if-snapshot.outputs.is_snapshot }}
-
-            -   name: Show vars
-                run: echo ${{ needs.check-if-snapshot.outputs }}
-
-            -   name: Run if
-                run: echo "ok"
-                if: ${{ needs.check-if-snapshot.outputs.is_snapshot }}
+                if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
 
     publish-gcp-artifacts:
         needs: check-if-snapshot
@@ -62,3 +47,17 @@ jobs:
                 uses: eskatos/gradle-command-action@v1
                 with:
                     arguments: check
+
+            -   name: Setup GCP
+                uses: google-github-actions/setup-gcloud@master
+                with:
+                    project_id: ${{ secrets.GCP_PROJECT_ID }}
+                    service_account_key: ${{ secrets.GCP_ARTIFACTS_KEY }}
+                    export_default_credentials: true
+
+            -   name: Upload to GCP
+                uses: eskatos/gradle-command-action@v1
+                with:
+                    arguments: publish
+                env:
+                    ENABLE_GCP: true
