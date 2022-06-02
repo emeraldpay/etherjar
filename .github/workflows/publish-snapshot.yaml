@@ -1,0 +1,50 @@
+name: Publish Snapshot
+
+on:
+    push:
+        branches:
+            - master
+            - ci/*
+
+jobs:
+    check-if-snapshots:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@master
+                with:
+                    ref: ${{ github.ref }}
+
+            -   name: Set up JDK
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 11
+
+            -   name: Check
+                uses: eskatos/gradle-command-action@v1
+                with:
+                    arguments: check
+
+            -   name: Get Version
+                run: ./gradlew properties -q | grep "^version:" | awk '{printf "PROJECT_VERSION=" $2}' >> $GITHUB_ENV
+
+            -   name: Enable if Snapshot
+                run: "::set-output name=snapshot::true"
+                if: endsWith(env.PROJECT_VERSION, 'SNAPSHOT')
+
+    publish-gcp-artifacts:
+        if: ${{ needs.check-if-snapshots.outputs.snapshot }}
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@master
+                with:
+                    ref: ${{ github.ref }}
+
+            -   name: Set up JDK
+                uses: actions/setup-java@v1
+                with:
+                    java-version: 11
+
+            -   name: Check
+                uses: eskatos/gradle-command-action@v1
+                with:
+                    arguments: check
