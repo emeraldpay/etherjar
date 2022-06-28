@@ -235,4 +235,18 @@ class ReactorEmeraldClientSpec extends Specification {
             .expectError()
             .verify(Duration.ofSeconds(3))
     }
+
+    def "Setup with TLS enables ALPN and HTTP2"() {
+        // GrpcSslContexts.ensureAlpnAndH2Enabled may throw exceptions with "ALPN must be enabled and list HTTP/2 as a supported protocol."
+        setup:
+        def dir = new File("src/test/resources/")
+        when:
+        def act = ReactorEmeraldClient.newBuilder()
+            .connectTo("localhost", 2448)
+            .clientCertificate(new File(dir,"cert.pem"), new File(dir, "key_p8.pem"))
+            .build()
+
+        then:
+        act != null
+    }
 }

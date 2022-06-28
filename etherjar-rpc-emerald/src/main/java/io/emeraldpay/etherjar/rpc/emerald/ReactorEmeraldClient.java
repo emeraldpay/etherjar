@@ -25,9 +25,13 @@ import io.emeraldpay.grpc.Chain;
 import io.grpc.Channel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
 import io.emeraldpay.etherjar.rpc.ResponseJson;
+import io.netty.handler.ssl.ApplicationProtocolConfig;
+import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -267,6 +271,12 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             return connectTo(host, port);
         }
 
+        protected SslContextBuilder startSslContextBuilder() {
+            // use a GRPC based SSL Context, which enables ALPN and HTTP2,
+            // otherwise GrpcSslContexts.ensureAlpnAndH2Enabled may throw "ALPN must be enabled and list HTTP/2 as a supported protocol" if misconfigured
+            return GrpcSslContexts.forClient();
+        }
+
         /**
          * Setup x509 certificate for target server
          *
@@ -275,8 +285,8 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
          */
         public Builder trustedCertificate(InputStream certificate) {
             if (sslContextBuilder == null) {
-                sslContextBuilder = SslContextBuilder.forClient();
-                channelBuilder.useTransportSecurity();
+                sslContextBuilder = startSslContextBuilder();
+                channelBuilder = channelBuilder.useTransportSecurity();
             }
             sslContextBuilder = sslContextBuilder.trustManager(certificate);
             return this;
@@ -290,8 +300,8 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
          */
         public Builder trustedCertificate(File certificate) {
             if (sslContextBuilder == null) {
-                sslContextBuilder = SslContextBuilder.forClient();
-                channelBuilder.useTransportSecurity();
+                sslContextBuilder = startSslContextBuilder();
+                channelBuilder = channelBuilder.useTransportSecurity();
             }
             sslContextBuilder = sslContextBuilder.trustManager(certificate);
             return this;
@@ -306,8 +316,8 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
          */
         public Builder clientCertificate(InputStream certificate, InputStream key) {
             if (sslContextBuilder == null) {
-                sslContextBuilder = SslContextBuilder.forClient();
-                channelBuilder.useTransportSecurity();
+                sslContextBuilder = startSslContextBuilder();
+                channelBuilder = channelBuilder.useTransportSecurity();
             }
             sslContextBuilder = sslContextBuilder.keyManager(certificate, key);
             return this;
@@ -322,8 +332,8 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
          */
         public Builder clientCertificate(File certificate, File key) {
             if (sslContextBuilder == null) {
-                sslContextBuilder = SslContextBuilder.forClient();
-                channelBuilder.useTransportSecurity();
+                sslContextBuilder = startSslContextBuilder();
+                channelBuilder = channelBuilder.useTransportSecurity();
             }
             sslContextBuilder = sslContextBuilder.keyManager(certificate, key);
             return this;
@@ -345,6 +355,11 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
          */
         public Builder rpcConverter(JacksonRpcConverter rpcConverter) {
             this.rpcConverter = rpcConverter;
+            return this;
+        }
+
+        public Builder withSslContextBuilder(Function<SslContextBuilder, SslContextBuilder> changes) {
+            this.sslContextBuilder = changes.apply(this.sslContextBuilder);
             return this;
         }
 
