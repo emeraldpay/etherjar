@@ -82,7 +82,7 @@ public class TransactionEncoder {
                 .write(signature.getS());
         } else if (chainId != null) {
             // if EIP-155 include chain id and empty r,s
-            wrt.write(chainId.byteValue())
+            wrt.write(chainId)
                 .write(0)
                 .write(0);
         }
@@ -151,7 +151,7 @@ public class TransactionEncoder {
         buffer.write(TransactionType.ACCESS_LIST.getFlag());
         RlpWriter wrt = new RlpWriter(buffer);
         wrt.startList()
-            .write(Integer.valueOf(tx.getChainId()).byteValue())
+            .write(tx.getChainId())
             .write(tx.getNonce())
             .write(tx.getGasPrice().getAmount())
             .write(tx.getGas());
@@ -165,7 +165,7 @@ public class TransactionEncoder {
         buffer.write(TransactionType.GAS_PRIORITY.getFlag());
         RlpWriter wrt = new RlpWriter(buffer);
         wrt.startList()
-            .write(Integer.valueOf(tx.getChainId()).byteValue())
+            .write(tx.getChainId())
             .write(tx.getNonce())
             .write(tx.getPriorityGasPrice().getAmount())
             .write(tx.getMaxGasPrice().getAmount())

@@ -268,4 +268,107 @@ class TransactionDecoderSpec extends Specification {
         }
         act.transactionId().toHex() == "0x6fe439fa7b6f3b4883aa48f85018405e3ae61de3ad72aec614db69bebbd522b5"
     }
+
+    def "Parse with large chainId - arbitrum 0x4a97c3"() {
+        // 0x4a97c3e7ccff3c12fd7872cb0e1eb66861937dde8128f27f5d52f993b67b4d4a
+        setup:
+        def tx = Hex.decodeHex("f9018f8263aa840bebc8cd830c3500945d8e854f0fe0d55c4dbc32d5f3ec0734f2da002680b9012405615a750000000000000000000000000000000000000000000000001b5c8a19bb24c800000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000bbfc327f00000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ff970a61a04b1ca14834a43f5de4533ebddb5cc800000000000000000000000082af49447d8a07e3bd95bd0d56f35241523fbab1000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000001f483014986a0fa891149bf52113d95ab98a8e39bbd97b7c48c2a440f6e46418ac4ee2686606ea062b6f1c3fd2cada8badb19968c9c33790ca6df643468e8fde6ed4833ef2467ad")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act.getType() == TransactionType.STANDARD
+        act.nonce == 0x63aa
+        act.gasPrice == Wei.from("0xbebc8cd") // 200001741
+        act.gas == 0xc3500
+        act.to.toHex() == "0x5d8e854f0fe0d55c4dbc32d5f3ec0734f2da0026"
+        act.value.toHex() == "0x0"
+        act.data.toHex() == "0x05615a750000000000000000000000000000000000000000000000001b5c8a19bb24c800000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000bbfc327f00000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000ff970a61a04b1ca14834a43f5de4533ebddb5cc800000000000000000000000082af49447d8a07e3bd95bd0d56f35241523fbab1000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000001f4"
+        act.signature != null
+        act.signature.getType() == SignatureType.EIP155
+        with((SignatureEIP155)act.signature) {
+            chainId == 42161
+            recoverAddress() == Address.from("0xe61ca074cd20f94dcc3b74e7df02ba5a4987f1fa")
+        }
+        act.transactionId().toHex() == "0x4a97c3e7ccff3c12fd7872cb0e1eb66861937dde8128f27f5d52f993b67b4d4a"
+    }
+
+    def "Parse with large chainId - arbitrum 0x8a6a7e"() {
+        // 0x8a6a7e1adf9c900b64dc284152f419a63acfcd94c1d881449d1912f4d150de47
+        setup:
+        def tx = Hex.decodeHex("f8af82078d8502540be400830c350094888f4408ab925bd9511ea8440121186519fb496380b84490b98a11000000000000000000000000bde60cdd192734665f21d3c2e2712bc65cef45d7000000000000000000000000000000000000000000000028a857425466f8000083014985a0d21ea4286eadd0ae9be4636e0ea029d4c894ddc2a7b714f846c24ff2a0b6fa59a040f358a0ce0c5ca75ebe011a21ccf2c873255222fdfba31aff785ff62e7a36ce")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act.getType() == TransactionType.STANDARD
+        act.nonce == 0x78d
+        act.gasPrice == Wei.from("0x2540be400")
+        act.gas == 0xc3500
+        act.to.toHex() == "0x888f4408ab925bd9511ea8440121186519fb4963"
+        act.value.toHex() == "0x0"
+        act.data.toHex() == "0x90b98a11000000000000000000000000bde60cdd192734665f21d3c2e2712bc65cef45d7000000000000000000000000000000000000000000000028a857425466f80000"
+        act.signature != null
+        act.signature.getType() == SignatureType.EIP155
+        with((SignatureEIP155)act.signature) {
+            chainId == 42161
+            getV() == 0x14985
+            r.toString(16) == "d21ea4286eadd0ae9be4636e0ea029d4c894ddc2a7b714f846c24ff2a0b6fa59"
+            s.toString(16) == "40f358a0ce0c5ca75ebe011a21ccf2c873255222fdfba31aff785ff62e7a36ce"
+            recoverAddress() == Address.from("0x8a14f2ec98cc1d4a144903550308d838ee6ec3c9")
+        }
+        act.transactionId().toHex() == "0x8a6a7e1adf9c900b64dc284152f419a63acfcd94c1d881449d1912f4d150de47"
+    }
+
+    def "Parse with large chainId - ethw 0x190340"() {
+        // 0x190340bd96279d4f337a16b319d76c517315ba7c04331781787344a579ab1543
+        setup:
+        def tx = Hex.decodeHex("f86e808502540be40082520894fd87622db43ca9e135180b32c2e4ee8e445f9af8880ddff7b537fce00080824e45a0bc44ec7d7dfe10a46b51e48b8681ba43aa6a6f3dbc08a14e71225014709c181ea01dbcedda6890a31e425ce7c315666984a47de6954343cfaef0c8c394958f17b1")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act.transactionId().toHex() == "0x190340bd96279d4f337a16b319d76c517315ba7c04331781787344a579ab1543"
+        act.getType() == TransactionType.STANDARD
+        act.nonce == 0x0
+        act.gasPrice == Wei.from("0x2540be400")
+        act.gas == 0x5208
+        act.to.toHex() == "0xfd87622db43ca9e135180b32c2e4ee8e445f9af8"
+        act.value.toHex() == "0xddff7b537fce000"
+        act.data.toHex() == "0x"
+        act.signature != null
+        act.signature.getType() == SignatureType.EIP155
+        with((SignatureEIP155)act.signature) {
+            chainId == 10001
+            recoverAddress() == Address.from("0xec4eae283f68056e43dc8bbf8ba6f6464db65ab0")
+        }
+    }
+
+    def "Parse with large chainId type 2 - ethw 0xda4d4d type 2"() {
+        // 0xda4d4d6f87437d05f7988e4bdfa5d8fa2136a3084cbe4a3e3a832b18beff021a
+        setup:
+        def tx = Hex.decodeHex("02f8b18227110c8477359400847735940082c7c7942ad7868ca212135c6119fd7ad1ce51cfc570289280b844095ea7b30000000000000000000000004f381d5ff61ad1d0ec355fed2ac4000ea1e67854ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc080a06db5c4c3c07bc4f992599edc62537e772b0ba7bf8e6cb2995876868cc577cb2aa0624bef1817d59d1fb653a4972111f6585378057228e4e223d94a72d9593b456e")
+        when:
+        def act = decoder.decode(tx)
+        act.signature.message = act.hash()
+
+        then:
+        act.transactionId().toHex() == "0xda4d4d6f87437d05f7988e4bdfa5d8fa2136a3084cbe4a3e3a832b18beff021a"
+        act.getType() == TransactionType.GAS_PRIORITY
+        act.nonce == 0xc
+        act.gasPrice == Wei.from("0x77359400")
+        act.gas == 0xc7c7
+        act.to.toHex() == "0x2ad7868ca212135c6119fd7ad1ce51cfc5702892"
+        act.value.toHex() == "0x0"
+        act.data.toHex() == "0x095ea7b30000000000000000000000004f381d5ff61ad1d0ec355fed2ac4000ea1e67854ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        act.signature != null
+        act.signature.getType() == SignatureType.EIP2930
+        with((SignatureEIP2930)act.signature) {
+            chainId == 10001
+            recoverAddress() == Address.from("0x72e96f7033c40cacc2fd554836846c2258f39909")
+        }
+    }
 }
