@@ -17,15 +17,18 @@
 
 package io.emeraldpay.etherjar.domain;
 
+import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 
-public class BlockHash extends HexData {
+import java.util.Arrays;
+
+public class BlockHash extends Hex32 implements Comparable<BlockHash> {
 
     public static final int SIZE_BYTES = 32;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
     public BlockHash(byte[] value) {
-        super(value, SIZE_BYTES);
+        super(value);
     }
 
     public static BlockHash from(byte[] value) {
@@ -50,5 +53,10 @@ public class BlockHash extends HexData {
 
     public static BlockHash empty() {
         return new BlockHash(new byte[SIZE_BYTES]);
+    }
+
+    @Override
+    public int compareTo(BlockHash o) {
+        return Arrays.compareUnsigned(this.getBytes(), o.getBytes());
     }
 }

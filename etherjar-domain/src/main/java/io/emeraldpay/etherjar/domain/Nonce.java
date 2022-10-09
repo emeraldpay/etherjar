@@ -20,7 +20,7 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
 
-public class Nonce extends HexData {
+public class Nonce extends HexData implements Comparable<Nonce> {
 
     public static final int SIZE_BYTES = 8;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
@@ -47,5 +47,10 @@ public class Nonce extends HexData {
             throw new IllegalArgumentException("Invalid Nonce length: " + value.length());
         }
         return new Nonce(HexData.from(value).getBytes());
+    }
+
+    @Override
+    public int compareTo(Nonce o) {
+        return this.asQuantity().compareTo(o.asQuantity());
     }
 }

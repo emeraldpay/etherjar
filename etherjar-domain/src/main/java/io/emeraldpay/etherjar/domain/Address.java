@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 /**
  * Ethereum Wallet address
  */
-public class Address extends HexData {
+public class Address extends HexData implements Comparable<Address> {
 
     private final static byte[] HEX_BYTES = "0123456789abcdef".getBytes();
 
@@ -182,5 +182,10 @@ public class Address extends HexData {
         }
 
         return true;
+    }
+
+    @Override
+    public int compareTo(Address o) {
+        return Arrays.compareUnsigned(this.getBytes(), o.getBytes());
     }
 }

@@ -15,18 +15,21 @@
  */
 package io.emeraldpay.etherjar.hex;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 /**
  * Compares two <strong>same size</strong> HexData object by their byte representation.
- * Can be used for Hex32, TransactionId, BlockHash, MethodId and other types of HexData.
+ *
+ * Most of the final types implements Comparable. This one is created as a separate class for intermediary
+ * classes (i.e., HexData itself, and Hex32) because they cannot be Comparable to avoid an interface clash.
  */
-public class HexDataComparator implements Comparator<HexData> {
+public class HexDataComparator<T extends HexData> implements Comparator<T> {
 
     /**
      * Default instance. Can be shared and used anywhere.
      */
-    public static final HexDataComparator INSTANCE = new HexDataComparator();
+    public static final HexDataComparator<HexData> INSTANCE = HexData.COMPARATOR;
 
     /**
      * @param o1 left side of comparison
@@ -35,24 +38,11 @@ public class HexDataComparator implements Comparator<HexData> {
      * @throws IllegalArgumentException if the compared values have different length
      */
     @Override
-    public int compare(HexData o1, HexData o2) {
+    public int compare(T o1, T o2) {
         if (o1.getSize() != o2.getSize()) {
             throw new IllegalArgumentException("Cannot compare HexData with different lengths. " + o1.getSize() + " and " + o2.getSize());
         }
-        byte[] val1 = o1.getBytes();
-        byte[] val2 = o2.getBytes();
-        for (int i = 0; i < val1.length; i++) {
-            // convert to _unsigned_ value
-            int a = val1[i] & 0xff;
-            int b = val2[i] & 0xff;
-            if (a < b) {
-                return -1;
-            }
-            if (a > b) {
-                return 1;
-            }
-        }
-        return 0;
+        return Arrays.compareUnsigned(o1.getBytes(), o2.getBytes());
     }
 
 }

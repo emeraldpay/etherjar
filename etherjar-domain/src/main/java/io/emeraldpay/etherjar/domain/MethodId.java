@@ -32,7 +32,7 @@ import java.util.Objects;
  *
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector">Function Selector</a>
  */
-public class MethodId extends HexData {
+public class MethodId extends HexData implements Comparable<MethodId> {
 
     public static final int SIZE_BYTES = 4;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
@@ -93,5 +93,10 @@ public class MethodId extends HexData {
 
     public MethodId(byte[] value) {
         super(value, SIZE_BYTES);
+    }
+
+    @Override
+    public int compareTo(MethodId o) {
+        return Arrays.compareUnsigned(this.getBytes(), o.getBytes());
     }
 }

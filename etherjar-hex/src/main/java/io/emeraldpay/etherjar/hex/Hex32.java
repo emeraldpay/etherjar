@@ -24,6 +24,12 @@ import java.math.BigInteger;
  */
 public class Hex32 extends HexData {
 
+    /**
+     * Default instance. Can be shared and used anywhere.
+     */
+    public static final HexDataComparator<Hex32> COMPARATOR = new HexDataComparator<Hex32>();
+
+
     // 0x1000 > MAX_NUMBER
     private static final BigInteger NUMBER_LIMIT = BigInteger.valueOf(2).pow(256);
     // 0xffff.... as for 256-bit value

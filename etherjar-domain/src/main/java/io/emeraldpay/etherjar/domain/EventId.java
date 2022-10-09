@@ -27,7 +27,7 @@ import java.util.Objects;
  * A 32-byte long id representing a contract event, i.e. first item of the topics array in the log.
  * Calculated as keccak256("EventName(types...)")
  */
-public class EventId extends Hex32 {
+public class EventId extends Hex32 implements Comparable<EventId> {
 
     public static final int SIZE_BYTES = Hex32.SIZE_BYTES;
     public static final int SIZE_HEX = Hex32.SIZE_HEX;
@@ -70,5 +70,10 @@ public class EventId extends Hex32 {
         Keccak.Digest256 digest256 = new Keccak.Digest256();
         digest256.update(sign.getBytes());
         return from(digest256.digest());
+    }
+
+    @Override
+    public int compareTo(EventId o) {
+        return Arrays.compareUnsigned(this.getBytes(), o.getBytes());
     }
 }

@@ -51,8 +51,8 @@ class EventIdSpec extends Specification {
 
     def "equal to Hex32"() {
         when:
-        def act1 = EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67") == Hex32.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
-        def act2 = Hex32.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67") == EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
+        def act1 = EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67").equals(Hex32.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"))
+        def act2 = Hex32.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67").equals(EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"))
         then:
         act1
         act2
@@ -60,10 +60,40 @@ class EventIdSpec extends Specification {
 
     def "equal to HexData"() {
         when:
-        def act1 = EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67") == HexData.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
-        def act2 = HexData.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67") == EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
+        def act1 = EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67").equals(HexData.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"))
+        def act2 = HexData.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67").equals(EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"))
         then:
         act1
         act2
     }
+
+    def "same if compared"() {
+        when:
+        def e1 = EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
+        def e2 = EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
+        def act1 = e1.compareTo(e2)
+        def act2 = e2.compareTo(e1)
+        then:
+        act1 == 0
+        act2 == 0
+    }
+
+    def "Comparator order"() {
+        when:
+        def events = [
+            EventId.from("0x35f204e1c42079f94a6391cca67f928cc2ac818eb64fed80749246215fb50d7e"),
+            EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"),
+            EventId.from("0xf928c112aca635fbc818eb64fed8c5079f94ca67d7e6235f29174924e004c420"),
+            EventId.from("0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67")
+        ]
+        Collections.sort(events)
+        then:
+        events.collect {it.toHex() } == [
+            "0x35f204e1c42079f94a6391cca67f928cc2ac818eb64fed80749246215fb50d7e",
+            "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+            "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+            "0xf928c112aca635fbc818eb64fed8c5079f94ca67d7e6235f29174924e004c420"
+        ]
+    }
+
 }

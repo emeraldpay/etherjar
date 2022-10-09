@@ -87,4 +87,54 @@ class TransactionIdSpec extends Specification {
         then:
         !act
     }
+
+    def "Order"() {
+        when:
+        def tx_99 = TransactionId.from('0x99d94ccf4f1ad255ba6538ad53c31cf3a9c49065c9b5822533b0abb5af171d82')
+        def tx_b8 = TransactionId.from('0xb8b54c779d2eb83b14bd56875c063064937593871658ae559596a25ea5bc0f91')
+        def tx_f4 = TransactionId.from('0xf4457d9466b7a445198ca95781032ff46eebeae71578b9f97c8df1caa7ef9b85')
+        def tx_0f = TransactionId.from('0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236')
+        def tx_a0 = TransactionId.from('0xa009852beaafe46df94f28116491f3f63a1c03567b0a85e97494c2fd95a5ac45')
+        def tx_00 = TransactionId.from('0x0000000000000000000000000000000000000000000000000000000000000000')
+        def tx_ff = TransactionId.from('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+
+        then:
+        tx_00 < tx_ff
+
+        tx_00 < tx_99
+
+        tx_99 < tx_b8
+        tx_b8 < tx_f4
+        tx_f4 > tx_0f
+        tx_a0 > tx_00
+        tx_a0 > tx_99
+        tx_ff > tx_f4
+    }
+
+    def "Sort"() {
+        when:
+        def txes = [
+            '0x99d94ccf4f1ad255ba6538ad53c31cf3a9c49065c9b5822533b0abb5af171d82',
+            '0xb8b54c779d2eb83b14bd56875c063064937593871658ae559596a25ea5bc0f91',
+            '0xf4457d9466b7a445198ca95781032ff46eebeae71578b9f97c8df1caa7ef9b85',
+            '0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236',
+            '0xa009852beaafe46df94f28116491f3f63a1c03567b0a85e97494c2fd95a5ac45',
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+            '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+        ].collect { TransactionId.from(it) }
+        Collections.sort(txes)
+
+        then:
+        txes.collect { it.toHex() } == [
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x0f4f762709c13a6d5253c794f77c2a467384023874418ca1df4cd80ffe651236',
+            '0x99d94ccf4f1ad255ba6538ad53c31cf3a9c49065c9b5822533b0abb5af171d82',
+            '0xa009852beaafe46df94f28116491f3f63a1c03567b0a85e97494c2fd95a5ac45',
+            '0xb8b54c779d2eb83b14bd56875c063064937593871658ae559596a25ea5bc0f91',
+            '0xf4457d9466b7a445198ca95781032ff46eebeae71578b9f97c8df1caa7ef9b85',
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+            '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+        ]
+    }
 }

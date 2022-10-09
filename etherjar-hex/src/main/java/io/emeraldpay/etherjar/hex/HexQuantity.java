@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Objects;
 
-public class HexQuantity implements Serializable {
+public class HexQuantity implements Serializable, Comparable<HexQuantity> {
 
     private final BigInteger value;
 
@@ -106,5 +106,10 @@ public class HexQuantity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    @Override
+    public int compareTo(HexQuantity o) {
+        return value.compareTo(o.value);
     }
 }

@@ -39,8 +39,8 @@ subprojects {
         apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
     }
 
-    targetCompatibility = '1.8'
-    sourceCompatibility = '1.8'
+    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_11
 
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 

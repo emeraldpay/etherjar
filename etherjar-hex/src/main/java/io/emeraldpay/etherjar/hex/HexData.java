@@ -35,6 +35,12 @@ import java.util.stream.Stream;
 public class HexData implements Serializable {
 
     /**
+     * Default instance. Can be shared and used anywhere.
+     */
+    public static final HexDataComparator<HexData> COMPARATOR = new HexDataComparator<HexData>();
+
+
+    /**
      * Use {@link HexData#empty()}
      */
     @Deprecated

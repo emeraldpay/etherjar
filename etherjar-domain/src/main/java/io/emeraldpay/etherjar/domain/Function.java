@@ -19,10 +19,12 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
 
+import java.util.Arrays;
+
 /**
  * An address, followed by a function selector.
  */
-public class Function extends HexData {
+public class Function extends HexData implements Comparable<Function> {
 
     public static final int SIZE_BYTES = 24;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
@@ -49,5 +51,10 @@ public class Function extends HexData {
             throw new IllegalArgumentException("Invalid Function length: " + value.length());
         }
         return new Function(HexData.from(value).getBytes());
+    }
+
+    @Override
+    public int compareTo(Function o) {
+        return Arrays.compareUnsigned(this.getBytes(), o.getBytes());
     }
 }

@@ -17,18 +17,21 @@
 
 package io.emeraldpay.etherjar.domain;
 
+import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
+
+import java.util.Arrays;
 
 /**
  * Transaction Hash value
  */
-public class TransactionId extends HexData {
+public class TransactionId extends Hex32 implements Comparable<TransactionId> {
 
     public static final int SIZE_BYTES = 32;
     public static final int SIZE_HEX = 2 + SIZE_BYTES * 2;
 
     protected TransactionId(byte[] value) {
-        super(value, SIZE_BYTES);
+        super(value);
     }
 
     /**
@@ -64,4 +67,8 @@ public class TransactionId extends HexData {
         return new TransactionId(new byte[SIZE_BYTES]);
     }
 
+    @Override
+    public int compareTo(TransactionId o) {
+        return Arrays.compareUnsigned(this.getBytes(), o.getBytes());
+    }
 }
