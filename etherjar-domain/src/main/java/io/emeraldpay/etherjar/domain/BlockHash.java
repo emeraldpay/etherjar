@@ -19,6 +19,7 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.Arrays;
 
@@ -31,6 +32,12 @@ public class BlockHash extends Hex32 implements Comparable<BlockHash> {
         super(value);
     }
 
+    /**
+     * Create a block hash from its byte representation. The array must be 32-bytes long.
+     *
+     * @param value byte value
+     * @return BlockHash
+     */
     public static BlockHash from(byte[] value) {
         if (value == null) {
             throw new IllegalArgumentException("Null Hash");
@@ -41,6 +48,25 @@ public class BlockHash extends Hex32 implements Comparable<BlockHash> {
         return new BlockHash(value);
     }
 
+    /**
+     * Create a block hash from its Hex32 representation.
+     *
+     * @param value Hex32 value
+     * @return BlockHash
+     */
+    public static BlockHash from(Hex32 value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Null Hash");
+        }
+        return new BlockHash(value.getBytes());
+    }
+
+    /**
+     * Create a block hash from its hex representation. The string must start with 0x and contain 64 hexadecimal symbols after that (i.e., 66 in total)
+     *
+     * @param value byte value
+     * @return BlockHash
+     */
     public static BlockHash from(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Null Hash");
@@ -51,6 +77,10 @@ public class BlockHash extends Hex32 implements Comparable<BlockHash> {
         return new BlockHash(HexData.from(value).getBytes());
     }
 
+    /**
+     *
+     * @return an empty block hash with zeros only
+     */
     public static BlockHash empty() {
         return new BlockHash(new byte[SIZE_BYTES]);
     }

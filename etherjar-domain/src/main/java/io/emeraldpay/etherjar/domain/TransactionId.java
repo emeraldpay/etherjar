@@ -41,10 +41,26 @@ public class TransactionId extends Hex32 implements Comparable<TransactionId> {
      * @return TransactionId
      */
     public static TransactionId from(byte[] value) {
+        if (value == null) {
+            throw new NullPointerException("Null value provided as Transaction ID");
+        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid Tx length: " + value.length);
         }
         return new TransactionId(value);
+    }
+
+    /**
+     * Create from existing Hex32 value
+     *
+     * @param value hex32 representation for a Transaction ID
+     * @return instance of it
+     */
+    public static TransactionId from(Hex32 value) {
+        if (value == null) {
+            throw new NullPointerException("Null value provided as Transaction ID");
+        }
+        return new TransactionId(value.getBytes());
     }
 
     /**
@@ -55,7 +71,7 @@ public class TransactionId extends Hex32 implements Comparable<TransactionId> {
      */
     public static TransactionId from(String value) {
         if (value == null) {
-            return null;
+            throw new NullPointerException("Null value provided as Transaction ID");
         }
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Tx length: " + value.length());
