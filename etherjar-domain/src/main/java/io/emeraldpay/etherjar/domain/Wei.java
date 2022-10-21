@@ -110,22 +110,42 @@ public class Wei implements Serializable, Comparable<Wei> {
     }
 
     /**
+     * Use {@link Wei#fromHex(String)} instead.
+     *
+     * @param value
+     * @return
+     */
+    @Deprecated(forRemoval = true)
+    public static Wei from(String value) {
+        return fromHex(value);
+    }
+
+    /**
      * Parse hex representation of the amount, like 0x100
      *
      * @param value string representation of the amount
      * @return parsed value or exception
      * @throws IllegalArgumentException if passed value is null or not hex
      */
-    public static Wei from(String value) { //TODO rename to fromHex?
+    public static Wei fromHex(String value) {
         //TODO return null?
         if (value == null) {
-            throw new IllegalArgumentException("Null Address");
+            throw new IllegalArgumentException("Null Amount");
+        }
+        boolean isNegative = false;
+        if (value.startsWith("-")) {
+            isNegative = true;
+            value = value.substring(1);
         }
         if (!value.startsWith("0x") || value.length() <= 2) {
             throw new IllegalArgumentException("Invalid hex format: " + value);
         }
         value = value.substring(2);
-        return new Wei(new BigInteger(value, 16));
+        BigInteger amount = new BigInteger(value, 16);
+        if (isNegative) {
+            amount = amount.negate();
+        }
+        return new Wei(amount);
     }
 
     private final BigInteger amount;
@@ -249,6 +269,14 @@ public class Wei implements Serializable, Comparable<Wei> {
     }
 
     public String toHex() {
-        return "0x" + amount.toString(16);
+        StringBuilder buf = new StringBuilder();
+        BigInteger amount = getAmount();
+        if (amount.signum() == -1) {
+            buf.append('-');
+            amount = amount.negate();
+        }
+        buf.append("0x");
+        buf.append(amount.toString(16));
+        return buf.toString();
     }
 }

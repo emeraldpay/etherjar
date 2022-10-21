@@ -105,5 +105,18 @@ class WeiSpec extends Specification {
         act == Wei.ofEthers(4.8)
     }
 
+    def "encode negative number"() {
+        when:
+        def act = Wei.ofEthers(-1.25).toHex()
+        then:
+        act == "-0x1158e460913d0000"
+    }
+
+    def "parse negative number"() {
+        when:
+        def act = Wei.fromHex("-0x1158e460913d0000")
+        then:
+        act == Wei.ofEthers(-1.25)
+    }
 
 }
