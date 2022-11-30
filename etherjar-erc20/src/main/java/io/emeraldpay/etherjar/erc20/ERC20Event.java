@@ -131,7 +131,12 @@ public enum ERC20Event {
      */
     public static ERC20Event extractFrom(TransactionLogJson log) {
         List<Hex32> topics = log.getTopics();
-        if (topics.isEmpty()) {
+        // both Transfer and Approval has exactly 3 topics (id + address + address)
+        if (topics.size() != 3) {
+            return null;
+        }
+        // data contains actual number and cannot be emty for a valid ERC20
+        if (log.getData() == null || log.getData().isEmpty()) {
             return null;
         }
         return extractFrom(topics.get(0));

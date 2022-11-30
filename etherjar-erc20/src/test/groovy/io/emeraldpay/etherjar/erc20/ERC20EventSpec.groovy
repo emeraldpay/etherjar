@@ -51,6 +51,43 @@ class ERC20EventSpec extends Specification {
         details.amount == new BigInteger("230609712")
     }
 
+    def "Ignore invalid transfer details"() {
+        when: "no data"
+        def log = new TransactionLogJson().tap {
+            it.topics = [
+                Hex32.from("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"),
+                Hex32.from("0x0000000000000000000000003cd751e6b0078be393132286c442345e5dc49699"),
+                Hex32.from("0x00000000000000000000000065968e42789eb8b257c34eb7dd66059708c791b0")
+            ]
+            it.data = null
+        }
+        def type = ERC20Event.extractFrom(log)
+
+        then:
+        type == null
+
+        when: "just the topic id"
+        log.topics = [
+            Hex32.from("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"),
+        ]
+        log.data = HexData.from("0x000000000000000000000000000000000000000000000000000000000dbed330")
+        type = ERC20Event.extractFrom(log)
+
+        then:
+        type == null
+
+        when: "no second address"
+        log.topics = [
+            Hex32.from("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"),
+            Hex32.from("0x0000000000000000000000003cd751e6b0078be393132286c442345e5dc49699"),
+        ]
+        log.data = HexData.from("0x000000000000000000000000000000000000000000000000000000000dbed330")
+        type = ERC20Event.extractFrom(log)
+
+        then:
+        type == null
+    }
+
     def "Write transfer details"() {
         setup:
         // https://etherscan.io/tx/0x6564204d12b63b06e06e38b6f3e40dcb9da9b5bf5deb585ed6726599a131f15b#eventlog
@@ -101,6 +138,49 @@ class ERC20EventSpec extends Specification {
         details.owner == Address.from("0xa9ba157770045cffe977601fd46b9cc3c4429604")
         details.spender == Address.from("0x4b92d19c11435614cd49af1b589001b7c08cd4d5")
         details.amountLimit == new BigInteger("16746801863022")
+    }
+
+    def "Ignore invalid approval details"() {
+        setup:
+        def log = new TransactionLogJson().tap {
+            it.topics = [
+                Hex32.from("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"),
+                Hex32.from("0x000000000000000000000000a9ba157770045cffe977601fd46b9cc3c4429604"),
+                Hex32.from("0x0000000000000000000000004b92d19c11435614cd49af1b589001b7c08cd4d5")
+            ]
+            it.data = HexData.from("0x00000000000000000000000000000000000000000000000000000f3b2b2d196e")
+        }
+
+        when: "only topic id"
+        log.topics = [
+            Hex32.from("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"),
+        ]
+        def type = ERC20Event.extractFrom(log)
+
+        then:
+        type == null
+
+        when: "no second address"
+        log.topics = [
+            Hex32.from("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"),
+            Hex32.from("0x000000000000000000000000a9ba157770045cffe977601fd46b9cc3c4429604"),
+        ]
+        type = ERC20Event.extractFrom(log)
+
+        then:
+        type == null
+
+        when: "empty data"
+        log.topics = [
+            Hex32.from("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"),
+            Hex32.from("0x000000000000000000000000a9ba157770045cffe977601fd46b9cc3c4429604"),
+            Hex32.from("0x0000000000000000000000004b92d19c11435614cd49af1b589001b7c08cd4d5")
+        ]
+        log.data = HexData.empty()
+        type = ERC20Event.extractFrom(log)
+
+        then:
+        type == null
     }
 
     def "Extract approval details for a maximum amount"() {
