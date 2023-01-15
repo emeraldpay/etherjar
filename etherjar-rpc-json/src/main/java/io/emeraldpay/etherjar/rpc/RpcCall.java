@@ -265,4 +265,26 @@ public class RpcCall<JS, RES> {
     public int hashCode() {
         return Objects.hash(method, params);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append(method)
+            .append('(');
+        if (params != null) {
+            for (int i = 0; i < params.size(); i++) {
+                if (i > 0) {
+                    buf.append(", ");
+                }
+                Object param = params.get(i);
+                if (param != null) {
+                    buf.append(param);
+                } else {
+                    buf.append("null");
+                }
+            }
+        }
+        buf.append(')');
+        return buf.toString();
+    }
 }
