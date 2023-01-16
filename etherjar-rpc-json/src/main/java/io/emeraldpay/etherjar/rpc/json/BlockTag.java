@@ -19,11 +19,37 @@ package io.emeraldpay.etherjar.rpc.json;
 
 import java.io.Serializable;
 
+/**
+ * @link <a href="https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml#L92">https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml</a>
+ */
 public enum BlockTag implements Serializable {
 
-    LATEST("latest"), EARLIEST("earliest"), PENDING("pending");
+    /**
+     * The most recent block in the canonical chain observed by the client, this block may be re-orged out of the canonical chain even under healthy/normal conditions
+     */
+    LATEST("latest"),
 
-    private String code;
+    /**
+     *  The lowest numbered block the client has available
+     */
+    EARLIEST("earliest"),
+
+    /**
+     * A sample next block built by the client on top of `latest` and containing the set of transactions usually taken from local mempool
+     */
+    PENDING("pending"),
+
+    /**
+     * The most recent block that is safe from re-orgs under honest majority and certain synchronicity assumptions
+     */
+    SAFE("safe"),
+
+    /**
+     * The most recent crypto-economically secure block, cannot be re-orged outside of manual intervention driven by community coordination
+     */
+    FINALIZED("finalized");
+
+    private final String code;
 
     BlockTag(String code) {
         this.code = code;
