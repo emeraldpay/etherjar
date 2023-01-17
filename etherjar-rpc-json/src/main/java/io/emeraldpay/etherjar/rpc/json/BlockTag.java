@@ -20,7 +20,7 @@ package io.emeraldpay.etherjar.rpc.json;
 import java.io.Serializable;
 
 /**
- * @link <a href="https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml#L92">https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml</a>
+ * @see <a href="https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml#L92">https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml</a>
  */
 public enum BlockTag implements Serializable {
 

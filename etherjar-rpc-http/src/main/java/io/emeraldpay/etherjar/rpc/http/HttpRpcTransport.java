@@ -18,9 +18,7 @@
 package io.emeraldpay.etherjar.rpc.http;
 
 import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.RequestJson;
 import io.emeraldpay.etherjar.rpc.ResponseJson;
-import io.emeraldpay.etherjar.rpc.RpcTransport;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -49,31 +47,25 @@ import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
+public class HttpRpcTransport extends AbstractRpcTransport {
 
     private static final Logger log = Logger.getLogger(HttpRpcTransport.class.getName());
 
-    private ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
     private final URI target;
-    private final ExecutorService executorService;
-    private final RpcConverter rpcConverter;
 
     private final HttpClient httpclient;
     private final HttpClientContext context;
     private final Runnable onClose;
 
     private HttpRpcTransport(URI target, RpcConverter rpcConverter, ExecutorService executorService, HttpClient httpClient, HttpClientContext context, Runnable onClose) {
+        super(executorService, rpcConverter);
         this.target = target;
-        this.rpcConverter = rpcConverter;
-        this.executorService = executorService;
         this.httpclient = httpClient;
         this.context = context;
         this.onClose = onClose;
@@ -91,71 +83,19 @@ public class HttpRpcTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     }
 
     @Override
-    public CompletableFuture<Iterable<RpcCallResponse>> execute(List<DefaultBatch.FutureBatchItem> items) {
-        if (items.isEmpty()) {
-            return CompletableFuture.completedFuture(
-                Collections.emptyList()
-            );
+    public InputStream execute(String json) throws IOException {
+        RequestBuilder requestBuilder = RequestBuilder.create("POST")
+                .setUri(target)
+                .addHeader("Content-Type", "application/json")
+                .setEntity(new ByteArrayEntity(json.getBytes(StandardCharsets.UTF_8)));
+        HttpResponse rcpResponse = httpclient.execute(requestBuilder.build(), this.context);
+        int statusCode = rcpResponse.getStatusLine().getStatusCode();
+        if (statusCode != 200) {
+            throw new IOException("Server returned error response: " + statusCode);
         }
-        Map<Integer, DefaultBatch.FutureBatchItem> requests = new HashMap<>(items.size());
-        Map<Integer, Class> responseMapping = new HashMap<>(items.size());
-        List<RequestJson<Integer>> rpcRequests = items.stream()
-                .map(item -> {
-                    RequestJson<Integer> request = new RequestJson<>(
-                        item.getCall().getMethod(),
-                        item.getCall().getParams(),
-                        item.getId()
-                    );
-                    requests.put(item.getId(), item);
-                    responseMapping.put(item.getId(), item.getCall().getJsonType());
-                    return request;
-                }).collect(Collectors.toList());
-        CompletableFuture<Iterable<RpcCallResponse>> f = new CompletableFuture<>();
-        executorService.submit(() -> {
-            try {
-                String json = rpcConverter.toJson(rpcRequests);
-                RequestBuilder requestBuilder = RequestBuilder.create("POST")
-                        .setUri(target)
-                        .addHeader("Content-Type", "application/json")
-                        .setEntity(new ByteArrayEntity(json.getBytes(StandardCharsets.UTF_8)));
-                HttpResponse rcpResponse = httpclient.execute(requestBuilder.build(), this.context);
-                int statusCode = rcpResponse.getStatusLine().getStatusCode();
-                if (statusCode != 200) {
-                    throw new IOException("Server returned error response: " + statusCode);
-                }
-                InputStream content = rcpResponse.getEntity().getContent();
-                List<ResponseJson<Object, Integer>> response = rpcConverter.parseBatch(content, responseMapping);
-                List<RpcCallResponse> result = response.stream()
-                    .map(reader(requests))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-                f.complete(result);
-            } catch (Throwable e) {
-                RpcException rpcError;
-                if (e instanceof RpcException) {
-                    rpcError = (RpcException) e;
-                } else if (e instanceof IOException) {
-                    rpcError = new RpcException(RpcResponseError.CODE_UPSTREAM_CONNECTION_ERROR, e.getMessage(), null, e);
-                } else {
-                    rpcError = new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, e.getMessage(), null, e);
-                }
-                f.completeExceptionally(rpcError);
-            }
-        });
-        return f;
+        return rcpResponse.getEntity().getContent();
     }
 
-    @SuppressWarnings("unchecked")
-    private <JS, RES> Function<ResponseJson<?, Integer>, RpcCallResponse<JS, RES>> reader(final Map<Integer, DefaultBatch.FutureBatchItem> requests) {
-        return (resp) -> {
-            RpcCall<JS, RES> call = requests.get(resp.getId()).getCall();
-            if (call != null) {
-                ResponseJson<JS, Integer> castResp = resp.cast(call.getJsonType());
-                return responseJsonConverter.convert(call, castResp);
-            }
-            return null;
-        };
-    }
     public static class Builder {
         private URI target;
         private ExecutorService executorService;

@@ -16,6 +16,7 @@
 package io.emeraldpay.etherjar.rpc.http
 
 import io.emeraldpay.etherjar.rpc.DefaultBatch
+import io.emeraldpay.etherjar.rpc.DefaultRpcClient
 import io.emeraldpay.etherjar.rpc.RpcCall
 import io.emeraldpay.etherjar.test.MockRpcTransport
 import spock.lang.Specification

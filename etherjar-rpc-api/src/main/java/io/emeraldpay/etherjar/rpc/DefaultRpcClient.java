@@ -15,10 +15,7 @@
  * limitations under the License.
  */
 
-package io.emeraldpay.etherjar.rpc.http;
-
-import io.emeraldpay.etherjar.rpc.*;
-import io.emeraldpay.etherjar.rpc.RpcTransport;
+package io.emeraldpay.etherjar.rpc;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

@@ -1,6 +1,7 @@
 package io.emeraldpay.etherjar.rpc.http
 
 import io.emeraldpay.etherjar.rpc.Commands
+import io.emeraldpay.etherjar.rpc.DefaultRpcClient
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
