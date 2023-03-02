@@ -16,15 +16,15 @@
 package io.emeraldpay.etherjar.rpc.emerald
 
 import com.google.protobuf.ByteString
+import io.emeraldpay.api.Chain
 import io.emeraldpay.api.proto.BlockchainGrpc
 import io.emeraldpay.api.proto.BlockchainOuterClass
 import io.emeraldpay.api.proto.Common
-import io.emeraldpay.grpc.Chain
-import io.grpc.stub.StreamObserver
 import io.emeraldpay.etherjar.domain.Address
 import io.emeraldpay.etherjar.domain.Wei
 import io.emeraldpay.etherjar.rpc.Commands
 import io.emeraldpay.etherjar.rpc.json.BlockTag
+import io.grpc.stub.StreamObserver
 import reactor.test.StepVerifier
 import spock.lang.Specification
 
