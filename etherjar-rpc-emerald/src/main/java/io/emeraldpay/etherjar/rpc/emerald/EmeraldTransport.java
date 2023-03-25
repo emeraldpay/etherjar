@@ -22,9 +22,7 @@ import io.emeraldpay.api.proto.BlockchainGrpc;
 import io.emeraldpay.api.proto.BlockchainOuterClass;
 import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.grpc.Chain;
-import io.grpc.Channel;
-import io.grpc.ManagedChannel;
-import io.grpc.StatusRuntimeException;
+import io.grpc.*;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
 import io.emeraldpay.etherjar.rpc.ResponseJson;
@@ -39,6 +37,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * RPC Transport over gRPC for Emerald API compatible servers (such as Emerald Dshackle)
@@ -252,6 +251,11 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     public static class Builder {
 
         private NettyChannelBuilder channelBuilder;
+
+        private Function<NettyChannelBuilder, ManagedChannelBuilder<?>> channelUpdate;
+
+        private boolean useLoadBalancing = true;
+
         private SslContextBuilder sslContextBuilder;
         private Channel channel;
 
@@ -271,6 +275,28 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
             this.channel = channel;
             channelBuilder = null;
             sslContextBuilder = null;
+            return this;
+        }
+
+        /**
+         * Apply a custom modification for the default NettyChannelBuilder
+         *
+         * @param customChannel function to update the Channel Builder
+         * @return builder
+         */
+        public Builder withChannelBuilder(Function<NettyChannelBuilder, ManagedChannelBuilder<?>> customChannel) {
+            this.channelUpdate = customChannel;
+            return this;
+        }
+
+        /**
+         * By default, connection uses a Round Robin load balancing when it's available if a host name specified for the connection,
+         * and it resolves to multiple IPs. This method disables the load balancing.
+         *
+         * @return builder
+         */
+        public Builder disableLoadBalancing() {
+            useLoadBalancing = false;
             return this;
         }
 
@@ -437,11 +463,24 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
          */
         public EmeraldTransport build() throws SSLException {
             if (channel == null) {
+                NettyChannelBuilder nettyBuilder = channelBuilder;
                 if (sslContextBuilder != null) {
-                    channelBuilder.useTransportSecurity()
+                    nettyBuilder = nettyBuilder.useTransportSecurity()
                         .sslContext(sslContextBuilder.build());
                 }
-                channel = channelBuilder.build();
+                if (useLoadBalancing) {
+                    String policy = "round_robin";
+                    if (LoadBalancerRegistry.getDefaultRegistry().getProvider(policy) != null) {
+                        nettyBuilder = nettyBuilder.defaultLoadBalancingPolicy(policy);
+                    }
+                }
+                ManagedChannelBuilder<?> finalBuilder;
+                if (this.channelUpdate != null) {
+                    finalBuilder = this.channelUpdate.apply(nettyBuilder);
+                } else {
+                    finalBuilder = nettyBuilder;
+                }
+                channel = finalBuilder.build();
             }
             if (executorService == null) {
                 threadsCount(2);
