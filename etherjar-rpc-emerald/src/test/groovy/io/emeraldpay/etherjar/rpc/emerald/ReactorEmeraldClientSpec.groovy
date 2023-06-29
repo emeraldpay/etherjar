@@ -19,7 +19,7 @@ import com.google.protobuf.ByteString
 import io.emeraldpay.api.proto.BlockchainGrpc
 import io.emeraldpay.api.proto.BlockchainOuterClass
 import io.emeraldpay.api.proto.Common
-import io.emeraldpay.grpc.Chain
+import io.emeraldpay.api.Chain
 import io.grpc.stub.StreamObserver
 import io.emeraldpay.etherjar.domain.Address
 import io.emeraldpay.etherjar.domain.Wei

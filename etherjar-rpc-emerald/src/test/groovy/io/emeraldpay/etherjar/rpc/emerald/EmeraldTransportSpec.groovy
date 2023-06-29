@@ -20,7 +20,7 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import io.emeraldpay.api.proto.BlockchainGrpc
 import io.emeraldpay.api.proto.BlockchainOuterClass
-import io.emeraldpay.grpc.Chain
+import io.emeraldpay.api.Chain
 import io.grpc.stub.StreamObserver
 import io.emeraldpay.etherjar.rpc.Conversion
 import io.emeraldpay.etherjar.rpc.DefaultBatch
