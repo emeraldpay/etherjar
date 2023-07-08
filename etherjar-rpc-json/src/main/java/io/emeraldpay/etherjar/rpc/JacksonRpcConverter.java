@@ -49,7 +49,7 @@ public class JacksonRpcConverter implements RpcConverter {
         this.objectMapper = createJsonMapper();
     }
 
-    public ObjectMapper createJsonMapper() {
+    public static ObjectMapper createJsonMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new EtherjarModule());
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);

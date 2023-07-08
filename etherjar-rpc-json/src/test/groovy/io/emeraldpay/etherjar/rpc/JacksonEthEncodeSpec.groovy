@@ -22,6 +22,7 @@ import io.emeraldpay.etherjar.domain.Address
 import io.emeraldpay.etherjar.domain.BlockHash
 import io.emeraldpay.etherjar.domain.TransactionId
 import io.emeraldpay.etherjar.domain.Wei
+import io.emeraldpay.etherjar.hex.Hex32
 import io.emeraldpay.etherjar.hex.HexData
 import io.emeraldpay.etherjar.rpc.json.BlockJson
 import io.emeraldpay.etherjar.rpc.json.TransactionJson
@@ -53,33 +54,35 @@ class JacksonEthEncodeSpec extends Specification {
         block.setHash(BlockHash.from('0x88e96d4537bea4d9c05d12549907b32561d3bf31f45aae734cdc119f13406cb6'))
         block.setNumber(1)
         block.setParentHash(BlockHash.from('0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3'))
-        block.setReceiptsRoot(HexData.from('0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'))
-        block.setSha3Uncles(HexData.from('0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'))
+        block.setReceiptsRoot(Hex32.from('0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'))
+        block.setSha3Uncles(Hex32.from('0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'))
         block.setSize(537)
-        block.setStateRoot(HexData.from('0xd67e4d450343046425ae4271474353857ab860dbc0a1dde64b41b5cd3a532bf3'))
+        block.setStateRoot(Hex32.from('0xd67e4d450343046425ae4271474353857ab860dbc0a1dde64b41b5cd3a532bf3'))
         block.setTimestamp(Instant.ofEpochMilli(1438269988000))
         block.setTotalDifficulty(new BigInteger('07ff800000', 16))
-        block.setTransactionsRoot(HexData.from('0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'))
+        block.setTransactions([])
+        block.setTransactionsRoot(Hex32.from('0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'))
+        block.setUncles([])
         when:
         def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(block)
         then:
         act == '{\n'+
                 '  "number" : "0x1",\n' +
                 '  "hash" : "0x88e96d4537bea4d9c05d12549907b32561d3bf31f45aae734cdc119f13406cb6",\n' +
-                '  "timestamp" : "0x55ba4224",\n' +
-                '  "transactions" : [ ],\n' +
                 '  "parentHash" : "0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3",\n' +
                 '  "sha3Uncles" : "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",\n' +
+                '  "transactionsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",\n' +
+                '  "stateRoot" : "0xd67e4d450343046425ae4271474353857ab860dbc0a1dde64b41b5cd3a532bf3",\n' +
+                '  "receiptsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",\n' +
                 '  "miner" : "0x05a56e2d52c817161883f50c441c3228cfe54d9f",\n' +
                 '  "difficulty" : "0x3ff800000",\n' +
                 '  "totalDifficulty" : "0x7ff800000",\n' +
-                '  "size" : 537,\n' +
+                '  "extraData" : "0x476574682f76312e302e302f6c696e75782f676f312e342e32",\n' +
+                '  "size" : "0x219",\n' +
                 '  "gasLimit" : "0x1388",\n' +
                 '  "gasUsed" : "0x0",\n' +
-                '  "extraData" : "0x476574682f76312e302e302f6c696e75782f676f312e342e32",\n' +
-                '  "stateRoot" : "0xd67e4d450343046425ae4271474353857ab860dbc0a1dde64b41b5cd3a532bf3",\n' +
-                '  "receiptsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",\n' +
-                '  "transactionsRoot" : "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",\n' +
+                '  "timestamp" : "0x55ba4224",\n' +
+                '  "transactions" : [ ],\n' +
                 '  "uncles" : [ ]\n' +
                 '}'
 
@@ -96,17 +99,17 @@ class JacksonEthEncodeSpec extends Specification {
         block.setHash(BlockHash.from("0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339"))
         block.setNumber(2050000)
         block.setParentHash(BlockHash.from("0xecdf74d16a971ba6618a8f28bfac28daaca7612894993d1050a09214b66dac33"))
-        block.setReceiptsRoot(HexData.from("0xeefbe1843a32791d70d0e4b761d4908ccb41e2081afdb548b2db1811fff422fb"))
-        block.setSha3Uncles(HexData.from("0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630"))
+        block.setReceiptsRoot(Hex32.from("0xeefbe1843a32791d70d0e4b761d4908ccb41e2081afdb548b2db1811fff422fb"))
+        block.setSha3Uncles(Hex32.from("0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630"))
         block.setSize(1310)
-        block.setStateRoot(HexData.from("0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8"))
+        block.setStateRoot(Hex32.from("0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8"))
         block.setTimestamp(Instant.ofEpochMilli(1470921159000))
         block.setTotalDifficulty(new BigInteger("231df208bad7ab602", 16))
         block.setTransactions([
                 TransactionId.from("0x8239debcd3a242afb6a664784d2a2e2384c5192880d680331f00c50cccd88d0c"),
                 TransactionId.from("0x4556bec0c50d23a05d7d7eb056206ffbf8418244216aa4882c75bd6130f46637")
         ].collect { new TransactionRefJson(it) })
-        block.setTransactionsRoot(HexData.from("0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba"))
+        block.setTransactionsRoot(Hex32.from("0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba"))
         block.setUncles([
                 BlockHash.from("0x56f250f7de13d3fcb0cc4af795c14a303eaba5aaea981c646c2d7d139c405783")
         ])
@@ -115,24 +118,24 @@ class JacksonEthEncodeSpec extends Specification {
         def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(block)
         then:
         act == '{\n' +
-                '  "number" : "0x1f47d0",\n' +
-                '  "hash" : "0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339",\n' +
-                '  "timestamp" : "0x57ac79c7",\n' +
-                '  "transactions" : [ "0x8239debcd3a242afb6a664784d2a2e2384c5192880d680331f00c50cccd88d0c", "0x4556bec0c50d23a05d7d7eb056206ffbf8418244216aa4882c75bd6130f46637" ],\n' +
-                '  "parentHash" : "0xecdf74d16a971ba6618a8f28bfac28daaca7612894993d1050a09214b66dac33",\n' +
-                '  "sha3Uncles" : "0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630",\n' +
-                '  "miner" : "0xbe57c30111a068b9aac079d0dcda1a9e4ad51881",\n' +
-                '  "difficulty" : "0x7dea18c66b5",\n' +
-                '  "totalDifficulty" : "0x231df208bad7ab602",\n' +
-                '  "size" : 1310,\n' +
-                '  "gasLimit" : "0x47e7c4",\n' +
-                '  "gasUsed" : "0xa410",\n' +
-                '  "extraData" : "0xd98301040a844765746887676f312e362e328777696e646f7773",\n' +
-                '  "stateRoot" : "0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8",\n' +
-                '  "receiptsRoot" : "0xeefbe1843a32791d70d0e4b761d4908ccb41e2081afdb548b2db1811fff422fb",\n' +
-                '  "transactionsRoot" : "0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba",\n' +
-                '  "uncles" : [ "0x56f250f7de13d3fcb0cc4af795c14a303eaba5aaea981c646c2d7d139c405783" ]\n' +
-                '}'
+            '  "number" : "0x1f47d0",\n' +
+            '  "hash" : "0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339",\n' +
+            '  "parentHash" : "0xecdf74d16a971ba6618a8f28bfac28daaca7612894993d1050a09214b66dac33",\n' +
+            '  "sha3Uncles" : "0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630",\n' +
+            '  "transactionsRoot" : "0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba",\n' +
+            '  "stateRoot" : "0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8",\n' +
+            '  "receiptsRoot" : "0xeefbe1843a32791d70d0e4b761d4908ccb41e2081afdb548b2db1811fff422fb",\n' +
+            '  "miner" : "0xbe57c30111a068b9aac079d0dcda1a9e4ad51881",\n' +
+            '  "difficulty" : "0x7dea18c66b5",\n' +
+            '  "totalDifficulty" : "0x231df208bad7ab602",\n' +
+            '  "extraData" : "0xd98301040a844765746887676f312e362e328777696e646f7773",\n' +
+            '  "size" : "0x51e",\n' +
+            '  "gasLimit" : "0x47e7c4",\n' +
+            '  "gasUsed" : "0xa410",\n' +
+            '  "timestamp" : "0x57ac79c7",\n' +
+            '  "transactions" : [ "0x8239debcd3a242afb6a664784d2a2e2384c5192880d680331f00c50cccd88d0c", "0x4556bec0c50d23a05d7d7eb056206ffbf8418244216aa4882c75bd6130f46637" ],\n' +
+            '  "uncles" : [ "0x56f250f7de13d3fcb0cc4af795c14a303eaba5aaea981c646c2d7d139c405783" ]\n' +
+            '}'
 
 
     }
@@ -176,36 +179,35 @@ class JacksonEthEncodeSpec extends Specification {
         def act = jacksonRpcConverter.getObjectMapper().writer().with(prettyPrinter).writeValueAsString(block)
         then:
         act == '{\n' +
-                '  "number" : "0x1f47d0",\n' +
-                '  "hash" : "0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339",\n' +
-                '  "timestamp" : "0x57ac79c7",\n' +
-                '  "transactions" : [ {\n' +
-                '    "hash" : "0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31",\n' +
-                '    "nonce" : "0x3ca4",\n' +
-                '    "blockHash" : "0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339",\n' +
-                '    "blockNumber" : "0x1f47d0",\n' +
-                '    "transactionIndex" : "0x4",\n' +
-                '    "from" : "0xed059bc543141c8c93031d545079b3da0233b27f",\n' +
-                '    "to" : "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac",\n' +
-                '    "value" : "0x0",\n' +
-                '    "gasPrice" : "0x59b9b95f0",\n' +
-                '    "gas" : "0x3d090",\n' +
-                '    "input" : "0x667a2f58"\n' +
-                '  } ],\n' +
-                '  "parentHash" : "0xecdf74d16a971ba6618a8f28bfac28daaca7612894993d1050a09214b66dac33",\n' +
-                '  "sha3Uncles" : "0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630",\n' +
-                '  "miner" : "0xbe57c30111a068b9aac079d0dcda1a9e4ad51881",\n' +
-                '  "difficulty" : "0x7dea18c66b5",\n' +
-                '  "totalDifficulty" : "0x231df208bad7ab602",\n' +
-                '  "size" : 1310,\n' +
-                '  "gasLimit" : "0x47e7c4",\n' +
-                '  "gasUsed" : "0xa410",\n' +
-                '  "extraData" : "0xd98301040a844765746887676f312e362e328777696e646f7773",\n' +
-                '  "stateRoot" : "0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8",\n' +
-                '  "receiptsRoot" : "0xeefbe1843a32791d70d0e4b761d4908ccb41e2081afdb548b2db1811fff422fb",\n' +
-                '  "transactionsRoot" : "0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba",\n' +
-                '  "uncles" : [ ]\n' +
-                '}'
+            '  "number" : "0x1f47d0",\n' +
+            '  "hash" : "0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339",\n' +
+            '  "parentHash" : "0xecdf74d16a971ba6618a8f28bfac28daaca7612894993d1050a09214b66dac33",\n' +
+            '  "sha3Uncles" : "0xfecf4c589cab09da47205aa2587e7c8d76f521be749672ab0b6e8fb4f6f97630",\n' +
+            '  "transactionsRoot" : "0xac58c7512041220f5e627300f7e41e03a1ebb3b6837b4d2b00063293ae1b46ba",\n' +
+            '  "stateRoot" : "0xc19378ec99df369d3f95fcc8d40966f76e91c9e485957d472fa974acf6ac59e8",\n' +
+            '  "receiptsRoot" : "0xeefbe1843a32791d70d0e4b761d4908ccb41e2081afdb548b2db1811fff422fb",\n' +
+            '  "miner" : "0xbe57c30111a068b9aac079d0dcda1a9e4ad51881",\n' +
+            '  "difficulty" : "0x7dea18c66b5",\n' +
+            '  "totalDifficulty" : "0x231df208bad7ab602",\n' +
+            '  "extraData" : "0xd98301040a844765746887676f312e362e328777696e646f7773",\n' +
+            '  "size" : "0x51e",\n' +
+            '  "gasLimit" : "0x47e7c4",\n' +
+            '  "gasUsed" : "0xa410",\n' +
+            '  "timestamp" : "0x57ac79c7",\n' +
+            '  "transactions" : [ {\n' +
+            '    "hash" : "0x19442fe5e9e4f4819b7090298f1f108f2a1cca1f2167a413c771d6574fa34a31",\n' +
+            '    "nonce" : "0x3ca4",\n' +
+            '    "blockHash" : "0xdb87647a46c2418c22250ecb23a3861bd6a223632d85b5c5af12303a04387339",\n' +
+            '    "blockNumber" : "0x1f47d0",\n' +
+            '    "transactionIndex" : "0x4",\n' +
+            '    "from" : "0xed059bc543141c8c93031d545079b3da0233b27f",\n' +
+            '    "to" : "0x8b3b3b624c3c0397d3da8fd861512393d51dcbac",\n' +
+            '    "value" : "0x0",\n' +
+            '    "gasPrice" : "0x59b9b95f0",\n' +
+            '    "gas" : "0x3d090",\n' +
+            '    "input" : "0x667a2f58"\n' +
+            '  } ]\n' +
+            '}'
     }
 
     def "encode transaction"() {

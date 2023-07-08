@@ -17,12 +17,17 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.BlockHash;
 import io.emeraldpay.etherjar.domain.Bloom;
 import io.emeraldpay.etherjar.domain.Wei;
+import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.Serializable;
@@ -32,19 +37,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@JsonDeserialize(using = BlockJsonDeserializer.class)
-@JsonSerialize(using = BlockJsonSerializer.class)
+/**
+ *
+ * @see <a href="https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml">https://github.com/ethereum/execution-apis/blob/main/src/schemas/block.yaml</a>
+ * @param <T> type of transactions structure (full or ref)
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BlockJson<T extends TransactionRefJson> implements Serializable {
 
-    //TODO nonce or sealFields
-
     /**
-     * the block number. null when its pending block.
+     * the block number. `null` when it's a pending block.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long number;
 
     /**
-     * hash of the block. null when its pending block.
+     * hash of the block. `null` when it's a pending block.
      */
     private BlockHash hash;
 
@@ -56,7 +66,7 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
     /**
      * SHA3 of the uncles data in the block.
      */
-    private HexData sha3Uncles;
+    private Hex32 sha3Uncles;
 
     /**
      * the bloom filter for the logs of the block. null when its pending block.
@@ -66,17 +76,17 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
     /**
      * the root of the transaction trie of the block.
      */
-    private HexData transactionsRoot;
+    private Hex32 transactionsRoot;
 
     /**
      * the root of the final state trie of the block.
      */
-    private HexData stateRoot;
+    private Hex32 stateRoot;
 
     /**
      * the root of the receipts trie of the block.
      */
-    private HexData receiptsRoot;
+    private Hex32 receiptsRoot;
 
     /**
      * the address of the beneficiary to whom the mining rewards were given.
@@ -86,11 +96,15 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
     /**
      * the difficulty for this block.
      */
+    @JsonDeserialize(using = BigIntegerDeserializer.class)
+    @JsonSerialize(using = BigIntegerSerializer.class)
     private BigInteger difficulty;
 
     /**
      * total difficulty of the chain until this block.
      */
+    @JsonDeserialize(using = BigIntegerDeserializer.class)
+    @JsonSerialize(using = BigIntegerSerializer.class)
     private BigInteger totalDifficulty;
 
     /**
@@ -98,24 +112,39 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
      */
     private HexData extraData;
 
+    private Hex32 mixHash;
+
+    /**
+     * 8-bytes data
+     */
+    private HexData nonce;
+
     /**
      * the size of this block in bytes.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long size;
 
     /**
      * the maximum gas allowed in this block.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long gasLimit;
 
     /**
      * the total used gas by all transactions in this block.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long gasUsed;
 
     /**
      * when the block was collated
      */
+    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonSerialize(using = TimestampSerializer.class)
     private Instant timestamp;
 
     /**
@@ -123,6 +152,9 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
      * <p>
      * HexData or TransactionJson
      */
+    @JsonDeserialize(contentUsing = TransactionRefJsonDeserializer.class)
+    @JsonSerialize(contentUsing = TransactionRefJsonSerializer.class)
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private List<T> transactions;
 
     /**
@@ -134,6 +166,10 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
      * basefee value for that block, as per EIP-1559
      */
     private Wei baseFeePerGas;
+
+    private Hex32 withdrawalsRoot;
+
+    private List<WithdrawalJson> withdrawals;
 
     public Long getNumber() {
         return number;
@@ -159,12 +195,17 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.parentHash = parentHash;
     }
 
-    public HexData getSha3Uncles() {
+    public Hex32 getSha3Uncles() {
         return sha3Uncles;
     }
 
-    public void setSha3Uncles(HexData sha3Uncles) {
+    @JsonSetter
+    public void setSha3Uncles(Hex32 sha3Uncles) {
         this.sha3Uncles = sha3Uncles;
+    }
+
+    public void setSha3Uncles(HexData sha3Uncles) {
+        setSha3Uncles(Hex32.from(sha3Uncles));
     }
 
     public Bloom getLogsBloom() {
@@ -175,28 +216,43 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.logsBloom = logsBloom;
     }
 
-    public HexData getTransactionsRoot() {
+    public Hex32 getTransactionsRoot() {
         return transactionsRoot;
     }
 
-    public void setTransactionsRoot(HexData transactionsRoot) {
+    @JsonSetter
+    public void setTransactionsRoot(Hex32 transactionsRoot) {
         this.transactionsRoot = transactionsRoot;
     }
 
-    public HexData getStateRoot() {
+    public void setTransactionsRoot(HexData transactionsRoot) {
+        setTransactionsRoot(Hex32.from(transactionsRoot));
+    }
+
+    public Hex32 getStateRoot() {
         return stateRoot;
     }
 
-    public void setStateRoot(HexData stateRoot) {
+    @JsonSetter
+    public void setStateRoot(Hex32 stateRoot) {
         this.stateRoot = stateRoot;
     }
 
-    public HexData getReceiptsRoot() {
+    public void setStateRoot(HexData stateRoot) {
+        setStateRoot(Hex32.from(stateRoot));
+    }
+
+    public Hex32 getReceiptsRoot() {
         return receiptsRoot;
     }
 
-    public void setReceiptsRoot(HexData receiptsRoot) {
+    @JsonSetter
+    public void setReceiptsRoot(Hex32 receiptsRoot) {
         this.receiptsRoot = receiptsRoot;
+    }
+
+    public void setReceiptsRoot(HexData receiptsRoot) {
+        setReceiptsRoot(Hex32.from(receiptsRoot));
     }
 
     public Address getMiner() {
@@ -287,6 +343,38 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         this.baseFeePerGas = baseFeePerGas;
     }
 
+    public Hex32 getMixHash() {
+        return mixHash;
+    }
+
+    public void setMixHash(Hex32 mixHash) {
+        this.mixHash = mixHash;
+    }
+
+    public HexData getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(HexData nonce) {
+        this.nonce = nonce;
+    }
+
+    public Hex32 getWithdrawalsRoot() {
+        return withdrawalsRoot;
+    }
+
+    public void setWithdrawalsRoot(Hex32 withdrawalsRoot) {
+        this.withdrawalsRoot = withdrawalsRoot;
+    }
+
+    public List<WithdrawalJson> getWithdrawals() {
+        return withdrawals;
+    }
+
+    public void setWithdrawals(List<WithdrawalJson> withdrawals) {
+        this.withdrawals = withdrawals;
+    }
+
     /**
      * If this instance is empty or contains only references, then return as is. Otherwise
      * returns a copy of the BlockJson with transactions fields replaced with id references
@@ -335,6 +423,10 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         copy.transactions = this.transactions;
         copy.uncles = this.uncles;
         copy.baseFeePerGas = this.baseFeePerGas;
+        copy.mixHash = this.mixHash;
+        copy.nonce = this.nonce;
+        copy.withdrawalsRoot = this.withdrawalsRoot;
+        copy.withdrawals = this.withdrawals;
         return copy;
     }
 
@@ -363,6 +455,10 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
         if (!Objects.equals(timestamp, blockJson.timestamp)) return false;
         if (!Objects.equals(transactions, blockJson.transactions)) return false;
         if (!Objects.equals(baseFeePerGas, blockJson.baseFeePerGas)) return false;
+        if (!Objects.equals(mixHash, blockJson.mixHash)) return false;
+        if (!Objects.equals(nonce, blockJson.nonce)) return false;
+        if (!Objects.equals(withdrawalsRoot, blockJson.withdrawalsRoot)) return false;
+        if (!Objects.equals(withdrawals, blockJson.withdrawals)) return false;
         return Objects.equals(uncles, blockJson.uncles);
     }
 

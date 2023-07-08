@@ -91,17 +91,20 @@ public abstract class Subscription<T> {
 
     public static class Block extends Subscription<BlockJson<TransactionRefJson>> {
 
+        private final ObjectMapper objectMapper;
+
         private static final List PARAMS = Arrays.asList(
             "newHeads"
         );
 
-        protected Block() {
+        protected Block(ObjectMapper objectMapper) {
             super(PARAMS);
+            this.objectMapper = objectMapper;
         }
 
         @Override
         public void onReceive(SubscriptionJson json) {
-            BlockJson<TransactionRefJson> blockJson = json.getBlockResult();
+            BlockJson<TransactionRefJson> blockJson = json.getBlockResult(objectMapper);
             onReceive(blockJson);
         }
     }

@@ -24,6 +24,7 @@ import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.BlockHash;
 import io.emeraldpay.etherjar.domain.TransactionId;
 import io.emeraldpay.etherjar.domain.Wei;
+import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.hex.HexEncoding;
 
@@ -53,6 +54,12 @@ public abstract class EtherJsonDeserializer<T> extends JsonDeserializer<T> {
         String value = getHexString(node, name);
         if (value == null) return null;
         return HexData.from(value);
+    }
+
+    protected Hex32 getData32(JsonNode node, String name) {
+        String value = getHexString(node, name);
+        if (value == null) return null;
+        return Hex32.from(value);
     }
 
     protected BigInteger getQuantity(JsonNode node, String name) {

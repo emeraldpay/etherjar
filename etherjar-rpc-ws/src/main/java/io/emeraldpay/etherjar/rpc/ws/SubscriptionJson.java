@@ -16,11 +16,13 @@
 package io.emeraldpay.etherjar.rpc.ws;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.emeraldpay.etherjar.rpc.RpcResponseError;
 import io.emeraldpay.etherjar.rpc.json.BlockJson;
-import io.emeraldpay.etherjar.rpc.json.BlockJsonDeserializer;
 import io.emeraldpay.etherjar.rpc.json.TransactionRefJson;
+
+import java.io.IOException;
 
 /**
  * JSON emitted from Websocket
@@ -29,8 +31,6 @@ import io.emeraldpay.etherjar.rpc.json.TransactionRefJson;
  */
 @JsonDeserialize(using = SubscriptionJsonDeserializer.class)
 public class SubscriptionJson {
-
-    private static BlockJsonDeserializer blockJsonDeserializer = new BlockJsonDeserializer();
 
     private String subscription;
     private JsonNode result;
@@ -54,8 +54,12 @@ public class SubscriptionJson {
     }
 
     @SuppressWarnings("unchecked")
-    public BlockJson<TransactionRefJson> getBlockResult() {
-        return (BlockJson<TransactionRefJson>) blockJsonDeserializer.deserialize(result);
+    public BlockJson<TransactionRefJson> getBlockResult(ObjectMapper objectMapper) throws IllegalStateException {
+        try {
+            return objectMapper.readerFor(BlockJson.class).readValue(result);
+        } catch (IOException e) {
+            throw new IllegalStateException("Not a Block JSON", e);
+        }
     }
 
     public String getStringResult() {

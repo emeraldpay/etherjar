@@ -1,5 +1,6 @@
 package io.emeraldpay.etherjar.rpc.json
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.emeraldpay.etherjar.domain.BlockHash
 import io.emeraldpay.etherjar.domain.TransactionId
 import io.emeraldpay.etherjar.domain.Wei
@@ -12,6 +13,7 @@ import java.time.format.DateTimeFormatter
 class BlockJsonSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
+    ObjectMapper objectMapper = jacksonRpcConverter.getObjectMapper()
     DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z").withZone(ZoneId.of('UTC'))
 
     def "Parse block 1"() {
@@ -173,6 +175,102 @@ class BlockJsonSpec extends Specification {
         act.gasLimit == 4712388
         act.gasUsed == 42000
         act.extraData.toHex() == '0xd98301040a844765746887676f312e362e328777696e646f7773'
+    }
+
+    def "Parse block 17172922"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-17172922.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.number == 17172922
+        act.size == 0x2bb75
+        act.transactionsRoot.toHex() == "0xf9959b8e5dd137dcc1d1ddba57dba0d3efb8d5e8de0ed03de1414bd627d7bac7"
+        act.stateRoot.toHex() == "0xe2aa2262e478ccb0028ed5a3ad34f54bafcb0fbd8570ae426f4697a8dcdc225d"
+        act.withdrawalsRoot.toHex() == "0x3490d74ee78919d255a0676e1c0575c163268860a05cbc36c57a274be763aeae"
+        act.withdrawals.size() == 16
+        with(act.withdrawals[0]) {
+            it.index == 0x21b3d0
+            it.validatorIndex == 0x835d8
+            it.address.toHex() == "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
+            it.amount.toHex() == "0xbdb6f3"
+        }
+    }
+
+    def "Re-parse serialized block 17172922"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-17172922.json")
+
+        when:
+        def original = jacksonRpcConverter.fromJson(json, BlockJson)
+        def serialized = objectMapper.writeValueAsString(original)
+        def act = objectMapper.readValue(serialized, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.number == 17172922
+        act == original
+    }
+
+    def "Serialized block 17172922"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-17172922.json")
+
+        when:
+        def original = jacksonRpcConverter.fromJson(json, BlockJson)
+        def serialized = objectMapper.writeValueAsString(original)
+
+        then:
+        serialized.contains('"gasUsed":"0xd42912"')
+        serialized.contains('"difficulty":"0x0"')
+        serialized.contains('"transactions":["0x127cf0f46f247d48a169afc1604ea5c1d92b4e47b58956c0286ba25dafd7b4d8","0x4fcdc4523cfafa63eb22ae2fb3d468b6b96c036ab0cbe1fd754f01d5128a33a4"')
+        serialized.contains('"size":"0x2bb75"')
+        serialized.contains('"timestamp":"0x6450f9ef"')
+        serialized.contains('"logsBloom":"0x1cab412361e57d22b01114529c')
+    }
+
+    def "Parse full block 17172922"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-17172922-full.json")
+
+        when:
+        def act = jacksonRpcConverter.fromJson(json, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.number == 17172922
+        act.size == 0x2bb75
+        act.transactionsRoot.toHex() == "0xf9959b8e5dd137dcc1d1ddba57dba0d3efb8d5e8de0ed03de1414bd627d7bac7"
+        act.stateRoot.toHex() == "0xe2aa2262e478ccb0028ed5a3ad34f54bafcb0fbd8570ae426f4697a8dcdc225d"
+        act.withdrawalsRoot.toHex() == "0x3490d74ee78919d255a0676e1c0575c163268860a05cbc36c57a274be763aeae"
+        act.withdrawals.size() == 16
+        with(act.withdrawals[0]) {
+            it.index == 0x21b3d0
+            it.validatorIndex == 0x835d8
+            it.address.toHex() == "0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f"
+            it.amount.toHex() == "0xbdb6f3"
+        }
+        act.transactions.size() == 148
+        with(act.transactions[0]) {
+            it instanceof TransactionJson
+            with(it as TransactionJson) {
+                it.blockHash.toHex() == "0xf44a5b9e759bbe35c49644b6ef1cb78b4c2f2657164452b791602be0d9509b43"
+                it.hash.toHex() == "0x127cf0f46f247d48a169afc1604ea5c1d92b4e47b58956c0286ba25dafd7b4d8"
+            }
+        }
+    }
+
+    def "Re-parse serialized full block 17172922"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-17172922-full.json")
+
+        when:
+        def original = jacksonRpcConverter.fromJson(json, BlockJson)
+        def serialized = objectMapper.writeValueAsString(original)
+        def act = objectMapper.readValue(serialized, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.number == 17172922
+        act == original
     }
 
     def "Makes an identical copy of an empty block"() {

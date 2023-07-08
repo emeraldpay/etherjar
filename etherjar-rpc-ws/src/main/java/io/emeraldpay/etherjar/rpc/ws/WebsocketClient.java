@@ -15,6 +15,8 @@
  */
 package io.emeraldpay.etherjar.rpc.ws;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.emeraldpay.etherjar.rpc.JacksonRpcConverter;
 import io.emeraldpay.etherjar.rpc.json.BlockJson;
 import io.emeraldpay.etherjar.rpc.json.TransactionRefJson;
 import io.netty.bootstrap.Bootstrap;
@@ -53,6 +55,8 @@ public class WebsocketClient implements Closeable {
     private String username;
     private String password;
 
+    private ObjectMapper objectMapper;
+
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -63,8 +67,13 @@ public class WebsocketClient implements Closeable {
      * @param origin origin header, ex. http://localhost
      */
     private WebsocketClient(URI upstream, URI origin) {
+        this(upstream, origin, JacksonRpcConverter.createJsonMapper());
+    }
+
+    public WebsocketClient(URI upstream, URI origin, ObjectMapper objectMapper) {
         this.upstream = upstream;
         this.origin = origin;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -170,7 +179,7 @@ public class WebsocketClient implements Closeable {
      * @param listener handler of new blocks
      */
     public void onNewBlock(SubscriptionListener<BlockJson<TransactionRefJson>> listener) {
-        Subscription<BlockJson<TransactionRefJson>> sub = new Subscription.Block();
+        Subscription<BlockJson<TransactionRefJson>> sub = new Subscription.Block(objectMapper);
         sub.addListener(listener);
         this.socketApiHandler.subscribe(sub);
     }
@@ -190,6 +199,8 @@ public class WebsocketClient implements Closeable {
 
         private String username;
         private String password;
+
+        private ObjectMapper objectMapper;
 
         /**
          *
@@ -246,7 +257,10 @@ public class WebsocketClient implements Closeable {
                     origin = new URI("http://localhost");
                 } catch (URISyntaxException e) { }
             }
-            WebsocketClient client = new WebsocketClient(address, origin);
+            if (objectMapper == null) {
+                objectMapper = JacksonRpcConverter.createJsonMapper();
+            }
+            WebsocketClient client = new WebsocketClient(address, origin, objectMapper);
             if (username != null && password != null) {
                 client.setBasicAuth(username, password);
             }
