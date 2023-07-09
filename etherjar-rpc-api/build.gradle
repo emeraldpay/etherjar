@@ -23,6 +23,6 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-core:2.9.8"
     api "com.fasterxml.jackson.core:jackson-databind:2.9.8"
 
-    implementation "io.projectreactor:reactor-core:3.4.6"
+    implementation "io.projectreactor:reactor-core:3.5.3"
 
 }

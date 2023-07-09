@@ -6,16 +6,18 @@ repositories {
 
 dependencies {
     api project(':etherjar-rpc-api')
-    api ("io.emeraldpay:emerald-api:0.12-alpha.4") {
+    api ("io.emeraldpay:emerald-api:0.12-alpha.5") {
         exclude group: "io.grpc"
     }
     implementation 'io.grpc:grpc-netty:1.53.0'
     implementation 'io.grpc:grpc-stub:1.53.0'
     implementation 'io.grpc:grpc-protobuf:1.53.0'
+    implementation 'io.projectreactor:reactor-core:3.5.3'
+    implementation 'com.salesforce.servicelibs:reactor-grpc:1.2.3'
 
-    testCompile "io.projectreactor:reactor-test:3.2.12.RELEASE"
-    testCompile "io.grpc:grpc-testing:1.53.0"
-    testCompile "io.netty:netty-tcnative:2.0.50.Final"
-    testCompile "io.netty:netty-tcnative-boringssl-static:2.0.50.Final"
+    testImplementation "io.projectreactor:reactor-test:3.5.3"
+    testImplementation "io.grpc:grpc-testing:1.53.0"
+    testImplementation "io.netty:netty-tcnative:2.0.50.Final"
+    testImplementation "io.netty:netty-tcnative-boringssl-static:2.0.50.Final"
 
 }
