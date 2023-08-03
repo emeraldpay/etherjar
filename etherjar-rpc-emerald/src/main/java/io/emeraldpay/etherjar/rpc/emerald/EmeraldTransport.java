@@ -58,13 +58,13 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     private final Channel channel;
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
 
-    private ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
+    private final ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
 
-    private ObjectMapper objectMapper;
-    private JacksonRpcConverter rpcConverter;
-    private ExecutorService executorService;
-    private Common.ChainRef chainRef;
+    private final ObjectMapper objectMapper;
+    private final JacksonRpcConverter rpcConverter;
+    private final ExecutorService executorService;
+    private final Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
     public EmeraldTransport(Channel channel,
@@ -486,7 +486,11 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                 threadsCount(2);
             }
             if (objectMapper == null) {
-                objectMapper = new ObjectMapper();
+                if (rpcConverter != null) {
+                    objectMapper = rpcConverter.getObjectMapper();
+                } else {
+                    objectMapper = JacksonRpcConverter.createJsonMapper();
+                }
             }
             if (rpcConverter == null) {
                 rpcConverter = new JacksonRpcConverter(objectMapper);
