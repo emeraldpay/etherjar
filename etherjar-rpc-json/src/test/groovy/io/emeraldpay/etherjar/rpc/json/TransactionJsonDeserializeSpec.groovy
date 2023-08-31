@@ -1,12 +1,17 @@
 package io.emeraldpay.etherjar.rpc.json
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.emeraldpay.etherjar.domain.Wei
+import io.emeraldpay.etherjar.rpc.EtherjarModule
 import io.emeraldpay.etherjar.rpc.JacksonRpcConverter
 import spock.lang.Specification
 
 class TransactionJsonDeserializeSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
+    ObjectMapper objectMapper = new ObjectMapper().tap {
+        it.registerModule(new EtherjarModule())
+    }
 
     def "Parse unprotected tx 0x5c7851"() {
         InputStream json = TransactionJsonDeserializeSpec.classLoader.getResourceAsStream("tx/0x5c7851.json")
@@ -15,13 +20,29 @@ class TransactionJsonDeserializeSpec extends Specification {
         def act = jacksonRpcConverter.fromJson(json, TransactionJson)
 
         then:
+        act.hash.toString() == "0x5c7851f4b2dc93860ed5a6624a422d4f17975d41c68667b64453de3ffaa8af49"
         act.signature != null
         act.signature.chainId == null
         !act.signature.protected
         act.signature.r.toHex() == '0xe28800dc73a56b5c687ad6b38789f5a485a5ead8236b3d1fc04143fbc1b12c40'
         act.signature.s.toHex() == '0x690014487d34d1881461f89edf6662e2efb833f08c5d6913bace4289f2f7736e'
         act.signature.v == 27
-        act.signature.publicKey.toHex() == '0x2d4fa87b8e395b5e3f9ff674e0ec109e32d9db99b2b20387cf2f2079c9c041aa2199a67390b8696457020e0aae324cfd1b5e21f86a17683b8afd3660c3ed8c01'
+    }
+
+    def "Parse unprotected tx 0x5c7851 as resulting json"() {
+        InputStream json = TransactionJsonDeserializeSpec.classLoader.getResourceAsStream("tx/0x5c7851-result.json")
+
+        when:
+        def act = objectMapper.readValue(json, TransactionJson)
+
+        then:
+        act.hash.toString() == "0x5c7851f4b2dc93860ed5a6624a422d4f17975d41c68667b64453de3ffaa8af49"
+        act.signature != null
+        act.signature.chainId == null
+        !act.signature.protected
+        act.signature.r.toHex() == '0xe28800dc73a56b5c687ad6b38789f5a485a5ead8236b3d1fc04143fbc1b12c40'
+        act.signature.s.toHex() == '0x690014487d34d1881461f89edf6662e2efb833f08c5d6913bace4289f2f7736e'
+        act.signature.v == 27
     }
 
     def "Parse protected tx 0xb35804"() {
@@ -32,12 +53,10 @@ class TransactionJsonDeserializeSpec extends Specification {
 
         then:
         act.signature != null
-        act.signature.chainId.value == 61
         act.signature.protected
         act.signature.r.toHex() == '0x9873696b852c34c3da10dda993f02eb800892e30cb5acacd335d47109e73e51b'
         act.signature.s.toHex() == '0x45adb2148a0f37d30d0a2b4ac3bf4ec0f4d8b938181b45635f02e054ae750759'
         act.signature.v == 157
-        act.signature.publicKey.toHex() == '0x7ac35ec4a59a772186573ed9d26787889cde2042110572ddf79a1f9ef2c7bc28b55b35d4fc5497c50e90cdf53b5a6be6174c456d98ba479a86ff4753d652fba3'
     }
 
     def "Parse tx 0x1e694e"() {
@@ -78,7 +97,7 @@ class TransactionJsonDeserializeSpec extends Specification {
         act.nonce == 259
     }
 
-    def "Parse tx 0x19442f"() {
+    def "Parse tx 0x19442f without v"() {
         InputStream json = this.class.classLoader.getResourceAsStream("tx/0x19442f.json")
 
         when:
@@ -138,7 +157,7 @@ class TransactionJsonDeserializeSpec extends Specification {
         act.chainId == 1
     }
 
-    def "Reads access list"() {
+    def "Parse tx 0xb8e7e1 with access list"() {
         setup:
         InputStream json = this.class.classLoader.getResourceAsStream("tx/0xb8e7e1.json")
         when:
@@ -185,6 +204,16 @@ class TransactionJsonDeserializeSpec extends Specification {
                 "0x9e4f5f97e03aa4efae12a106e7836019d87ddeb1f4c0a5c8013e28b7ec1f0f31"
             ]
         }
+    }
+    def "Parse tx 0x408dc2 with access list"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("tx/0x408dc2.json")
+        when:
+        def act = jacksonRpcConverter.fromJson(json, TransactionJson)
+
+        then:
+        act.accessList != null
+        act.accessList.size() == 5
     }
 
     def "Reads tx with v=0"() {

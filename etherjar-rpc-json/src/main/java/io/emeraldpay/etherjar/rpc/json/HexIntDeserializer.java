@@ -13,24 +13,24 @@ import java.io.IOException;
 /**
  * Deserialize Long from Hex Quantity
  */
-public class HexLongDeserializer extends StdDeserializer<Long> {
+public class HexIntDeserializer extends StdDeserializer<Integer> {
 
-    public HexLongDeserializer() {
-        super(Long.class);
+    public HexIntDeserializer() {
+        super(Integer.class);
     }
 
     @Override
-    public Long deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public Integer deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         JsonToken token = p.currentToken();
         if (token == JsonToken.VALUE_STRING) {
             try {
-                return HexQuantity.from(p.getValueAsString()).getValue().longValueExact();
+                return HexQuantity.from(p.getValueAsString()).getValue().intValueExact();
             } catch (Throwable t) {
                 throw JsonMappingException.from(p,"Invalid HexQuantity value: " + p.getValueAsString(), t);
             }
         }
         if (token == JsonToken.VALUE_NUMBER_INT) {
-            return p.getValueAsLong();
+            return p.getValueAsInt();
         }
         if (token == JsonToken.VALUE_NULL) {
             return null;

@@ -60,17 +60,19 @@ class ChainIdSpec extends Specification {
         x << (0..255)
     }
 
-    def "Decline non-byte numbers"() {
+    def "Decline negative numbers"() {
         expect:
         !ChainId.isValid(x)
         where:
-        x << [-1, -100, -250, 256, 1024, 6161, 6819571, Integer.MAX_VALUE, Integer.MIN_VALUE]
+        x << [-1, -100, -250]
     }
 
-    def "Doesn't allow to create invalid id"() {
-        when:
-        new ChainId(1024)
-        then:
-        thrown(IllegalArgumentException)
+    def "Accept standard chains"() {
+        // see https://chainlist.org/
+        expect:
+        ChainId.isValid(x)
+        where:
+        x << [1, 56, 42161, 137, 10, 43114, 25, 2222, 8453, 8217, 32659, 369, 66, 42220, 30, 250, 100]
     }
+
 }

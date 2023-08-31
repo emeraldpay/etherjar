@@ -20,8 +20,12 @@ public class HexDataDeserializer extends StdDeserializer<HexData> {
     public HexData deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         JsonToken token = p.currentToken();
         if (token == JsonToken.VALUE_STRING) {
+            String value = p.getValueAsString();
+            if ("0x".equals(value)) {
+                return null;
+            }
             try {
-                return HexData.from(p.getValueAsString());
+                return HexData.from(value);
             } catch (Throwable t) {
                 throw JsonMappingException.from(p,"Invalid HexData value: " + p.getValueAsString(), t);
             }

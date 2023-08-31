@@ -78,7 +78,7 @@ public class TransactionJsonDeserializer extends EtherJsonDeserializer<Transacti
             signature.setR(getData(node, "r"));
             signature.setS(getData(node, "s"));
             signature.setV(getLong(node, "v").intValue());
-            signature.setPublicKey(getData(node, "publicKey"));
+//            signature.setPublicKey(getData(node, "publicKey"));
 
             tx.setSignature(signature);
         }

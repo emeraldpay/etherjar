@@ -136,7 +136,8 @@ class ResponseJsonSerializerSpec extends Specification {
             '"to":"0x4d3c2271bb98e41d29896318d29f9e017b1c1669",' +
             '"value":"0xd8b72d434c800000",' +
             '"gasPrice":"0x5af3107a4000",' +
-            '"gas":"0x5208"}}'
+            '"gas":"0x5208",' +
+            '"type":"0x0"}}'
 
     }
 

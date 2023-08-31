@@ -97,7 +97,7 @@ class EtherjarModuleSpec extends Specification {
         when:
         def obj = objectMapper.readValue(json, TestObject.class)
         then:
-        obj.hexData == HexData.empty()
+        obj.hexData == null
     }
 
     def "Fails to decode HexData invalid string value"() {

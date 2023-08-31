@@ -17,6 +17,9 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.*;
@@ -29,13 +32,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@JsonDeserialize(using = TransactionJsonDeserializer.class)
-@JsonSerialize(using = TransactionJsonSerializer.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TransactionJson extends TransactionRefJson implements TransactionRef, Serializable {
 
     /**
      * the number of transactions made by the sender prior to this one.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long nonce;
 
     /**
@@ -46,11 +51,15 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     /**
      * block number where this transaction was in. null when its pending.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long blockNumber;
 
     /**
-     * position in the block. null when its pending.
+     * position in the block. null when it's pending.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long transactionIndex;
 
     /**
@@ -61,6 +70,7 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     /**
      * address of the receiver. null when its a contract creation transaction.
      */
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private Address to;
 
     /**
@@ -83,6 +93,8 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     /**
      * gas provided by the sender.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long gas;
 
     /**
@@ -90,16 +102,33 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
      */
     private HexData input;
 
-    private TransactionSignature signature;
-
     /**
      * Transaction type
      *
      * @see <a href="https://eips.ethereum.org/EIPS/eip-2718">EIP-2718: Typed Transaction Envelope</a>
      */
+    @JsonDeserialize(using = HexIntDeserializer.class)
+    @JsonSerialize(using = HexIntSerializer.class)
     private int type = 0;
 
+    @JsonDeserialize(using = HexIntDeserializer.class)
+    @JsonSerialize(using = HexIntSerializer.class)
     private Integer chainId;
+
+    @JsonDeserialize(using = HexIntDeserializer.class)
+    @JsonSerialize(using = HexIntSerializer.class)
+    private Integer v;
+
+    @JsonDeserialize
+    @JsonSerialize
+    private HexData r;
+
+    @JsonDeserialize
+    @JsonSerialize
+    private HexData s;
+
+    @JsonIgnore
+    private transient TransactionSignature signature;
 
     private List<Access> accessList;
 
@@ -208,7 +237,19 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     }
 
     public TransactionSignature getSignature() {
-        return signature;
+        if (signature != null) {
+            return signature;
+        }
+        if (v == null || r == null || s == null) {
+            return null;
+        }
+        TransactionSignature created = new TransactionSignature();
+        created.setV(v);
+        created.setR(r);
+        created.setS(s);
+        created.setChainId(chainId != null ? new ChainId(chainId) : null);
+        this.signature = created;
+        return created;
     }
 
     public void setSignature(TransactionSignature signature) {

@@ -62,7 +62,7 @@ public class TransactionJsonSerializer extends EtherJsonSerializer<TransactionJs
             if (signature.getV() != null) {
                 writeField(gen, "v", signature.getV().longValue());
             }
-            writeField(gen, "publicKey", signature.getPublicKey());
+//            writeField(gen, "publicKey", signature.getPublicKey());
         }
         List<TransactionJson.Access> accessList = value.getAccessList();
         if (accessList != null) {

@@ -30,7 +30,7 @@ public class ChainId {
     public static final ChainId RINKEBY_TESTNET = new ChainId(4);
     public static final ChainId KOVAN_TESTNET = new ChainId(42);
 
-    private int value;
+    private final int value;
 
     public ChainId(int value) {
         if (!ChainId.isValid(value)) {
@@ -40,7 +40,7 @@ public class ChainId {
     }
 
     public static boolean isValid(int value) {
-        return value >= 0 && value <= 255;
+        return value >= 0;
     }
 
     public int getValue() {

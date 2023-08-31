@@ -28,7 +28,6 @@ public class TransactionSignature {
 
     private ChainId chainId;
 
-    private HexData publicKey;
     private HexData r;
     private HexData s;
     private Integer v;
@@ -42,14 +41,6 @@ public class TransactionSignature {
 
     public void setChainId(ChainId chainId) {
         this.chainId = chainId;
-    }
-
-    public HexData getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(HexData publicKey) {
-        this.publicKey = publicKey;
     }
 
     public HexData getR() {
@@ -105,7 +96,7 @@ public class TransactionSignature {
         if (this == o) return true;
         if (!(o instanceof TransactionSignature)) return false;
         TransactionSignature that = (TransactionSignature) o;
-        return Objects.equals(chainId, that.chainId) && Objects.equals(publicKey, that.publicKey) && Objects.equals(r, that.r) && Objects.equals(s, that.s) && Objects.equals(v, that.v);
+        return Objects.equals(chainId, that.chainId) && Objects.equals(r, that.r) && Objects.equals(s, that.s) && Objects.equals(v, that.v);
     }
 
     @Override
