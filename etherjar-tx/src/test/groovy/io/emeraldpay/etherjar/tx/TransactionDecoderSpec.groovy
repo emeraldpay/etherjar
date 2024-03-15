@@ -16,9 +16,12 @@
 package io.emeraldpay.etherjar.tx
 
 import io.emeraldpay.etherjar.domain.Address
+import io.emeraldpay.etherjar.domain.TransactionId
 import io.emeraldpay.etherjar.domain.Wei
 import io.emeraldpay.etherjar.hex.Hex32
+import io.emeraldpay.etherjar.hex.HexData
 import org.apache.commons.codec.binary.Hex
+import org.bouncycastle.jcajce.provider.digest.Keccak
 import spock.lang.Specification
 
 class TransactionDecoderSpec extends Specification {
@@ -370,5 +373,96 @@ class TransactionDecoderSpec extends Specification {
             chainId == 10001
             recoverAddress() == Address.from("0x72e96f7033c40cacc2fd554836846c2258f39909")
         }
+    }
+
+    def "Parse tx type 0x6792c2"() {
+        // tx 0x6792c2e7a345b10a1f8d5cc4897f363602576e016a68a1e5e61729967b92f7f5
+        // data 0x03f9013b018310dd0f84773594008513d978f31082520894ff000000000000000000000000000000000000108080c0843b9aca00f8c6a0012e5ded2e690630287c8adf37fa41eaf98d887a29e2681a217d5ee511e86662a00152dc10942b02211cb44f21de65b7a166baa4f4c890eff4b39e0a79241e888ba001ef5bb4e3786697e4015d6d36e40490c3b01afad29be3ae0d470dbae8733a8fa001fa161dedc837ebd8615c7039cebea1dadb643e47ddd5d5e10f1e46ca355ca1a00100b76767b31dd57588183d2ad854802a0ae2e0839e7ecfa09f81af97435f1ea001222a1924007ab3f7e229cbf0254491b64621d96e0cc8da96e0752b3f00188b80a0d6919cc4c26508304c85e7ff91defe79a653a69619b068fa60bd49955c62adcfa040ccb84aebe0138ac45445759a82204ca197a2b1bd41394dd92e5696e441459b
+        // see https://etherscan.io/tx/0x6792c2e7a345b10a1f8d5cc4897f363602576e016a68a1e5e61729967b92f7f5#blobs
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-blob-0x6792c2.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+        Keccak.Digest256 keccak = new Keccak.Digest256();
+        keccak.update(tx);
+        println("Exp: " + TransactionId.from(keccak.digest()));
+
+
+        when:
+        def act = decoder.decode(tx)
+        println("Hash: " + act.transactionId())
+
+        then:
+        act.type == TransactionType.BLOB
+        with((TransactionWithBlob)act) {
+            value == Wei.ZERO
+            chainId == 1
+            extractFrom() == Address.from("0x6887246668a3b87F54DeB3b94Ba47a6f63F32985")
+            to == Address.from("0xFF00000000000000000000000000000000000010")
+            gas == 21000
+            nonce == 0x10dd0f
+            accessList.isEmpty()
+            maxGasPrice.toHex() == "0x13d978f310"
+            priorityGasPrice.toHex() == "0x77359400"
+            maxFeePerBlobGas.toHex() == "0x3b9aca00"
+            transactionId().toHex() == "0x6792c2e7a345b10a1f8d5cc4897f363602576e016a68a1e5e61729967b92f7f5"
+            blobVersionedHashes.size() == 6
+            blobVersionedHashes[0].toHex() == "0x012e5ded2e690630287c8adf37fa41eaf98d887a29e2681a217d5ee511e86662"
+            blobVersionedHashes[1].toHex() == "0x0152dc10942b02211cb44f21de65b7a166baa4f4c890eff4b39e0a79241e888b"
+            blobVersionedHashes[2].toHex() == "0x01ef5bb4e3786697e4015d6d36e40490c3b01afad29be3ae0d470dbae8733a8f"
+            blobVersionedHashes[3].toHex() == "0x01fa161dedc837ebd8615c7039cebea1dadb643e47ddd5d5e10f1e46ca355ca1"
+            blobVersionedHashes[4].toHex() == "0x0100b76767b31dd57588183d2ad854802a0ae2e0839e7ecfa09f81af97435f1e"
+            blobVersionedHashes[5].toHex() == "0x01222a1924007ab3f7e229cbf0254491b64621d96e0cc8da96e0752b3f00188b"
+        }
+        with((SignatureEIP2930)act.getSignature()) {
+            r.toString(16) == "d6919cc4c26508304c85e7ff91defe79a653a69619b068fa60bd49955c62adcf"
+            s.toString(16) == "40ccb84aebe0138ac45445759a82204ca197a2b1bd41394dd92e5696e441459b"
+            getYParity() == 0
+        }
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
+    }
+
+    def "Parse tx type 0x109332"() {
+        // tx 0x109332e227bb505e5731fcbe231dc8d9c0136c14300cd34e40097abf72c51105
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-blob-0x109332.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+
+        when:
+        def act = decoder.decode(tx)
+
+        then:
+        act.type == TransactionType.BLOB
+        with((TransactionWithBlob)act) {
+            value == Wei.ZERO
+            chainId == 1
+            extractFrom() == Address.from("0x2c169dfe5fbba12957bdd0ba47d9cedbfe260ca7")
+            to == Address.from("0xc662c410c0ecf747543f5ba90660f6abebd9c8c4")
+            gas == 0x53ec60
+            nonce == 0x96f2c
+            accessList.isEmpty()
+            maxGasPrice.toHex() == "0x22ecb25c00"
+            priorityGasPrice.toHex() == "0x5f5e100"
+            maxFeePerBlobGas.toHex() == "0x22ecb25c00"
+            transactionId().toHex() == "0x109332e227bb505e5731fcbe231dc8d9c0136c14300cd34e40097abf72c51105"
+            data.toHex() == "0xb72d42a100000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000d00c61b69ddec675e4b7ffeb185d154a8ed3623d4df8786b555a7bf44abecfe0f03d30fea5a885673f5647975be75e656672f176580385a21f4a27c23664112110000000000000000000000000000000000000000000000000000000000096f2b0773f23b4b16001938abff13310bc1eac3a820c0c05944224cf7f5479700be6c05ba2078240f1585f96424c2d1ee48211da3b3f9177bf2b9880b4fc91d59e9a200000000000000000000000000000000000000000000000000000000000000010000000000000000cb544616679c59d793a8814c7605b76f121e350626ea6cba0000000000000000963c4cd9d646d98528c052d384fe425af01f7f8bec0203e90304a6d9bc75a700597be71c9fa71286f76a3d5b0fd40f0eb7ef22ec19b08df200000000000000000000000000000000eacbe294cd474ee851cd8634ab96e968000000000000000000000000000000001321355a1f29da6c49b6267eefabb2c4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030a246ff605cb19ea1fa86c847d516c797fd5f98c913ab601de00e831f059661fe932e6e5de8b3a36d9ad2daf04744e10500000000000000000000000000000000"
+            blobVersionedHashes.size() == 1
+            blobVersionedHashes[0].toHex() == "0x01ebcede241d2473b6b1a6fa08f0a281858bc8901f742a39ff74d371e2f2664f"
+        }
+        with((SignatureEIP2930)act.getSignature()) {
+            r.toString(16) == "a0933938cbf7279651014732d845f7bfda8575e543c6f6350640d2e3a090db42"
+            s.toString(16) == "767e7e993e6e7e1c98d23b7dd782f734e2a8e54dc3083c7fabcab925759d2814"
+            getYParity() == 0
+        }
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
     }
 }

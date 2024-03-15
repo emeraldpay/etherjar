@@ -65,7 +65,7 @@ class TransactionEncoderSpec extends Specification {
             value = Wei.ofEthers(1)
         }
         when:
-        def act = encoder.encode(tx, false, 1)
+        def act = encoder.encodeStandard(tx, false, 1)
         then:
         Hex.encodeHexString(act) == "ec098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a764000080018080"
     }
@@ -92,7 +92,7 @@ class TransactionEncoderSpec extends Specification {
             "80" + //r
             "80" //s
         when:
-        def act = encoder.encode(tx,false, 0x25)
+        def act = encoder.encodeStandard(tx,false, 0x25)
         then:
         Hex.encodeHexString(act) == exp
     }
