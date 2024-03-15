@@ -29,17 +29,20 @@ public class TransactionEncoder {
         if (tx.getType() == TransactionType.GAS_PRIORITY) {
             return encode((TransactionWithGasPriority) tx, includeSignature);
         }
+        if (tx.getType() == TransactionType.BLOB) {
+            return encode((TransactionWithBlob) tx, includeSignature);
+        }
         if (tx.getType() == TransactionType.ACCESS_LIST) {
             return encode((TransactionWithAccess) tx, includeSignature);
         }
         if (tx.getType() == TransactionType.STANDARD) {
             if (includeSignature) {
-                return encode(tx, true, null);
+                return encodeStandard(tx, true, null);
             } else {
                 Signature signature = tx.getSignature();
                 if (signature.getType() == SignatureType.EIP155) {
                     int chainId = ((SignatureEIP155)signature).getChainId();
-                    return encode(tx, false, chainId);
+                    return encodeStandard(tx, false, chainId);
                 } else {
                     throw new IllegalStateException("Neither signature nor chainId specified");
                 }
@@ -48,7 +51,7 @@ public class TransactionEncoder {
         throw new IllegalStateException("Unsupported transaction type: " + tx.getType());
     }
 
-    public byte[] encode(Transaction tx, boolean includeSignature, Integer chainId) {
+    protected byte[] encodeStandard(Transaction tx, boolean includeSignature, Integer chainId) {
         RlpWriter wrt = new RlpWriter();
         wrt.startList()
             .write(tx.getNonce())
@@ -90,7 +93,7 @@ public class TransactionEncoder {
         return wrt.toByteArray();
     }
 
-    protected void writeBody(RlpWriter wrt, TransactionWithAccess tx, boolean includeSignature) {
+    protected void writeBody(RlpWriter wrt, Transaction tx) {
         if (tx.getTo() != null) {
             wrt.write(tx.getTo().getBytes());
         } else {
@@ -108,7 +111,9 @@ public class TransactionEncoder {
         } else {
             wrt.write(new byte[0]);
         }
+    }
 
+    private static void writeAccessList(RlpWriter wrt, TransactionWithAccess tx) {
         wrt.startList();
         for (TransactionWithAccess.Access access: tx.getAccessList()) {
             wrt.startList();
@@ -121,27 +126,35 @@ public class TransactionEncoder {
             wrt.closeList();
         }
         wrt.closeList();
+    }
 
-        if (includeSignature) {
-            Signature signature = tx.getSignature();
-            if (signature == null) {
-                // just empty signature
-                wrt.write(0)
-                    .write(0)
-                    .write(0);
-            } else {
-                if (signature.getType() == SignatureType.EIP2930) {
-                    int yParity = ((SignatureEIP2930)signature).getYParity();
-                    if (yParity == 0) {
-                        wrt.write(0);
-                    } else {
-                        wrt.write(Integer.valueOf(yParity).byteValue());
-                    }
-                    wrt.write(signature.getR());
-                    wrt.write(signature.getS());
+    private static void writeBlob(RlpWriter wrt, TransactionWithBlob tx) {
+        wrt.write(tx.getMaxFeePerBlobGas().getAmount());
+        wrt.startList();
+        for (Hex32 hash: tx.getBlobVersionedHashes()) {
+            wrt.write(hash.getBytes());
+        }
+        wrt.closeList();
+    }
+
+    private static void writeSignature(RlpWriter wrt, Signature signature) {
+        if (signature == null) {
+            // just empty signature
+            wrt.write(0)
+                .write(0)
+                .write(0);
+        } else {
+            if (signature.getType() == SignatureType.EIP2930) {
+                int yParity = ((SignatureEIP2930)signature).getYParity();
+                if (yParity == 0) {
+                    wrt.write(0);
                 } else {
-                    throw new ClassCastException("Required signature " + SignatureEIP2930.class.getName() + " but have " + signature.getClass().getName());
+                    wrt.write(Integer.valueOf(yParity).byteValue());
                 }
+                wrt.write(signature.getR());
+                wrt.write(signature.getS());
+            } else {
+                throw new ClassCastException("Required signature " + SignatureEIP2930.class.getName() + " but have " + signature.getClass().getName());
             }
         }
     }
@@ -155,7 +168,11 @@ public class TransactionEncoder {
             .write(tx.getNonce())
             .write(tx.getGasPrice().getAmount())
             .write(tx.getGas());
-        writeBody(wrt, tx, includeSignature);
+        writeBody(wrt, tx);
+        writeAccessList(wrt, tx);
+        if (includeSignature) {
+            writeSignature(wrt, tx.getSignature());
+        }
         wrt.closeList();
         return buffer.toByteArray();
     }
@@ -170,7 +187,31 @@ public class TransactionEncoder {
             .write(tx.getPriorityGasPrice().getAmount())
             .write(tx.getMaxGasPrice().getAmount())
             .write(tx.getGas());
-        writeBody(wrt, tx, includeSignature);
+        writeBody(wrt, tx);
+        writeAccessList(wrt, tx);
+        if (includeSignature) {
+            writeSignature(wrt, tx.getSignature());
+        }
+        wrt.closeList();
+        return buffer.toByteArray();
+    }
+
+    public byte[] encode(TransactionWithBlob tx, boolean includeSignature) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(TransactionType.BLOB.getFlag());
+        RlpWriter wrt = new RlpWriter(buffer);
+        wrt.startList()
+            .write(tx.getChainId())
+            .write(tx.getNonce())
+            .write(tx.getPriorityGasPrice().getAmount())
+            .write(tx.getMaxGasPrice().getAmount())
+            .write(tx.getGas());
+        writeBody(wrt, tx);
+        writeAccessList(wrt, tx);
+        writeBlob(wrt, tx);
+        if (includeSignature) {
+            writeSignature(wrt, tx.getSignature());
+        }
         wrt.closeList();
         return buffer.toByteArray();
     }

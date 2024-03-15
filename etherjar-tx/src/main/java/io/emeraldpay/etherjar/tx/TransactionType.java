@@ -34,7 +34,13 @@ public enum TransactionType {
      * Transaction with Gas Max and Priority prices.
      * @see <a href="https://eips.ethereum.org/EIPS/eip-1559">EIP-1559</a>
      */
-    GAS_PRIORITY((byte)2);
+    GAS_PRIORITY((byte)2),
+
+    /**
+     * Blob transaction
+     * @see <a href="https://eips.ethereum.org/EIPS/eip-4844">EIP-4844</a>
+     */
+    BLOB((byte)3);
 
     private final byte flag;
 
@@ -62,6 +68,9 @@ public enum TransactionType {
             //
             if (u == 2) {
                 return TransactionType.GAS_PRIORITY;
+            }
+            if (u == 3) {
+                return TransactionType.BLOB;
             }
             if (u == 1) {
                 return TransactionType.ACCESS_LIST;

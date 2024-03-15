@@ -41,6 +41,9 @@ public class TransactionDecoder {
         if (type == TransactionType.GAS_PRIORITY) {
             return decodeGasPriority(raw);
         }
+        if (type == TransactionType.BLOB) {
+            return decodeBlob(raw);
+        }
         if (type == TransactionType.STANDARD) {
             return decodeStandard(raw);
         }
@@ -130,6 +133,24 @@ public class TransactionDecoder {
         return tx;
     }
 
+    public TransactionWithBlob decodeBlob(byte[] raw) {
+        // rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, to, value, data, access_list, max_fee_per_blob_gas, blob_versioned_hashes, y_parity, r, s])
+        RlpReader rdr = startReader(raw, 1);
+        TransactionWithBlob tx = new TransactionWithBlob();
+        readChainId(rdr, tx);
+        readNonce(rdr, tx);
+        readPriorityGasPrice(rdr, tx);
+        readMaxGasPrice(rdr, tx);
+        readGasLimit(rdr, tx);
+        readBodyPart(rdr, tx);
+
+        readAccessList(rdr, tx);
+        readBlob(rdr, tx);
+        tryReadSignature(rdr, tx);
+        ensureFullyRead(rdr);
+        return tx;
+    }
+
     private RlpReader startReader(byte[] raw, int position) {
         RlpReader toprdr = new RlpReader(raw, position, raw.length - position);
         if (toprdr.getType() != RlpType.LIST) {
@@ -207,6 +228,26 @@ public class TransactionDecoder {
             tx.setAccessList(accessList);
         } else {
             throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list: Access List");
+        }
+    }
+
+    protected void readBlob(RlpReader rdr, TransactionWithBlob tx) {
+        // The field max_fee_per_blob_gas is a uint256
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            tx.setMaxFeePerBlobGas(new Wei(rdr.nextBigInt()));
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Max Fee Per Blob Gas");
+        }
+        // the field blob_versioned_hashes represents a list of hash outputs from kzg_to_versioned_hash.
+        if (rdr.hasNext() && rdr.getType() == RlpType.LIST) {
+            RlpReader blobVersionedHashesRdr = rdr.nextList();
+            List<Hex32> blobVersionedHashes = new ArrayList<>();
+            while (blobVersionedHashesRdr.hasNext()) {
+                blobVersionedHashes.add(Hex32.from(blobVersionedHashesRdr.next()));
+            }
+            tx.setBlobVersionedHashes(blobVersionedHashes);
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list: Blob Versioned Hashes");
         }
     }
 

@@ -152,7 +152,7 @@ public class Transaction {
     }
 
     public byte[] hash(Integer chainId) {
-        byte[] rlp = TransactionEncoder.DEFAULT.encode(this, false, chainId);
+        byte[] rlp = TransactionEncoder.DEFAULT.encodeStandard(this, false, chainId);
 
         Keccak.Digest256 keccak = new Keccak.Digest256();
         keccak.update(rlp);
