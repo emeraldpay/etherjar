@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.emeraldpay.etherjar.domain.BlockHash
 import io.emeraldpay.etherjar.domain.TransactionId
 import io.emeraldpay.etherjar.domain.Wei
+import io.emeraldpay.etherjar.hex.Hex32
 import io.emeraldpay.etherjar.rpc.JacksonRpcConverter
 import spock.lang.Specification
 
@@ -385,5 +386,38 @@ class BlockJsonSpec extends Specification {
         act instanceof BlockJson
         act.hash.toHex() == '0xa0437cab40119e21bc92d1ce5be52c89c64fa3b914489d51b4fe209a33ed31a5'
         act.transactions == null
+    }
+
+    def "Parse with blobs info"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-19443068.json")
+
+        when:
+        def act = jacksonRpcConverter.objectMapper.readValue(json, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.hash.toHex() == '0x4d9557d1933a02fb780063b4c35c0cd9fb590014f851f50641befa034dbdc7e4'
+        act.blobGasUsed == 0xc0000
+        act.excessBlobGas == 0x60000
+        act.parentBeaconBlockRoot.toHex() == "0x7c132a0e0eef72627f2af7c994e8c3cf27c5e6d296473124fb270023db9cf81d"
+    }
+
+    def "Parse with blobs info and transactions"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-19443105-full.json")
+
+        when:
+        BlockJson<TransactionJson> act = jacksonRpcConverter.objectMapper.readValue(json, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.hash.toHex() == '0x52806b8fab72317f97413323cc739de2cd2afc5915298a24beed5d184d798d4b'
+        act.blobGasUsed == 0x60000
+        act.excessBlobGas == 0x0
+        with((TransactionJson)act.transactions.find { it.hash == TransactionId.from("0x109332e227bb505e5731fcbe231dc8d9c0136c14300cd34e40097abf72c51105") }) {
+            maxFeePerBlobGas == Wei.fromHex("0x22ecb25c00")
+            blobVersionedHashes == [
+                Hex32.from("0x01ebcede241d2473b6b1a6fa08f0a281858bc8901f742a39ff74d371e2f2664f")
+            ]
+        }
     }
 }

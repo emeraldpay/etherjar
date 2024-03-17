@@ -171,6 +171,16 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
 
     private List<WithdrawalJson> withdrawals;
 
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
+    private Long blobGasUsed;
+
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
+    private Long excessBlobGas;
+
+    private Hex32 parentBeaconBlockRoot;
+
     public Long getNumber() {
         return number;
     }
@@ -373,6 +383,30 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
 
     public void setWithdrawals(List<WithdrawalJson> withdrawals) {
         this.withdrawals = withdrawals;
+    }
+
+    public Long getBlobGasUsed() {
+        return blobGasUsed;
+    }
+
+    public void setBlobGasUsed(Long blobGasUsed) {
+        this.blobGasUsed = blobGasUsed;
+    }
+
+    public Long getExcessBlobGas() {
+        return excessBlobGas;
+    }
+
+    public void setExcessBlobGas(Long excessBlobGas) {
+        this.excessBlobGas = excessBlobGas;
+    }
+
+    public Hex32 getParentBeaconBlockRoot() {
+        return parentBeaconBlockRoot;
+    }
+
+    public void setParentBeaconBlockRoot(Hex32 parentBeaconBlockRoot) {
+        this.parentBeaconBlockRoot = parentBeaconBlockRoot;
     }
 
     /**
