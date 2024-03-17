@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/emeraldpay/etherjar/branch/master/graph/badge.svg)](https://codecov.io/gh/emeraldpay/etherjar)
 [![license](https://img.shields.io/github/license/emeraldpay/etherjar.svg?maxAge=2592000)](https://github.com/emeraldpay/etherjar/blob/master/LICENSE)
 
-Framework agnostic modular Java 11+ integration library for [Ethereum blockchains](https://www.ethereum.org)
+Framework agnostic modular Java 17+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
 - Latest Stable Version: 0.11.0
 - Latest Snapshot Version: 0.12.0-SNAPSHOT
