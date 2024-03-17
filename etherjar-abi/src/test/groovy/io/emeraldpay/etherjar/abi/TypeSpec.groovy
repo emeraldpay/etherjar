@@ -112,8 +112,8 @@ class TypeSpec extends Specification {
 
     def "should encode & decode a dynamic type length"() {
         when:
-        def data = DynamicType.encodeLength val
-        def res = DynamicType.decodeLength data
+        def data = Type.encodeLength val
+        def res = Type.decodeLength data
 
         then:
         data.toHex() == hex
@@ -134,7 +134,7 @@ class TypeSpec extends Specification {
 
     def "should catch negative length before encoding"() {
         when:
-        DynamicType.encodeLength val
+        Type.encodeLength val
 
         then:
         thrown IllegalArgumentException

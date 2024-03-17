@@ -32,15 +32,14 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
-    apply plugin: 'maven'
     apply plugin: 'maven-publish'
 
     if (System.getenv("ENABLE_GCP") == "true") {
         apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
     }
 
-    targetCompatibility = JavaVersion.VERSION_11
-    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
 
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -48,10 +47,10 @@ subprojects {
         << '-Xlint:unchecked' << '-Xlint:deprecation'
 
     dependencies {
-        testCompile 'org.objenesis:objenesis:2.+'
-        testCompile 'org.spockframework:spock-core:1.3-groovy-2.5'
-        testCompile 'nl.jqno.equalsverifier:equalsverifier:3.1.9'
-        testCompile 'org.codehaus.groovy:groovy-all:2.5.12'
+        testImplementation 'org.objenesis:objenesis:3.3'
+        testImplementation 'org.spockframework:spock-core:2.4-M2-groovy-4.0'
+        testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.15.8'
+        testImplementation 'org.apache.groovy:groovy:4.0.20'
     }
 
     test {
@@ -59,16 +58,17 @@ subprojects {
 
         testLogging.showStandardStreams = true
         testLogging.exceptionFormat = 'full'
+        useJUnitPlatform()
     }
 
     jacocoTestReport {
         reports {
-            xml.enabled true
+            xml.required = true
         }
     }
 
     jacoco {
-        toolVersion = "0.8.5"
+        toolVersion = "0.8.11"
     }
 
     test.finalizedBy jacocoTestReport
@@ -108,12 +108,12 @@ subprojects {
     }
 
     task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
+        archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
 
@@ -132,10 +132,10 @@ subprojects {
         publications {
             EtherJarPublication(MavenPublication) {
                 from components.java
-                artifact sourcesJar {
+                artifact("sourcesJar") {
                     classifier "sources"
                 }
-                artifact javadocJar {
+                artifact("javadocJar") {
                     classifier "javadoc"
                 }
 
@@ -177,18 +177,18 @@ task syncJars(type: Sync) {
 }
 
 jacoco {
-    toolVersion = "0.8.5"
+    toolVersion = "0.8.11"
 }
 
 task coverageReport(type: JacocoReport) {
-    dependsOn = subprojects.test
+    dependsOn = [subprojects.test, subprojects.jacocoTestReport]
     additionalSourceDirs.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories.setFrom files(subprojects.sourceSets.main.allSource.srcDirs)
     classDirectories.setFrom files(subprojects.sourceSets.main.output)
     executionData.setFrom project.fileTree(dir: '.', include: '**/build/jacoco/test.exec')
     reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled true
+        xml.required = true
+        csv.required = false
+        html.required = true
     }
 }

@@ -171,10 +171,8 @@ class EmeraldTransportSpec extends Specification {
 
         then:
         act.size() == 1
-        with(act[0]) {
-            error == null
-            value == 0xab5461ca4b100
-        }
+        act[0].getError() == null
+        act[0].getValue() == 0xab5461ca4b100
 
         cleanup:
         transport.close()

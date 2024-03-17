@@ -66,7 +66,7 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(resp)
             .expectNextMatches({
                 println("Received value: $it.value")
-                return it.value == 1 && it.error == null
+                return it.value == 1 && it.getError() == null
             }).as("receive value")
             .expectComplete()
             .verify(Duration.ofSeconds(5))
@@ -108,11 +108,11 @@ class ReactorHttpRpcClientSpec extends Specification {
         StepVerifier.create(resp)
             .expectNextMatches({
                 println("Received value: $it.value ")
-                return it.value == 68 && it.error == null
+                return it.value == 68 && it.getError() == null
             }).as("receive value for peers")
             .expectNextMatches({
                 println("Received value: $it.value ${it.value.class}")
-                return it.value == Address.from("0x0000000000000000000000000000000000000000") && it.error == null
+                return it.value == Address.from("0x0000000000000000000000000000000000000000") && it.getError() == null
             }).as("receive value for coinbase")
             .expectComplete()
             .verify(Duration.ofSeconds(5))
@@ -171,13 +171,13 @@ class ReactorHttpRpcClientSpec extends Specification {
                 println("Received value 1: $it.value ${it.value.class}")
                 return expecting.indexOf(it.value) >= 0 &&
                     expecting.remove(expecting.indexOf(it.value)) &&
-                    it.error == null
+                    it.getError() == null
             }).as("receive value 1")
             .expectNextMatches({
                 println("Received value 2: $it.value ${it.value.class}")
                 return expecting.indexOf(it.value) >= 0 &&
                     expecting.remove(expecting.indexOf(it.value)) &&
-                    it.error == null
+                    it.getError() == null
             }).as("receive value 2")
             .expectComplete()
             .verify(Duration.ofSeconds(5))

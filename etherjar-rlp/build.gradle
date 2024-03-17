@@ -1,4 +1,4 @@
 dependencies {
-    testCompile 'commons-codec:commons-codec:1.12'
-    testCompile project(':etherjar-domain')
+    testImplementation 'commons-codec:commons-codec:1.12'
+    testImplementation project(':etherjar-domain')
 }
