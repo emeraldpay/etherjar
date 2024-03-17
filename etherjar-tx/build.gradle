@@ -3,5 +3,5 @@ dependencies {
     api project(':etherjar-rlp')
     implementation 'org.bouncycastle:bcprov-jdk15on:1.61'
 
-    testCompile 'commons-codec:commons-codec:1.12'
+    testImplementation 'commons-codec:commons-codec:1.12'
 }

@@ -24,6 +24,6 @@ dependencies {
     implementation "io.projectreactor:reactor-core:3.5.3"
     implementation "io.projectreactor.netty:reactor-netty:1.0.7"
 
-    testCompile "com.sparkjava:spark-core:2.9.1"
-    testCompile "io.projectreactor:reactor-test:3.5.3"
+    testImplementation "com.sparkjava:spark-core:2.9.1"
+    testImplementation "io.projectreactor:reactor-test:3.5.3"
 }

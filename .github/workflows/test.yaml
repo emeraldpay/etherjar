@@ -25,7 +25,7 @@ jobs:
             -   name: Set up JDK
                 uses: actions/setup-java@v1
                 with:
-                    java-version: 11
+                    java-version: 17
 
             -   name: Check
                 uses: eskatos/gradle-command-action@v1
@@ -45,11 +45,10 @@ jobs:
     # Make sure it works with all standard JVMs on main OSes
     platform-test:
         name: Java ${{ matrix.java }} on ${{ matrix.os }}
-        continue-on-error: ${{ matrix.java != '11' }}
+        continue-on-error: ${{ matrix.java != '17' }}
         strategy:
             matrix:
-                # to support Java 14 need to upgrade Groovy, https://github.com/gradle/gradle/issues/10248
-                java: ["11", "12", "13"]
+                java: ["17", "21"]
                 os: ["windows-latest", "macos-latest", "ubuntu-latest"]
         runs-on: ${{ matrix.os }}
         steps:
