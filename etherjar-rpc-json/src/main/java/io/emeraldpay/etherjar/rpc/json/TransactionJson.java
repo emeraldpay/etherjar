@@ -132,6 +132,10 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
 
     private List<Access> accessList;
 
+    private Wei maxFeePerBlobGas;
+
+    private List<Hex32> blobVersionedHashes;
+
     public Long getNonce() {
         return nonce;
     }
@@ -278,6 +282,22 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
 
     public void setAccessList(List<Access> accessList) {
         this.accessList = accessList;
+    }
+
+    public Wei getMaxFeePerBlobGas() {
+        return maxFeePerBlobGas;
+    }
+
+    public void setMaxFeePerBlobGas(Wei maxFeePerBlobGas) {
+        this.maxFeePerBlobGas = maxFeePerBlobGas;
+    }
+
+    public List<Hex32> getBlobVersionedHashes() {
+        return blobVersionedHashes;
+    }
+
+    public void setBlobVersionedHashes(List<Hex32> blobVersionedHashes) {
+        this.blobVersionedHashes = blobVersionedHashes;
     }
 
     public void addAccess(Access access) {
