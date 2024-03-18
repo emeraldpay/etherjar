@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.1.1" apply false
+    id "com.google.cloud.artifactregistry.gradle-plugin" version "2.2.1" apply false
 }
 
 // gradle aggregateJavadoc
