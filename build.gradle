@@ -107,14 +107,13 @@ subprojects {
         }
     }
 
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        archiveClassifier = 'sources'
-        from sourceSets.main.allSource
+    java {
+        withJavadocJar()
+        withSourcesJar()
     }
 
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        archiveClassifier = 'javadoc'
-        from javadoc.destinationDir
+    javadoc {
+        options.addBooleanOption('html5', true)
     }
 
     artifacts {
@@ -132,12 +131,6 @@ subprojects {
         publications {
             EtherJarPublication(MavenPublication) {
                 from components.java
-                artifact("sourcesJar") {
-                    classifier "sources"
-                }
-                artifact("javadocJar") {
-                    classifier "javadoc"
-                }
 
                 groupId project.group
                 artifactId project.name
