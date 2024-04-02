@@ -426,7 +426,7 @@ class TransactionDecoderSpec extends Specification {
         Hex.encodeHexString(encoded) == txHex
     }
 
-    def "Parse tx type 0x109332"() {
+    def "Parse tx type 3 0x109332"() {
         // tx 0x109332e227bb505e5731fcbe231dc8d9c0136c14300cd34e40097abf72c51105
         setup:
         def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-blob-0x109332.hex").text.trim()
@@ -457,6 +457,38 @@ class TransactionDecoderSpec extends Specification {
             r.toString(16) == "a0933938cbf7279651014732d845f7bfda8575e543c6f6350640d2e3a090db42"
             s.toString(16) == "767e7e993e6e7e1c98d23b7dd782f734e2a8e54dc3083c7fabcab925759d2814"
             getYParity() == 0
+        }
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
+    }
+
+    def "Parse tx type 3 - sepolia 0x9fd491"() {
+        // tx 0x9fd49139b36d116b4eb5389eec4065a944792a04cb5c0f1e9a6f31837d5e40ab
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-blob-0x9fd491.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+
+        when:
+        def act = decoder.decode(tx)
+
+        then:
+        act.type == TransactionType.BLOB
+        with((TransactionWithBlob)act) {
+            value == Wei.ZERO
+            chainId == 11155111
+            extractFrom() == Address.from("0x8aad4Fa2839a9E2A6dF43Ea0e8e691D0b4b03ED6")
+            to == Address.from("0x06676d75a43F38BEE9f48a0FFe99f95FDffA9238")
+            gas == 21_000
+            nonce == 7529
+            accessList.isEmpty()
+            transactionId().toHex() == "0x9fd49139b36d116b4eb5389eec4065a944792a04cb5c0f1e9a6f31837d5e40ab"
+            data.isEmpty()
+            blobVersionedHashes.size() == 1
+            blobVersionedHashes[0].toHex() == "0x0125c9f873a8784a430f9472f3991b42c21da929b2d3800e6925422adc70c26d"
         }
 
         when:
