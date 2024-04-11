@@ -144,6 +144,16 @@ public class EthCommands {
     /**
      *
      * @param hash transaction hash
+     * @return raw transaction data
+     */
+    public RpcCall<String, HexData> getRawTransaction(TransactionId hash) {
+        return RpcCall.create("eth_getRawTransactionByHash", String.class, hash.toHex())
+            .converted(HexData.class, HexData::from);
+    }
+
+    /**
+     *
+     * @param hash transaction hash
      * @return receipt of a transaction
      */
     public RpcCall<TransactionReceiptJson, TransactionReceiptJson> getTransactionReceipt(TransactionId hash) {
