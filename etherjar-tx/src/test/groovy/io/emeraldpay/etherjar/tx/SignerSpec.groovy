@@ -292,6 +292,44 @@ class SignerSpec extends Specification {
         Hex.encodeHexString(rlp) == "02f876018204d2843b9aca008504a817c800830249f0943535353535353535353535353535353535353535881121d3359738400080c001a0f0b3347ec48e78bf5ef6075b332334518ebc2f90d2bf0fea080623179936382ea05c58c5beeafb2398d5e79b40b320421112a9672167f27e7fc55e76d2d7d11062"
     }
 
+    def "Sign Sepolia"() {
+        setup:
+        TransactionWithGasPriority tx = new TransactionWithGasPriority()
+        tx.tap {
+            chainId = 11155111
+            nonce = 0x0123
+            maxGasPrice = Wei.ofUnits(20, Wei.Unit.GWEI)
+            priorityGasPrice = Wei.ofUnits(1, Wei.Unit.GWEI)
+            gas = 150_000 // 0x0249F0
+            to = Address.from("0x3535353535353535353535353535353535353535")
+            value = Wei.ofEthers(1)
+            accessList = []
+        }
+        PrivateKey pk = PrivateKey.create("0x4646464646464646464646464646464646464646464646464646464646464646")
+
+        when:
+        def hash = signer.hash(tx)
+
+        then:
+        Hex.encodeHexString(hash) == "c8dc2cc014237c5a09db43f575b41f89f4f55e4160a3a0e118250f102aec61ab"
+
+        when:
+        def act = signer.sign(tx, pk)
+        then:
+        act instanceof SignatureEIP2930
+        with((SignatureEIP2930)act) {
+            r.toString(16) == "ea3705d1137256ba5078c2d97a8886ea78e3c9ea4d3ffaa4985220705fdf02e1"
+            s.toString(16) == "f05771ac81ddb47283f592790db1205c6b321c3cdc5164b16d89898d0802647"
+            YParity == 1
+        }
+
+        when:
+        tx.signature = act
+        def rlp = encoder.encode(tx, true)
+        then:
+        Hex.encodeHexString(rlp) == "02f87983aa36a7820123843b9aca008504a817c800830249f0943535353535353535353535353535353535353535880de0b6b3a764000080c001a0ea3705d1137256ba5078c2d97a8886ea78e3c9ea4d3ffaa4985220705fdf02e1a00f05771ac81ddb47283f592790db1205c6b321c3cdc5164b16d89898d0802647"
+    }
+
     def "extract pubkey from base tx - 0x19442f"() {
         setup:
         Signature signature = new Signature()

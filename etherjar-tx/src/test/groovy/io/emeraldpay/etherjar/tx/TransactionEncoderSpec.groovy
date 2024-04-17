@@ -216,4 +216,42 @@ class TransactionEncoderSpec extends Specification {
         then:
         Hex.encodeHexString(act) == "02f8b101819684ee6b280085134062da9b82c79d947bebd226154e865954a87650faefa8f485d3608180b844095ea7b300000000000000000000000003f7724180aa6b939894b5ca4314783b0b36b329ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc001a0d978ed98e78dd480b2aec86d1521962a8fe4009e44fb19f45b70d8005e602182a0347c933f78131995c1abd07c1d0be67d8f04c2cf99cd79510657e97ead8c1a9f"
     }
+
+    def "Encode sepolia EIP-1559"() {
+        setup:
+        TransactionWithGasPriority tx = new TransactionWithGasPriority()
+        tx.tap {
+            chainId = 11155111 // 0xAA36A7
+            nonce = 0x0123
+            maxGasPrice = Wei.ofUnits(20, Wei.Unit.GWEI) // 0x04A817C800
+            priorityGasPrice = Wei.ofUnits(1, Wei.Unit.GWEI) // 0x3B9ACA00
+            gas = 150_000 // 0x0249F0
+            to = Address.from("0x3535353535353535353535353535353535353535")
+            value = Wei.ofEthers(1) // 0x0DE0B6B3A7640000
+            accessList = []
+        }
+        def exp = "" +
+            "02" + // type
+            "f6" +
+            "83" +
+            "aa36a7" + // chain id
+            "82" +
+            "0123" + // nonce
+            "84" +
+            "3b9aca00" + // priority gas price
+            "85" +
+            "04a817c800" + // max gas price
+            "83" +
+            "0249f0" + // gas
+            "94" +
+            "3535353535353535353535353535353535353535" + // to
+            "88" +
+            "0de0b6b3a7640000" + // value
+            "80" +
+            "c0"
+        when:
+        def act = encoder.encode(tx, false)
+        then:
+        Hex.encodeHexString(act) == exp
+    }
 }
