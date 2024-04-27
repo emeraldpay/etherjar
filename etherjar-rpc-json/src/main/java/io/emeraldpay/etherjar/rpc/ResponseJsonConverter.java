@@ -27,8 +27,14 @@ public class ResponseJsonConverter {
         if (response.getError() != null) {
             return new RpcCallResponse<>(call, response.getError().asException());
         } else {
-            RES value = call.getConverter().apply(response.getResult());
-            return new RpcCallResponse<>(call, value);
+            try {
+                RES value = call.getConverter().apply(response.getResult());
+                return new RpcCallResponse<>(call, value);
+            } catch (RpcException e) {
+                return new RpcCallResponse<>(call, e);
+            } catch (Throwable e) {
+                return new RpcCallResponse<>(call, new RpcException(RpcResponseError.CODE_INTERNAL_ERROR, e.getMessage()));
+            }
         }
     }
 
