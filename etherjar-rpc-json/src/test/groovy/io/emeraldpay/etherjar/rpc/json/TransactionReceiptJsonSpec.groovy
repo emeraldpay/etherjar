@@ -22,7 +22,7 @@ import spock.lang.Specification
 class TransactionReceiptJsonSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
-    ObjectMapper objectMapper = new ObjectMapper()
+    ObjectMapper objectMapper = jacksonRpcConverter.getObjectMapper()
 
 
     def "Parse receipt 0x5929b3"() {
@@ -262,5 +262,51 @@ class TransactionReceiptJsonSpec extends Specification {
 
         then:
         receipt.type == 2
+    }
+
+    def "reads effective gas price 2"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("receipt/0x678f2d.json")
+
+        when:
+        def receipt = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        receipt.effectiveGasPrice.toHex() == "0x224e4af38"
+    }
+
+    def "reads logs"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("receipt/0x38b7fb.json")
+
+        when:
+        def receipt = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        receipt.logs.size() == 5
+        with(receipt.logs[0]) {
+            address.toHex() == "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            topics.size() == 2
+            topics[0].toHex() == "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c"
+            topics[1].toHex() == "0x0000000000000000000000003fc91a3afd70395cd496c647d5a6cc9d4b2b7fad"
+            data.toHex() == "0x000000000000000000000000000000000000000000000000008e1bc9bf040000"
+            blockNumber == 0x12d87b5
+            blockHash.toHex() == "0x0fdb9c2f67ab662b05c0569bde0a5b42dbd9ab83d6d074850a8ca62560c69674"
+            logIndex == 0x341
+            transactionIndex == 0xfa
+            transactionHash.toHex() == "0x38b7fb8b1c10933440bb1ea3068124badf90cb06f504188ef8462a192856d83b"
+            !removed
+        }
+    }
+
+    def "reads bloom"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("receipt/0x38b7fb.json")
+
+        when:
+        def receipt = jacksonRpcConverter.fromJson(json, TransactionReceiptJson)
+
+        then:
+        receipt.logsBloom.toHex() == "0x00200000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000082000000080000000000000008000000200000080000000000000008000000200000000000000000000000008020000000000000000000100000000000000000400000000000200000000010000000000000000000000000000000000008000000000041000000080000004000000000000000000000000000000000000000000000000200000000000000000000000000000042000000000000800000000000000000000000001000000000000000000000200000000000000000000800000000001000000000400000000000000000"
     }
 }

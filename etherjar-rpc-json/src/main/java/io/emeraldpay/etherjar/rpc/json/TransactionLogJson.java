@@ -30,8 +30,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-@JsonDeserialize(using = TransactionLogJsonDeserializer.class)
-@JsonSerialize(using = TransactionLogJsonSerializer.class)
 public class TransactionLogJson implements TransactionRef, Serializable {
 
     /**
@@ -42,11 +40,15 @@ public class TransactionLogJson implements TransactionRef, Serializable {
     /**
      * log index position in the block. null when its pending log.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long logIndex;
 
     /**
      * transactions index position log was created from. null when its pending log.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long transactionIndex;
 
     /**
@@ -62,6 +64,8 @@ public class TransactionLogJson implements TransactionRef, Serializable {
     /**
      * the block number where this log was in. null when its pending. null when its pending log.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long blockNumber;
 
     /**

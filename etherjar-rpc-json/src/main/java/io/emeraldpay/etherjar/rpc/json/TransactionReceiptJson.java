@@ -25,8 +25,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-@JsonDeserialize(using = TransactionReceiptJsonDeserializer.class)
-@JsonSerialize(using = TransactionReceiptJsonSerializer.class)
 public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     /**
@@ -37,6 +35,8 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     /**
      * position in the block
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long transactionIndex;
 
     /**
@@ -47,11 +47,15 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     /**
      * block number where this transaction was in
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long blockNumber;
 
     /**
      * total amount of gas used when this transaction was executed in the block.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long cumulativeGasUsed;
 
     /**
@@ -67,6 +71,8 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     /**
      * amount of gas used by this specific transaction alone.
      */
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long gasUsed;
 
     /**
@@ -82,8 +88,10 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     private Bloom logsBloom;
 
     /**
-     * Optinal tx status. 0 if failed, 1 if successfull
+     * Optional tx status. 0 if failed, 1 if successfull
      */
+    @JsonDeserialize(using = HexIntDeserializer.class)
+    @JsonSerialize(using = HexIntSerializer.class)
     private Integer status;
 
     private Wei effectiveGasPrice;
@@ -93,7 +101,9 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
      *
      * @see <a href="https://eips.ethereum.org/EIPS/eip-2718">EIP-2718: Typed Transaction Envelope</a>
      */
-    private int type = 0;
+    @JsonDeserialize(using = HexIntDeserializer.class)
+    @JsonSerialize(using = HexIntSerializer.class)
+    private Integer type = 0;
 
     public TransactionId getTransactionHash() {
         return transactionHash;
@@ -200,6 +210,9 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     }
 
     public int getType() {
+        if (type == null) {
+            return 0;
+        }
         return type;
     }
 
