@@ -23,6 +23,7 @@ import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.api.proto.ReactorBlockchainGrpc;
 import io.emeraldpay.api.Chain;
 import io.grpc.Channel;
+import io.grpc.ClientInterceptor;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.GrpcSslContexts;
@@ -46,7 +47,6 @@ import java.util.function.Function;
 
 public class ReactorEmeraldClient extends AbstractReactorRpcClient implements ReactorRpcClient {
 
-    private final Channel channel;
     private final ReactorBlockchainGrpc.ReactorBlockchainStub stub;
 
     private final ObjectMapper objectMapper;
@@ -56,9 +56,8 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
 
     ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
-    public ReactorEmeraldClient(Channel channel, ObjectMapper objectMapper, JacksonRpcConverter rpcConverter, Common.ChainRef chainRef) {
-        this.channel = channel;
-        this.stub = ReactorBlockchainGrpc.newReactorStub(channel);
+    public ReactorEmeraldClient(ReactorBlockchainGrpc.ReactorBlockchainStub stub, ObjectMapper objectMapper, JacksonRpcConverter rpcConverter, Common.ChainRef chainRef) {
+        this.stub = stub;
         this.objectMapper = objectMapper;
         this.rpcConverter = rpcConverter;
         this.chainRef = chainRef;
@@ -76,7 +75,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
      * @return new instance of ReactorEmeraldClient configured for new chain
      */
     public ReactorEmeraldClient copyForChain(Chain chain) {
-        return new ReactorEmeraldClient(channel, objectMapper, rpcConverter, Common.ChainRef.forNumber(chain.getId()));
+        return new ReactorEmeraldClient(stub, objectMapper, rpcConverter, Common.ChainRef.forNumber(chain.getId()));
     }
 
     /**
@@ -114,7 +113,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
      * @return new instance of ReactorEmeraldClient configured with new selector
      */
     public ReactorEmeraldClient copyWithSelector(BlockchainOuterClass.Selector selector) {
-        ReactorEmeraldClient copy = new ReactorEmeraldClient(channel, objectMapper, rpcConverter, chainRef);
+        ReactorEmeraldClient copy = new ReactorEmeraldClient(stub, objectMapper, rpcConverter, chainRef);
         copy.selector = selector;
         return copy;
     }
@@ -212,6 +211,9 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
         private SslContextBuilder sslContextBuilder;
         private Channel channel;
 
+        private ReactorBlockchainGrpc.ReactorBlockchainStub stub;
+        private ClientInterceptor[] interceptors;
+
         private ObjectMapper objectMapper;
         private JacksonRpcConverter rpcConverter;
 
@@ -227,6 +229,20 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
             this.channel = channel;
             channelBuilder = null;
             sslContextBuilder = null;
+            return this;
+        }
+
+        /**
+         * Setup with an existing stub. All other settings related to connection will be ignored
+         *
+         * @param stub existing stub
+         * @return builder
+         */
+        public Builder connectUsing(ReactorBlockchainGrpc.ReactorBlockchainStub stub) {
+            this.stub = stub;
+            this.channel = null;
+            this.channelBuilder = null;
+            this.sslContextBuilder = null;
             return this;
         }
 
@@ -369,6 +385,17 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
         }
 
         /**
+         * Add interceptors to the client calls
+         *
+         * @param interceptors interceptors
+         * @return builder
+         */
+        public Builder interceptors(ClientInterceptor... interceptors) {
+            this.interceptors = interceptors;
+            return this;
+        }
+
+        /**
          *
          * @param chain chain
          * @return builder
@@ -385,12 +412,18 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
          * @throws SSLException if problem with TLS certificates
          */
         public ReactorEmeraldClient build() throws SSLException {
-            if (channel == null) {
-                if (sslContextBuilder != null) {
-                    channelBuilder.useTransportSecurity()
-                        .sslContext(sslContextBuilder.build());
+            if (stub == null) {
+                if (channel == null) {
+                    if (sslContextBuilder != null) {
+                        channelBuilder.useTransportSecurity()
+                            .sslContext(sslContextBuilder.build());
+                    }
+                    channel = channelBuilder.build();
                 }
-                channel = channelBuilder.build();
+                stub = ReactorBlockchainGrpc.newReactorStub(channel);
+                if (interceptors != null) {
+                    stub = stub.withInterceptors(interceptors);
+                }
             }
             if (objectMapper == null) {
                 objectMapper = new ObjectMapper();
@@ -402,7 +435,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
                 chain = Chain.UNSPECIFIED;
             }
             Common.ChainRef chainRef = Common.ChainRef.forNumber(chain.getId());
-            return new ReactorEmeraldClient(channel, objectMapper, rpcConverter, chainRef);
+            return new ReactorEmeraldClient(stub, objectMapper, rpcConverter, chainRef);
         }
     }
 

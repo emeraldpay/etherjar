@@ -22,6 +22,7 @@ import io.emeraldpay.api.proto.BlockchainGrpc;
 import io.emeraldpay.api.proto.BlockchainOuterClass;
 import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.api.Chain;
+import io.emeraldpay.api.proto.ReactorBlockchainGrpc;
 import io.grpc.*;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
@@ -55,7 +56,6 @@ import java.util.function.Function;
  */
 public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
 
-    private final Channel channel;
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
 
     private final ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
@@ -67,17 +67,16 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     private final Common.ChainRef chainRef;
     private BlockchainOuterClass.Selector selector;
 
-    public EmeraldTransport(Channel channel,
+    public EmeraldTransport(BlockchainGrpc.BlockchainBlockingStub stub,
                             ObjectMapper objectMapper,
                             JacksonRpcConverter rpcConverter,
                             ExecutorService executorService,
                             Common.ChainRef chainRef) {
-        this.channel = channel;
         this.objectMapper = objectMapper;
         this.rpcConverter = rpcConverter;
         this.executorService = executorService;
         this.chainRef = chainRef;
-        blockingStub = BlockchainGrpc.newBlockingStub(channel);
+        blockingStub = stub;
     }
 
     /**
@@ -97,7 +96,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
      * @return new instance of EmeraldGrpcTransport configured for new chain
      */
     public EmeraldTransport copyForChain(Chain chain) {
-        return new EmeraldTransport(channel, objectMapper, rpcConverter, executorService, Common.ChainRef.forNumber(chain.getId()));
+        return new EmeraldTransport(blockingStub, objectMapper, rpcConverter, executorService, Common.ChainRef.forNumber(chain.getId()));
     }
 
     /**
@@ -135,7 +134,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
      * @return new instance of EmeraldGrpcTransport configured with new selector
      */
     public EmeraldTransport copyWithSelector(BlockchainOuterClass.Selector selector) {
-        EmeraldTransport copy = new EmeraldTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
+        EmeraldTransport copy = new EmeraldTransport(blockingStub, objectMapper, rpcConverter, executorService, chainRef);
         copy.selector = selector;
         return copy;
     }
@@ -237,7 +236,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
 
     @Override
     public void close() throws IOException {
-        Channel channel = this.channel;
+        Channel channel = this.blockingStub.getChannel();
         if (channel instanceof ManagedChannel) {
             ((ManagedChannel) channel).shutdownNow();
             try {
@@ -258,6 +257,8 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
 
         private SslContextBuilder sslContextBuilder;
         private Channel channel;
+        private BlockchainGrpc.BlockchainBlockingStub stub;
+        private ClientInterceptor[] interceptors;
 
         private ObjectMapper objectMapper;
         private JacksonRpcConverter rpcConverter;
@@ -275,6 +276,20 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
             this.channel = channel;
             channelBuilder = null;
             sslContextBuilder = null;
+            return this;
+        }
+
+        /**
+         * Setup with an existing stub. All other settings related to connection will be ignored
+         *
+         * @param stub existing stub
+         * @return builder
+         */
+        public Builder connectUsing(BlockchainGrpc.BlockchainBlockingStub stub) {
+            this.stub = stub;
+            this.channel = null;
+            this.channelBuilder = null;
+            this.sslContextBuilder = null;
             return this;
         }
 
@@ -456,31 +471,48 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         }
 
         /**
+         * Add interceptors to the client calls
+         *
+         * @param interceptors interceptors
+         * @return builder
+         */
+        public Builder interceptors(ClientInterceptor... interceptors) {
+            this.interceptors = interceptors;
+            return this;
+        }
+
+        /**
          * Validates configuration and builds GrpcTransport
          *
          * @return configured grpc transport
          * @throws SSLException if problem with TLS certificates
          */
         public EmeraldTransport build() throws SSLException {
-            if (channel == null) {
-                NettyChannelBuilder nettyBuilder = channelBuilder;
-                if (sslContextBuilder != null) {
-                    nettyBuilder = nettyBuilder.useTransportSecurity()
-                        .sslContext(sslContextBuilder.build());
-                }
-                if (useLoadBalancing) {
-                    String policy = "round_robin";
-                    if (LoadBalancerRegistry.getDefaultRegistry().getProvider(policy) != null) {
-                        nettyBuilder = nettyBuilder.defaultLoadBalancingPolicy(policy);
+            if (stub == null) {
+                if (channel == null) {
+                    NettyChannelBuilder nettyBuilder = channelBuilder;
+                    if (sslContextBuilder != null) {
+                        nettyBuilder = nettyBuilder.useTransportSecurity()
+                            .sslContext(sslContextBuilder.build());
                     }
+                    if (useLoadBalancing) {
+                        String policy = "round_robin";
+                        if (LoadBalancerRegistry.getDefaultRegistry().getProvider(policy) != null) {
+                            nettyBuilder = nettyBuilder.defaultLoadBalancingPolicy(policy);
+                        }
+                    }
+                    ManagedChannelBuilder<?> finalBuilder;
+                    if (this.channelUpdate != null) {
+                        finalBuilder = this.channelUpdate.apply(nettyBuilder);
+                    } else {
+                        finalBuilder = nettyBuilder;
+                    }
+                    channel = finalBuilder.build();
                 }
-                ManagedChannelBuilder<?> finalBuilder;
-                if (this.channelUpdate != null) {
-                    finalBuilder = this.channelUpdate.apply(nettyBuilder);
-                } else {
-                    finalBuilder = nettyBuilder;
+                stub = BlockchainGrpc.newBlockingStub(channel);
+                if (interceptors != null) {
+                    stub = stub.withInterceptors(interceptors);
                 }
-                channel = finalBuilder.build();
             }
             if (executorService == null) {
                 threadsCount(2);
@@ -499,7 +531,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                 chain = Chain.UNSPECIFIED;
             }
             Common.ChainRef chainRef = Common.ChainRef.forNumber(chain.getId());
-            return new EmeraldTransport(channel, objectMapper, rpcConverter, executorService, chainRef);
+            return new EmeraldTransport(stub, objectMapper, rpcConverter, executorService, chainRef);
         }
     }
 }
