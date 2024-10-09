@@ -17,14 +17,17 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.*;
+import io.emeraldpay.etherjar.hex.Hex32;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     /**
@@ -94,7 +97,15 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     @JsonSerialize(using = HexIntSerializer.class)
     private Integer status;
 
+    /**
+     * The actual value per gas deducted from the sender's account. Before EIP-1559, this is equal to the transaction's gas price. After, it is equal to baseFeePerGas + min(maxFeePerGas - baseFeePerGas, maxPriorityFeePerGas).
+     */
     private Wei effectiveGasPrice;
+
+    /**
+     * The actual value per gas deducted from the sender's account for blob gas. Only specified for blob transactions as defined by EIP-4844.
+     */
+    private Wei blobGasPrice;
 
     /**
      * Transaction type
@@ -104,6 +115,11 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
     @JsonDeserialize(using = HexIntDeserializer.class)
     @JsonSerialize(using = HexIntSerializer.class)
     private Integer type = 0;
+
+    /**
+     * The post-transaction state root. Only specified for transactions included before the Byzantium upgrade.
+     */
+    private Hex32 root;
 
     public TransactionId getTransactionHash() {
         return transactionHash;
@@ -209,6 +225,14 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
         this.effectiveGasPrice = effectiveGasPrice;
     }
 
+    public Wei getBlobGasPrice() {
+        return blobGasPrice;
+    }
+
+    public void setBlobGasPrice(Wei blobGasPrice) {
+        this.blobGasPrice = blobGasPrice;
+    }
+
     public int getType() {
         if (type == null) {
             return 0;
@@ -218,6 +242,14 @@ public class TransactionReceiptJson implements TransactionRef, Serializable {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public Hex32 getRoot() {
+        return root;
+    }
+
+    public void setRoot(Hex32 root) {
+        this.root = root;
     }
 
     @Override
