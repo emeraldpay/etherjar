@@ -17,6 +17,7 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
@@ -30,6 +31,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TransactionLogJson implements TransactionRef, Serializable {
 
     /**
