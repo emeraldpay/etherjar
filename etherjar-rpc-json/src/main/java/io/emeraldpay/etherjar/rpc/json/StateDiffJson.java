@@ -24,6 +24,7 @@ import io.emeraldpay.etherjar.hex.HexData;
 import java.util.HashMap;
 import java.util.Map;
 
+// Uses a custom deserializer to read the JSON object, b/c the structure is a bit too complex for annotations
 @JsonDeserialize(using = StateDiffJsonDeserializer.class)
 public class StateDiffJson {
 

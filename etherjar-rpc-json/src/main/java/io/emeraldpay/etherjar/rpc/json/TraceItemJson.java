@@ -17,7 +17,10 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.BlockHash;
 import io.emeraldpay.etherjar.domain.TransactionId;
@@ -27,18 +30,24 @@ import io.emeraldpay.etherjar.hex.HexData;
 import java.io.Serializable;
 import java.util.List;
 
-@JsonDeserialize(using = TraceItemJsonDeserializer.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TraceItemJson implements Serializable {
 
     private TraceType type;
     private Action action;
     private BlockHash blockHash;
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long blockNumber;
     private Result result;
     private String error;
     private Long subtraces;
+    @JsonDeserialize(contentUsing = HexLongDeserializer.class)
+    @JsonSerialize(contentUsing = HexLongSerializer.class)
     private List<Long> traceAddress;
     private TransactionId transactionHash;
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long transactionPosition;
 
     public Action getAction() {
@@ -157,6 +166,8 @@ public class TraceItemJson implements Serializable {
 
         private CallType callType;
         private Address from;
+        @JsonDeserialize(using = HexLongDeserializer.class)
+        @JsonSerialize(using = HexLongSerializer.class)
         private Long gas;
         private HexData init;
         private HexData input;
@@ -284,14 +295,30 @@ public class TraceItemJson implements Serializable {
     }
 
     public static enum CallType {
-        NONE, CALL, CALLCODE, DELEGATECALL, STATICCALL;
+        @JsonProperty("none")
+        NONE,
+        @JsonProperty("call")
+        CALL,
+        @JsonProperty("callcode")
+        CALLCODE,
+        @JsonProperty("delegatecall")
+        DELEGATECALL,
+        @JsonProperty("staticcall")
+        STATICCALL;
     }
 
     public static enum TraceType {
-        CREATE, CALL, SUICIDE;
+        @JsonProperty("create")
+        CREATE,
+        @JsonProperty("call")
+        CALL,
+        @JsonProperty("suicide")
+        SUICIDE;
     }
 
     public static class Result implements Serializable {
+        @JsonDeserialize(using = HexLongDeserializer.class)
+        @JsonSerialize(using = HexLongSerializer.class)
         private Long gasUsed;
         private HexData output;
         private Address address;

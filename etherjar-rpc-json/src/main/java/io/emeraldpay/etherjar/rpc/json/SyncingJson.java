@@ -18,6 +18,7 @@ package io.emeraldpay.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+// Uses a custom serialization because it's either a boolean or an object
 @JsonDeserialize(using = SyncingJsonDeserializer.class)
 @JsonSerialize(using = SyncingJsonSerializer.class)
 public class SyncingJson {

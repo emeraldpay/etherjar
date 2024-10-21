@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 public class StateDiffJsonDeserializer extends JsonDeserializer<StateDiffJson> {
 
-    protected static final Function<String, Wei> WEI_CONVERTER = Wei::from;
+    protected static final Function<String, Wei> WEI_CONVERTER = Wei::fromHex;
     protected static final Function<String, HexData> CODE_CONVERTER = HexData::from;
     protected static final Function<String, Long> NONCE_CONVERTER = (s) -> HexQuantity.from(s).getValue().longValueExact();
     protected static final Function<String, Hex32> STORAGE_CONVERTER = Hex32::from;

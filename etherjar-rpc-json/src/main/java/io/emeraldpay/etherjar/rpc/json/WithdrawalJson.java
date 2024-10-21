@@ -1,5 +1,6 @@
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.Wei;
@@ -9,6 +10,7 @@ import java.util.Objects;
 /**
  * @see <a href="https://github.com/ethereum/execution-apis/blob/main/src/schemas/withdrawal.yaml">https://github.com/ethereum/execution-apis/blob/main/src/schemas/withdrawal.yaml</a>
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WithdrawalJson {
     @JsonDeserialize(using = HexLongDeserializer.class)
     private Long index;

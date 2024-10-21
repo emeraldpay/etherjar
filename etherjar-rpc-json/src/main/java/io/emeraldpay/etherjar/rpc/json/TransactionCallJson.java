@@ -17,6 +17,8 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.Wei;
@@ -24,15 +26,19 @@ import io.emeraldpay.etherjar.hex.HexData;
 
 import java.io.Serializable;
 
-@JsonSerialize(using = TransactionCallJsonSerializer.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionCallJson implements Serializable {
 
     private Address from;
     private Address to;
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long gas;
     private Wei gasPrice;
     private Wei value;
     private HexData data;
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long nonce;
 
     public TransactionCallJson() {

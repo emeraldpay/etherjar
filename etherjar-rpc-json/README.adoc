@@ -1,0 +1,4 @@
+= JSON Mapping for RPC API
+
+.Reference:
+- https://github.com/ethereum/execution-apis/tree/main/src/schemas

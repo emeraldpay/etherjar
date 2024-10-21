@@ -70,8 +70,8 @@ class JacksonEthRpcConverterSpec extends Specification {
         act == '{"jsonrpc":"2.0","method":"eth_call","params":[' +
             '{"from":"0xb7819ff807d9d52a9ce5d713dc7053e8871e077b",' +
             '"to":"0x57d90b64a1a57749b0f932f1a3395792e12e7055",' +
-            '"gas":"0x0186a0",' +
-            '"gasPrice":"0x071afd498d0000",' +
+            '"gas":"0x186a0",' +
+            '"gasPrice":"0x71afd498d0000",' +
             '"value":"0x14d1120d7b160000",' +
             '"data":"0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2"}' +
             ',"latest"],"id":1}'
