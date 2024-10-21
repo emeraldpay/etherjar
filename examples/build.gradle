@@ -8,9 +8,9 @@ repositories {
 
 dependencies {
 
-    compile "io.emeraldpay.etherjar:etherjar-domain:0.11.0-SNAPSHOT"
-    compile "io.emeraldpay.etherjar:etherjar-rpc-api:0.11.0-SNAPSHOT"
-    compile "io.emeraldpay.etherjar:etherjar-rpc-http:0.11.0-SNAPSHOT"
-    compile "io.emeraldpay.etherjar:etherjar-rlp:0.11.0-SNAPSHOT"
+    compile "io.emeraldpay.etherjar:etherjar-domain:0.12.0"
+    compile "io.emeraldpay.etherjar:etherjar-rpc-api:0.12.0"
+    compile "io.emeraldpay.etherjar:etherjar-rpc-http:0.12.0"
+    compile "io.emeraldpay.etherjar:etherjar-rlp:0.12.0"
 
 }

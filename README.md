@@ -6,8 +6,8 @@
 
 Framework agnostic modular Java 17+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.11.0
-- Latest Snapshot Version: 0.12.0-SNAPSHOT
+- Latest Stable Version: 0.12.0
+- Latest Snapshot Version: 0.13.0-SNAPSHOT
 
 ## Modules
 
@@ -85,7 +85,7 @@ where
 <dependency>
   <groupId>io.emeraldpay.etherjar</groupId>
   <artifactId>etherjar-rpc-http</artifactId>
-  <version>0.11.0</version>
+  <version>0.12.0</version>
 </dependency>
 ```
 
@@ -99,7 +99,7 @@ repositories {
 }
 
 dependencies {
-    implementation "io.emeraldpay.etherjar:etherjar-rpc-http:0.11.0"
+    implementation "io.emeraldpay.etherjar:etherjar-rpc-http:0.12.0"
 }
 ```
 
