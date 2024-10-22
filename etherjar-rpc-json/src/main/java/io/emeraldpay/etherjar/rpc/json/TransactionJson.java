@@ -240,6 +240,7 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         this.input = input;
     }
 
+    @JsonIgnore
     public TransactionSignature getSignature() {
         if (signature != null) {
             return signature;
@@ -256,6 +257,7 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         return created;
     }
 
+    @JsonIgnore
     public void setSignature(TransactionSignature signature) {
         this.signature = signature;
     }
