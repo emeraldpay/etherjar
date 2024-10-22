@@ -17,6 +17,7 @@
 
 package io.emeraldpay.etherjar.rpc.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -163,6 +164,7 @@ public class TransactionLogJson implements TransactionRef, Serializable {
     }
 
     @Override
+    @JsonIgnore
     public TransactionId getHash() {
         return transactionHash;
     }
