@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import io.emeraldpay.etherjar.domain.Address;
 
@@ -30,5 +31,12 @@ public class AddressDeserializer extends StdDeserializer<Address> {
             return null;
         }
         throw JsonMappingException.from(p,"Invalid Address type: " + token);
+    }
+
+    public static class FromKey extends KeyDeserializer {
+        @Override
+        public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            return Address.from(key);
+        }
     }
 }

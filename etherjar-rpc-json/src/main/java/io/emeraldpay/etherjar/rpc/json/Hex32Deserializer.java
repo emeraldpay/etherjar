@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
@@ -31,5 +32,12 @@ public class Hex32Deserializer extends StdDeserializer<Hex32> {
             return null;
         }
         throw JsonMappingException.from(p,"Invalid Hex32 type: " + token);
+    }
+
+    public static class FromKey extends KeyDeserializer {
+        @Override
+        public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            return Hex32.from(key);
+        }
     }
 }

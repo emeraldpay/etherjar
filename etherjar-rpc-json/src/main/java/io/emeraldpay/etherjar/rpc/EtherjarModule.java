@@ -27,5 +27,10 @@ public class EtherjarModule extends SimpleModule {
         addDeserializer(Address.class, new AddressDeserializer());
         addDeserializer(MethodId.class, new MethodIdDeserializer());
         addDeserializer(Bloom.class, new BloomDeserializer());
+
+        addKeySerializer(Address.class, new HexDataSerializer.AsKey());
+
+        addKeyDeserializer(Address.class, new AddressDeserializer.FromKey());
+        addKeyDeserializer(Hex32.class, new Hex32Deserializer.FromKey());
     }
 }

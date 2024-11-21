@@ -2,6 +2,7 @@ package io.emeraldpay.etherjar.rpc.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.domain.Wei;
 
@@ -13,15 +14,15 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WithdrawalJson {
     @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long index;
 
     @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
     private Long validatorIndex;
 
-    @JsonDeserialize(using = AddressDeserializer.class)
     private Address address;
 
-    @JsonDeserialize(using = WeiDeserializer.class)
     private Wei amount;
 
     public Long getIndex() {

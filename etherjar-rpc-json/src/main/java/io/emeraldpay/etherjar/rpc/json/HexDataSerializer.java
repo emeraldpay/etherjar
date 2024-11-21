@@ -36,4 +36,22 @@ public class HexDataSerializer extends StdSerializer<HexData> {
             gen.writeString(value.toHex());
         }
     }
+
+    /**
+     * To serialize Hex Data (including Hex32 and Address) as a JSON object key.
+     */
+    public static class AsKey extends StdSerializer<HexData> {
+        public AsKey() {
+            super(HexData.class);
+        }
+
+        @Override
+        public void serialize(HexData value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            if (value == null) {
+                gen.writeNull();
+            } else {
+                gen.writeFieldName(value.toHex());
+            }
+        }
+    }
 }

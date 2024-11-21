@@ -23,9 +23,6 @@ import io.emeraldpay.etherjar.hex.HexData
 import io.emeraldpay.etherjar.rpc.json.*
 import spock.lang.Specification
 
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-
 class JacksonEthRpcConverterSpec extends Specification {
 
     JacksonRpcConverter jacksonRpcConverter = new JacksonRpcConverter()
@@ -33,7 +30,7 @@ class JacksonEthRpcConverterSpec extends Specification {
     def "Encode basic call data"() {
         def callData = new TransactionCallJson(
             to: Address.from('0x57d90b64a1a57749b0f932f1a3395792e12e7055'),
-            data: HexData.from('0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2')
+                input: HexData.from('0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2')
         )
         def req = new RequestJson(
             "eth_call",
@@ -45,14 +42,14 @@ class JacksonEthRpcConverterSpec extends Specification {
         def act = jacksonRpcConverter.toJson(req)
 
         then:
-        act == '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x57d90b64a1a57749b0f932f1a3395792e12e7055","data":"0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2"},"latest"],"id":1}'
+        act == '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x57d90b64a1a57749b0f932f1a3395792e12e7055","input":"0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2"},"latest"],"id":1}'
     }
 
     def "Encode full call data"() {
         def callData = new TransactionCallJson(
             from: Address.from("0xb7819ff807d9d52a9ce5d713dc7053e8871e077b"),
             to: Address.from('0x57d90b64a1a57749b0f932f1a3395792e12e7055'),
-            data: HexData.from('0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2'),
+            input: HexData.from('0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2'),
             gas: 100000,
             gasPrice: Wei.ofEthers(0.002),
             value: Wei.ofEthers(1.5)
@@ -73,7 +70,7 @@ class JacksonEthRpcConverterSpec extends Specification {
             '"gas":"0x186a0",' +
             '"gasPrice":"0x71afd498d0000",' +
             '"value":"0x14d1120d7b160000",' +
-            '"data":"0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2"}' +
+            '"input":"0xa9059cbb00000000000000000000000014dd45d07d1d700579a9b7cfb3a4536890aafdc2"}' +
             ',"latest"],"id":1}'
     }
 

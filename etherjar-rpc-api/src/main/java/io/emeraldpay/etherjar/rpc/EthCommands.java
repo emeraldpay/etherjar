@@ -349,6 +349,17 @@ public class EthCommands {
     }
 
     /**
+     * The eth_simulateV1 method allows the simulation of multiple blocks and transactions without creating transactions or blocks on the blockchain. It functions similarly to eth_call, but offers more control.
+     *
+     * @param payload the simulation payload
+     * @param block The simulated blocks will be built on top of this. If null, the current block is used.
+     * @return simulated block
+     */
+    public RpcCall<BlockSimulatedJson, BlockSimulatedJson> simulateV1(SimulateJson payload, BlockTag block) {
+        return RpcCall.create("eth_simulateV1", BlockSimulatedJson.class, payload, block.getCode());
+    }
+
+    /**
      * Executes a new message call immediately without creating a transaction on the block chain.
      *
      * @param call the transaction call object
