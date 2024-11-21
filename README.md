@@ -6,7 +6,7 @@
 
 Framework agnostic modular Java 17+ integration library for [Ethereum blockchains](https://www.ethereum.org)
 
-- Latest Stable Version: 0.12.0
+- Latest Stable Version: 0.12.1
 - Latest Snapshot Version: 0.13.0-SNAPSHOT
 
 ## Modules
