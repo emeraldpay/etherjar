@@ -466,34 +466,33 @@ public class BlockJson<T extends TransactionRefJson> implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BlockJson)) return false;
-
-        BlockJson<?> blockJson = (BlockJson<?>) o;
-
-        if (!Objects.equals(number, blockJson.number)) return false;
-        if (!Objects.equals(hash, blockJson.hash)) return false;
-        if (!Objects.equals(parentHash, blockJson.parentHash)) return false;
-        if (!Objects.equals(sha3Uncles, blockJson.sha3Uncles)) return false;
-        if (!Objects.equals(logsBloom, blockJson.logsBloom)) return false;
-        if (!Objects.equals(transactionsRoot, blockJson.transactionsRoot)) return false;
-        if (!Objects.equals(stateRoot, blockJson.stateRoot)) return false;
-        if (!Objects.equals(receiptsRoot, blockJson.receiptsRoot)) return false;
-        if (!Objects.equals(miner, blockJson.miner)) return false;
-        if (!Objects.equals(difficulty, blockJson.difficulty)) return false;
-        if (!Objects.equals(totalDifficulty, blockJson.totalDifficulty)) return false;
-        if (!Objects.equals(extraData, blockJson.extraData)) return false;
-        if (!Objects.equals(size, blockJson.size)) return false;
-        if (!Objects.equals(gasLimit, blockJson.gasLimit)) return false;
-        if (!Objects.equals(gasUsed, blockJson.gasUsed)) return false;
-        if (!Objects.equals(timestamp, blockJson.timestamp)) return false;
-        if (!Objects.equals(transactions, blockJson.transactions)) return false;
-        if (!Objects.equals(baseFeePerGas, blockJson.baseFeePerGas)) return false;
-        if (!Objects.equals(mixHash, blockJson.mixHash)) return false;
-        if (!Objects.equals(nonce, blockJson.nonce)) return false;
-        if (!Objects.equals(withdrawalsRoot, blockJson.withdrawalsRoot)) return false;
-        if (!Objects.equals(withdrawals, blockJson.withdrawals)) return false;
-        return Objects.equals(uncles, blockJson.uncles);
+        if (!(o instanceof BlockJson<?> blockJson)) return false;
+        return Objects.equals(number, blockJson.number)
+            && Objects.equals(hash, blockJson.hash)
+            && Objects.equals(parentHash, blockJson.parentHash)
+            && Objects.equals(sha3Uncles, blockJson.sha3Uncles)
+            && Objects.equals(logsBloom, blockJson.logsBloom)
+            && Objects.equals(transactionsRoot, blockJson.transactionsRoot)
+            && Objects.equals(stateRoot, blockJson.stateRoot)
+            && Objects.equals(receiptsRoot, blockJson.receiptsRoot)
+            && Objects.equals(miner, blockJson.miner)
+            && Objects.equals(difficulty, blockJson.difficulty)
+            && Objects.equals(totalDifficulty, blockJson.totalDifficulty)
+            && Objects.equals(extraData, blockJson.extraData)
+            && Objects.equals(mixHash, blockJson.mixHash)
+            && Objects.equals(nonce, blockJson.nonce)
+            && Objects.equals(size, blockJson.size)
+            && Objects.equals(gasLimit, blockJson.gasLimit)
+            && Objects.equals(gasUsed, blockJson.gasUsed)
+            && Objects.equals(timestamp, blockJson.timestamp)
+            && Objects.equals(transactions, blockJson.transactions)
+            && Objects.equals(uncles, blockJson.uncles)
+            && Objects.equals(baseFeePerGas, blockJson.baseFeePerGas)
+            && Objects.equals(withdrawalsRoot, blockJson.withdrawalsRoot)
+            && Objects.equals(withdrawals, blockJson.withdrawals)
+            && Objects.equals(blobGasUsed, blockJson.blobGasUsed)
+            && Objects.equals(excessBlobGas, blockJson.excessBlobGas)
+            && Objects.equals(parentBeaconBlockRoot, blockJson.parentBeaconBlockRoot);
     }
 
     @Override

@@ -1,0 +1,30 @@
+{
+    "blockStateCalls": [
+        {
+            "blockOverrides": {
+                "baseFeePerGas": "0x9"
+            },
+            "stateOverrides": {
+                "0xc000000000000000000000000000000000000000": {
+                    "balance": "0x4a817c800"
+                }
+            },
+            "calls": [
+                {
+                    "from": "0xc000000000000000000000000000000000000000",
+                    "to": "0xc000000000000000000000000000000000000001",
+                    "maxFeePerGas": "0xf",
+                    "value": "0x1"
+                },
+                {
+                    "from": "0xc000000000000000000000000000000000000000",
+                    "to": "0xc000000000000000000000000000000000000002",
+                    "maxFeePerGas": "0xf",
+                    "value": "0x1"
+                }
+            ]
+        }
+    ],
+    "validation": true,
+    "traceTransfers": true
+}

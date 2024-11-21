@@ -36,7 +36,7 @@ import java.util.Objects;
 public class TransactionLogJson implements TransactionRef, Serializable {
 
     /**
-     * true when the log was removed, due to a chain reorganization. false if its a valid log.
+     * A flag indicating if a log was removed in a chain reorganization. Always <code>false</code> for <code>eth_simulateV1</code>.
      */
     private Boolean removed;
 

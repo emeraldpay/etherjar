@@ -32,7 +32,7 @@ public class ContractCall {
     public TransactionCallJson toJson() {
         TransactionCallJson json = new TransactionCallJson();
         json.setTo(contract);
-        json.setData(data.toData());
+        json.setInput(data.toData());
         return json;
     }
 
