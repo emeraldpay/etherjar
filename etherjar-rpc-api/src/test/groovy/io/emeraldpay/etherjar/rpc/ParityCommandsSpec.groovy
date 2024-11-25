@@ -16,6 +16,7 @@
 package io.emeraldpay.etherjar.rpc
 
 import io.emeraldpay.etherjar.domain.TransactionId
+import io.emeraldpay.etherjar.rpc.json.TraceItemJson
 import spock.lang.Specification
 
 class ParityCommandsSpec extends Specification {
@@ -27,7 +28,9 @@ class ParityCommandsSpec extends Specification {
         then:
         call.method == "trace_transaction"
         call.params == ['0x6013af0b08e2f0e8dacdfcf482813c7e1898ec2b3cd21da6d2c16ce9899a2d27']
-        call.jsonType == TraceList
-        call.resultType == TraceList
+        call.jsonType.isArrayType()
+        call.jsonType.rawClass == TraceItemJson[].class
+        call.resultType.isArray()
+        call.resultType == TraceItemJson[].class
     }
 }

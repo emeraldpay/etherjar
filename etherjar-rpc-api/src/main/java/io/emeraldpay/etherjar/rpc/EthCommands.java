@@ -15,6 +15,8 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.emeraldpay.etherjar.domain.*;
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
@@ -22,6 +24,9 @@ import io.emeraldpay.etherjar.hex.HexQuantity;
 import io.emeraldpay.etherjar.rpc.json.*;
 
 public class EthCommands {
+
+    private final JavaType blockWithTxJsonType = TypeFactory.defaultInstance().constructParametricType(BlockJson.class, TransactionJson.class);
+    private final JavaType blockWithTxIdType = TypeFactory.defaultInstance().constructParametricType(BlockJson.class, TransactionRefJson.class);
 
     private final Class<BlockJson<TransactionJson>> blockWithTxJson = getBlockWithTx();
     private final Class<BlockJson<TransactionRefJson>> blockWithTxId = getBlockWithRef();
@@ -73,7 +78,7 @@ public class EthCommands {
      */
     public RpcCall<BlockJson<TransactionRefJson>, BlockJson<TransactionRefJson>> getBlock(long blockNumber) {
         return RpcCall.create("eth_getBlockByNumber", blockWithTxId, HexQuantity.from(blockNumber).toHex(), false)
-            .withJsonType(blockWithTxId)
+            .withJsonType(blockWithTxIdType).castJsonType(blockWithTxId)
             .withResultType(blockWithTxId);
     }
 
@@ -85,7 +90,7 @@ public class EthCommands {
      */
     public RpcCall<BlockJson<TransactionJson>, BlockJson<TransactionJson>> getBlockWithTransactions(long blockNumber) {
         return RpcCall.create("eth_getBlockByNumber", blockWithTxJson, HexQuantity.from(blockNumber).toHex(), true)
-            .withJsonType(blockWithTxJson)
+            .withJsonType(blockWithTxJsonType).castJsonType(blockWithTxJson)
             .withResultType(blockWithTxJson);
     }
 
@@ -96,7 +101,7 @@ public class EthCommands {
      */
     public RpcCall<BlockJson<TransactionRefJson>, BlockJson<TransactionRefJson>> getBlock(BlockHash hash) {
         return RpcCall.create("eth_getBlockByHash", blockWithTxId, hash.toHex(), false)
-            .withJsonType(blockWithTxId)
+            .withJsonType(blockWithTxIdType).castJsonType(blockWithTxId)
             .withResultType(blockWithTxId);
     }
 
@@ -107,7 +112,7 @@ public class EthCommands {
      */
     public RpcCall<BlockJson<TransactionJson>, BlockJson<TransactionJson>> getBlockWithTransactions(BlockHash hash) {
         return RpcCall.create("eth_getBlockByHash", blockWithTxJson, hash.toHex(), true)
-            .withJsonType(blockWithTxJson)
+            .withJsonType(blockWithTxJsonType).castJsonType(blockWithTxJson)
             .withResultType(blockWithTxJson);
     }
 
@@ -355,8 +360,8 @@ public class EthCommands {
      * @param block The simulated blocks will be built on top of this. If null, the current block is used.
      * @return simulated block
      */
-    public RpcCall<BlockSimulatedJson, BlockSimulatedJson> simulateV1(SimulateJson payload, BlockTag block) {
-        return RpcCall.create("eth_simulateV1", BlockSimulatedJson.class, payload, block.getCode());
+    public RpcCall<BlockSimulatedJson[], BlockSimulatedJson[]> simulateV1(SimulateJson payload, BlockTag block) {
+        return RpcCall.create("eth_simulateV1", BlockSimulatedJson.class, payload, block.getCode()).asArray();
     }
 
     /**

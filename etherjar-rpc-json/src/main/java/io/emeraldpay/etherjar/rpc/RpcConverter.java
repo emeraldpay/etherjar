@@ -17,15 +17,17 @@
 
 package io.emeraldpay.etherjar.rpc;
 
+import com.fasterxml.jackson.databind.JavaType;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
 public interface RpcConverter {
 
-    <T> T fromJson(InputStream content, Class<T> clazz) throws RpcException;
+    <T> T fromJson(InputStream content, JavaType clazz) throws RpcException;
 
-    List<ResponseJson<Object,Integer>> parseBatch(InputStream content, Map<Integer, Class> targets) throws RpcException;
+    List<ResponseJson<Object,Integer>> parseBatch(InputStream content, Map<Integer, JavaType> targets) throws RpcException;
 
     String toJson(RequestJson request);
 

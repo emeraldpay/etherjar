@@ -15,6 +15,10 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,16 +33,13 @@ import java.util.function.Function;
  */
 public class RpcCall<JS, RES> {
 
-    private static <T> Function<T, T> same() {
-        return (a) -> a;
-    }
-
     private final String method;
     private final List params;
 
-    private Class<? extends JS> jsonType;
+    private JavaType jsonType;
     private Class<? extends RES> resultType;
     private java.util.function.Function<JS, RES> converter;
+    private boolean isArray = false;
 
     private RpcCall(String method, List params) {
         if (method == null) {
@@ -64,10 +65,23 @@ public class RpcCall<JS, RES> {
      * @return call definition
      */
     public static <T> RpcCall<T, T> create(String method, Class<? extends T> type, List params) {
+        return create(method, TypeFactory.defaultInstance().constructType(type), params);
+    }
+
+    /**
+     *
+     * @param method method name
+     * @param type data type
+     * @param params call parameters
+     * @param <T> data type, same for Java and JSON (i.e. String)
+     * @return call definition
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> RpcCall<T, T> create(String method, JavaType type, List params) {
         RpcCall<T, T> call = new RpcCall<>(method, params);
-        call.jsonType = type;
-        call.resultType = type;
-        call.converter = same();
+        call.jsonType = TypeFactory.defaultInstance().constructType(type);
+        call.resultType = (Class<? extends T>) type.getRawClass();
+        call.converter = Function.identity();
         return call;
     }
 
@@ -150,7 +164,7 @@ public class RpcCall<JS, RES> {
      */
     @SuppressWarnings("unchecked")
     public <T> RpcCall<T, RES> castJsonType(Class<T> clazz) {
-        if (this.jsonType == null || clazz.isAssignableFrom(this.jsonType)) {
+        if (this.jsonType == null || clazz.isAssignableFrom(this.jsonType.getRawClass())) {
             return (RpcCall<T, RES>) this;
         }
         throw new ClassCastException("Value of " + this.jsonType + " is not assignable to " + clazz);
@@ -162,6 +176,9 @@ public class RpcCall<JS, RES> {
      */
     @SuppressWarnings("unchecked")
     public void setResultType(Class clazz) {
+        if (isArray) {
+            throw new IllegalStateException("Cannot change result type after enabling array type");
+        }
         this.resultType = clazz;
     }
 
@@ -172,11 +189,25 @@ public class RpcCall<JS, RES> {
      * @param <T> JSON data type
      * @return new call definition
      */
-    @SuppressWarnings("unchecked")
     public <T> RpcCall<T, RES> withJsonType(Class<? extends T> clazz) {
+        return withJsonType(TypeFactory.defaultInstance().constructType(clazz));
+    }
+
+    /**
+     * Convert into a new call definition with specified JSON data type
+     *
+     * @param jsonType new JSON data type
+     * @param <T> JSON data type
+     * @return new call definition
+     */
+    @SuppressWarnings("unchecked")
+    public <T> RpcCall<T, RES> withJsonType(JavaType jsonType) {
+        if (isArray) {
+            throw new IllegalStateException("Cannot change json type after enabling array type");
+        }
         RpcCall<T, RES> copy = new RpcCall<>(this.method, this.params);
         copy.resultType = this.resultType;
-        copy.jsonType = clazz;
+        copy.jsonType = jsonType;
         copy.converter = (Function<T, RES>) this.converter;
         return copy;
     }
@@ -190,6 +221,9 @@ public class RpcCall<JS, RES> {
      */
     @SuppressWarnings("unchecked")
     public <T> RpcCall<JS, T> withResultType(Class<T> clazz) {
+        if (isArray) {
+            throw new IllegalStateException("Cannot change result type after enabling array type");
+        }
         RpcCall<JS, T> copy = new RpcCall<>(this.method, this.params);
         copy.resultType = clazz;
         copy.jsonType = this.jsonType;
@@ -197,6 +231,27 @@ public class RpcCall<JS, RES> {
         return copy;
     }
 
+    @SuppressWarnings("unchecked")
+    public RpcCall<JS[], RES[]> asArray() {
+        RpcCall<JS[], RES[]> copy = new RpcCall<>(this.method, this.params);
+        copy.jsonType = TypeFactory.defaultInstance().constructArrayType(this.jsonType);
+        copy.resultType = (Class<RES[]>) this.resultType.arrayType();
+        if (this.converter != null) {
+            copy.converter = (values) -> {
+                if (values == null) {
+                    return null;
+                }
+                // it's critical to create an instance of the expected type, otherwise the class type will be Object[]
+                RES[] result = (RES[]) Array.newInstance(this.resultType, values.length);
+                for (int i = 0; i < values.length; i++) {
+                    result[i] = this.converter.apply(values[i]);
+                }
+                return result;
+            };
+        }
+        copy.isArray = true;
+        return copy;
+    }
 
     /**
      *
@@ -227,9 +282,8 @@ public class RpcCall<JS, RES> {
      *
      * @return JSON data type
      */
-    @SuppressWarnings("unchecked")
-    public Class<JS> getJsonType() {
-        return (Class<JS>) jsonType;
+    public JavaType getJsonType() {
+        return jsonType;
     }
 
     /**
@@ -257,6 +311,7 @@ public class RpcCall<JS, RES> {
         RpcCall<?, ?> call = (RpcCall<?, ?>) o;
         return method.equals(call.method) &&
                 params.equals(call.params) &&
+                Objects.equals(isArray, call.isArray) &&
                 Objects.equals(jsonType, call.jsonType) &&
                 Objects.equals(resultType, call.resultType);
     }

@@ -26,7 +26,7 @@ class NetCommandsSpec extends Specification {
         then:
         call.method == "net_version"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Integer
     }
 
@@ -37,7 +37,7 @@ class NetCommandsSpec extends Specification {
         then:
         call.method == "net_listening"
         call.params == []
-        call.jsonType == Boolean
+        call.jsonType.rawClass == Boolean
         call.resultType == Boolean
     }
 
@@ -48,7 +48,7 @@ class NetCommandsSpec extends Specification {
         then:
         call.method == "net_peerCount"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Integer
     }
 

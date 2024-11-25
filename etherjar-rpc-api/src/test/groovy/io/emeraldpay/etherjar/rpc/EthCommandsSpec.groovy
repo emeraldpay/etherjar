@@ -23,11 +23,14 @@ import io.emeraldpay.etherjar.domain.Wei
 import io.emeraldpay.etherjar.hex.Hex32
 import io.emeraldpay.etherjar.hex.HexData
 import io.emeraldpay.etherjar.rpc.json.BlockJson
+import io.emeraldpay.etherjar.rpc.json.BlockSimulatedJson
 import io.emeraldpay.etherjar.rpc.json.BlockTag
+import io.emeraldpay.etherjar.rpc.json.SimulateJson
 import io.emeraldpay.etherjar.rpc.json.SyncingJson
 import io.emeraldpay.etherjar.rpc.json.TransactionCallJson
 import io.emeraldpay.etherjar.rpc.json.TransactionJson
 import io.emeraldpay.etherjar.rpc.json.TransactionReceiptJson
+import io.emeraldpay.etherjar.rpc.json.TransactionRefJson
 import spock.lang.Specification
 
 class EthCommandsSpec extends Specification {
@@ -39,7 +42,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_blockNumber"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
     }
 
@@ -50,7 +53,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBalance"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x3e8']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Wei
 
         when:
@@ -59,7 +62,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBalance"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Wei
     }
 
@@ -70,7 +73,8 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBlockByNumber"
         call.params == ['0x3e8', false]
-        call.jsonType == BlockJson
+        call.jsonType.rawClass == BlockJson
+        call.jsonType.containedType(0).rawClass == TransactionRefJson.class
         call.resultType == BlockJson
 
         when:
@@ -79,7 +83,8 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBlockByNumber"
         call.params == ['0x3e8', true]
-        call.jsonType == BlockJson
+        call.jsonType.rawClass == BlockJson
+        call.jsonType.containedType(0).rawClass == TransactionJson.class
         call.resultType == BlockJson
 
         when:
@@ -88,7 +93,8 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBlockByHash"
         call.params == ['0x4eeb9aa586c63c0f1ce033e6c6fb44b4db1ffe8c5e19c93e2b768c71b5f9cb9c', false]
-        call.jsonType == BlockJson
+        call.jsonType.rawClass == BlockJson
+        call.jsonType.containedType(0).rawClass == TransactionRefJson.class
         call.resultType == BlockJson
 
         when:
@@ -97,8 +103,20 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBlockByHash"
         call.params == ['0x4eeb9aa586c63c0f1ce033e6c6fb44b4db1ffe8c5e19c93e2b768c71b5f9cb9c', true]
-        call.jsonType == BlockJson
+        call.jsonType.rawClass == BlockJson
+        call.jsonType.containedType(0).rawClass == TransactionJson.class
         call.resultType == BlockJson
+    }
+
+    def simulateV1() {
+        when:
+        def call = Commands.eth().simulateV1(new SimulateJson(), BlockTag.EARLIEST)
+
+        then:
+        call.method == "eth_simulateV1"
+        call.jsonType.arrayType
+        call.jsonType.contentType.rawClass == BlockSimulatedJson.class
+        call.resultType == BlockSimulatedJson[]
     }
 
     def getTransaction() {
@@ -108,7 +126,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionByHash"
         call.params == ['0x18c3ba292e0388fdbcb3789feabc7312fba679f2a7ddc0f5611ce187b32a1d2b']
-        call.jsonType == TransactionJson
+        call.jsonType.rawClass == TransactionJson
         call.resultType == TransactionJson
 
         when:
@@ -117,7 +135,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionByBlockNumberAndIndex"
         call.params == ['0x3e8', '0x5']
-        call.jsonType == TransactionJson
+        call.jsonType.rawClass == TransactionJson
         call.resultType == TransactionJson
 
         when:
@@ -126,7 +144,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionByBlockHashAndIndex"
         call.params == ['0x4eeb9aa586c63c0f1ce033e6c6fb44b4db1ffe8c5e19c93e2b768c71b5f9cb9c', '0x5']
-        call.jsonType == TransactionJson
+        call.jsonType.rawClass == TransactionJson
         call.resultType == TransactionJson
     }
 
@@ -137,7 +155,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionReceipt"
         call.params == ['0x18c3ba292e0388fdbcb3789feabc7312fba679f2a7ddc0f5611ce187b32a1d2b']
-        call.jsonType == TransactionReceiptJson
+        call.jsonType.rawClass == TransactionReceiptJson
         call.resultType == TransactionReceiptJson
     }
 
@@ -148,7 +166,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionCount"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x3e8']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
 
         when:
@@ -157,7 +175,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionCount"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'earliest']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
 
         when:
@@ -166,7 +184,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getTransactionCount"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
 
         when:
@@ -175,7 +193,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBlockTransactionCountByHash"
         call.params == ['0x4eeb9aa586c63c0f1ce033e6c6fb44b4db1ffe8c5e19c93e2b768c71b5f9cb9c']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
 
         when:
@@ -184,7 +202,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getBlockTransactionCountByNumber"
         call.params == ['0x3e8']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
     }
 
@@ -195,7 +213,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getUncleCountByBlockNumber"
         call.params == ['0x3e8']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
 
         when:
@@ -204,7 +222,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getUncleCountByBlockHash"
         call.params == ['0x4eeb9aa586c63c0f1ce033e6c6fb44b4db1ffe8c5e19c93e2b768c71b5f9cb9c']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
     }
 
@@ -215,7 +233,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getUncleByBlockNumberAndIndex"
         call.params == ['0x3e8', '0x2']
-        call.jsonType == BlockJson
+        call.jsonType.rawClass == BlockJson
         call.resultType == BlockJson
 
         when:
@@ -224,7 +242,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getUncleByBlockHashAndIndex"
         call.params == ['0x4eeb9aa586c63c0f1ce033e6c6fb44b4db1ffe8c5e19c93e2b768c71b5f9cb9c', '0x1']
-        call.jsonType == BlockJson
+        call.jsonType.rawClass == BlockJson
         call.resultType == BlockJson
     }
 
@@ -235,7 +253,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getCode"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x3e8']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == HexData
 
         when:
@@ -244,7 +262,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getCode"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', 'latest']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == HexData
     }
 
@@ -255,7 +273,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_getWork"
         call.params == []
-        call.jsonType == String[]
+        call.jsonType.rawClass == String[]
         call.resultType == HexData[]
     }
 
@@ -270,7 +288,7 @@ class EthCommandsSpec extends Specification {
         call.params == ["0x0000000000000001",
                         "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
                         "0xd1fe5700000000000000000000000000d1fe5700000000000000000000000000"]
-        call.jsonType == Boolean
+        call.jsonType.rawClass == Boolean
         call.resultType == Boolean
     }
 
@@ -284,7 +302,7 @@ class EthCommandsSpec extends Specification {
         call.method == "eth_submitHashrate"
         call.params == ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
                         "0xd1fe5700000000000000000000000000d1fe5700000000000000000000000000"]
-        call.jsonType == Boolean
+        call.jsonType.rawClass == Boolean
         call.resultType == Boolean
     }
 
@@ -295,7 +313,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_coinbase"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Address
     }
 
@@ -306,7 +324,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_hashrate"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
     }
 
@@ -317,7 +335,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_mining"
         call.params == []
-        call.jsonType == Boolean
+        call.jsonType.rawClass == Boolean
         call.resultType == Boolean
     }
 
@@ -328,7 +346,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_gasPrice"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Wei
     }
 
@@ -339,7 +357,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_accounts"
         call.params == []
-        call.jsonType == String[]
+        call.jsonType.rawClass == String[]
         call.resultType == Address[]
     }
 
@@ -350,7 +368,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_chainId"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == Long
     }
 
@@ -362,7 +380,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_call"
         call.params == [tx, 'latest']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == HexData
 
         when:
@@ -371,7 +389,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_call"
         call.params == [tx, '0xaafcb3']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == HexData
     }
 
@@ -383,7 +401,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_sendTransaction"
         call.params == [tx]
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == TransactionId
 
         when:
@@ -392,7 +410,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_sendRawTransaction"
         call.params == ['0x00']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == TransactionId
     }
 
@@ -403,7 +421,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_sign"
         call.params == ['0xf45c301e123a068badac079d0cff1a9e4ad51911', '0x1234']
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == HexData
     }
 
@@ -414,7 +432,7 @@ class EthCommandsSpec extends Specification {
         then:
         call.method == "eth_syncing"
         call.params == []
-        call.jsonType == SyncingJson
+        call.jsonType.rawClass == SyncingJson
         call.resultType == SyncingJson
     }
 }

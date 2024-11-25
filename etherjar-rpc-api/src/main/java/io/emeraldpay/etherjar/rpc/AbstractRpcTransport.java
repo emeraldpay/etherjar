@@ -15,6 +15,8 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import com.fasterxml.jackson.databind.JavaType;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -46,7 +48,7 @@ abstract public class AbstractRpcTransport implements RpcTransport<DefaultBatch.
             );
         }
         Map<Integer, DefaultBatch.FutureBatchItem> requests = new HashMap<>(items.size());
-        Map<Integer, Class> responseMapping = new HashMap<>(items.size());
+        Map<Integer, JavaType> responseMapping = new HashMap<>(items.size());
         List<RequestJson<Integer>> rpcRequests = items.stream()
             .map(item -> {
                 RequestJson<Integer> request = new RequestJson<>(
@@ -89,7 +91,7 @@ abstract public class AbstractRpcTransport implements RpcTransport<DefaultBatch.
         return (resp) -> {
             RpcCall<JS, RES> call = requests.get(resp.getId()).getCall();
             if (call != null) {
-                ResponseJson<JS, Integer> castResp = resp.cast(call.getJsonType());
+                ResponseJson<JS, Integer> castResp = resp.cast((Class<JS>) call.getJsonType().getRawClass());
                 return responseJsonConverter.convert(call, castResp);
             }
             return null;

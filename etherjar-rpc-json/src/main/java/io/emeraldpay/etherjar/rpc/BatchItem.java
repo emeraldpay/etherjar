@@ -15,6 +15,8 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import com.fasterxml.jackson.databind.JavaType;
+
 import java.util.Objects;
 
 public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
@@ -27,7 +29,7 @@ public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
     }
 
     @SuppressWarnings("unchecked")
-    public <A, B> BatchItem<PROC, A, B> cast(Class<A> jsType, Class<B> javaType) {
+    public <A, B> BatchItem<PROC, A, B> cast(JavaType jsType, Class<B> javaType) {
         return (BatchItem<PROC, A, B>) this;
     }
 
@@ -87,7 +89,7 @@ public abstract class BatchItem<PROC, JS, RES> implements AutoCloseable {
         } else if (resp.getResult() == null) {
             onComplete(null);
             return true;
-        } else if (!call.getJsonType().isAssignableFrom(resp.getResult().getClass())) {
+        } else if (!call.getJsonType().getRawClass().isAssignableFrom(resp.getResult().getClass())) {
             throw new ClassCastException("Expected " + call.getJsonType() + " but received " + resp.getResult().getClass());
         } else {
             onComplete((JS) resp.getResult());

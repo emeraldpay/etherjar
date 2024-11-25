@@ -17,7 +17,8 @@
 
 package io.emeraldpay.etherjar.rpc
 
-
+import com.fasterxml.jackson.databind.type.TypeFactory
+import io.emeraldpay.etherjar.hex.HexQuantity
 import io.emeraldpay.etherjar.rpc.json.BlockJson
 import io.emeraldpay.etherjar.rpc.json.TraceItemJson
 import io.emeraldpay.etherjar.rpc.json.TransactionJson
@@ -38,7 +39,7 @@ class JacksonRpcConverterSpec extends Specification {
         setup:
         InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("batch/one-item.json")
         def target = [
-                1: TransactionJson
+                1: TypeFactory.defaultInstance().constructType(TransactionJson)
         ]
         when:
         def act = jacksonRpcConverter.parseBatch(json, target)
@@ -55,9 +56,9 @@ class JacksonRpcConverterSpec extends Specification {
         setup:
         InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("batch/similar-items.json")
         def target = [
-                1: BlockJson,
-                2: BlockJson,
-                3: BlockJson
+                1: TypeFactory.defaultInstance().constructType(BlockJson),
+                2: TypeFactory.defaultInstance().constructType(BlockJson),
+                3: TypeFactory.defaultInstance().constructType(BlockJson)
         ]
         when:
         def act = jacksonRpcConverter.parseBatch(json, target)
@@ -81,12 +82,12 @@ class JacksonRpcConverterSpec extends Specification {
         setup:
         InputStream json = JacksonEthRpcConverterSpec.classLoader.getResourceAsStream("batch/many-items.json")
         def target = [
-                1: BlockJson,
-                2: TransactionJson,
-                3: Boolean,
-                4: String,
-                5: String,
-                6: String
+                1: TypeFactory.defaultInstance().constructType(BlockJson),
+                2: TypeFactory.defaultInstance().constructType(TransactionJson),
+                3: TypeFactory.defaultInstance().constructType(Boolean),
+                4: TypeFactory.defaultInstance().constructType(String),
+                5: TypeFactory.defaultInstance().constructType(String),
+                6: TypeFactory.defaultInstance().constructType(String)
         ]
         when:
         def act = jacksonRpcConverter.parseBatch(json, target)
@@ -112,5 +113,21 @@ class JacksonRpcConverterSpec extends Specification {
 
         act[5].id == 5
         act[5].result == "0x435901"
+    }
+
+    def "Can parse a list"() {
+        setup:
+        def rpcCall = RpcCall.create("test", HexQuantity.class).asArray()
+        def json = '{"id":1, "result": ["0x123", "0x456", "0x789"]}'
+        when:
+        def act = jacksonRpcConverter.fromJson(new ByteArrayInputStream(json.getBytes()), rpcCall.jsonType)
+        then:
+        act instanceof HexQuantity[]
+        with(act as HexQuantity[]) {
+            size() == 3
+            it[0] == HexQuantity.from("0x123")
+            it[1] == HexQuantity.from("0x456")
+            it[2] == HexQuantity.from("0x789")
+        }
     }
 }

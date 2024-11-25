@@ -15,12 +15,14 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import com.fasterxml.jackson.databind.JavaType;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class BatchCallContext<T extends BatchItem> {
     private final Map<Integer, T> sourceMapping = new HashMap<>();
-    private final Map<Integer, Class> jsonTypes = new HashMap<>();
+    private final Map<Integer, JavaType> jsonTypes = new HashMap<>();
     private final Map<RpcCall, T> callMapping = new HashMap<>();
 
     public int add(T item) {
@@ -31,7 +33,7 @@ public class BatchCallContext<T extends BatchItem> {
         return current;
     }
 
-    public Map<Integer, Class> getJsonTypes() {
+    public Map<Integer, JavaType> getJsonTypes() {
         return jsonTypes;
     }
 

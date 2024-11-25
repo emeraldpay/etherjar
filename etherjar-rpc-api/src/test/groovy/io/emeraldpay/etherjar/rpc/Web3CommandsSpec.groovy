@@ -15,6 +15,7 @@
  */
 package io.emeraldpay.etherjar.rpc
 
+import io.emeraldpay.etherjar.hex.Hex32
 import io.emeraldpay.etherjar.hex.HexData
 import spock.lang.Specification
 
@@ -27,7 +28,7 @@ class Web3CommandsSpec extends Specification {
         then:
         call.method == "web3_clientVersion"
         call.params == []
-        call.jsonType == String
+        call.jsonType.rawClass == String
         call.resultType == String
     }
 
@@ -38,7 +39,7 @@ class Web3CommandsSpec extends Specification {
         then:
         call.method == "web3_sha3"
         call.params == ["0x00"]
-        call.jsonType == String
-        call.resultType == io.emeraldpay.etherjar.hex.Hex32
+        call.jsonType.rawClass == String
+        call.resultType == Hex32
     }
 }

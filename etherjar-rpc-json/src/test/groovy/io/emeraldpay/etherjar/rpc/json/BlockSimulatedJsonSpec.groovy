@@ -11,6 +11,7 @@ import io.emeraldpay.etherjar.hex.Hex32
 import io.emeraldpay.etherjar.hex.HexData
 import io.emeraldpay.etherjar.hex.HexQuantity
 import io.emeraldpay.etherjar.rpc.JacksonRpcConverter
+import io.emeraldpay.etherjar.rpc.RpcCall
 import spock.lang.Specification
 
 import java.time.Instant
@@ -124,5 +125,32 @@ class BlockSimulatedJsonSpec extends Specification {
         act.calls[0] == block1.calls[0]
         act.calls[1] == block1.calls[1]
         act == block1
+    }
+
+    def "Decodes full JSON RPC response"() {
+        setup:
+        String json = BlockSimulatedJsonSpec.classLoader.getResourceAsStream("simulate/simulated-1.json").text
+        String jsonRpc = """
+            {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "result": [$json]
+            }
+        """
+        // as in EthCommands
+        def rpcCall = RpcCall.create("eth_simulateV1", BlockSimulatedJson.class, "foor", "latest").asArray();
+
+        when:
+        def act = jacksonRpcConverter.fromJson(new ByteArrayInputStream(jsonRpc.bytes), rpcCall.jsonType)
+
+        then:
+        act instanceof BlockSimulatedJson[]
+        with (act as BlockSimulatedJson[]) {
+            it[0].calls.size() == block1.calls.size()
+            it[0].calls.size() == 2
+            it[0].calls[0] == block1.calls[0]
+            it[0].calls[1] == block1.calls[1]
+            it[0] == block1
+        }
     }
 }

@@ -17,11 +17,11 @@
 
 package io.emeraldpay.etherjar.rpc.json
 
+import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.etherjar.domain.Wei
 import io.emeraldpay.etherjar.hex.HexData
 import io.emeraldpay.etherjar.rpc.JacksonRpcConverter
-import io.emeraldpay.etherjar.rpc.TraceList
-import io.emeraldpay.etherjar.rpc.json.TraceItemJson
+
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
@@ -40,7 +40,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0x16cb69.json")
 
         when:
-        def act = jacksonRpcConverter.fromJson(json, TraceList.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 1
@@ -65,7 +65,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0x19442f.json")
 
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 2
@@ -107,7 +107,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0xdc6c6d.json")
 
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 3
@@ -131,7 +131,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0x5c1969-eth.json")
 
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 1
@@ -155,7 +155,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0x847149.json")
 
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 236
@@ -169,7 +169,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0xb9c321.json")
 
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 2
@@ -185,7 +185,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0x02e508.json")
 
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 2642
@@ -202,7 +202,7 @@ class TraceItemJsonSpec extends Specification {
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0x0cbb36.json")
 
         when:
-        def act = jacksonRpcConverter.fromJson(json, TraceList.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
 
         then:
         act.size() == 3
@@ -231,7 +231,7 @@ class TraceItemJsonSpec extends Specification {
         setup:
         InputStream json = TraceItemJsonSpec.classLoader.getResourceAsStream("trace/0xdc6c6d.json")
         when:
-        def act = jacksonRpcConverter.fromJsonList(json, TraceItemJson.class)
+        def act = jacksonRpcConverter.fromJson(json, TypeFactory.defaultInstance().constructArrayType(TraceItemJson)) as List<TraceItemJson>
         then:
         act.size() == 3
         act[0].transactionHash.toHex() == '0xdc6c6d169946767dc3448848c1dd82e6286ac939aadeac8450ab959cac7da54d'

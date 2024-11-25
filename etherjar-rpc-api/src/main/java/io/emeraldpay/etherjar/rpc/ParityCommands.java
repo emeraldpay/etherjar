@@ -16,6 +16,7 @@
 package io.emeraldpay.etherjar.rpc;
 
 import io.emeraldpay.etherjar.domain.TransactionId;
+import io.emeraldpay.etherjar.rpc.json.TraceItemJson;
 
 /**
  * Commands specific for Parity Ethereum
@@ -28,7 +29,7 @@ public class ParityCommands {
      * @param hash hash of the transaction
      * @return trace list
      */
-    public RpcCall<TraceList, TraceList> traceTransaction(TransactionId hash) {
-        return RpcCall.create("trace_transaction", TraceList.class, hash.toHex());
+    public RpcCall<TraceItemJson[], TraceItemJson[]> traceTransaction(TransactionId hash) {
+        return RpcCall.create("trace_transaction", TraceItemJson.class, hash.toHex()).asArray();
     }
 }
