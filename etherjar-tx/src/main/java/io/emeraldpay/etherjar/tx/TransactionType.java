@@ -23,7 +23,7 @@ public enum TransactionType {
     /**
      * A standard transaction available in Ethereum from the beginning
      */
-    STANDARD((byte)-1),
+    STANDARD(null),
 
     /**
      * Transaction with Access List introduced by EIP-2930 and available since Berlin Fork of Ethereum Mainnet.
@@ -42,9 +42,9 @@ public enum TransactionType {
      */
     BLOB((byte)3);
 
-    private final byte flag;
+    private final Byte flag;
 
-    TransactionType(byte flag) {
+    TransactionType(Byte flag) {
         this.flag = flag;
     }
 
@@ -83,11 +83,27 @@ public enum TransactionType {
         throw new IllegalArgumentException("Unsupported type: 0x" + Integer.toHexString(u));
     }
 
-    public byte getFlag() {
+    public static TransactionType fromTransaction(Transaction tx) {
+        return tx.getType();
+    }
+
+    /**
+     * A byte to prepend to the transaction when encode in Raw
+     *
+     * @return the byte for EIP-2718 type, or null for other transactions
+     */
+    public Byte getFlag() {
         return flag;
     }
 
-    public boolean isFlagPrefixed() {
-        return this == STANDARD;
+    /**
+     * Check if this type is actually an EIP-2718 type (which also means it's a part of the Raw Transaction, etc.).
+     * I.e. the Legacy / Standard transaction is not an EIP-2718 type, but all other types are.
+     *
+     * @see <a href="https://eips.ethereum.org/EIPS/eip-2718">EIP-2718</a>
+     * @return true if this type is an EIP-2718 type
+     */
+    public boolean is2718() {
+        return this != STANDARD;
     }
 }
