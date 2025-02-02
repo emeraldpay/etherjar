@@ -37,12 +37,12 @@ public class TransactionEncoder {
         }
         if (tx.getType() == TransactionType.STANDARD) {
             if (includeSignature) {
-                return encodeStandard(tx, true, null);
+                return encodeLegacy(tx, true, null);
             } else {
                 Signature signature = tx.getSignature();
                 if (signature.getType() == SignatureType.EIP155) {
                     int chainId = ((SignatureEIP155)signature).getChainId();
-                    return encodeStandard(tx, false, chainId);
+                    return encodeLegacy(tx, false, chainId);
                 } else {
                     throw new IllegalStateException("Neither signature nor chainId specified");
                 }
@@ -51,7 +51,16 @@ public class TransactionEncoder {
         throw new IllegalStateException("Unsupported transaction type: " + tx.getType());
     }
 
-    protected byte[] encodeStandard(Transaction tx, boolean includeSignature, Integer chainId) {
+    /**
+     * Encode a Legacy transaction (pre EIP-2718 which introduces a new RLP format).
+     * For legacy transaction you have to encode either the signature or the chainId for unsigned transaction.
+     *
+     * @param tx legacy transaction
+     * @param includeSignature if true, include signature, if false include chainId
+     * @param chainId chain id to include in the transaction if signature is not specified
+     * @return RLP encoded transaction
+     */
+    public byte[] encodeLegacy(Transaction tx, boolean includeSignature, Integer chainId) {
         RlpWriter wrt = new RlpWriter();
         wrt.startList()
             .write(tx.getNonce())
