@@ -19,10 +19,7 @@ import io.emeraldpay.etherjar.domain.Address;
 import io.emeraldpay.etherjar.hex.Hex32;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Transaction encoded with Address Access List (EIP-2930)
@@ -35,6 +32,20 @@ public class TransactionWithAccess extends Transaction {
 
     private int chainId;
     private List<Access> accessList = Collections.emptyList();
+
+    public TransactionWithAccess() {
+    }
+
+    public TransactionWithAccess(TransactionWithAccess other) {
+        super(other);
+        this.chainId = other.chainId;
+        if (other.accessList != null) {
+            this.accessList = new ArrayList<>(other.accessList.size());
+            for (Access access : other.accessList) {
+                this.accessList.add(new Access(access));
+            }
+        }
+    }
 
     public List<Access> getAccessList() {
         return accessList;
@@ -104,6 +115,12 @@ public class TransactionWithAccess extends Transaction {
 
         public Access(Address address, Hex32... storageKeys) {
             this(address, Arrays.asList(storageKeys));
+        }
+
+        public Access(Access other) {
+            this.address = other.address;
+            this.storageKeys = new ArrayList<>();
+            this.storageKeys.addAll(other.storageKeys);
         }
 
         public Address getAddress() {

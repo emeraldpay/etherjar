@@ -44,6 +44,21 @@ public class Transaction {
      */
     protected transient TransactionId transactionId;
 
+    public Transaction() {
+    }
+
+    public Transaction(Transaction other) {
+        this.nonce = other.nonce;
+        this.gasPrice = other.gasPrice;
+        this.gas = other.gas;
+        this.to = other.to;
+        this.value = other.value;
+        this.data = other.data;
+        if (other.signature != null) {
+            this.signature = Signature.copyOf(other.signature);
+        }
+    }
+
     public long getNonce() {
         return nonce;
     }
@@ -207,5 +222,20 @@ public class Transaction {
             ", value=" + value +
             ", data=" + data +
             '}';
+    }
+
+    public static Transaction copyOf(Transaction other) {
+        if (other == null) {
+            return null;
+        }
+        if (other instanceof TransactionWithBlob) {
+            return new TransactionWithBlob((TransactionWithBlob)other);
+        } else if (other instanceof TransactionWithGasPriority) {
+            return new TransactionWithGasPriority((TransactionWithGasPriority)other);
+        } else if (other instanceof TransactionWithAccess) {
+            return new TransactionWithAccess((TransactionWithAccess)other);
+        } else {
+            return new Transaction(other);
+        }
     }
 }

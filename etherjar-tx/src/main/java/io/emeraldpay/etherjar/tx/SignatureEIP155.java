@@ -39,6 +39,11 @@ public class SignatureEIP155 extends Signature {
         this.chainId = chainId;
     }
 
+    public SignatureEIP155(SignatureEIP155 other) {
+        super(other);
+        this.chainId = other.chainId;
+    }
+
     @Override
     public int getRecId() {
         if (getV() == 27 || getV() == 28) {

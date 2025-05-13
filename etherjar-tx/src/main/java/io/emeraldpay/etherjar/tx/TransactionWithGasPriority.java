@@ -45,6 +45,14 @@ public class TransactionWithGasPriority extends TransactionWithAccess {
 
     private Wei priorityGasPrice;
 
+    public TransactionWithGasPriority() {
+    }
+
+    public TransactionWithGasPriority(TransactionWithGasPriority other) {
+        super(other);
+        this.priorityGasPrice = other.priorityGasPrice;
+    }
+
     /**
      * NOTE: same a default {@link #getGasPrice()}
      *

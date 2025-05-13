@@ -37,6 +37,12 @@ public class SignatureEIP2930 extends Signature {
         this.chainId = chainId;
     }
 
+    public SignatureEIP2930(SignatureEIP2930 other) {
+        super(other);
+        this.yParity = other.yParity;
+        this.chainId = other.chainId;
+    }
+
     public int getYParity() {
         return yParity;
     }

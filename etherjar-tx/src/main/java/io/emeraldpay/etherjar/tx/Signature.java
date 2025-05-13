@@ -54,6 +54,15 @@ public class Signature {
         this.s = s;
     }
 
+    public Signature(Signature other) {
+        if (other.message != null) {
+            this.message = Arrays.copyOf(other.message, other.message.length);
+        }
+        this.v = other.v;
+        this.r = other.r;
+        this.s = other.s;
+    }
+
     public byte[] getMessage() {
         return message;
     }
@@ -119,6 +128,7 @@ public class Signature {
             System.arraycopy(hash, 12, buf, 0, 20);
             Address address = Address.from(buf);
             this.address = address;
+            System.out.println("Signature.recoverAddress: " + address);
             return address;
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,5 +158,18 @@ public class Signature {
     @Override
     public int hashCode() {
         return Objects.hash(r, s);
+    }
+
+    public static Signature copyOf(Signature other) {
+        if (other == null) {
+            return null;
+        }
+        if (other instanceof SignatureEIP2930) {
+            return new SignatureEIP2930((SignatureEIP2930)other);
+        } else if (other instanceof SignatureEIP155) {
+            return new SignatureEIP155((SignatureEIP155)other);
+        } else {
+            return new Signature(other);
+        }
     }
 }

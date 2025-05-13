@@ -4,6 +4,7 @@ import io.emeraldpay.etherjar.domain.Wei;
 import io.emeraldpay.etherjar.hex.Hex32;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,18 @@ public class TransactionWithBlob extends TransactionWithGasPriority {
      * Represents a list of hash outputs from kzg_to_versioned_hash
      */
     private List<Hex32> blobVersionedHashes;
+
+    public TransactionWithBlob() {
+    }
+
+    public TransactionWithBlob(TransactionWithBlob other) {
+        super(other);
+        this.maxFeePerBlobGas = other.maxFeePerBlobGas;
+        if (other.blobVersionedHashes != null) {
+            this.blobVersionedHashes = new ArrayList<>(other.blobVersionedHashes.size());
+            this.blobVersionedHashes.addAll(other.blobVersionedHashes);
+        }
+    }
 
     public Wei getMaxFeePerBlobGas() {
         return maxFeePerBlobGas;
