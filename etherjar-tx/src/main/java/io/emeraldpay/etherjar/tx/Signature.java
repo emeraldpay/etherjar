@@ -128,7 +128,6 @@ public class Signature {
             System.arraycopy(hash, 12, buf, 0, 20);
             Address address = Address.from(buf);
             this.address = address;
-            System.out.println("Signature.recoverAddress: " + address);
             return address;
         } catch (Exception e) {
             e.printStackTrace();

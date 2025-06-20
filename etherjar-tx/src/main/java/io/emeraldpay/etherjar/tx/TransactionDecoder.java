@@ -41,6 +41,9 @@ public class TransactionDecoder {
         if (type == TransactionType.GAS_PRIORITY) {
             return decodeGasPriority(raw);
         }
+        if (type == TransactionType.SET_CODE) {
+            return decodeEIP7702(raw);
+        }
         if (type == TransactionType.BLOB) {
             return decodeBlob(raw);
         }
@@ -116,7 +119,7 @@ public class TransactionDecoder {
     }
 
     public TransactionWithGasPriority decodeGasPriority(byte[] raw) {
-        // rlp([chain_id, nonce, priorityGasPrice, maxGasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])
+        // rlp([chain_id, nonce, priorityGasPrice, maxGasPrice, gasLimit, to, value, data, accessList, yParity, senderR, senderS])
         RlpReader rdr = startReader(raw, 1);
         TransactionWithGasPriority tx = new TransactionWithGasPriority();
 
@@ -131,6 +134,83 @@ public class TransactionDecoder {
         tryReadSignature(rdr, tx);
         ensureFullyRead(rdr);
         return tx;
+    }
+
+    public TransactionWithSetCode decodeEIP7702(byte[] raw) {
+        // rlp([chain_id, nonce, priorityGasPrice, maxGasPrice, gasLimit, to, value, data, accessList, authorizationList, yParity, senderR, senderS])
+        // authorizationList = [[chain_id, address, nonce, yParity, r, s], ...]
+        RlpReader rdr = startReader(raw, 1);
+        TransactionWithSetCode tx = new TransactionWithSetCode();
+        readChainId(rdr, tx);
+        readNonce(rdr, tx);
+        readPriorityGasPrice(rdr, tx);
+        readMaxGasPrice(rdr, tx);
+        readGasLimit(rdr, tx);
+        readBodyPart(rdr, tx);
+        readAccessList(rdr, tx);
+
+        if (rdr.hasNext() && rdr.getType() == RlpType.LIST) {
+            RlpReader authorizationListRdr = rdr.nextList();
+            if (authorizationListRdr.getType() != RlpType.LIST) {
+                throw new IllegalArgumentException("Authorization has invalid RLP encoding. Not a list");
+            }
+            List<TransactionWithSetCode.Authorization> authorizationList = new ArrayList<>();
+            while (authorizationListRdr.hasNext()) {
+                TransactionWithSetCode.Authorization authorization = readAuthorization(authorizationListRdr.nextList());
+                authorizationList.add(authorization);
+            }
+            tx.setAuthorizationList(authorizationList);
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Not a list: Authorization List");
+        }
+
+        tryReadSignature(rdr, tx);
+        ensureFullyRead(rdr);
+        return tx;
+    }
+
+    public TransactionWithSetCode.Authorization readAuthorization(RlpReader rdr) {
+        // rlp([chain_id, address, nonce, yParity, r, s])
+        TransactionWithSetCode.Authorization authorization = new TransactionWithSetCode.Authorization();
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            authorization.setChainId(rdr.nextInt());
+        } else {
+            System.out.println(rdr.getType());
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: ChainID");
+        }
+
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            authorization.setAddress(Address.from(rdr.next()));
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Address");
+        }
+
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            authorization.setNonce(rdr.nextLong());
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: Nonce");
+        }
+
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            int yParity = rdr.nextInt();
+            authorization.setYParity(yParity);
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: yParity");
+        }
+
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            authorization.setR(rdr.nextBigInt());
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: R");
+        }
+
+        if (rdr.hasNext() && rdr.getType() == RlpType.BYTES) {
+            authorization.setS(rdr.nextBigInt());
+        } else {
+            throw new IllegalArgumentException("Transaction has invalid RLP encoding. Cannot extract: S");
+        }
+
+        return authorization;
     }
 
     public TransactionWithBlob decodeBlob(byte[] raw) {

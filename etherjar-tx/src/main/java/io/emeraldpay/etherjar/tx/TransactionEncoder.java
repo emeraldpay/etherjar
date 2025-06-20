@@ -29,6 +29,9 @@ public class TransactionEncoder {
         if (tx.getType() == TransactionType.GAS_PRIORITY) {
             return encode((TransactionWithGasPriority) tx, includeSignature);
         }
+        if (tx.getType() == TransactionType.SET_CODE) {
+            return encode((TransactionWithSetCode) tx, includeSignature);
+        }
         if (tx.getType() == TransactionType.BLOB) {
             return encode((TransactionWithBlob) tx, includeSignature);
         }
@@ -137,6 +140,29 @@ public class TransactionEncoder {
         wrt.closeList();
     }
 
+    private static void writeAuthzList(RlpWriter wrt, TransactionWithSetCode tx) {
+        wrt.startList();
+        for (TransactionWithSetCode.Authorization authz: tx.getAuthorizationList()) {
+            writeAuthz(wrt, authz);
+        }
+        wrt.closeList();
+    }
+
+    private static void writeAuthz(RlpWriter wrt, TransactionWithSetCode.Authorization authz) {
+        wrt.startList()
+            .write(authz.getChainId())
+            .write(authz.getAddress().getBytes())
+            .write(authz.getNonce());
+        if (authz.getYParity() == 0) {
+            wrt.write(0);
+        } else {
+            wrt.write(Integer.valueOf(authz.getYParity()).byteValue());
+        }
+        wrt.write(authz.getR())
+            .write(authz.getS());
+        wrt.closeList();
+    }
+
     private static void writeBlob(RlpWriter wrt, TransactionWithBlob tx) {
         wrt.write(tx.getMaxFeePerBlobGas().getAmount());
         wrt.startList();
@@ -198,6 +224,26 @@ public class TransactionEncoder {
             .write(tx.getGas());
         writeBody(wrt, tx);
         writeAccessList(wrt, tx);
+        if (includeSignature) {
+            writeSignature(wrt, tx.getSignature());
+        }
+        wrt.closeList();
+        return buffer.toByteArray();
+    }
+
+    public byte[] encode(TransactionWithSetCode tx, boolean includeSignature) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(TransactionType.SET_CODE.getFlag());
+        RlpWriter wrt = new RlpWriter(buffer);
+        wrt.startList()
+            .write(tx.getChainId())
+            .write(tx.getNonce())
+            .write(tx.getPriorityGasPrice().getAmount())
+            .write(tx.getMaxGasPrice().getAmount())
+            .write(tx.getGas());
+        writeBody(wrt, tx);
+        writeAccessList(wrt, tx);
+        writeAuthzList(wrt, tx);
         if (includeSignature) {
             writeSignature(wrt, tx.getSignature());
         }

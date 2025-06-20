@@ -40,7 +40,15 @@ public enum TransactionType {
      * Blob transaction
      * @see <a href="https://eips.ethereum.org/EIPS/eip-4844">EIP-4844</a>
      */
-    BLOB((byte)3);
+    BLOB((byte)3),
+
+
+    /**
+     * Transaction with EIP-7702 authorization to set code.
+     * @see <a href="https://eips.ethereum.org/EIPS/eip-7702">EIP-7702</a>
+     */
+    SET_CODE((byte)4)
+    ;
 
     private final Byte flag;
 
@@ -68,6 +76,9 @@ public enum TransactionType {
             //
             if (u == 2) {
                 return TransactionType.GAS_PRIORITY;
+            }
+            if (u == 4) {
+                return TransactionType.SET_CODE;
             }
             if (u == 3) {
                 return TransactionType.BLOB;

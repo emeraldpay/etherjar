@@ -230,6 +230,8 @@ public class Transaction {
         }
         if (other instanceof TransactionWithBlob) {
             return new TransactionWithBlob((TransactionWithBlob)other);
+        } else if (other instanceof TransactionWithSetCode) {
+            return new TransactionWithSetCode((TransactionWithSetCode)other);
         } else if (other instanceof TransactionWithGasPriority) {
             return new TransactionWithGasPriority((TransactionWithGasPriority)other);
         } else if (other instanceof TransactionWithAccess) {

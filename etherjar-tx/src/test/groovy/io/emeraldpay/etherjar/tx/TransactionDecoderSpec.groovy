@@ -19,7 +19,6 @@ import io.emeraldpay.etherjar.domain.Address
 import io.emeraldpay.etherjar.domain.TransactionId
 import io.emeraldpay.etherjar.domain.Wei
 import io.emeraldpay.etherjar.hex.Hex32
-import io.emeraldpay.etherjar.hex.HexData
 import org.apache.commons.codec.binary.Hex
 import org.bouncycastle.jcajce.provider.digest.Keccak
 import spock.lang.Specification
@@ -489,6 +488,140 @@ class TransactionDecoderSpec extends Specification {
             data.isEmpty()
             blobVersionedHashes.size() == 1
             blobVersionedHashes[0].toHex() == "0x0125c9f873a8784a430f9472f3991b42c21da929b2d3800e6925422adc70c26d"
+        }
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
+    }
+
+    def "Parse tx type 4 - 0xcd3768"() {
+        // tx 0xcd3768bfb02d7c4854d03a56c6b0271e1225724689d5b8f79f492bb6346ae2df
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-type4-0xcd376.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+
+        when:
+        def act = decoder.decode(tx)
+
+        then:
+        act.type == TransactionType.SET_CODE
+        with((TransactionWithSetCode)act) {
+            value == Wei.ZERO
+            chainId == 1
+            extractFrom() == Address.from("0x00000C771F6176268D5A9846E0956C3eF58597A1")
+            to == Address.from("0x00000C771F6176268D5A9846E0956C3eF58597A1")
+            gas == 46_000
+            nonce == 218
+            accessList.isEmpty()
+            transactionId().toHex() == "0xcd3768bfb02d7c4854d03a56c6b0271e1225724689d5b8f79f492bb6346ae2df"
+            data.isEmpty()
+            authorizationList.size() == 1
+            with(authorizationList.get(0)) { authz ->
+                authz.address == Address.from("0x63c0c19a282a1B52b07dD5a65b58948A07DAE32B")
+                authz.nonce == 219
+                authz.getYParity() == 0
+                authz.r.toString(16) == "519f3869351fc5cc7228aa9a4db629582db81e96e920c1b1dc3af7075f261c1f"
+                authz.s.toString(16) == "7bd630de81adb24be5655db7583928333a784c13b93e3d0b480a6c2f761a117d"
+                authz.extractFrom() == Address.from("0x00000C771F6176268D5A9846E0956C3eF58597A1")
+            }
+        }
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
+    }
+
+    def "Parse tx type 4 - 0x9979cc"() {
+        // tx 0x9979cc61f13a022170e8395583c8267cc5546da5109421aba18f1faaf62792b5
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-type4-0x9979cc.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+
+        when:
+        def act = decoder.decode(tx)
+
+        then:
+        act.type == TransactionType.SET_CODE
+        with((TransactionWithSetCode)act) {
+            value == Wei.ZERO
+            chainId == 1
+            extractFrom() == Address.from("0x8863786beBE8eB9659DF00b49f8f1eeEc7e2C8c1")
+            to == Address.from("0x38C22D4a1e124B5B864f87fB847D35b312D6D3e5")
+            gas == 155_000
+            nonce == 4135
+            accessList.isEmpty()
+            transactionId().toHex() == "0x9979cc61f13a022170e8395583c8267cc5546da5109421aba18f1faaf62792b5"
+            data.toHex() == "0x5c43fcf6000000000000000000000000b159e3934ffcd49e7942c9b71f48aa6675984ca10000000000000000000000008863786bebe8eb9659df00b49f8f1eeec7e2c8c1"
+            authorizationList.size() == 1
+            with(authorizationList.get(0)) { authz ->
+                authz.address == Address.from("0x6B7879a5d747E30a3ADb37A9e41c046928FCE933")
+                authz.nonce == 19
+                authz.getYParity() == 0
+                authz.r.toString(16) == "3bd708712ffbd345d7437e53747362c4dcf1a26a512a397a7c45ba1629499d02"
+                authz.s.toString(16) == "19ae5d8d88cd741669afd5f1648155cd8bac5dbc7bb88af928182b61806967e0"
+                authz.extractFrom() == Address.from("0xB159E3934Ffcd49E7942C9B71f48Aa6675984CA1")
+            }
+        }
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
+    }
+
+    def "Parse tx type 4 - 0x15104c"() {
+        // tx 0x15104c3616ddd4be8d279d46a50e38bfa4a1f9f591e38a93273636fbfd097580
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-type4-0x15104c.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+
+        when:
+        def act = decoder.decode(tx)
+
+        then:
+        act.type == TransactionType.SET_CODE
+        with((TransactionWithSetCode)act) {
+            value == Wei.ZERO
+            chainId == 1
+            extractFrom() == Address.from("0xc2734b94ceD77Da3298e39e0B4ADc141735f74C7")
+            to == Address.from("0x2F30E943549243c964ce22543F958eFA0fbBf273")
+            gas == 1_000_000
+            nonce == 2708
+            accessList.isEmpty()
+            transactionId().toHex() == "0x15104c3616ddd4be8d279d46a50e38bfa4a1f9f591e38a93273636fbfd097580"
+            data.isEmpty()
+            authorizationList.size() == 3
+
+            with(authorizationList.get(0)) { authz ->
+                authz.address == Address.from("0xB6785B782571980b3Ddb5d40659f4861fF15AA02")
+                authz.nonce == 818
+                authz.getYParity() == 0
+                authz.r.toString(16) == "1b48360a9d04c799ba99a162b6ec4a2bfeac21a81b0ed918c1016e488bbec918"
+                authz.s.toString(16) == "4e284796f5ccc6b9797e573e4fd5c6baeda7e5bd9cc41e6e6f4944783c5af6dc"
+                authz.extractFrom() == Address.from("0xd5CFDf472291d2D92Cd23C1DCd091b00f8E54552")
+            }
+            with(authorizationList.get(1)) { authz ->
+                authz.address == Address.from("0xB6785B782571980b3Ddb5d40659f4861fF15AA02")
+                authz.nonce == 38
+                authz.getYParity() == 0
+                authz.r.toString(16) == "f53528694a90ce5950af32ca7006a20349f6635d91c7d55802af41223a8ab8eb"
+                authz.s.toString(16) == "11921664bf9445396f53a8618a09529fe4376c14c6d9217ffd73a1dfdd39caec"
+                authz.extractFrom() == Address.from("0xf1b1312986998b254193D4d96Ed1E71E6eFd5deF")
+            }
+            with(authorizationList.get(2)) { authz ->
+                authz.address == Address.from("0xB6785B782571980b3Ddb5d40659f4861fF15AA02")
+                authz.nonce == 2645
+                authz.getYParity() == 1
+                authz.r.toString(16) == "f89da0852775ce00ae8aaad5bec8162c5c231ea75c2b7884bf541bce735199fa"
+                authz.s.toString(16) == "741030799032844dd2e9daac578492afd37ce76f91f549e7b92413f04b2fcd8b"
+                authz.extractFrom() == Address.from("0x3e542154cc3b20F34f10cd816850C7569b0119b1")
+            }
         }
 
         when:
