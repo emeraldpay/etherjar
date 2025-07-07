@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2020 EmeraldPay Inc, All Rights Reserved.
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2025 EmeraldPay Ltd, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +14,11 @@
  * limitations under the License.
  */
 
-rootProject.name = 'etherjar'
+package io.emeraldpay.etherjar.rpc.ktor
 
-include "etherjar-abi",
-    "etherjar-contract",
-    "etherjar-domain",
-    "etherjar-erc20",
-    "etherjar-hex",
-    "etherjar-rlp",
-    "etherjar-rpc-json",
-    "etherjar-rpc-api",
-    "etherjar-rpc-emerald",
-    "etherjar-rpc-http",
-    "etherjar-rpc-ktor",
-    "etherjar-rpc-ws",
-    "etherjar-solidity",
-    "etherjar-tx"
+import io.emeraldpay.etherjar.rpc.RpcCallResponse
+import java.io.Closeable
 
+interface CoroutineRpcTransport : Closeable {
+    suspend fun execute(items: List<CoroutineBatchItem<*, *>>): List<RpcCallResponse<*, *>>
+}

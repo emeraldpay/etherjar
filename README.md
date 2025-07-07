@@ -28,6 +28,9 @@ Structure of dependencies between modules:
   * `etherjar-hex`
 * `etherjar-rpc-emerald`
   * `etherjar-rpc-api`
+* `etherjar-rpc-ktor`
+  * `etherjar-rpc-api`
+  * `etherjar-rpc-json`
 * `etherjar-rpc-http`
   * `etherjar-rpc-api`
   * `etherjar-domain`
@@ -62,6 +65,7 @@ where
 * `etherjar-rpc-json` - JSON mapping to/from Java objects
 * `etherjar-rpc-api` - [JSON-RPC API](https://github.com/ethereum/wiki/wiki/JSON-RPC) generic
   implementation
+* `etherjar-rpc-ktor` - Kotlin with coroutines transport implementation for JSON-RPC API data-layer
 * `etherjar-rpc-emerald` - gRPC transport,
   see [Emerald Dshackle](https://github.com/emeraldpay/dshackle)
 * `etherjar-rpc-http` - HTTP transport implementation for JSON-RPC API data-layer
