@@ -6,7 +6,7 @@ repositories {
 
 dependencies {
     api project(':etherjar-rpc-api')
-    api ("io.emeraldpay:emerald-api:0.12-alpha.5") {
+    api ("io.emeraldpay:emerald-api:0.13.0") {
         exclude group: "io.grpc"
     }
     implementation 'io.grpc:grpc-netty:1.53.0'
