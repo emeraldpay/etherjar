@@ -16,16 +16,13 @@
 package io.emeraldpay.etherjar.tx;
 
 import io.emeraldpay.etherjar.domain.Address;
-import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
-import io.emeraldpay.etherjar.hex.HexQuantity;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
-import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.math.ec.ECAlgorithms;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECPoint;
@@ -58,15 +55,35 @@ public class Signer {
     }
 
     /**
+     * Get an EIP-191 message signer instance.
+     *
+     * @return EIP-191 message signer
+     */
+    public EIP191MessageSigner getEIP191MessageSigner() {
+        return new EIP191MessageSigner(this);
+    }
+
+    /**
+     * Get an EIP-712 message signer instance.
+     *
+     * @return EIP-712 message signer
+     */
+    public EIP712MessageSigner getEIP712MessageSigner() {
+        return new EIP712MessageSigner(this);
+    }
+
+    /**
      * Sign a message with Private Key as by EIP-191
      *
      * @param msg message to sign
      * @param pk signer private key
      * @return signature
      * @see <a href="https://eips.ethereum.org/EIPS/eip-191">EIP-191</a>
+     * @deprecated Use {@link #getEIP191MessageSigner()} instead
      */
+    @Deprecated
     public Signature signMessage(String msg, PrivateKey pk) {
-        return signMessage(msg.getBytes(), pk);
+        return getEIP191MessageSigner().signMessage(msg, pk);
     }
 
     /**
@@ -76,10 +93,11 @@ public class Signer {
      * @param pk signer private key
      * @return signature
      * @see <a href="https://eips.ethereum.org/EIPS/eip-191">EIP-191</a>
+     * @deprecated Use {@link #getEIP191MessageSigner()} instead
      */
+    @Deprecated
     public Signature signMessage(byte[] msg, PrivateKey pk) {
-        byte[] hash = getMessageHash(msg);
-        return create(hash, pk, SignatureType.LEGACY);
+        return getEIP191MessageSigner().signMessage(msg, pk);
     }
 
     /**
@@ -89,9 +107,11 @@ public class Signer {
      * @param pk signer private key
      * @return signature
      * @see <a href="https://eips.ethereum.org/EIPS/eip-191">EIP-191</a>
+     * @deprecated Use {@link #getEIP191MessageSigner()} instead
      */
+    @Deprecated
     public HexData signMessageEncoded(String msg, PrivateKey pk) {
-        return signMessageEncoded(msg.getBytes(), pk);
+        return getEIP191MessageSigner().signMessageEncoded(msg, pk);
     }
 
     /**
@@ -101,13 +121,11 @@ public class Signer {
      * @param pk signer private key
      * @return signature
      * @see <a href="https://eips.ethereum.org/EIPS/eip-191">EIP-191</a>
+     * @deprecated Use {@link #getEIP191MessageSigner()} instead
      */
+    @Deprecated
     public HexData signMessageEncoded(byte[] msg, PrivateKey pk) {
-        Signature signature = signMessage(msg, pk);
-
-        return Hex32.extendFrom(toBytes(signature.getR()))
-            .concat(Hex32.extendFrom(toBytes(signature.getS())))
-            .concat(HexQuantity.from((long)signature.getV()).asData());
+        return getEIP191MessageSigner().signMessageEncoded(msg, pk);
     }
 
     /**
@@ -117,9 +135,11 @@ public class Signer {
      * @param encodedSignature signature
      * @param signer address of the signer
      * @return true if signature is valid
+     * @deprecated Use {@link #getEIP191MessageSigner()} instead
      */
+    @Deprecated
     public boolean verifyMessageSignature(String msg, HexData encodedSignature, Address signer) {
-        return verifyMessageSignature(msg.getBytes(), encodedSignature, signer);
+        return getEIP191MessageSigner().verifyMessageSignature(msg, encodedSignature, signer);
     }
 
     /**
@@ -129,39 +149,11 @@ public class Signer {
      * @param encodedSignature signature
      * @param signer address of the signer
      * @return true if signature is valid
+     * @deprecated Use {@link #getEIP191MessageSigner()} instead
      */
+    @Deprecated
     public boolean verifyMessageSignature(byte[] msg, HexData encodedSignature, Address signer) {
-        if (encodedSignature.getSize() < Hex32.SIZE_BYTES + Hex32.SIZE_BYTES + 1) {
-            throw new IllegalArgumentException("Signature is too short");
-        }
-        BigInteger r = new BigInteger(1, Hex32.from(encodedSignature.extract(Hex32.SIZE_BYTES)).getBytes());
-        BigInteger s = new BigInteger(1, Hex32.from(encodedSignature.extract(Hex32.SIZE_BYTES, Hex32.SIZE_BYTES)).getBytes());
-        BigInteger v = encodedSignature.extract(encodedSignature.getSize() - (Hex32.SIZE_BYTES + Hex32.SIZE_BYTES), Hex32.SIZE_BYTES + Hex32.SIZE_BYTES).asQuantity().getValue();
-        if (v.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-            throw new IllegalStateException("V is too large for int value: " + v);
-        }
-        byte[] hash = getMessageHash(msg);
-        Signature signatureDetails = new Signature(hash, v.intValue(), r, s);
-        return signatureDetails.recoverAddress().equals(signer);
-    }
-
-    protected byte[] getMessageHash(byte[] msg) {
-        Keccak.Digest256 digest = new Keccak.Digest256();
-        digest.update((byte)0x19);
-        digest.update("Ethereum Signed Message:\n".getBytes());
-        digest.update(Integer.toString(msg.length).getBytes());
-        digest.update(msg);
-        return digest.digest();
-    }
-
-    private byte[] toBytes(BigInteger value) {
-        byte[] b = value.toByteArray();
-        if (b[0] == 0x00) {
-            byte[] tail = new byte[b.length - 1];
-            System.arraycopy(b, 1, tail, 0, tail.length);
-            return tail;
-        }
-        return b;
+        return getEIP191MessageSigner().verifyMessageSignature(msg, encodedSignature, signer);
     }
 
     public Signature sign(Transaction tx, PrivateKey pk) {
