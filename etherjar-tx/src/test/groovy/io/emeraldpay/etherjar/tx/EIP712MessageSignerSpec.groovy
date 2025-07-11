@@ -398,13 +398,12 @@ class EIP712MessageSignerSpec extends Specification {
 
         when:
         def signature = signer.signTypedData(dataHashes, pk)
-        def encodedSignature = signer.encodeSignature(signature)
 
         then:
-        encodedSignature == HexData.from("0x34ad89a26f346e7c488bfb9a1f4078b415a6fe4f0fdca025653b9b833545fb7c4f07ce6e0cfc93f1d5dcae29704955b3b7d6dcdbc8509933a0940b5242c2761c1b")
+        signature.encode() == HexData.from("0x34ad89a26f346e7c488bfb9a1f4078b415a6fe4f0fdca025653b9b833545fb7c4f07ce6e0cfc93f1d5dcae29704955b3b7d6dcdbc8509933a0940b5242c2761c1b")
 
         when:
-        def valid = signer.verifyTypedDataSignature(dataHashes, encodedSignature, signerAddress)
+        def valid = signer.verifyTypedDataSignature(dataHashes, signature.encode(), signerAddress)
 
         then:
         valid

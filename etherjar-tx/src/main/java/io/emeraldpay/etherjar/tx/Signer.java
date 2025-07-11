@@ -50,6 +50,16 @@ public class Signer {
         this.chainId = chainId;
     }
 
+    /**
+     * Creates a signer instance for the mainnet (chainId=1).
+     */
+    public Signer() {
+        this(1);
+    }
+
+    /**
+     * Creates a signer instance for the mainnet (chainId=1).
+     */
     public static Signer newMainnet() {
         return new Signer(1);
     }

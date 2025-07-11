@@ -17,6 +17,8 @@
 package io.emeraldpay.etherjar.tx;
 
 import io.emeraldpay.etherjar.domain.Address;
+import io.emeraldpay.etherjar.hex.Hex32;
+import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import java.math.BigInteger;
@@ -63,6 +65,32 @@ public class Signature {
         this.s = other.s;
     }
 
+    /**
+     * Extract signature from R, S, V encoded as 65 bytes.
+     *
+     * @param encoded R, S, V encoded as 65 bytes
+     * @return signature without the message
+     */
+    public static Signature fromEncoded(byte[] encoded) {
+        if (encoded == null || encoded.length != 65) {
+            throw new IllegalArgumentException("Invalid signature length: " + (encoded == null ? 0 : encoded.length));
+        }
+        BigInteger r = new BigInteger(1, Arrays.copyOfRange(encoded, 0, 32));
+        BigInteger s = new BigInteger(1, Arrays.copyOfRange(encoded, 32, 64));
+        int v = encoded[64] & 0xFF;
+        return new Signature(null, v, r, s);
+    }
+
+    /**
+     * Extract signature from R, S, V encoded as 65 bytes.
+     *
+     * @param encoded R, S, V encoded as 65 bytes
+     * @return signature without the message
+     */
+    public static Signature fromEncoded(HexData encoded) {
+        return Signature.fromEncoded(encoded.getBytes());
+    }
+
     public byte[] getMessage() {
         return message;
     }
@@ -70,6 +98,28 @@ public class Signature {
     public void setMessage(byte[] message) {
         this.address = null;
         this.message = message;
+    }
+
+    /**
+     * Creates a copy of this signature with a new message.
+     *
+     * @param message the message that was signed
+     * @return a copy of this signature with the new message set
+     */
+    public Signature withMessage(byte[] message) {
+        Signature copy = new Signature(this);
+        copy.setMessage(message);
+        return copy;
+    }
+
+    /**
+     * Creates a copy of this signature with a new message.
+     *
+     * @param message the message that was signed
+     * @return a copy of this signature with the new message set
+     */
+    public Signature withMessage(Hex32 message) {
+        return this.withMessage(message.getBytes());
     }
 
     public SignatureType getType() {
@@ -101,6 +151,25 @@ public class Signature {
     public void setS(BigInteger s) {
         this.address = null;
         this.s = s;
+    }
+
+    /**
+     * Encodes signature as R, S, V in 65 bytes.
+     *
+     * @return encoded signature
+     */
+    public HexData encode() {
+        if (r == null || s == null) {
+            throw new IllegalStateException("Signature R/S are not set");
+        }
+        if (v < 0 || v > 255) {
+            throw new IllegalStateException("Signature V is not set or invalid: " + v);
+        }
+        return HexData.combine(
+            Hex32.extendFrom(r),
+            Hex32.extendFrom(s),
+            HexData.from((byte)v)
+        );
     }
 
     /**

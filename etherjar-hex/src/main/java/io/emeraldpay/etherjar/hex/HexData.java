@@ -74,6 +74,10 @@ public class HexData implements Serializable {
         return new HexData(BigInteger.valueOf(value).toByteArray());
     }
 
+    public static HexData from(byte value) {
+        return new HexData(new byte[]{ value });
+    }
+
     /**
      * Parse hex representation for a number, should start with {@code 0x}.
      *

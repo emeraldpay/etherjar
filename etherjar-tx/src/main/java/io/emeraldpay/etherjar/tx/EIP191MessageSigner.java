@@ -25,26 +25,26 @@ import java.math.BigInteger;
 
 /**
  * EIP-191 message signer implementation for Ethereum personal messages.
- * 
+ *
  * <p>This class provides functionality to sign and verify messages according to the EIP-191 specification
  * for Ethereum Signed Messages. The standard prefixes messages with "\x19Ethereum Signed Message:\n"
  * followed by the message length before hashing with Keccak-256.</p>
- * 
+ *
  * @see <a href="https://eips.ethereum.org/EIPS/eip-191">EIP-191: Signed Data Standard</a>
  */
 public class EIP191MessageSigner {
-    
+
     private final Signer signer;
-    
+
     /**
      * Creates a new EIP-191 message signer.
-     * 
+     *
      * @param signer the underlying signer instance
      */
     public EIP191MessageSigner(Signer signer) {
         this.signer = signer;
     }
-    
+
     /**
      * Sign a message with Private Key as by EIP-191.
      *
@@ -92,10 +92,7 @@ public class EIP191MessageSigner {
      */
     public HexData signMessageEncoded(byte[] msg, PrivateKey pk) {
         Signature signature = signMessage(msg, pk);
-
-        return Hex32.extendFrom(toBytes(signature.getR()))
-            .concat(Hex32.extendFrom(toBytes(signature.getS())))
-            .concat(HexQuantity.from((long)signature.getV()).asData());
+        return signature.encode();
     }
 
     /**
@@ -119,25 +116,16 @@ public class EIP191MessageSigner {
      * @return true if signature is valid
      */
     public boolean verifyMessageSignature(byte[] msg, HexData encodedSignature, Address signer) {
-        if (encodedSignature.getSize() < Hex32.SIZE_BYTES + Hex32.SIZE_BYTES + 1) {
-            throw new IllegalArgumentException("Signature is too short");
-        }
-        BigInteger r = new BigInteger(1, Hex32.from(encodedSignature.extract(Hex32.SIZE_BYTES)).getBytes());
-        BigInteger s = new BigInteger(1, Hex32.from(encodedSignature.extract(Hex32.SIZE_BYTES, Hex32.SIZE_BYTES)).getBytes());
-        BigInteger v = encodedSignature.extract(encodedSignature.getSize() - (Hex32.SIZE_BYTES + Hex32.SIZE_BYTES), Hex32.SIZE_BYTES + Hex32.SIZE_BYTES).asQuantity().getValue();
-        if (v.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-            throw new IllegalStateException("V is too large for int value: " + v);
-        }
-        byte[] hash = getMessageHash(msg);
-        Signature signatureDetails = new Signature(hash, v.intValue(), r, s);
-        return signatureDetails.recoverAddress().equals(signer);
+        Signature signature = Signature.fromEncoded(encodedSignature)
+            .withMessage(getMessageHash(msg));
+        return signature.recoverAddress().equals(signer);
     }
 
     /**
      * Calculate the EIP-191 hash of a message.
-     * 
+     *
      * <p>The hash is calculated as keccak256("\x19Ethereum Signed Message:\n" + len(message) + message)</p>
-     * 
+     *
      * @param msg the message to hash
      * @return the Keccak-256 hash of the EIP-191 formatted message
      */
@@ -150,13 +138,4 @@ public class EIP191MessageSigner {
         return digest.digest();
     }
 
-    private byte[] toBytes(BigInteger value) {
-        byte[] b = value.toByteArray();
-        if (b[0] == 0x00) {
-            byte[] tail = new byte[b.length - 1];
-            System.arraycopy(b, 1, tail, 0, tail.length);
-            return tail;
-        }
-        return b;
-    }
 }

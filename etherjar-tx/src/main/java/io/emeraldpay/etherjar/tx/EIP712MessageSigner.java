@@ -184,16 +184,7 @@ public class EIP712MessageSigner {
      */
     public HexData signTypedDataEncoded(TypedData typedData, PrivateKey pk) {
         Signature signature = signTypedData(typedData, pk);
-        return encodeSignature(signature);
-    }
-
-    public static HexData encodeSignature(Signature signature) {
-        if (signature.getType() != SignatureType.LEGACY) {
-            throw new IllegalArgumentException("Signature type must be LEGACY for EIP-712");
-        }
-        return Hex32.extendFrom(signature.getR())
-            .concat(Hex32.extendFrom(signature.getS()))
-            .concat(HexQuantity.from((long)signature.getV()).asData());
+        return signature.encode();
     }
 
     /**
@@ -217,18 +208,9 @@ public class EIP712MessageSigner {
      * @return true if signature is valid
      */
     public boolean verifyTypedDataSignature(TypedDataHashes typedDataHashes, HexData encodedSignature, Address signer) {
-        if (encodedSignature.getSize() < Hex32.SIZE_BYTES + Hex32.SIZE_BYTES + 1) {
-            throw new IllegalArgumentException("Signature is too short");
-        }
-        BigInteger r = new BigInteger(1, Hex32.from(encodedSignature.extract(Hex32.SIZE_BYTES)).getBytes());
-        BigInteger s = new BigInteger(1, Hex32.from(encodedSignature.extract(Hex32.SIZE_BYTES, Hex32.SIZE_BYTES)).getBytes());
-        BigInteger v = encodedSignature.extract(encodedSignature.getSize() - (Hex32.SIZE_BYTES + Hex32.SIZE_BYTES), Hex32.SIZE_BYTES + Hex32.SIZE_BYTES).asQuantity().getValue();
-        if (v.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-            throw new IllegalStateException("V is too large for int value: " + v);
-        }
-        Hex32 hash = typedDataHashes.getTypedDataHash();
-        Signature signatureDetails = new Signature(hash.getBytes(), v.intValue(), r, s);
-        return signatureDetails.recoverAddress().equals(signer);
+        Signature signature = Signature.fromEncoded(encodedSignature)
+            .withMessage(typedDataHashes.getTypedDataHash());
+        return signature.recoverAddress().equals(signer);
     }
 
     /**
