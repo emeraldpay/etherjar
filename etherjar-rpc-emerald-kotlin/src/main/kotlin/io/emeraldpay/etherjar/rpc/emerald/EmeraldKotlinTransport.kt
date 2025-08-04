@@ -17,21 +17,31 @@ package io.emeraldpay.etherjar.rpc.emerald
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.protobuf.ByteString
+import io.emeraldpay.api.Chain
 import io.emeraldpay.api.proto.BlockchainGrpcKt
 import io.emeraldpay.api.proto.BlockchainOuterClass
 import io.emeraldpay.api.proto.Common
-import io.emeraldpay.api.Chain
-import io.emeraldpay.etherjar.rpc.*
-import io.emeraldpay.etherjar.rpc.kotlin.CoroutineRpcTransport
+import io.emeraldpay.etherjar.rpc.JacksonRpcConverter
+import io.emeraldpay.etherjar.rpc.ResponseJson
+import io.emeraldpay.etherjar.rpc.ResponseJsonConverter
+import io.emeraldpay.etherjar.rpc.RpcCallResponse
+import io.emeraldpay.etherjar.rpc.RpcException
+import io.emeraldpay.etherjar.rpc.RpcResponseError
 import io.emeraldpay.etherjar.rpc.kotlin.CoroutineBatchItem
+import io.emeraldpay.etherjar.rpc.kotlin.CoroutineRpcTransport
 import io.grpc.Channel
 import io.grpc.ClientInterceptor
+import io.grpc.LoadBalancerRegistry
 import io.grpc.ManagedChannel
+import io.grpc.ManagedChannelBuilder
 import io.grpc.netty.NettyChannelBuilder
 import io.netty.handler.ssl.SslContextBuilder
+import java.io.File
 import java.io.IOException
+import java.io.InputStream
 import java.net.URI
 import java.util.concurrent.TimeUnit
+import java.util.function.Function
 import javax.net.ssl.SSLException
 
 /**
@@ -181,6 +191,8 @@ class EmeraldKotlinTransport(
 
     class Builder {
         private var channelBuilder: NettyChannelBuilder? = null
+        private var channelUpdate: Function<NettyChannelBuilder, ManagedChannelBuilder<*>>? = null
+        private var useLoadBalancing = true
         private var sslContextBuilder: SslContextBuilder? = null
         private var channel: Channel? = null
         private var stub: BlockchainGrpcKt.BlockchainCoroutineStub? = null
@@ -257,6 +269,69 @@ class EmeraldKotlinTransport(
         }
 
         /**
+         * Setup x509 certificate for target server
+         *
+         * @param certificate x509 certificate
+         * @return builder
+         */
+        fun trustedCertificate(certificate: InputStream): Builder {
+            if (sslContextBuilder == null) {
+                sslContextBuilder = SslContextBuilder.forClient()
+                channelBuilder!!.useTransportSecurity()
+            }
+            sslContextBuilder = sslContextBuilder!!.trustManager(certificate)
+            return this
+        }
+
+        /**
+         * Setup x509 certificate for target server
+         *
+         * @param certificate x509 certificate
+         * @return builder
+         */
+        fun trustedCertificate(certificate: File): Builder {
+            if (sslContextBuilder == null) {
+                sslContextBuilder = SslContextBuilder.forClient()
+                channelBuilder!!.useTransportSecurity()
+            }
+            sslContextBuilder = sslContextBuilder!!.trustManager(certificate)
+            return this
+        }
+
+        /**
+         * Setup client certificate
+         *
+         * @param certificate x509 certificate
+         * @param key private key for the certificate in PKCS8 format
+         * @return builder
+         */
+        fun clientCertificate(certificate: InputStream, key: InputStream
+        ): Builder {
+            if (sslContextBuilder == null) {
+                sslContextBuilder = SslContextBuilder.forClient()
+                channelBuilder!!.useTransportSecurity()
+            }
+            sslContextBuilder = sslContextBuilder!!.keyManager(certificate, key)
+            return this
+        }
+
+        /**
+         * Setup client certificate
+         *
+         * @param certificate x509 certificate
+         * @param key private key for the certificate in PKCS8 format
+         * @return builder
+         */
+        fun clientCertificate(certificate: File, key: File): Builder {
+            if (sslContextBuilder == null) {
+                sslContextBuilder = SslContextBuilder.forClient()
+                channelBuilder!!.useTransportSecurity()
+            }
+            sslContextBuilder = sslContextBuilder!!.keyManager(certificate, key)
+            return this
+        }
+
+        /**
          * Setup custom ObjectMapper
          *
          * @param objectMapper custom Object Mapper
@@ -301,6 +376,28 @@ class EmeraldKotlinTransport(
         }
 
         /**
+         * Apply a custom modification for the default NettyChannelBuilder
+         *
+         * @param customChannel function to update the Channel Builder
+         * @return builder
+         */
+        fun withChannelBuilder(customChannel: Function<NettyChannelBuilder, ManagedChannelBuilder<*>>?): Builder {
+            this.channelUpdate = customChannel
+            return this
+        }
+
+        /**
+         * By default, connection uses a Round Robin load balancing when it's available if a host name specified for the connection,
+         * and it resolves to multiple IPs. This method disables the load balancing.
+         *
+         * @return builder
+         */
+        fun disableLoadBalancing(): Builder {
+            useLoadBalancing = false
+            return this
+        }
+
+        /**
          * Validates configuration and builds transport
          *
          * @return configured transport
@@ -308,13 +405,33 @@ class EmeraldKotlinTransport(
          */
         @Throws(SSLException::class)
         fun build(): EmeraldKotlinTransport {
-            val finalStub = stub ?: run {
-                val finalChannel = channel ?: run {
-                    val builder = channelBuilder ?: throw IllegalStateException("No connection configured")
+
+            val finalStub: BlockchainGrpcKt.BlockchainCoroutineStub = if (stub != null) {
+                stub!!
+            } else {
+                val finalChannel: Channel = if (channel != null) {
+                    channel!!
+                } else {
+                    requireNotNull(channelBuilder)
+                    var nettyBuilder: NettyChannelBuilder = channelBuilder!!
+
                     sslContextBuilder?.let { ssl ->
-                        builder.useTransportSecurity().sslContext(ssl.build())
+                        nettyBuilder = nettyBuilder.useTransportSecurity()
+                            .sslContext(ssl.build())
                     }
-                    builder.build()
+                    if (useLoadBalancing) {
+                        val policy = "round_robin"
+                        if (LoadBalancerRegistry.getDefaultRegistry().getProvider(policy) != null) {
+                            nettyBuilder = nettyBuilder.defaultLoadBalancingPolicy(policy)
+                        }
+                    }
+                    val finalBuilder: ManagedChannelBuilder<*> = if (this.channelUpdate != null) {
+                        this.channelUpdate!!.apply(nettyBuilder)
+                    } else {
+                        nettyBuilder
+                    }
+
+                    finalBuilder.build()
                 }
 
                 var newStub = BlockchainGrpcKt.BlockchainCoroutineStub(finalChannel)
@@ -322,7 +439,9 @@ class EmeraldKotlinTransport(
                 newStub
             }
 
-            val finalObjectMapper = objectMapper ?: run {
+            val finalObjectMapper: ObjectMapper = if (objectMapper != null) {
+                objectMapper!!
+            } else {
                 rpcConverter?.objectMapper ?: JacksonRpcConverter.createJsonMapper()
             }
 
