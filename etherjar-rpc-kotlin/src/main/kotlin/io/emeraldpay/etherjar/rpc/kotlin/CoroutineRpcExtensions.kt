@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-package io.emeraldpay.etherjar.rpc.ktor
+package io.emeraldpay.etherjar.rpc.kotlin
 
 import io.emeraldpay.etherjar.rpc.RpcCall
-import io.emeraldpay.etherjar.rpc.RpcException
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-class CoroutineBatchItem<JS, RES>(
-    val call: RpcCall<JS, RES>,
-    val id: Int
-) {
-    private val deferred = CompletableDeferred<RES>()
+suspend inline fun <JS, RES> CoroutineRpcClient.execute(
+    callBuilder: () -> RpcCall<JS, RES>
+): RES = execute(callBuilder())
 
-    fun onResult(value: RES) {
-        deferred.complete(value)
-    }
+suspend inline fun CoroutineRpcClient.batch(
+    builder: CoroutineBatch.() -> Unit
+): List<Any?> {
+    val batch = createBatch()
+    batch.builder()
+    return batch.executeAndGetResults()
+}
 
-    fun onError(exception: RpcException) {
-        deferred.completeExceptionally(exception)
-    }
-
-    suspend fun getResult(): RES = deferred.await()
-
-    fun cancel() {
-        deferred.cancel()
-    }
-
-    val isCompleted: Boolean
-        get() = deferred.isCompleted
+fun <JS, RES> CoroutineRpcClient.executeAsFlow(call: RpcCall<JS, RES>): Flow<RES> = flow {
+    emit(execute(call))
 }

@@ -18,6 +18,8 @@ package io.emeraldpay.etherjar.rpc.ktor
 
 import com.fasterxml.jackson.databind.JavaType
 import io.emeraldpay.etherjar.rpc.*
+import io.emeraldpay.etherjar.rpc.kotlin.CoroutineBatchItem
+import io.emeraldpay.etherjar.rpc.kotlin.CoroutineRpcTransport
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*

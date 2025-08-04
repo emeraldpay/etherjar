@@ -17,6 +17,7 @@
 package io.emeraldpay.etherjar.rpc.ktor
 
 import io.emeraldpay.etherjar.rpc.*
+import io.emeraldpay.etherjar.rpc.kotlin.CoroutineBatchItem
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe

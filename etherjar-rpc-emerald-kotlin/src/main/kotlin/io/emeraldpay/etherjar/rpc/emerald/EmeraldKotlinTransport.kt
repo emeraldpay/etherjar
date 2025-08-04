@@ -22,8 +22,8 @@ import io.emeraldpay.api.proto.BlockchainOuterClass
 import io.emeraldpay.api.proto.Common
 import io.emeraldpay.api.Chain
 import io.emeraldpay.etherjar.rpc.*
-import io.emeraldpay.etherjar.rpc.ktor.CoroutineRpcTransport
-import io.emeraldpay.etherjar.rpc.ktor.CoroutineBatchItem
+import io.emeraldpay.etherjar.rpc.kotlin.CoroutineRpcTransport
+import io.emeraldpay.etherjar.rpc.kotlin.CoroutineBatchItem
 import io.grpc.Channel
 import io.grpc.ClientInterceptor
 import io.grpc.ManagedChannel

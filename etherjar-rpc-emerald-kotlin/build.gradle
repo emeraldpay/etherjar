@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     api project(':etherjar-rpc-api')
-    api project(':etherjar-rpc-http-ktor')
+    api project(':etherjar-rpc-kotlin')
     api ("io.emeraldpay:emerald-api:0.13.0") {
         exclude group: "io.grpc"
     }

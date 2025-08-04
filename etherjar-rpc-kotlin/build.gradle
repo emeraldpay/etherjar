@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2020 EmeraldPay Inc, All Rights Reserved.
- * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
+ * Copyright (c) 2025 EmeraldPay Ltd, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,20 +33,14 @@ compileTestKotlin {
 dependencies {
     api project(':etherjar-rpc-api')
     api project(':etherjar-rpc-json')
-    api project(':etherjar-rpc-kotlin')
 
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1'
-    implementation 'io.ktor:ktor-client-core:3.0.3'
-    implementation 'io.ktor:ktor-client-cio:3.0.3'
-    implementation 'io.ktor:ktor-client-content-negotiation:3.0.3'
-    implementation 'io.ktor:ktor-serialization-jackson:3.0.3'
 
     // Jackson dependencies (matching etherjar-rpc-json versions)
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
 
-    testImplementation 'io.ktor:ktor-client-mock:3.0.3'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1'
     testImplementation 'io.kotest:kotest-runner-junit5:5.9.1'
     testImplementation 'io.kotest:kotest-assertions-core:5.9.1'

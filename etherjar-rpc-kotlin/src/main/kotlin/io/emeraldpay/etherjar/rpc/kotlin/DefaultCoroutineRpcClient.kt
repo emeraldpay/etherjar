@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.emeraldpay.etherjar.rpc.ktor
+package io.emeraldpay.etherjar.rpc.kotlin
 
 import io.emeraldpay.etherjar.rpc.RpcCall
 import io.emeraldpay.etherjar.rpc.RpcCallResponse
