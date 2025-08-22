@@ -86,29 +86,46 @@ public class HexData implements Serializable {
      */
     public static HexData from(String value) {
         if (value.isEmpty())
-            throw new IllegalArgumentException("Empty value");
+            throw new IllegalArgumentException("Empty hex value");
 
         if (!value.startsWith("0x"))
-            throw new IllegalArgumentException("Invalid hex format: " + value);
+            throw new IllegalArgumentException("Hex Data must start with 0x prefix: " + value);
 
-        value = value.substring(2);
+        // if it's just 0x
+        if (value.length() == 2) {
+            return empty();
+        }
 
-        if (value.length() <= 0) return empty();
+        byte[] bytes = parseHex(value);
+        return new HexData(bytes);
+    }
 
-        byte[] bytes = new BigInteger(value, 16).toByteArray();
+    private static byte[] parseHex(String value) {
+        int length = value.length();
+        boolean isFullBytes = length % 2 == 0;
 
-        int len = (value.length() / 2) + (value.length() % 2);
+        byte[] bytes = new byte[(length + 1 - 2) / 2];
+        int inputPos = 2; // skip '0x'
+        int outputPos = 0;
 
-        if (bytes.length == len)
-            return new HexData(bytes);
+        if (!isFullBytes) {
+            int high = Character.digit(value.charAt(inputPos), 16);
+            if (high == -1) {
+                throw new IllegalArgumentException("Invalid hex character in: " + value);
+            }
+            inputPos++;
+            bytes[outputPos++] = (byte) high;
+        }
 
-        byte[] buf = new byte[len];
-
-        // for values like 0xffffff it produces extra 0 byte in the beginning, we need to skip it
-        int pos = bytes.length > buf.length ? bytes.length - buf.length : 0;
-        System.arraycopy(bytes, pos, buf, buf.length - bytes.length + pos, bytes.length - pos);
-
-        return new HexData(buf);
+        for (int i = inputPos; i < length; i += 2) {
+            int high = Character.digit(value.charAt(i), 16);
+            int low = Character.digit(value.charAt(i + 1), 16);
+            if (high == -1 || low == -1) {
+                throw new IllegalArgumentException("Invalid hex character in: " + value);
+            }
+            bytes[outputPos++] = (byte) ((high << 4) | low);
+        }
+        return bytes;
     }
 
     public static HexData empty(int size) {
