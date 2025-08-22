@@ -20,8 +20,8 @@ dependencies {
     api project(':etherjar-domain')
     api project(':etherjar-rpc-json')
 
-    api "com.fasterxml.jackson.core:jackson-core:2.9.8"
-    api "com.fasterxml.jackson.core:jackson-databind:2.9.8"
+    api "com.fasterxml.jackson.core:jackson-core:2.19.2"
+    api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
 
     implementation "io.projectreactor:reactor-core:3.5.3"
 

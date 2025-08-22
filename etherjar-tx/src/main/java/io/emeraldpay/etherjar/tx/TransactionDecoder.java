@@ -70,6 +70,9 @@ public class TransactionDecoder {
         readBodyPart(rdr, tx);
         tryReadBaseSignature(rdr, tx);
         ensureFullyRead(rdr);
+        if (tx.getSignature() != null) {
+            tx.getSignature().setMessage(tx.hash());
+        }
         return tx;
     }
 
@@ -115,6 +118,9 @@ public class TransactionDecoder {
         readAccessList(rdr, tx);
         tryReadSignature(rdr, tx);
         ensureFullyRead(rdr);
+        if (tx.getSignature() != null) {
+            tx.getSignature().setMessage(tx.hash());
+        }
         return tx;
     }
 
@@ -133,6 +139,9 @@ public class TransactionDecoder {
         readAccessList(rdr, tx);
         tryReadSignature(rdr, tx);
         ensureFullyRead(rdr);
+        if (tx.getSignature() != null) {
+            tx.getSignature().setMessage(tx.hash());
+        }
         return tx;
     }
 
@@ -166,6 +175,9 @@ public class TransactionDecoder {
 
         tryReadSignature(rdr, tx);
         ensureFullyRead(rdr);
+        if (tx.getSignature() != null) {
+            tx.getSignature().setMessage(tx.hash());
+        }
         return tx;
     }
 
@@ -228,6 +240,9 @@ public class TransactionDecoder {
         readBlob(rdr, tx);
         tryReadSignature(rdr, tx);
         ensureFullyRead(rdr);
+        if (tx.getSignature() != null) {
+            tx.getSignature().setMessage(tx.hash());
+        }
         return tx;
     }
 

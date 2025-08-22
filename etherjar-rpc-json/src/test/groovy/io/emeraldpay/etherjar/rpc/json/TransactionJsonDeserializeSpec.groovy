@@ -224,4 +224,20 @@ class TransactionJsonDeserializeSpec extends Specification {
         then:
         act.signature.v == 0
     }
+
+    def "Parse tx 0xd89cc9 with blob version"() {
+        setup:
+        InputStream json = this.class.classLoader.getResourceAsStream("tx/0xd89cc9.json")
+        when:
+        def act = objectMapper.readValue(json, TransactionJson)
+
+        then:
+        act != null
+        act.blobVersionedHashes != null
+        act.blobVersionedHashes.size() == 1
+        act.blobVersionedHashes[0].toHex() == "0x01a09f25413eb9ecf2f3ae18f0012dcac6395afd36e047a43938d6b6a81a7ee7"
+        with(act.signature) {
+            it.v == 1
+        }
+    }
 }

@@ -44,8 +44,8 @@ dependencies {
     implementation 'io.ktor:ktor-serialization-jackson:3.0.3'
 
     // Jackson dependencies (matching etherjar-rpc-json versions)
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.2'
 
     testImplementation 'io.ktor:ktor-client-mock:3.0.3'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1'

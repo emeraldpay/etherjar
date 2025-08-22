@@ -465,6 +465,31 @@ class TransactionDecoderSpec extends Specification {
         Hex.encodeHexString(encoded) == txHex
     }
 
+    def "Parse tx type 3 0xd89cc9"() {
+        // tx 0xd89cc90d3ee397b20ac164b950db865755e1a347ae7d64dc7084806c56e83d08
+        setup:
+        def txHex = TransactionDecoderSpec.class.getClassLoader().getResourceAsStream("tx-blob-0xd89cc9.hex").text.trim()
+        def tx = Hex.decodeHex(txHex)
+
+        when:
+        def act = decoder.decode(tx)
+
+        then:
+        act.type == TransactionType.BLOB
+        with((TransactionWithBlob)act) {
+            blobVersionedHashes.size() == 1
+            blobVersionedHashes[0].toHex() == "0x01a09f25413eb9ecf2f3ae18f0012dcac6395afd36e047a43938d6b6a81a7ee7"
+        }
+        act.getSignature().recoverAddress() == Address.from("0xFBC0dcd6c3518cB529bC1B585dB992A7d40005fa")
+        act.transactionId() == TransactionId.from("0xd89cc90d3ee397b20ac164b950db865755e1a347ae7d64dc7084806c56e83d08")
+
+        when:
+        def encoded = TransactionEncoder.DEFAULT.encode(act, true)
+
+        then:
+        Hex.encodeHexString(encoded) == txHex
+    }
+
     def "Parse tx type 3 - sepolia 0x9fd491"() {
         // tx 0x9fd49139b36d116b4eb5389eec4065a944792a04cb5c0f1e9a6f31837d5e40ab
         setup:

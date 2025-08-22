@@ -119,6 +119,10 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
     @JsonSerialize(using = HexIntSerializer.class)
     private Integer v;
 
+    @JsonDeserialize(using = HexIntDeserializer.class)
+    @JsonSerialize(using = HexIntSerializer.class)
+    private Integer yParity;
+
     @JsonDeserialize
     @JsonSerialize
     private HexData r;
@@ -253,6 +257,7 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         created.setR(r);
         created.setS(s);
         created.setChainId(chainId != null ? new ChainId(chainId) : null);
+        created.setYParity(yParity);
         this.signature = created;
         return created;
     }
@@ -332,7 +337,15 @@ public class TransactionJson extends TransactionRefJson implements TransactionRe
         if (!Objects.equals(maxFeePerGas, that.maxFeePerGas)) return false;
         if (!Objects.equals(maxPriorityFeePerGas, that.maxPriorityFeePerGas)) return false;
         if (!Objects.equals(accessList, that.accessList)) return false;
-        return Objects.equals(signature, that.signature);
+        if (!Objects.equals(maxFeePerBlobGas, that.maxFeePerBlobGas)) return false;
+        if (!Objects.equals(blobVersionedHashes, that.blobVersionedHashes)) return false;
+        if (!Objects.equals(chainId, that.chainId)) return false;
+        if (!Objects.equals(v, that.v)) return false;
+        if (!Objects.equals(yParity, that.yParity)) return false;
+        if (!Objects.equals(r, that.r)) return false;
+        if (!Objects.equals(s, that.s)) return false;
+
+        return true;
     }
 
     @Override

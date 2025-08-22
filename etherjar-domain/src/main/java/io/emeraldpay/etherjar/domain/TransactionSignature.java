@@ -32,6 +32,8 @@ public class TransactionSignature {
     private HexData s;
     private Integer v;
 
+    private Integer yParity;
+
     public TransactionSignature() {
     }
 
@@ -89,6 +91,14 @@ public class TransactionSignature {
             return false;
         }
         return true;
+    }
+
+    public Integer getYParity() {
+        return yParity;
+    }
+
+    public void setYParity(Integer yParity) {
+        this.yParity = yParity;
     }
 
     @Override

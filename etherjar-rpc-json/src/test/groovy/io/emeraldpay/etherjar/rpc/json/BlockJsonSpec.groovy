@@ -260,6 +260,24 @@ class BlockJsonSpec extends Specification {
         }
     }
 
+    def "Parse full block 23122116"() {
+        InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-23122116-full.json")
+
+        when:
+        def act = objectMapper.readValue(json, BlockJson)
+
+        then:
+        act instanceof BlockJson
+        act.number == 23122116
+        act.transactionsRoot.toHex() == "0xffed04a23b15be96f2dd85c51c2608f40710d3fd7a329230d8b9f962e4dbdb1b"
+        act.stateRoot.toHex() == "0x96e6a1c03ea56096c7b3a562a82a0dc786145849cd85e75a751881c528fbd1b5"
+        act.withdrawalsRoot.toHex() == "0xe62da3f6055aaeb130033c839463e3b5362a5bb5ac02ba9c3f624f102b3033ac"
+        act.size == 0xa9d16
+        act.excessBlobGas == 0x20000
+        act.withdrawals.size() == 16
+        act.transactions.size() == 224
+    }
+
     def "Re-parse serialized full block 17172922"() {
         InputStream json = BlockJsonSpec.classLoader.getResourceAsStream("block/block-17172922-full.json")
 
