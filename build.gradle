@@ -18,7 +18,7 @@ apply plugin: 'jacoco'
 
 allprojects {
     group = 'io.emeraldpay.etherjar'
-    version = "0.13.0-SNAPSHOT"
+    version = "0.13.0"
 
     repositories {
         mavenLocal()
