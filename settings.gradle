@@ -1,4 +1,11 @@
-/*
+pluginManagement {
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version '2.1.0'
+    }
+}
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}/*
  * Copyright (c) 2020 EmeraldPay Inc, All Rights Reserved.
  * Copyright (c) 2016-2017 Infinitape Inc, All Rights Reserved.
  *

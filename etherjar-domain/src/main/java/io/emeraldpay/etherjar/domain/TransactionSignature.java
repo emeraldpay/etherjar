@@ -18,86 +18,95 @@
 package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
  * Transaction signature with support of Replay Protection (EIP-155)
  */
+@NullMarked
 public class TransactionSignature {
 
-    private ChainId chainId;
+    private @Nullable ChainId chainId;
 
-    private HexData r;
-    private HexData s;
-    private Integer v;
+    private @Nullable HexData r;
+    private @Nullable HexData s;
+    private @Nullable Integer v;
 
-    private Integer yParity;
+    private @Nullable Integer yParity;
 
     public TransactionSignature() {
     }
 
-    public ChainId getChainId() {
+    public @Nullable ChainId getChainId() {
         return chainId;
     }
 
-    public void setChainId(ChainId chainId) {
+    public void setChainId(@Nullable ChainId chainId) {
         this.chainId = chainId;
     }
 
-    public HexData getR() {
+    public @Nullable HexData getR() {
         return r;
     }
 
-    public void setR(HexData r) {
+    public void setR(@Nullable HexData r) {
         this.r = r;
     }
 
-    public HexData getS() {
+    public @Nullable HexData getS() {
         return s;
     }
 
-    public void setS(HexData s) {
+    public void setS(@Nullable HexData s) {
         this.s = s;
     }
 
-    public Integer getV() {
+    public @Nullable Integer getV() {
         return v;
     }
 
-    public void setV(Integer v) {
+    public void setV(@Nullable Integer v) {
         if (v == null || v < 0) {
             throw new IllegalArgumentException("Invalid V: " + v);
         }
         this.v = v;
     }
 
-    public ChainId getExtractedChainId() {
+    public @Nullable ChainId getExtractedChainId() {
         if (!isProtected()) {
             return null;
         }
         return new ChainId((v - 35) / 2);
     }
 
-    public Integer getNormalizedV() {
+    public @Nullable Integer getNormalizedV() {
         if (chainId == null) {
             return v;
+        }
+        if (v == null) {
+            return null;
         }
         return v - chainId.getValue() * 2 - 35 + 27;
     }
 
     public boolean isProtected() {
+        if (v == null) {
+            throw new IllegalStateException("Not initialized");
+        }
         if (v == 27 || v == 28) {
             return false;
         }
         return true;
     }
 
-    public Integer getYParity() {
+    public @Nullable Integer getYParity() {
         return yParity;
     }
 
-    public void setYParity(Integer yParity) {
+    public void setYParity(@Nullable Integer yParity) {
         this.yParity = yParity;
     }
 

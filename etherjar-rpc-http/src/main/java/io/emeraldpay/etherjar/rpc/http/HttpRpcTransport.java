@@ -36,6 +36,9 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -49,9 +52,9 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 import java.util.logging.Logger;
 
+@NullMarked
 public class HttpRpcTransport extends AbstractRpcTransport {
 
     private static final Logger log = Logger.getLogger(HttpRpcTransport.class.getName());
@@ -60,10 +63,12 @@ public class HttpRpcTransport extends AbstractRpcTransport {
     private final URI target;
 
     private final HttpClient httpclient;
+    @Nullable
     private final HttpClientContext context;
+    @Nullable
     private final Runnable onClose;
 
-    private HttpRpcTransport(URI target, RpcConverter rpcConverter, ExecutorService executorService, HttpClient httpClient, HttpClientContext context, Runnable onClose) {
+    private HttpRpcTransport(URI target, RpcConverter rpcConverter, ExecutorService executorService, HttpClient httpClient, @Nullable HttpClientContext context, @Nullable Runnable onClose) {
         super(executorService, rpcConverter);
         this.target = target;
         this.httpclient = httpClient;
@@ -97,14 +102,21 @@ public class HttpRpcTransport extends AbstractRpcTransport {
     }
 
     public static class Builder {
+        @Nullable
         private URI target;
+        @Nullable
         private ExecutorService executorService;
+        @Nullable
         private RpcConverter rpcConverter;
 
+        @Nullable
         private HttpClientContext context;
+        @Nullable
         private SSLContext sslContext;
+        @Nullable
         private HttpClient httpClient;
 
+        @Nullable
         private Runnable onClose;
 
         private int maxConnections = 50;
@@ -184,10 +196,12 @@ public class HttpRpcTransport extends AbstractRpcTransport {
         }
 
         protected void initDefaults() {
-            if (httpClient == null && target == null) {
+            if (target == null) {
                 try {
-                    connectTo("http://127.0.0.1:8545");
-                } catch (URISyntaxException e) { }
+                    target = new URI("http://127.0.0.1:8545");
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
             }
             if (executorService == null) {
                 ExecutorService executorService = Executors.newCachedThreadPool();
@@ -216,6 +230,10 @@ public class HttpRpcTransport extends AbstractRpcTransport {
                     )
                     .build();
             }
+            Objects.requireNonNull(target);
+            Objects.requireNonNull(executorService);
+            Objects.requireNonNull(rpcConverter);
+            Objects.requireNonNull(httpClient);
 
             return new HttpRpcTransport(target, rpcConverter, executorService, httpClient, context, onClose);
         }

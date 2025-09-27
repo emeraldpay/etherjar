@@ -15,11 +15,14 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *  Validates an upstream URI to conform requirements of the current app
  *
  * @author Igor Artamonov
  */
+@NullMarked
 public interface UpstreamValidator {
 
     /**

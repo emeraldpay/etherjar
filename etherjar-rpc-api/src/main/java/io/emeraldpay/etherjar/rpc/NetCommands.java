@@ -15,6 +15,9 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class NetCommands {
 
     /**

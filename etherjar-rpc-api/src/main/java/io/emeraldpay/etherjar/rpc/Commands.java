@@ -15,9 +15,12 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Common RPC commands
  */
+@NullMarked
 public class Commands {
 
     private static final EthCommands eth = new EthCommands();

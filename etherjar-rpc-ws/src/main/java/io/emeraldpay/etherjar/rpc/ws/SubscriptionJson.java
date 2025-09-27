@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.emeraldpay.etherjar.rpc.RpcResponseError;
 import io.emeraldpay.etherjar.rpc.json.BlockJson;
 import io.emeraldpay.etherjar.rpc.json.TransactionRefJson;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -30,13 +32,19 @@ import java.io.IOException;
  * @author Igor Artamonov
  */
 @JsonDeserialize(using = SubscriptionJsonDeserializer.class)
+@NullMarked
 public class SubscriptionJson {
 
+    @Nullable
     private String subscription;
+    @Nullable
     private JsonNode result;
+    @Nullable
     private Integer id;
+    @Nullable
     private JsonNode error;
 
+    @Nullable
     public String getSubscription() {
         return subscription;
     }
@@ -45,6 +53,7 @@ public class SubscriptionJson {
         this.subscription = subscription;
     }
 
+    @Nullable
     public JsonNode getResult() {
         return result;
     }
@@ -66,6 +75,7 @@ public class SubscriptionJson {
         return result == null ? null : result.asText();
     }
 
+    @Nullable
     public Integer getId() {
         return id;
     }
@@ -74,6 +84,7 @@ public class SubscriptionJson {
         this.id = id;
     }
 
+    @Nullable
     public JsonNode getError() {
         return error;
     }

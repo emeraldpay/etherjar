@@ -17,10 +17,13 @@
 
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 public interface RpcTransport<T extends BatchItem> extends Closeable {
 
     CompletableFuture<Iterable<RpcCallResponse>> execute(List<T> items);

@@ -20,9 +20,12 @@ package io.emeraldpay.etherjar.domain;
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.util.encoders.Hex;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
+import java.util.Objects;
 
+@NullMarked
 public class BlockHash extends Hex32 implements Comparable<BlockHash> {
 
     public static final int SIZE_BYTES = 32;
@@ -39,9 +42,6 @@ public class BlockHash extends Hex32 implements Comparable<BlockHash> {
      * @return BlockHash
      */
     public static BlockHash from(byte[] value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hash");
-        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid Block Hash length: " + value.length);
         }
@@ -55,9 +55,7 @@ public class BlockHash extends Hex32 implements Comparable<BlockHash> {
      * @return BlockHash
      */
     public static BlockHash from(Hex32 value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hash");
-        }
+        Objects.requireNonNull(value);
         return new BlockHash(value.getBytes());
     }
 
@@ -68,9 +66,7 @@ public class BlockHash extends Hex32 implements Comparable<BlockHash> {
      * @return BlockHash
      */
     public static BlockHash from(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hash");
-        }
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Block Hash length: " + value.length());
         }

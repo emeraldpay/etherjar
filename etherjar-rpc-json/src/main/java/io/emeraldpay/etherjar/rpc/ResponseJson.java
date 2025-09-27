@@ -18,28 +18,35 @@
 package io.emeraldpay.etherjar.rpc;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @JsonSerialize(using = ResponseJsonSerializer.class)
 public class ResponseJson<DATA, ID> {
-
+    @NonNull
     private String jsonrpc = "2.0";
+    @Nullable
     private ID id;
+    @Nullable
     private DATA result;
+    @Nullable
     private RpcResponseError error;
 
+    @NonNull
     public String getJsonrpc() {
         return jsonrpc;
     }
 
-    public void setJsonrpc(String jsonrpc) {
+    public void setJsonrpc(@NonNull String jsonrpc) {
         this.jsonrpc = jsonrpc;
     }
 
+    @Nullable
     public ID getId() {
         return id;
     }
 
-    public void setId(ID id) {
+    public void setId(@NonNull ID id) {
         if (!(
             Integer.class.isAssignableFrom(id.getClass())
                 || Long.class.isAssignableFrom(id.getClass())
@@ -50,23 +57,26 @@ public class ResponseJson<DATA, ID> {
         this.id = id;
     }
 
+    @Nullable
     public DATA getResult() {
         return result;
     }
 
-    public void setResult(DATA result) {
+    public void setResult(@Nullable DATA result) {
         this.result = result;
     }
 
+    @Nullable
     public RpcResponseError getError() {
         return error;
     }
 
-    public void setError(RpcResponseError error) {
+    public void setError(@Nullable RpcResponseError error) {
         this.error = error;
     }
 
     @SuppressWarnings("unchecked")
+    @NonNull
     public <T> ResponseJson<T, ID> cast(Class<T> clazz) {
         if (result == null || clazz.isAssignableFrom(result.getClass())) {
             return (ResponseJson<T, ID>) this;

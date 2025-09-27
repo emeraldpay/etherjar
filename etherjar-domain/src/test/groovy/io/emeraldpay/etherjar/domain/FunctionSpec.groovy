@@ -41,12 +41,12 @@ class FunctionSpec extends Specification {
         when:
         Function.from(null as String)
         then:
-        thrown(IllegalArgumentException)
+        thrown(NullPointerException)
 
         when:
         Function.from(null as byte[])
         then:
-        thrown(IllegalArgumentException)
+        thrown(NullPointerException)
 
         when:
         Function.from('')

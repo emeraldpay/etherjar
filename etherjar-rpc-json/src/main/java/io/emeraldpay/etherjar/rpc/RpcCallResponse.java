@@ -15,32 +15,41 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Objects;
 
 public class RpcCallResponse<JS, RES> {
 
+    @NonNull
     private final RpcCall<JS, RES> source;
+    @Nullable
     private RES value;
+    @Nullable
     private RpcException error;
 
-    public RpcCallResponse(RpcCall<JS, RES> source, RES value) {
+    public RpcCallResponse(@NonNull RpcCall<JS, RES> source, @Nullable RES value) {
         this.source = source;
         this.value = value;
     }
 
-    public RpcCallResponse(RpcCall<JS, RES> source, RpcException error) {
+    public RpcCallResponse(@NonNull RpcCall<JS, RES> source, @NonNull RpcException error) {
         this.source = source;
         this.error = error;
     }
 
+    @NonNull
     public RpcCall<JS, RES> getSource() {
         return source;
     }
 
+    @Nullable
     public RES getValue() {
         return value;
     }
 
+    @Nullable
     public RpcException getError() {
         return error;
     }
@@ -54,6 +63,7 @@ public class RpcCallResponse<JS, RES> {
     }
 
     @SuppressWarnings("unchecked")
+    @NonNull
     public <T> RpcCallResponse<JS, T> cast(Class<T> clazz) {
         if (value == null || clazz.isAssignableFrom(value.getClass())) {
             return (RpcCallResponse<JS, T>) this;

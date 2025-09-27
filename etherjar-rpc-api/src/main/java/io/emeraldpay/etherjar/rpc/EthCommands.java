@@ -22,7 +22,9 @@ import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.hex.HexQuantity;
 import io.emeraldpay.etherjar.rpc.json.*;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class EthCommands {
 
     private final JavaType blockWithTxJsonType = TypeFactory.defaultInstance().constructParametricType(BlockJson.class, TransactionJson.class);
@@ -58,7 +60,7 @@ public class EthCommands {
      * @return balance of the account of given address.
      */
     public RpcCall<String, Wei> getBalance(Address address, BlockTag block) {
-        return RpcCall.create("eth_getBalance", address.toHex(), block.getCode()).converted(Wei.class, Wei::from);
+        return RpcCall.create("eth_getBalance", address.toHex(), block.getCode()).converted(Wei.class, Wei::fromHex);
     }
 
     /**
@@ -68,7 +70,7 @@ public class EthCommands {
      * @return balance of the account of given address.
      */
     public RpcCall<String, Wei> getBalance(Address address, long block) {
-        return RpcCall.create("eth_getBalance", address.toHex(), HexQuantity.from(block).toHex()).converted(Wei.class, Wei::from);
+        return RpcCall.create("eth_getBalance", address.toHex(), HexQuantity.from(block).toHex()).converted(Wei.class, Wei::fromHex);
     }
 
     /**
@@ -325,7 +327,7 @@ public class EthCommands {
      * @return the current price per gas in wei.
      */
     public RpcCall<String, Wei> getGasPrice() {
-        return RpcCall.create("eth_gasPrice").converted(Wei.class, Wei::from);
+        return RpcCall.create("eth_gasPrice").converted(Wei.class, Wei::fromHex);
     }
 
     /**

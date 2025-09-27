@@ -17,6 +17,8 @@ package io.emeraldpay.etherjar.rpc;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -33,27 +35,32 @@ import java.util.function.Function;
  */
 public class RpcCall<JS, RES> {
 
+    @NonNull
     private final String method;
+    @NonNull
     private final List params;
 
+    @Nullable
     private JavaType jsonType;
+    @Nullable
     private Class<? extends RES> resultType;
-    private java.util.function.Function<JS, RES> converter;
+    @Nullable
+    private Function<JS, RES> converter;
     private boolean isArray = false;
 
-    private RpcCall(String method, List params) {
-        if (method == null) {
-            throw new IllegalArgumentException("Method must be not null");
-        }
+    @SuppressWarnings("unchecked")
+    private RpcCall(@NonNull String method, @Nullable List params) {
+        Objects.requireNonNull(method);
         method = method.trim();
-        if ("".equals(method)) {
+        if (method.isEmpty()) {
             throw new IllegalArgumentException("Method must be not empty");
         }
         this.method = method;
         if (params == null) {
-            params = Collections.emptyList();
+            this.params = Collections.emptyList();
+        } else {
+            this.params = List.copyOf(params);
         }
-        this.params = params;
     }
 
     /**
@@ -64,7 +71,7 @@ public class RpcCall<JS, RES> {
      * @param <T> data type, same for Java and JSON (i.e. String)
      * @return call definition
      */
-    public static <T> RpcCall<T, T> create(String method, Class<? extends T> type, List params) {
+    public static <T> RpcCall<T, T> create(@NonNull String method, @NonNull Class<? extends T> type, @NonNull List params) {
         return create(method, TypeFactory.defaultInstance().constructType(type), params);
     }
 
@@ -77,7 +84,7 @@ public class RpcCall<JS, RES> {
      * @return call definition
      */
     @SuppressWarnings("unchecked")
-    public static <T> RpcCall<T, T> create(String method, JavaType type, List params) {
+    public static <T> RpcCall<T, T> create(@NonNull String method, @NonNull JavaType type, @NonNull List params) {
         RpcCall<T, T> call = new RpcCall<>(method, params);
         call.jsonType = TypeFactory.defaultInstance().constructType(type);
         call.resultType = (Class<? extends T>) type.getRawClass();
@@ -92,7 +99,7 @@ public class RpcCall<JS, RES> {
      * @param params call parameters
      * @return call definition
      */
-    public static RpcCall<String, String> create(String method, List params) {
+    public static RpcCall<String, String> create(@NonNull String method, @NonNull List params) {
         return create(method, String.class, params);
     }
 
@@ -105,7 +112,7 @@ public class RpcCall<JS, RES> {
      * @return call definition
      */
 
-    public static <T> RpcCall<T, T> create(String method, Class<T> type, Object ... params) {
+    public static <T> RpcCall<T, T> create(@NonNull String method, @NonNull Class<T> type, @Nullable Object ... params) {
         return create(method, type, Arrays.asList(params));
     }
 
@@ -116,7 +123,7 @@ public class RpcCall<JS, RES> {
      * @param params call parameters
      * @return call definition
      */
-    public static RpcCall<String, String> create(String method, Object ... params) {
+    public static RpcCall<String, String> create(@NonNull String method, @Nullable Object ... params) {
         return create(method, String.class, params);
     }
 
@@ -128,7 +135,7 @@ public class RpcCall<JS, RES> {
      * @param <T> data type, same for Java and JSON (i.e. String)
      * @return call definition
      */
-    public static <T> RpcCall<T, T> create(String method, Class<T> type) {
+    public static <T> RpcCall<T, T> create(@NonNull String method, @NonNull Class<T> type) {
         return create(method, type, Collections.emptyList());
     }
 
@@ -138,7 +145,7 @@ public class RpcCall<JS, RES> {
      * @param method method name
      * @return call definition
      */
-    public static RpcCall<String, String> create(String method) {
+    public static RpcCall<String, String> create(@NonNull String method) {
         return create(method, String.class, Collections.emptyList());
     }
 
@@ -150,7 +157,8 @@ public class RpcCall<JS, RES> {
      * @param <T> Java data type
      * @return call definition
      */
-    public <T> RpcCall<JS, T> converted(Class<T> resultType, java.util.function.Function<JS, T> converter) {
+    @NonNull
+    public <T> RpcCall<JS, T> converted(@NonNull Class<T> resultType, @NonNull Function<JS, T> converter) {
         RpcCall<JS, T> call = new RpcCall<>(this.method, this.params);
         call.jsonType = this.jsonType;
         call.resultType = resultType;
@@ -163,7 +171,8 @@ public class RpcCall<JS, RES> {
      * @param clazz JSON data type
      */
     @SuppressWarnings("unchecked")
-    public <T> RpcCall<T, RES> castJsonType(Class<T> clazz) {
+    @NonNull
+    public <T> RpcCall<T, RES> castJsonType(@NonNull Class<T> clazz) {
         if (this.jsonType == null || clazz.isAssignableFrom(this.jsonType.getRawClass())) {
             return (RpcCall<T, RES>) this;
         }
@@ -175,7 +184,7 @@ public class RpcCall<JS, RES> {
      * @param clazz Java data type
      */
     @SuppressWarnings("unchecked")
-    public void setResultType(Class clazz) {
+    public void setResultType(@NonNull Class clazz) {
         if (isArray) {
             throw new IllegalStateException("Cannot change result type after enabling array type");
         }
@@ -189,7 +198,8 @@ public class RpcCall<JS, RES> {
      * @param <T> JSON data type
      * @return new call definition
      */
-    public <T> RpcCall<T, RES> withJsonType(Class<? extends T> clazz) {
+    @NonNull
+    public <T> RpcCall<T, RES> withJsonType(@NonNull Class<? extends T> clazz) {
         return withJsonType(TypeFactory.defaultInstance().constructType(clazz));
     }
 
@@ -201,7 +211,8 @@ public class RpcCall<JS, RES> {
      * @return new call definition
      */
     @SuppressWarnings("unchecked")
-    public <T> RpcCall<T, RES> withJsonType(JavaType jsonType) {
+    @NonNull
+    public <T> RpcCall<T, RES> withJsonType(@NonNull JavaType jsonType) {
         if (isArray) {
             throw new IllegalStateException("Cannot change json type after enabling array type");
         }
@@ -220,7 +231,8 @@ public class RpcCall<JS, RES> {
      * @return new call definition
      */
     @SuppressWarnings("unchecked")
-    public <T> RpcCall<JS, T> withResultType(Class<T> clazz) {
+    @NonNull
+    public <T> RpcCall<JS, T> withResultType(@NonNull Class<T> clazz) {
         if (isArray) {
             throw new IllegalStateException("Cannot change result type after enabling array type");
         }
@@ -232,6 +244,7 @@ public class RpcCall<JS, RES> {
     }
 
     @SuppressWarnings("unchecked")
+    @NonNull
     public RpcCall<JS[], RES[]> asArray() {
         RpcCall<JS[], RES[]> copy = new RpcCall<>(this.method, this.params);
         copy.jsonType = TypeFactory.defaultInstance().constructArrayType(this.jsonType);
@@ -257,6 +270,7 @@ public class RpcCall<JS, RES> {
      *
      * @return method for RPC call
      */
+    @NonNull
     public String getMethod() {
         return method;
     }
@@ -265,6 +279,7 @@ public class RpcCall<JS, RES> {
      *
      * @return parameters for RPC call
      */
+    @NonNull
     public List getParams() {
         return params;
     }
@@ -274,6 +289,7 @@ public class RpcCall<JS, RES> {
      * @return Java data type
      */
     @SuppressWarnings("unchecked")
+    @Nullable
     public Class<RES> getResultType() {
         return (Class<RES>) resultType;
     }
@@ -282,14 +298,23 @@ public class RpcCall<JS, RES> {
      *
      * @return JSON data type
      */
+    @NonNull
     public JavaType getJsonType() {
+        if (jsonType == null) {
+            throw new IllegalStateException("JSON type is not defined for " + this);
+        }
         return jsonType;
+    }
+
+    public boolean hasJsonType() {
+        return jsonType != null;
     }
 
     /**
      *
      * @return function that converts from JSON data to Java data
      */
+    @Nullable
     public Function<JS, RES> getConverter() {
         return converter;
     }
@@ -300,7 +325,8 @@ public class RpcCall<JS, RES> {
      * @param batchId request id (uniq per batch)
      * @return JSON RPC request
      */
-    public RequestJson<Integer> toJson(int batchId) {
+    @NonNull
+    public RequestJson<@NonNull Integer> toJson(int batchId) {
         return new RequestJson<>(method, params, batchId);
     }
 

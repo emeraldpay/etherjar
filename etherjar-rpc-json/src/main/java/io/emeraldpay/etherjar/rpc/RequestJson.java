@@ -18,9 +18,12 @@
 package io.emeraldpay.etherjar.rpc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
+@NullMarked
 public class RequestJson<T> {
 
     private final String jsonrpc = "2.0";
@@ -30,7 +33,7 @@ public class RequestJson<T> {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private final T id;
 
-    public RequestJson(String method, List params, T id) {
+    public RequestJson(String method, @Nullable List params, T id) {
         if (!(
             Integer.class.isAssignableFrom(id.getClass())
                 || Long.class.isAssignableFrom(id.getClass())
@@ -39,7 +42,11 @@ public class RequestJson<T> {
             throw new IllegalArgumentException("ID must be String or Integer/Long");
         }
         this.method = method;
-        this.params = params;
+        if (params == null) {
+            this.params = List.of();
+        } else {
+            this.params = params;
+        }
         this.id = id;
     }
 
@@ -47,6 +54,7 @@ public class RequestJson<T> {
         return jsonrpc;
     }
 
+    @Nullable
     public String getMethod() {
         return method;
     }
@@ -55,6 +63,7 @@ public class RequestJson<T> {
         return params;
     }
 
+    @Nullable
     public T getId() {
         return id;
     }

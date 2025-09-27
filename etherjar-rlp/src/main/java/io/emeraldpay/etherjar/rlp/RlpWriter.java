@@ -16,6 +16,9 @@
  */
 package io.emeraldpay.etherjar.rlp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -25,12 +28,13 @@ import java.util.LinkedList;
 /**
  * RLP (Recursive Length Prefix) encoding writer
  *
- * See RLP Spec at https://github.com/ethereum/wiki/wiki/RLP
+ * See RLP Spec at <a href="https://github.com/ethereum/wiki/wiki/RLP">RLP Specification</a>
  */
+@NullMarked
 public class RlpWriter {
 
     private ByteArrayOutputStream buffer;
-    private LinkedList<ByteArrayOutputStream> levels;
+    private final LinkedList<ByteArrayOutputStream> levels;
 
     public RlpWriter(ByteArrayOutputStream buffer) {
         levels = new LinkedList<>();
@@ -85,7 +89,7 @@ public class RlpWriter {
      * @param value String to encode into RLP list
      * @return writer for the list
      */
-    public RlpWriter write(String value) {
+    public RlpWriter write(@Nullable String value) {
         return write(value == null ? new byte[0] : value.getBytes());
     }
 
@@ -152,7 +156,7 @@ public class RlpWriter {
      * @return writer for the list
      */
     protected RlpWriter write(byte[] value, RlpType type) {
-        if (type != RlpType.LIST && buffer.size() > 0 && levels.size() == 0) {
+        if (type != RlpType.LIST && buffer.size() > 0 && levels.isEmpty()) {
             throw new IllegalStateException("Cannot encode another value into same RLP output. Use LIST to write multiple values.");
         }
         try {

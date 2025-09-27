@@ -17,9 +17,12 @@
 
 package io.emeraldpay.etherjar.domain;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * CHAIN_ID for Replay Protection (EIP-155)
  */
+@NullMarked
 public class ChainId {
 
     public static final ChainId FOUNDATION = new ChainId(1);

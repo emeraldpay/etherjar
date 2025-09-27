@@ -19,7 +19,9 @@ package io.emeraldpay.etherjar.domain;
 
 
 import io.emeraldpay.etherjar.hex.HexData;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Nonce extends HexData implements Comparable<Nonce> {
 
     public static final int SIZE_BYTES = 8;
@@ -30,9 +32,6 @@ public class Nonce extends HexData implements Comparable<Nonce> {
     }
 
     public static Nonce from(byte[] value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hash");
-        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid Nonce length: " + value.length);
         }
@@ -40,9 +39,6 @@ public class Nonce extends HexData implements Comparable<Nonce> {
     }
 
     public static Nonce from(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hash");
-        }
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Nonce length: " + value.length());
         }

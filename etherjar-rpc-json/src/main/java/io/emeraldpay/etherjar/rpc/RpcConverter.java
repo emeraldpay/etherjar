@@ -18,11 +18,13 @@
 package io.emeraldpay.etherjar.rpc;
 
 import com.fasterxml.jackson.databind.JavaType;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+@NullMarked
 public interface RpcConverter {
 
     <T> T fromJson(InputStream content, JavaType clazz) throws RpcException;

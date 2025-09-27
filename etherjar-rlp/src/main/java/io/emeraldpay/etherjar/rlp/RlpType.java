@@ -16,7 +16,7 @@
 package io.emeraldpay.etherjar.rlp;
 
 /**
- * Type of an element
+ * Type of element
  */
 public enum RlpType {
 

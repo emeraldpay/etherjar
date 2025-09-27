@@ -18,12 +18,15 @@
 package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * An address, followed by a function selector.
  */
+@NullMarked
 public class Function extends HexData implements Comparable<Function> {
 
     public static final int SIZE_BYTES = 24;
@@ -34,9 +37,6 @@ public class Function extends HexData implements Comparable<Function> {
     }
 
     public static Function from(byte[] value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Function");
-        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid Function length: " + value.length);
         }
@@ -44,9 +44,7 @@ public class Function extends HexData implements Comparable<Function> {
     }
 
     public static Function from(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Function");
-        }
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Function length: " + value.length());
         }

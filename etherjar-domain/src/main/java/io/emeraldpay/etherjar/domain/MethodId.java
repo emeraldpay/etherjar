@@ -19,6 +19,7 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import java.util.Objects;
  *
  * @see <a href="https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#function-selector">Function Selector</a>
  */
+@NullMarked
 public class MethodId extends HexData implements Comparable<MethodId> {
 
     public static final int SIZE_BYTES = 4;
@@ -55,9 +57,6 @@ public class MethodId extends HexData implements Comparable<MethodId> {
     }
 
     public static MethodId from(byte[] value) {
-        if (value == null)
-            throw new IllegalArgumentException("Null Hash");
-
         if (value.length != SIZE_BYTES)
             throw new IllegalArgumentException("Invalid MethodId length: " + value.length);
 
@@ -65,9 +64,7 @@ public class MethodId extends HexData implements Comparable<MethodId> {
     }
 
     public static MethodId from(String value) {
-        if (value == null)
-            throw new IllegalArgumentException("Null Hash");
-
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX)
             throw new IllegalArgumentException("Invalid MethodId length: " + value.length());
 
@@ -79,12 +76,10 @@ public class MethodId extends HexData implements Comparable<MethodId> {
     }
 
     public static MethodId fromInput(HexData input) {
-        if (input == null) {
-            return null;
-        }
+        Objects.requireNonNull(input);
         byte[] data = input.getBytes();
         if (data.length < SIZE_BYTES) {
-            return null;
+            throw new IllegalArgumentException("Invalid input length: " + data.length);
         }
         byte[] head = new byte[SIZE_BYTES];
         System.arraycopy(data, 0, head, 0, SIZE_BYTES);

@@ -33,7 +33,7 @@ class DefaultCoroutineRpcClient(
         val response = responses.first()
 
         return if (response.isError) {
-            throw response.error
+            throw response.error!!
         } else {
             @Suppress("UNCHECKED_CAST")
             response.value as RES

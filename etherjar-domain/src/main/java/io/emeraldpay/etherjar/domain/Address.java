@@ -21,13 +21,16 @@ import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.util.encoders.Hex;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
  * Ethereum Wallet address
  */
+@NullMarked
 public class Address extends HexData implements Comparable<Address> {
 
     private final static byte[] HEX_BYTES = "0123456789abcdef".getBytes();
@@ -57,9 +60,7 @@ public class Address extends HexData implements Comparable<Address> {
      * @return address
      */
     public static Address from(HexData value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null input value");
-        }
+        Objects.requireNonNull(value);
         if (value.getSize() != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid input length: " + value.getSize() + " != " + SIZE_BYTES);
         }
@@ -67,9 +68,6 @@ public class Address extends HexData implements Comparable<Address> {
     }
 
     public static Address from(byte[] value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null input value");
-        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid input length: " + value.length + " != " + SIZE_BYTES);
         }
@@ -77,9 +75,7 @@ public class Address extends HexData implements Comparable<Address> {
     }
 
     public static Address from(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null input value");
-        }
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_HEX);
         }
@@ -98,9 +94,7 @@ public class Address extends HexData implements Comparable<Address> {
      * @return address
      */
     public static Address extract(Hex32 value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null input value");
-        }
+        Objects.requireNonNull(value);
         byte[] bytes = value.getBytes();
         byte[] empty = new byte[Hex32.SIZE_BYTES - Address.SIZE_BYTES];
         System.arraycopy(bytes, 0, empty, 0, empty.length);

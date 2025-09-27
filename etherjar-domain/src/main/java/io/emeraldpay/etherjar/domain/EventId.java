@@ -18,6 +18,7 @@ package io.emeraldpay.etherjar.domain;
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.Objects;
  * A 32-byte long id representing a contract event, i.e. first item of the topics array in the log.
  * Calculated as keccak256("EventName(types...)")
  */
+@NullMarked
 public class EventId extends Hex32 implements Comparable<EventId> {
 
     public static final int SIZE_BYTES = Hex32.SIZE_BYTES;
@@ -37,9 +39,6 @@ public class EventId extends Hex32 implements Comparable<EventId> {
     }
 
     public static EventId from(byte[] value) {
-        if (value == null)
-            throw new IllegalArgumentException("Null Hash");
-
         if (value.length != SIZE_BYTES)
             throw new IllegalArgumentException("Invalid EventId length: " + value.length);
 
@@ -47,9 +46,7 @@ public class EventId extends Hex32 implements Comparable<EventId> {
     }
 
     public static EventId from(String value) {
-        if (value == null)
-            throw new IllegalArgumentException("Null Hash");
-
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX)
             throw new IllegalArgumentException("Invalid EventId length: " + value.length());
 

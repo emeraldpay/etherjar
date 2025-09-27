@@ -15,39 +15,36 @@
  */
 package io.emeraldpay.etherjar.hex;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Objects;
 
+@NullMarked
 public class HexQuantity implements Serializable, Comparable<HexQuantity> {
 
     private final BigInteger value;
 
     public HexQuantity(BigInteger value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Can't create instance of null quantity");
-        }
+        Objects.requireNonNull(value);
         this.value = value;
     }
 
     public static HexQuantity from(Long value) {
-        if (value == null) {
-            return null;
-        }
+        Objects.requireNonNull(value);
         return new HexQuantity(BigInteger.valueOf(value));
     }
 
     public static HexQuantity from(BigInteger value) {
-        if (value == null) {
-            return null;
-        }
+        Objects.requireNonNull(value);
         return new HexQuantity(value);
     }
 
+    @Nullable
     public static HexQuantity from(String value) {
-        if (value == null) {
-            return null;
-        }
+        Objects.requireNonNull(value);
         int signum = 1;
         if (value.startsWith("-")) {
             signum = -1;
@@ -57,7 +54,7 @@ public class HexQuantity implements Serializable, Comparable<HexQuantity> {
             throw new IllegalArgumentException("Input must be formatted as a hex value");
         }
         value = value.substring(2);
-        if (value.length() == 0) {
+        if (value.isEmpty()) {
             return null;
         }
         try {

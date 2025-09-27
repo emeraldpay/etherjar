@@ -17,11 +17,16 @@
 
 package io.emeraldpay.etherjar.hex;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * Fixed-size 32-bytes hex value.
  */
+@NullMarked
 public class Hex32 extends HexData {
 
     /**
@@ -63,9 +68,6 @@ public class Hex32 extends HexData {
     }
 
     public static Hex32 from(byte[] value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hex32");
-        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid Hex32 length: " + value.length);
         }
@@ -73,9 +75,7 @@ public class Hex32 extends HexData {
     }
 
     public static Hex32 from(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null Hex32");
-        }
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Hex32 length: " + value.length());
         }

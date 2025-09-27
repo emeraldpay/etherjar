@@ -15,19 +15,23 @@
  */
 package io.emeraldpay.etherjar.rlp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 /**
  * RLP (Recursive Length Prefix) encoding reader
  *
- * See RLP Spec at https://github.com/ethereum/wiki/wiki/RLP
+ * See RLP Spec at <a href="https://github.com/ethereum/wiki/wiki/RLP">RLP Specification</a>
  */
+@NullMarked
 public class RlpReader {
 
     private final byte[] input;
 
-    private Current current;
+    private @Nullable Current current;
     private int position = 0;
     private final int limit;
 
@@ -54,10 +58,6 @@ public class RlpReader {
         this.limit = position + length;
     }
 
-    private int unsigned(byte b) {
-        return ((int)b) & 0xff;
-    }
-
     /**
      * Access to the underlying bytes data
      * @return the whole input
@@ -79,7 +79,7 @@ public class RlpReader {
             return new Current(RlpType.NONE, input);
         }
         byte b0 = input[position];
-        int i0 = unsigned(b0);
+        int i0 = Byte.toUnsignedInt(b0);
         position++;
         // the data is a string if the range of the first byte(i.e. prefix)
         // is [0x00, 0x7f], and the string is the first byte itself exactly;
@@ -152,7 +152,7 @@ public class RlpReader {
 
     /**
      *
-     * @return true if input is read fulluy
+     * @return true if input is read fully
      */
     public boolean isConsumed() {
         return position >= limit;
@@ -288,23 +288,29 @@ public class RlpReader {
             throw new IllegalStateException("Next item is not list: " + current.type);
         }
         RlpReader list = current.list;
+        assert list != null;
         current = null;
         return list;
     }
 
     private static class Current {
         RlpType type;
-        byte[] data;
-        RlpReader list;
+        final byte[] data;
+        final @Nullable RlpReader list;
 
         Current(RlpType type, byte[] data) {
             this.type = type;
             this.data = data;
+            this.list = null;
         }
 
         Current(RlpType type, RlpReader list) {
+            if (type != RlpType.LIST) {
+                throw new IllegalArgumentException("Only LIST type is allowed here");
+            }
             this.type = type;
             this.list = list;
+            this.data = new byte[] {};
         }
     }
 }

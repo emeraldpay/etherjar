@@ -17,6 +17,8 @@
 
 package io.emeraldpay.etherjar.domain;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,6 +28,7 @@ import java.util.Objects;
 /**
  * Wei amount.
  */
+@NullMarked
 public class Wei implements Serializable, Comparable<Wei> {
 
     /**
@@ -43,9 +46,9 @@ public class Wei implements Serializable, Comparable<Wei> {
         KETHER("Kether", 21),
         METHER("Mether", 24);
 
-        private String name;
+        private final String name;
 
-        private int scale;
+        private final int scale;
 
         /**
          * @param name  a unit name
@@ -125,13 +128,10 @@ public class Wei implements Serializable, Comparable<Wei> {
      *
      * @param value string representation of the amount
      * @return parsed value or exception
-     * @throws IllegalArgumentException if passed value is null or not hex
+     * @throws IllegalArgumentException if passed value is not hex
      */
     public static Wei fromHex(String value) {
-        //TODO return null?
-        if (value == null) {
-            throw new IllegalArgumentException("Null Amount");
-        }
+        Objects.requireNonNull(value);
         boolean isNegative = false;
         if (value.startsWith("-")) {
             isNegative = true;

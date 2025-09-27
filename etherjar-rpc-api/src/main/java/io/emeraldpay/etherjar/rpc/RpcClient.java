@@ -18,6 +18,9 @@
 
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface RpcClient<RESP, BI extends BatchItem, REQ extends Batch<BI>> {
 
     RESP execute(REQ batch);

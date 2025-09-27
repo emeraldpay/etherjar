@@ -15,12 +15,16 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +34,7 @@ import java.util.function.Function;
  * An implementation for the {@link RpcTransport} that uses a provided <code>Function&lt;String, InputStream&gt;</code> to get a response.
  * The function may respond with a hard-coded values, or dispatch the call to actual RPC. It supposed to be used in a testing environment.
  */
+@NullMarked
 public class InMemoryRpcTransport extends AbstractRpcTransport {
 
     private final Function<String, InputStream> delegate;
@@ -53,8 +58,11 @@ public class InMemoryRpcTransport extends AbstractRpcTransport {
     }
 
     public static class Builder {
+        @Nullable
         private Function<String, InputStream> delegate;
+        @Nullable
         private ExecutorService executorService;
+        @Nullable
         private RpcConverter rpcConverter;
 
         public Builder respondWithInputStream(Function<String, InputStream> delegate) {
@@ -103,9 +111,7 @@ public class InMemoryRpcTransport extends AbstractRpcTransport {
             if (rpcConverter == null) {
                 rpcConverter = new JacksonRpcConverter();
             }
-            if (delegate == null) {
-                throw new NullPointerException("Response Function is null");
-            }
+            Objects.requireNonNull(delegate);
 
             return new InMemoryRpcTransport(delegate, executorService, rpcConverter);
         }

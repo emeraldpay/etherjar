@@ -195,6 +195,6 @@ class DefaultCoroutineRpcClientTest : ShouldSpec({
         responses[0].isSuccessful shouldBe true
         responses[0].value shouldBe "Geth/v1.10.0"
         responses[1].isError shouldBe true
-        responses[1].error.rpcMessage shouldBe "Invalid params"
+        responses[1].error!!.rpcMessage shouldBe "Invalid params"
     }
 })

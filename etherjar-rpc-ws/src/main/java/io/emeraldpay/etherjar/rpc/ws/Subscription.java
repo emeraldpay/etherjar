@@ -23,6 +23,8 @@ import io.emeraldpay.etherjar.rpc.RequestJson;
 import io.emeraldpay.etherjar.rpc.json.TransactionRefJson;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -31,12 +33,15 @@ import java.util.*;
  *
  * @author Igor Artamonov
  */
+@NullMarked
 public abstract class Subscription<T> {
 
-    private List params;
+    private final List params;
 
-    private List<SubscriptionListener<T>> listeners = new ArrayList<>();
+    private final List<SubscriptionListener<T>> listeners = new ArrayList<>();
+    @Nullable
     private Channel channel;
+    @Nullable
     private String id;
 
     protected Subscription(List params) {
@@ -56,14 +61,17 @@ public abstract class Subscription<T> {
 
     public void stop(ObjectMapper objectMapper, Integer requestId) throws JsonProcessingException {
         RequestJson<Integer> json = new RequestJson<>("eth_unsubscribe", Collections.singletonList(id), requestId);
-        channel.write(new TextWebSocketFrame(objectMapper.writeValueAsString(json)));
-        channel.flush();
+        if (channel != null) {
+            channel.write(new TextWebSocketFrame(objectMapper.writeValueAsString(json)));
+            channel.flush();
+        }
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
+    @Nullable
     public String getId() {
         return id;
     }
@@ -83,7 +91,7 @@ public abstract class Subscription<T> {
      *
      * @param error error if closed as a result of error
      */
-    public void onClose(RpcResponseError error) {
+    public void onClose(@Nullable RpcResponseError error) {
         if (error != null) {
             System.err.println("Socket closed with " + error.getMessage());
         }

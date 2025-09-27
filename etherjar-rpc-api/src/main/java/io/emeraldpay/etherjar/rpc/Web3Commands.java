@@ -17,10 +17,12 @@ package io.emeraldpay.etherjar.rpc;
 
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Web3 commands
  */
+@NullMarked
 public class Web3Commands {
 
     /**

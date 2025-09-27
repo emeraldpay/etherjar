@@ -17,10 +17,12 @@ package io.emeraldpay.etherjar.rpc;
 
 import io.emeraldpay.etherjar.domain.TransactionId;
 import io.emeraldpay.etherjar.rpc.json.TraceItemJson;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Commands specific for Parity Ethereum
  */
+@NullMarked
 public class ParityCommands {
 
     /**

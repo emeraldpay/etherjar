@@ -27,22 +27,20 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.emeraldpay.etherjar.domain.Wei;
 import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.rpc.json.*;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@NullMarked
 public class JacksonRpcConverter implements RpcConverter {
 
     private final ObjectMapper objectMapper;
 
     public JacksonRpcConverter(ObjectMapper objectMapper) {
-        if (objectMapper == null) {
-            throw new IllegalArgumentException("objectMapper must be set");
-        }
+        Objects.requireNonNull(objectMapper);
         this.objectMapper = objectMapper;
     }
 

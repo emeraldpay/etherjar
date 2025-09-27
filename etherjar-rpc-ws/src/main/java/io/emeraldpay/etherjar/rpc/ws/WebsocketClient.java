@@ -28,6 +28,8 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManagerFactory;
@@ -45,17 +47,21 @@ import java.util.Base64;
  *
  * @author Igor Artamonov
  */
+@NullMarked
 public class WebsocketClient implements Closeable {
 
     private static final EventLoopGroup group = new NioEventLoopGroup();
+    @Nullable
     private SocketApiHandler socketApiHandler;
-    private URI upstream;
-    private URI origin;
+    private final URI upstream;
+    private final URI origin;
 
+    @Nullable
     private String username;
+    @Nullable
     private String password;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public static Builder newBuilder() {
         return new Builder();
@@ -181,12 +187,16 @@ public class WebsocketClient implements Closeable {
     public void onNewBlock(SubscriptionListener<BlockJson<TransactionRefJson>> listener) {
         Subscription<BlockJson<TransactionRefJson>> sub = new Subscription.Block(objectMapper);
         sub.addListener(listener);
-        this.socketApiHandler.subscribe(sub);
+        if (this.socketApiHandler != null) {
+            this.socketApiHandler.subscribe(sub);
+        }
     }
 
     @Override
     public void close() throws IOException {
-        socketApiHandler.stop();
+        if (socketApiHandler != null) {
+            socketApiHandler.stop();
+        }
     }
 
     /**
@@ -194,12 +204,17 @@ public class WebsocketClient implements Closeable {
      */
     public static class Builder {
 
+        @Nullable
         private URI address;
+        @Nullable
         private URI origin;
 
+        @Nullable
         private String username;
+        @Nullable
         private String password;
 
+        @Nullable
         private ObjectMapper objectMapper;
 
         /**

@@ -18,6 +18,7 @@ package io.emeraldpay.etherjar.rpc.http;
 import io.emeraldpay.etherjar.rpc.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.jspecify.annotations.NullMarked;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,12 +28,13 @@ import reactor.netty.http.client.HttpClient;
  * A transport which always executes calls as a single JSON RPC batch, e.x. by translating into
  * JSON Array and sending in a single request
  */
+@NullMarked
 public class BatchTransport implements ReactorRpcTransport {
 
-    private HttpClient httpClient;
-    private Mono<String> target;
-    private RpcConverter rpcConverter;
-    private BatchToString batchToString;
+    private final HttpClient httpClient;
+    private final Mono<String> target;
+    private final RpcConverter rpcConverter;
+    private final BatchToString batchToString;
 
     public BatchTransport(HttpClient httpClient, Mono<String> target, RpcConverter rpcConverter, BatchToString batchToString) {
         this.httpClient = httpClient;

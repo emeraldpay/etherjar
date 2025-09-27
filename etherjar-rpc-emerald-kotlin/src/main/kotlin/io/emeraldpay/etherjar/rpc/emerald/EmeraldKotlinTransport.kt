@@ -146,7 +146,7 @@ class EmeraldKotlinTransport(
         response: BlockchainOuterClass.NativeCallReplyItem
     ): ResponseJson<JS, Int> {
         val responseJson = ResponseJson<JS, Int>()
-        responseJson.id = response.id
+        responseJson.setId(response.id)
 
         if (response.succeed) {
             try {

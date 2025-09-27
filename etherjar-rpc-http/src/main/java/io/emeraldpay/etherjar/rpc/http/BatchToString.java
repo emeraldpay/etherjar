@@ -21,6 +21,7 @@ import io.emeraldpay.etherjar.rpc.RpcConverter;
 import io.emeraldpay.etherjar.rpc.RequestJson;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.jspecify.annotations.NullMarked;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,9 +32,10 @@ import java.util.function.Function;
 /**
  * Converts batch to JSON RPC request string
  */
+@NullMarked
 public class BatchToString {
 
-    private RpcConverter rpcConverter;
+    private final RpcConverter rpcConverter;
 
     public BatchToString(RpcConverter rpcConverter) {
         this.rpcConverter = rpcConverter;

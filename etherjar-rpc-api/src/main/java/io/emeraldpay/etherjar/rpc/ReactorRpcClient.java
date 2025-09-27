@@ -15,9 +15,11 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@NullMarked
 public interface ReactorRpcClient extends RpcClient<Flux<RpcCallResponse>, ReactorBatch.ReactorBatchItem, ReactorBatch> {
 
     Flux<RpcCallResponse> execute(ReactorBatch batch);

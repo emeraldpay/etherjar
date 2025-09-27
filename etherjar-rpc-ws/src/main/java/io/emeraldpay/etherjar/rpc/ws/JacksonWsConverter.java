@@ -18,6 +18,7 @@ package io.emeraldpay.etherjar.rpc.ws;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.emeraldpay.etherjar.rpc.JacksonRpcConverter;
 import io.emeraldpay.etherjar.rpc.RpcResponseException;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
 
@@ -26,6 +27,7 @@ import java.io.IOException;
  *
  * @author Igor Artamonov
  */
+@NullMarked
 public class JacksonWsConverter extends JacksonRpcConverter {
 
     public SubscriptionJson readSubscription(String content) throws RpcResponseException {

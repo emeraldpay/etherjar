@@ -17,6 +17,9 @@
 
 package io.emeraldpay.etherjar.hex;
 
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,6 +35,7 @@ import java.util.stream.Stream;
 /**
  * Fixed size value, such as Wallet Address, represented in Hex.
  */
+@NullMarked
 public class HexData implements Serializable {
 
     /**
@@ -85,6 +89,7 @@ public class HexData implements Serializable {
      * @return parsed value
      */
     public static HexData from(String value) {
+        Objects.requireNonNull(value);
         if (value.isEmpty())
             throw new IllegalArgumentException("Empty hex value");
 
@@ -446,6 +451,7 @@ public class HexData implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <T> T[] asEncodedArray(Function<Hex32, T> converter) {
+        Objects.requireNonNull(converter);
         Hex32[] values = asEncodedArray();
         return (T[]) Arrays.stream(values).map(converter).toArray();
     }

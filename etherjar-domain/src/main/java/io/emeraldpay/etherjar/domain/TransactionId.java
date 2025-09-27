@@ -19,12 +19,15 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.Hex32;
 import io.emeraldpay.etherjar.hex.HexData;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Transaction Hash value
  */
+@NullMarked
 public class TransactionId extends Hex32 implements Comparable<TransactionId> {
 
     public static final int SIZE_BYTES = 32;
@@ -41,9 +44,6 @@ public class TransactionId extends Hex32 implements Comparable<TransactionId> {
      * @return TransactionId
      */
     public static TransactionId from(byte[] value) {
-        if (value == null) {
-            throw new NullPointerException("Null value provided as Transaction ID");
-        }
         if (value.length != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid Tx length: " + value.length);
         }
@@ -57,9 +57,7 @@ public class TransactionId extends Hex32 implements Comparable<TransactionId> {
      * @return instance of it
      */
     public static TransactionId from(Hex32 value) {
-        if (value == null) {
-            throw new NullPointerException("Null value provided as Transaction ID");
-        }
+        Objects.requireNonNull(value);
         return new TransactionId(value.getBytes());
     }
 
@@ -70,9 +68,7 @@ public class TransactionId extends Hex32 implements Comparable<TransactionId> {
      * @return TransactionId
      */
     public static TransactionId from(String value) {
-        if (value == null) {
-            throw new NullPointerException("Null value provided as Transaction ID");
-        }
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid Tx length: " + value.length());
         }

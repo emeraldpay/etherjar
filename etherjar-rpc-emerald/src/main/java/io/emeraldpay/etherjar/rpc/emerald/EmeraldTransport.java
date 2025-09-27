@@ -22,13 +22,14 @@ import io.emeraldpay.api.proto.BlockchainGrpc;
 import io.emeraldpay.api.proto.BlockchainOuterClass;
 import io.emeraldpay.api.proto.Common;
 import io.emeraldpay.api.Chain;
-import io.emeraldpay.api.proto.ReactorBlockchainGrpc;
 import io.grpc.*;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
 import io.emeraldpay.etherjar.rpc.ResponseJson;
 import io.emeraldpay.etherjar.rpc.RpcTransport;
 import io.netty.handler.ssl.SslContextBuilder;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
@@ -39,6 +40,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import static io.emeraldpay.api.proto.BlockchainOuterClass.*;
 
 /**
  * RPC Transport over gRPC for Emerald API compatible servers (such as Emerald Dshackle)
@@ -54,6 +57,7 @@ import java.util.function.Function;
  * RpcClient client = new DefaultRpcClient(transport);
  * </code></pre>
  */
+@NullMarked
 public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
 
     private final BlockchainGrpc.BlockchainBlockingStub blockingStub;
@@ -65,7 +69,8 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     private final JacksonRpcConverter rpcConverter;
     private final ExecutorService executorService;
     private final Common.ChainRef chainRef;
-    private BlockchainOuterClass.Selector selector;
+
+    private BlockchainOuterClass.@Nullable  Selector  selector;
 
     public EmeraldTransport(BlockchainGrpc.BlockchainBlockingStub stub,
                             ObjectMapper objectMapper,
@@ -133,14 +138,14 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
      *
      * @return new instance of EmeraldGrpcTransport configured with new selector
      */
-    public EmeraldTransport copyWithSelector(BlockchainOuterClass.Selector selector) {
+    public EmeraldTransport copyWithSelector(@Nullable Selector selector) {
         EmeraldTransport copy = new EmeraldTransport(blockingStub, objectMapper, rpcConverter, executorService, chainRef);
         copy.selector = selector;
         return copy;
     }
 
-    public BlockchainOuterClass.NativeCallRequest convert(List<DefaultBatch.FutureBatchItem> items, Map<Integer, DefaultBatch.FutureBatchItem> idMapping) {
-        final BlockchainOuterClass.NativeCallRequest.Builder req = BlockchainOuterClass.NativeCallRequest.newBuilder();
+    public NativeCallRequest convert(List<DefaultBatch.FutureBatchItem> items, Map<Integer, DefaultBatch.FutureBatchItem> idMapping) {
+        final NativeCallRequest.Builder req = NativeCallRequest.newBuilder();
         req.setChain(chainRef);
         if (selector != null) {
             req.setSelector(selector);
@@ -155,7 +160,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                 throw new RuntimeException(e);
             }
             req.addItems(
-                BlockchainOuterClass.NativeCallItem.newBuilder()
+                NativeCallItem.newBuilder()
                     .setId(id)
                     .setMethod(item.getCall().getMethod())
                     .setPayload(ByteString.copyFromUtf8(json))
@@ -174,7 +179,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
         CompletableFuture<Iterable<RpcCallResponse>> f = new CompletableFuture<>();
         executorService.execute(() -> {
             final Map<Integer, DefaultBatch.FutureBatchItem> idMapping = new HashMap<>(items.size());
-            BlockchainOuterClass.NativeCallRequest req;
+            NativeCallRequest req;
             try {
                 req = convert(items, idMapping);
             } catch (Exception e) {
@@ -182,7 +187,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                 return;
             }
             List<RpcCallResponse> result = new ArrayList<>();
-            Iterator<BlockchainOuterClass.NativeCallReplyItem> responses;
+            Iterator<NativeCallReplyItem> responses;
             try {
                 responses = blockingStub.nativeCall(req);
                 responses.forEachRemaining((resp) -> {
@@ -203,16 +208,16 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
     }
 
     @SuppressWarnings("unchecked")
-    private RpcCallResponse convertUnchecked(DefaultBatch.FutureBatchItem request, BlockchainOuterClass.NativeCallReplyItem resp) {
+    private RpcCallResponse convertUnchecked(DefaultBatch.FutureBatchItem request, NativeCallReplyItem resp) {
         return convertToRpcResponse(request, resp);
     }
 
-    public <JS, RES> RpcCallResponse<JS, RES> convertToRpcResponse(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+    public <JS, RES> RpcCallResponse<JS, RES> convertToRpcResponse(DefaultBatch.FutureBatchItem<JS, RES> request, NativeCallReplyItem resp) {
         ResponseJson<JS, Integer> responseJson = convertToResponseJson(request, resp);
         return responseJsonConverter.convert(request.getCall(), responseJson);
     }
 
-    public <JS, RES> ResponseJson<JS, Integer> convertToResponseJson(DefaultBatch.FutureBatchItem<JS, RES> request, BlockchainOuterClass.NativeCallReplyItem resp) {
+    public <JS, RES> ResponseJson<JS, Integer> convertToResponseJson(DefaultBatch.FutureBatchItem<JS, RES> request, NativeCallReplyItem resp) {
         ResponseJson<JS, Integer> responseJson = new ResponseJson<>();
         if (resp.getSucceed()) {
             try {
@@ -249,21 +254,30 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
 
     public static class Builder {
 
+        @Nullable
         private NettyChannelBuilder channelBuilder;
 
+        @Nullable
         private Function<NettyChannelBuilder, ManagedChannelBuilder<?>> channelUpdate;
 
         private boolean useLoadBalancing = true;
 
+        @Nullable
         private SslContextBuilder sslContextBuilder;
+        @Nullable
         private Channel channel;
-        private BlockchainGrpc.BlockchainBlockingStub stub;
+        private BlockchainGrpc.@Nullable BlockchainBlockingStub stub;
+        @Nullable
         private ClientInterceptor[] interceptors;
 
+        @Nullable
         private ObjectMapper objectMapper;
+        @Nullable
         private JacksonRpcConverter rpcConverter;
+        @Nullable
         private ExecutorService executorService;
 
+        @Nullable
         private Chain chain;
 
         /**
@@ -514,6 +528,7 @@ public class EmeraldTransport implements RpcTransport<DefaultBatch.FutureBatchIt
                     stub = stub.withInterceptors(interceptors);
                 }
             }
+            Objects.requireNonNull(stub);
             if (executorService == null) {
                 threadsCount(2);
             }

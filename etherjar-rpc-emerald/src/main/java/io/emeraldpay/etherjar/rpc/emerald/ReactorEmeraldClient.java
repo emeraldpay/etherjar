@@ -27,13 +27,12 @@ import io.grpc.ClientInterceptor;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.GrpcSslContexts;
-import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
 import io.emeraldpay.etherjar.rpc.*;
 import io.emeraldpay.etherjar.rpc.ResponseJson;
-import io.netty.handler.ssl.ApplicationProtocolConfig;
-import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.SslContextBuilder;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,9 +41,11 @@ import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 
+@NullMarked
 public class ReactorEmeraldClient extends AbstractReactorRpcClient implements ReactorRpcClient {
 
     private final ReactorBlockchainGrpc.ReactorBlockchainStub stub;
@@ -52,7 +53,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
     private final ObjectMapper objectMapper;
     private final JacksonRpcConverter rpcConverter;
     private final Common.ChainRef chainRef;
-    private BlockchainOuterClass.Selector selector;
+    private BlockchainOuterClass.@Nullable  Selector selector;
 
     ResponseJsonConverter responseJsonConverter = new ResponseJsonConverter();
 
@@ -172,7 +173,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
         return result;
     }
 
-    public <JS, RES> Mono<ResponseJson<JS, Integer>> read(BlockchainOuterClass.NativeCallReplyItem item, RpcCall<JS, RES> call) {
+    public <JS, RES> Mono<ResponseJson<JS, Integer>> read(BlockchainOuterClass.NativeCallReplyItem item, @Nullable RpcCall<JS, RES> call) {
         ResponseJson<JS, Integer> result = new ResponseJson<>();
         if (call != null) {
             result.setId(item.getId());
@@ -207,16 +208,23 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
 
     public static class Builder {
 
+        @Nullable
         private NettyChannelBuilder channelBuilder;
+        @Nullable
         private SslContextBuilder sslContextBuilder;
+        @Nullable
         private Channel channel;
 
-        private ReactorBlockchainGrpc.ReactorBlockchainStub stub;
+        private ReactorBlockchainGrpc.@Nullable ReactorBlockchainStub stub;
+        @Nullable
         private ClientInterceptor[] interceptors;
 
+        @Nullable
         private ObjectMapper objectMapper;
+        @Nullable
         private JacksonRpcConverter rpcConverter;
 
+        @Nullable
         private Chain chain;
 
         /**
@@ -425,6 +433,7 @@ public class ReactorEmeraldClient extends AbstractReactorRpcClient implements Re
                     stub = stub.withInterceptors(interceptors);
                 }
             }
+            Objects.requireNonNull(stub);
             if (objectMapper == null) {
                 objectMapper = new ObjectMapper();
             }

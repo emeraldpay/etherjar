@@ -59,10 +59,10 @@ class CoroutineBatch(
             val response = responseMap[index]
             if (response != null) {
                 if (response.isError) {
-                    item.onError(response.error)
+                    item.onError(response.error!!)
                 } else {
                     @Suppress("UNCHECKED_CAST")
-                    (item as CoroutineBatchItem<Any, Any>).onResult(response.value)
+                    (item as CoroutineBatchItem<Any, Any>).onResult(response.value!!)
                 }
             }
         }

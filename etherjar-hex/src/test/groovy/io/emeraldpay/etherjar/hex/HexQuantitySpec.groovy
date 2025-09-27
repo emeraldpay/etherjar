@@ -97,28 +97,28 @@ class HexQuantitySpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    def "Return null for null input"() {
+    def "Error for null input"() {
         when:
-        def act = HexQuantity.from((Long)null)
+        HexQuantity.from((Long)null)
         then:
-        act == null
+        thrown(NullPointerException)
 
         when:
-        act = HexQuantity.from((BigInteger)null)
+        HexQuantity.from((BigInteger)null)
         then:
-        act == null
+        thrown(NullPointerException)
 
         when:
-        act = HexQuantity.from((String)null)
+        HexQuantity.from((String)null)
         then:
-        act == null
+        thrown(NullPointerException)
     }
 
-    def "Unable to create from null"() {
+    def "Error when create from null"() {
         when:
         new HexQuantity(null)
         then:
-        thrown(IllegalArgumentException)
+        thrown(NullPointerException)
     }
 
 

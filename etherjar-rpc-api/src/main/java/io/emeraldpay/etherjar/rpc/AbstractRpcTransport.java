@@ -16,6 +16,7 @@
 package io.emeraldpay.etherjar.rpc;
 
 import com.fasterxml.jackson.databind.JavaType;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Base implementation for a {@link RpcTransport}
  */
+@NullMarked
 abstract public class AbstractRpcTransport implements RpcTransport<DefaultBatch.FutureBatchItem> {
 
     private final ExecutorService executorService;

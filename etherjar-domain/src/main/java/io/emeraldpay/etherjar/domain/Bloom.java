@@ -2,11 +2,14 @@ package io.emeraldpay.etherjar.domain;
 
 import io.emeraldpay.etherjar.hex.HexData;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
+@NullMarked
 public class Bloom extends HexData {
 
     public static final int SIZE_BYTES = 256;
@@ -17,9 +20,7 @@ public class Bloom extends HexData {
     }
 
     public static Bloom from(HexData value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null input value");
-        }
+        Objects.requireNonNull(value);
         if (value.getSize() != SIZE_BYTES) {
             throw new IllegalArgumentException("Invalid input length: " + value.getSize() + " != " + SIZE_BYTES);
         }
@@ -27,9 +28,7 @@ public class Bloom extends HexData {
     }
 
     public static Bloom from(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Null input value");
-        }
+        Objects.requireNonNull(value);
         if (value.length() != SIZE_HEX) {
             throw new IllegalArgumentException("Invalid input length: " + value.length() + " != " + SIZE_HEX);
         }
@@ -41,6 +40,7 @@ public class Bloom extends HexData {
     }
 
     public Bloom mergeWith(Bloom another) {
+        Objects.requireNonNull(value);
         byte[] result = new byte[SIZE_BYTES];
         for (int i = 0; i < SIZE_BYTES; i++) {
             result[i] = (byte)(this.value[i] | another.value[i]);

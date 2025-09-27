@@ -58,10 +58,23 @@ class MethodIdSpec extends Specification {
 
         where:
         _ | invalid_bytes
-        _ | null
         _ | []
         _ | [0x00]
         _ | [0x00, 0x01, 0x00, 0x00, 0xFF]
+    }
+
+    def "check from null"() {
+        when:
+        MethodId.from(null as byte[])
+
+        then:
+        thrown(NullPointerException)
+
+        when:
+        MethodId.from(null as String)
+
+        then:
+        thrown(NullPointerException)
     }
 
     def "check from invalid string"() {
@@ -73,7 +86,6 @@ class MethodIdSpec extends Specification {
 
         where:
         _ | invalid_string
-        _ | null
         _ | '123'
         _ | '-850932852093457982375'
     }
@@ -110,14 +122,16 @@ class MethodIdSpec extends Specification {
 
     def "extract from input - none"() {
         when:
-        MethodId id = MethodId.fromInput(null)
+        MethodId.fromInput(HexData.from('0x'))
         then:
-        id == null
+        thrown(IllegalArgumentException)
+    }
 
+    def "extract from input - null"() {
         when:
-        id = MethodId.fromInput(HexData.from('0x'))
+        MethodId.fromInput(null)
         then:
-        id == null
+        thrown(NullPointerException)
     }
 
     def "extract from input - just method"() {

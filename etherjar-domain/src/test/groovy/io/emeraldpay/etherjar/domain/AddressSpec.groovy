@@ -123,12 +123,12 @@ class AddressSpec extends Specification {
         when:
         Address.from null as String
         then:
-        thrown IllegalArgumentException
+        thrown NullPointerException
 
         when:
         Address.from(null as byte[])
         then:
-        thrown IllegalArgumentException
+        thrown NullPointerException
 
         when:
         Address.from ''

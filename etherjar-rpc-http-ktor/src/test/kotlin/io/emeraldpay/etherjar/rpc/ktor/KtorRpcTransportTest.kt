@@ -120,8 +120,8 @@ class KtorRpcTransportTest : ShouldSpec({
         // Then
         responses shouldHaveSize 1
         responses[0].isError shouldBe true
-        responses[0].error.error.code shouldBe RpcResponseError.CODE_METHOD_NOT_EXIST
-        responses[0].error.rpcMessage shouldBe "Method not found"
+        responses[0].error!!.error.code shouldBe RpcResponseError.CODE_METHOD_NOT_EXIST
+        responses[0].error!!.rpcMessage shouldBe "Method not found"
 
         transport.close()
         mockClient.close()
@@ -144,8 +144,8 @@ class KtorRpcTransportTest : ShouldSpec({
         // Then
         responses shouldHaveSize 1
         responses[0].isError shouldBe true
-        responses[0].error.error.code shouldBe RpcResponseError.CODE_INTERNAL_ERROR
-        responses[0].error.rpcMessage shouldBe "HTTP error: 500 Internal Server Error"
+        responses[0].error!!.error.code shouldBe RpcResponseError.CODE_INTERNAL_ERROR
+        responses[0].error!!.rpcMessage shouldBe "HTTP error: 500 Internal Server Error"
 
         transport.close()
         mockClient.close()
@@ -176,8 +176,8 @@ class KtorRpcTransportTest : ShouldSpec({
         responses[0].isSuccessful shouldBe true
         responses[0].value shouldBe "Geth/v1.10.0"
         responses[1].isError shouldBe true
-        responses[1].error.error.code shouldBe RpcResponseError.CODE_INVALID_METHOD_PARAMS
-        responses[1].error.rpcMessage shouldBe "Invalid params"
+        responses[1].error!!.error.code shouldBe RpcResponseError.CODE_INVALID_METHOD_PARAMS
+        responses[1].error!!.rpcMessage shouldBe "Invalid params"
 
         transport.close()
         mockClient.close()
@@ -209,8 +209,8 @@ class KtorRpcTransportTest : ShouldSpec({
         // Then
         responses shouldHaveSize 1
         responses[0].isError shouldBe true
-        responses[0].error.error.code shouldBe RpcResponseError.CODE_INTERNAL_ERROR
-        responses[0].error.rpcMessage shouldBe "Request failed: Network connection failed"
+        responses[0].error!!.error.code shouldBe RpcResponseError.CODE_INTERNAL_ERROR
+        responses[0].error!!.rpcMessage shouldBe "Request failed: Network connection failed"
 
         transport.close()
         mockClient.close()
