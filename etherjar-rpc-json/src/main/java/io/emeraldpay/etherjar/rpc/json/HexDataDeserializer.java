@@ -24,6 +24,9 @@ public class HexDataDeserializer extends StdDeserializer<HexData> {
             if ("0x".equals(value)) {
                 return null;
             }
+            if ("".equals(value)) {
+                return null;
+            }
             try {
                 return HexData.from(value);
             } catch (Throwable t) {
