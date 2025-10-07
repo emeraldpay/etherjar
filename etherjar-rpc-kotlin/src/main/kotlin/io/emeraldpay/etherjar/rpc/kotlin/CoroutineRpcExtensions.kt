@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.flow
 
 suspend inline fun <JS, RES> CoroutineRpcClient.execute(
     callBuilder: () -> RpcCall<JS, RES>
-): RES = execute(callBuilder())
+): RES? = execute(callBuilder())
 
 suspend inline fun CoroutineRpcClient.batch(
     builder: CoroutineBatch.() -> Unit
@@ -32,6 +32,6 @@ suspend inline fun CoroutineRpcClient.batch(
     return batch.executeAndGetResults()
 }
 
-fun <JS, RES> CoroutineRpcClient.executeAsFlow(call: RpcCall<JS, RES>): Flow<RES> = flow {
+fun <JS, RES> CoroutineRpcClient.executeAsFlow(call: RpcCall<JS, RES>): Flow<RES?> = flow {
     emit(execute(call))
 }

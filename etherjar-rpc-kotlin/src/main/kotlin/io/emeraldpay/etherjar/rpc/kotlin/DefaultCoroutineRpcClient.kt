@@ -25,7 +25,7 @@ class DefaultCoroutineRpcClient(
     private val transport: CoroutineRpcTransport
 ) : CoroutineRpcClient {
 
-    override suspend fun <JS, RES> execute(call: RpcCall<JS, RES>): RES {
+    override suspend fun <JS, RES> execute(call: RpcCall<JS, RES>): RES? {
         val batch = createBatch()
         val item = batch.add(call)
 
@@ -36,7 +36,7 @@ class DefaultCoroutineRpcClient(
             throw response.error!!
         } else {
             @Suppress("UNCHECKED_CAST")
-            response.value as RES
+            response.value as RES?
         }
     }
 
@@ -44,7 +44,7 @@ class DefaultCoroutineRpcClient(
         return batch.execute()
     }
 
-    override fun <JS, RES> executeFlow(call: RpcCall<JS, RES>): Flow<RES> = flow {
+    override fun <JS, RES> executeFlow(call: RpcCall<JS, RES>): Flow<RES?> = flow {
         emit(execute(call))
     }
 

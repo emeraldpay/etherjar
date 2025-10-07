@@ -15,11 +15,15 @@
  */
 package io.emeraldpay.etherjar.rpc;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.concurrent.CompletableFuture;
 
+@NullMarked
 public abstract class AbstractFuturesRpcClient implements FuturesRpcClient {
 
-    public <JS, RES> CompletableFuture<RES> execute(RpcCall<JS, RES> call) {
+    public <JS, RES> CompletableFuture<@Nullable RES> execute(RpcCall<JS, RES> call) {
         DefaultBatch batch = new DefaultBatch();
         DefaultBatch.FutureBatchItem<JS, RES> result = batch.add(call);
         this.execute(batch);

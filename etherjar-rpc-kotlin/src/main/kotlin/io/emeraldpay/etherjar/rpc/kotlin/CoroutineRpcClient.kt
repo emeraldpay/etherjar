@@ -22,11 +22,11 @@ import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
 
 interface CoroutineRpcClient : Closeable {
-    suspend fun <JS, RES> execute(call: RpcCall<JS, RES>): RES
+    suspend fun <JS, RES> execute(call: RpcCall<JS, RES>): RES?
 
     suspend fun execute(batch: CoroutineBatch): List<RpcCallResponse<*, *>>
 
-    fun <JS, RES> executeFlow(call: RpcCall<JS, RES>): Flow<RES>
+    fun <JS, RES> executeFlow(call: RpcCall<JS, RES>): Flow<RES?>
 
     fun executeFlow(batch: CoroutineBatch): Flow<RpcCallResponse<*, *>>
 
