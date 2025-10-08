@@ -101,16 +101,26 @@ public class HexData implements Serializable {
             return empty();
         }
 
-        byte[] bytes = parseHex(value);
+        byte[] bytes = parseHex(2, value);
         return new HexData(bytes);
     }
 
-    private static byte[] parseHex(String value) {
+    public static HexData fromDirect(String value) {
+        Objects.requireNonNull(value);
+
+        if (value.isEmpty()) {
+            return empty();
+        }
+
+        byte[] bytes = parseHex(0, value);
+        return new HexData(bytes);
+    }
+
+    private static byte[] parseHex(int inputPos, String value) {
         int length = value.length();
         boolean isFullBytes = length % 2 == 0;
 
-        byte[] bytes = new byte[(length + 1 - 2) / 2];
-        int inputPos = 2; // skip '0x'
+        byte[] bytes = new byte[(length + 1 - inputPos) / 2];
         int outputPos = 0;
 
         if (!isFullBytes) {

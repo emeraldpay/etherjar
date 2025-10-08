@@ -23,6 +23,7 @@ import io.emeraldpay.etherjar.hex.HexData;
 import io.emeraldpay.etherjar.hex.HexQuantity;
 import io.emeraldpay.etherjar.rpc.json.*;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class EthCommands {
@@ -345,7 +346,7 @@ public class EthCommands {
     }
 
     /**
-     * Executes a new message call immediately without creating a transaction on the block chain.
+     * Executes a new message call immediately without creating a transaction on the blockchain.
      *
      * @param call the transaction call object
      * @param block target block
@@ -353,6 +354,43 @@ public class EthCommands {
      */
     public RpcCall<String, HexData> call(TransactionCallJson call, BlockTag block) {
         return RpcCall.create("eth_call", call, block.getCode()).converted(HexData.class, HexData::from);
+    }
+
+    /**
+     * Executes a new message call immediately without creating a transaction on the blockchain.
+     *
+     * @param call the transaction call object
+     * @param block target block height
+     * @return return value of executed contract
+     */
+    public RpcCall<String, HexData> call(TransactionCallJson call, Long block) {
+        return RpcCall.create("eth_call", call, HexQuantity.from(block).toHex()).converted(HexData.class, HexData::from);
+    }
+
+    /**
+     * Executes a new message call immediately without creating a transaction on the blockchain.
+     *
+     * @param call the transaction call object
+     * @param block target block
+     * @param stateOverride state override object
+     * @param blockOverrides block override object
+     * @return return value of executed contract
+     */
+    public RpcCall<String, HexData> call(TransactionCallJson call, BlockTag block, @Nullable StateOverrideJson stateOverride, @Nullable BlockOverridesJson blockOverrides) {
+        return RpcCall.create("eth_call", block, call, stateOverride, blockOverrides).converted(HexData.class, HexData::from);
+    }
+
+    /**
+     * Executes a new message call immediately without creating a transaction on the blockchain.
+     *
+     * @param call the transaction call object
+     * @param block target block height
+     * @param stateOverride state override object
+     * @param blockOverrides block override object
+     * @return return value of executed contract
+     */
+    public RpcCall<String, HexData> call(TransactionCallJson call, Long block, @Nullable StateOverrideJson stateOverride, @Nullable BlockOverridesJson blockOverrides) {
+        return RpcCall.create("eth_call", block, call, stateOverride, blockOverrides).converted(HexData.class, HexData::from);
     }
 
     /**
@@ -366,16 +404,6 @@ public class EthCommands {
         return RpcCall.create("eth_simulateV1", BlockSimulatedJson.class, payload, block.getCode()).asArray();
     }
 
-    /**
-     * Executes a new message call immediately without creating a transaction on the block chain.
-     *
-     * @param call the transaction call object
-     * @param block target block height
-     * @return return value of executed contract
-     */
-    public RpcCall<String, HexData> call(TransactionCallJson call, Long block) {
-        return RpcCall.create("eth_call", call, HexQuantity.from(block).toHex()).converted(HexData.class, HexData::from);
-    }
 
     /**
      * Creates new message call transaction or a contract creation, if the data.data field contains code.

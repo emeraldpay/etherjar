@@ -27,6 +27,7 @@ public class Commands {
     private static final Web3Commands web3 = new Web3Commands();
     private static final ParityCommands parity = new ParityCommands();
     private static final NetCommands net = new NetCommands();
+    private static final DebugCommands debug = new DebugCommands();
 
     /**
      *
@@ -58,6 +59,10 @@ public class Commands {
      */
     public static ParityCommands parity() {
         return parity;
+    }
+
+    public static DebugCommands debug() {
+        return debug;
     }
 
 }

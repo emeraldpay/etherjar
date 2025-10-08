@@ -148,6 +148,13 @@ class HexDataSpec extends Specification {
         HexData.from('0x0123456789abcdef') | 1    | 2      | HexData.from('0x45')
     }
 
+    def "should extract direct data"() {
+        when:
+        def act = HexData.fromDirect("0000000000000000000000000000000000000000000000000000000000000008")
+        then:
+        act == HexData.from("0x0000000000000000000000000000000000000000000000000000000000000008")
+    }
+
     def "should skip head data"() {
         when:
         def act = HexData.from(hex).skip(offset)

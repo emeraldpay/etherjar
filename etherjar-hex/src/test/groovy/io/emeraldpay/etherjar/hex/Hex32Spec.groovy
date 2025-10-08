@@ -4,6 +4,13 @@ import spock.lang.Specification
 
 class Hex32Spec extends Specification {
 
+    def "Parse Hex32"() {
+        when:
+        def act = HexData.from("0xefe39acb01aaae1060fd2711f388f99eb31efc11caab724e5c5d72307fe78d62")
+        then:
+        act.toHex() == "0xefe39acb01aaae1060fd2711f388f99eb31efc11caab724e5c5d72307fe78d62"
+    }
+
     def "Extend from Address"() {
         expect:
         Hex32.extendFrom(HexData.from(address)).toHex() == hex

@@ -5,10 +5,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import io.emeraldpay.etherjar.hex.HexQuantity;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Deserialize Long from Hex Quantity
@@ -36,5 +38,15 @@ public class HexLongDeserializer extends StdDeserializer<Long> {
             return null;
         }
         throw JsonMappingException.from(p,"Invalid HexQuantity type: " + token);
+    }
+
+    public static class FromKey extends KeyDeserializer {
+        @Override
+        public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+            if (key == null || key.isEmpty()) {
+                return null;
+            }
+            return Objects.requireNonNull(HexQuantity.from(key)).getValue().longValueExact();
+        }
     }
 }
