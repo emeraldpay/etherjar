@@ -33,9 +33,6 @@ class SyncingJsonSpec extends Specification {
         def act = jacksonRpcConverter.fromJson(new ByteArrayInputStream(json.getBytes()), SyncingJson)
         then:
         !act.syncing
-        act.currentBlock == null
-        act.highestBlock == null
-        act.startingBlock == null
     }
 
     def "Reads syncing"() {
@@ -56,5 +53,43 @@ class SyncingJsonSpec extends Specification {
         act.currentBlock == 902
         act.highestBlock == 1108
         act.startingBlock == 900
+    }
+
+    def "Reads syncing in Erigon"() {
+        setup:
+        def json = '{\n' +
+            '  "id":1,\n' +
+            '  "jsonrpc": "2.0",\n' +
+            '  "result": {' +
+            '    "currentBlock": "0x8f5a95",\n' +
+            '    "highestBlock": "0x8f5367",\n' +
+            '    "stages": [\n' +
+            '        {\n' +
+            '          "stage_name": "OtterSync",\n' +
+            '          "block_number": "0x8f5a95"\n' +
+            '        },\n' +
+            '        {\n' +
+            '          "stage_name": "Headers",\n' +
+            '          "block_number": "0x8f5a95"\n' +
+            '        }\n' +
+            '    ],\n' +
+            '    "startingBlock": "0x0"' +
+            '  }\n' +
+            '}'
+        when:
+        def act = jacksonRpcConverter.fromJson(new ByteArrayInputStream(json.getBytes()), SyncingJson)
+        then:
+        act.syncing
+        act.currentBlock == 0x8f5a95
+        act.highestBlock == 0x8f5367
+        act.startingBlock == 0
+        act instanceof SyncingJson.AtBlock
+        with (act as SyncingJson.AtBlock) {
+            stages.size() == 2
+            stages[0].stageName == "OtterSync"
+            stages[0].block == 0x8f5a95
+            stages[1].stageName == "Headers"
+            stages[1].block == 0x8f5a95
+        }
     }
 }

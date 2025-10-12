@@ -18,46 +18,110 @@ package io.emeraldpay.etherjar.rpc.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import java.util.List;
+
 // Uses a custom serialization because it's either a boolean or an object
 @JsonDeserialize(using = SyncingJsonDeserializer.class)
 @JsonSerialize(using = SyncingJsonSerializer.class)
-public class SyncingJson {
+public abstract class SyncingJson {
 
-    private boolean syncing;
+    abstract public boolean isSyncing();
 
-    private Long startingBlock;
-    private Long currentBlock;
-    private Long highestBlock;
+    abstract public Long getStartingBlock();
 
-    public boolean isSyncing() {
-        return syncing;
+    abstract public Long getCurrentBlock();
+
+    abstract public Long getHighestBlock();
+
+    static class Status extends SyncingJson {
+        private final boolean syncing;
+
+        public Status(boolean syncing) {
+            this.syncing = syncing;
+        }
+
+        @Override
+        public boolean isSyncing() {
+            return syncing;
+        }
+
+        @Override
+        public Long getStartingBlock() {
+            return 0L;
+        }
+        @Override
+        public Long getCurrentBlock() {
+            return null;
+        }
+        @Override
+        public Long getHighestBlock() {
+            return null;
+        }
     }
 
-    public void setSyncing(boolean syncing) {
-        this.syncing = syncing;
+    static class AtBlock extends SyncingJson {
+        private Long startingBlock;
+        private Long currentBlock;
+        private Long highestBlock;
+        private List<Stage> stages;
+
+        @Override
+        public boolean isSyncing() {
+            return true;
+        }
+
+        public Long getStartingBlock() {
+            return startingBlock;
+        }
+
+        public void setStartingBlock(Long startingBlock) {
+            this.startingBlock = startingBlock;
+        }
+
+        public Long getCurrentBlock() {
+            return currentBlock;
+        }
+
+        public void setCurrentBlock(Long currentBlock) {
+            this.currentBlock = currentBlock;
+        }
+
+        public Long getHighestBlock() {
+            return highestBlock;
+        }
+
+        public void setHighestBlock(Long highestBlock) {
+            this.highestBlock = highestBlock;
+        }
+
+        public List<Stage> getStages() {
+            return stages;
+        }
+
+        public void setStages(List<Stage> stages) {
+            this.stages = stages;
+        }
     }
 
-    public Long getStartingBlock() {
-        return startingBlock;
+    static class Stage {
+        private String stageName;
+        private Long block;
+
+        public String getStageName() {
+            return stageName;
+        }
+
+        public void setStageName(String stageName) {
+            this.stageName = stageName;
+        }
+
+        public Long getBlock() {
+            return block;
+        }
+
+        public void setBlock(Long block) {
+            this.block = block;
+        }
     }
 
-    public void setStartingBlock(Long startingBlock) {
-        this.startingBlock = startingBlock;
-    }
-
-    public Long getCurrentBlock() {
-        return currentBlock;
-    }
-
-    public void setCurrentBlock(Long currentBlock) {
-        this.currentBlock = currentBlock;
-    }
-
-    public Long getHighestBlock() {
-        return highestBlock;
-    }
-
-    public void setHighestBlock(Long highestBlock) {
-        this.highestBlock = highestBlock;
-    }
 }

@@ -21,21 +21,33 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
+import java.util.List;
 
 public class SyncingJsonDeserializer extends EtherJsonDeserializer<SyncingJson> {
 
     @Override
     public SyncingJson deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         JsonNode node = jp.readValueAsTree();
-        SyncingJson resp = new SyncingJson();
         if (node.isBoolean()) {
-            resp.setSyncing(node.asBoolean());
-        } else {
-            resp.setSyncing(true);
+            return new SyncingJson.Status(node.asBoolean());
+        } else if (node.isObject()) {
+            SyncingJson.AtBlock resp = new SyncingJson.AtBlock();
             resp.setStartingBlock(getLong(node, "startingBlock"));
             resp.setCurrentBlock(getLong(node, "currentBlock"));
             resp.setHighestBlock(getLong(node, "highestBlock"));
+            if (node.has("stages") && node.get("stages").isArray()) {
+                List<SyncingJson.Stage> stages = new java.util.ArrayList<>();
+                for (JsonNode stageNode : node.get("stages")) {
+                    SyncingJson.Stage stage = new SyncingJson.Stage();
+                    stage.setStageName(stageNode.get("stage_name").asText());
+                    stage.setBlock(getLong(stageNode, "block_number"));
+                    stages.add(stage);
+                }
+                resp.setStages(stages);
+            }
+            return resp;
+        } else {
+            throw new IOException("Invalid syncing value: " + node);
         }
-        return resp;
     }
 }

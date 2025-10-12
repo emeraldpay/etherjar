@@ -26,11 +26,22 @@ public class SyncingJsonSerializer extends EtherJsonSerializer<SyncingJson> {
     public void serialize(SyncingJson value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value == null) {
             gen.writeNull();
-        } else if (value.isSyncing()) {
+        } else if (value instanceof SyncingJson.AtBlock) {
+            SyncingJson.AtBlock atBlock = (SyncingJson.AtBlock) value;
             gen.writeStartObject();
-            writeField(gen, "startingBlock", value.getStartingBlock());
-            writeField(gen, "currentBlock", value.getCurrentBlock());
-            writeField(gen, "highestBlock", value.getHighestBlock());
+            writeField(gen, "startingBlock", atBlock.getStartingBlock());
+            writeField(gen, "currentBlock", atBlock.getCurrentBlock());
+            writeField(gen, "highestBlock", atBlock.getHighestBlock());
+            if (atBlock.getStages() != null && !atBlock.getStages().isEmpty()) {
+                gen.writeArrayFieldStart("stages");
+                for (SyncingJson.Stage stage : atBlock.getStages()) {
+                    gen.writeStartObject();
+                    gen.writeStringField("stage_name", stage.getStageName());
+                    writeField(gen, "block_number", stage.getBlock());
+                    gen.writeEndObject();
+                }
+                gen.writeEndArray();
+            }
             gen.writeEndObject();
         } else {
             gen.writeBoolean(false);
