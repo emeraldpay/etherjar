@@ -140,15 +140,28 @@ public class ContractData {
     private static class Argument {
         private final boolean struct;
         private final List<Hex32> value;
+        /**
+         * When >= 0, this argument is a raw bytes value and this field holds the actual byte length
+         * (as opposed to the number of Hex32 slots). Used for ABI {@code bytes} type encoding.
+         */
+        private final int byteLength;
 
         public Argument(List<Hex32> value) {
             this.struct = true;
             this.value = value;
+            this.byteLength = -1;
+        }
+
+        public Argument(List<Hex32> value, int byteLength) {
+            this.struct = true;
+            this.value = value;
+            this.byteLength = byteLength;
         }
 
         public Argument(Hex32 value) {
             this.struct = false;
             this.value = Collections.singletonList(value);
+            this.byteLength = -1;
         }
 
         public boolean isStruct() {
@@ -157,6 +170,10 @@ public class ContractData {
 
         public List<Hex32> getValue() {
             return value;
+        }
+
+        public int getByteLength() {
+            return byteLength;
         }
     }
 
@@ -259,6 +276,31 @@ public class ContractData {
         }
 
         /**
+         * Add argument of ABI {@code bytes} type. The raw bytes are right-padded to 32-byte slots,
+         * and the length is encoded as the actual byte count (not the number of slots).
+         *
+         * @param data raw bytes
+         * @return builder
+         */
+        public Builder argumentBytes(byte[] data) {
+            int slots = (data.length + Hex32.SIZE_BYTES - 1) / Hex32.SIZE_BYTES;
+            if (slots == 0) {
+                slots = 1;
+            }
+            List<Hex32> values = new ArrayList<>(slots);
+            for (int i = 0; i < slots; i++) {
+                byte[] slot = new byte[Hex32.SIZE_BYTES];
+                int srcOffset = i * Hex32.SIZE_BYTES;
+                int len = Math.min(Hex32.SIZE_BYTES, data.length - srcOffset);
+                // right-pad: copy data at the beginning of each slot
+                System.arraycopy(data, srcOffset, slot, 0, len);
+                values.add(Hex32.from(slot));
+            }
+            arguments.add(new Argument(values, data.length));
+            return this;
+        }
+
+        /**
          * Add argument to the call
          *
          * @param value argument value, must be 32 bytes value
@@ -283,7 +325,10 @@ public class ContractData {
             for (Argument arg: arguments) {
                 if (arg.struct) {
                     base.add(Hex32.extendFrom(position * 32));
-                    structs.add(Hex32.extendFrom(Integer.toUnsignedLong(arg.value.size())));
+                    long length = arg.byteLength >= 0
+                        ? Integer.toUnsignedLong(arg.byteLength)
+                        : Integer.toUnsignedLong(arg.value.size());
+                    structs.add(Hex32.extendFrom(length));
                     structs.addAll(arg.value);
                     position += 1 + arg.value.size();
                 } else {
